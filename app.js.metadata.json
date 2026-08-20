@@ -1,4 +1,4 @@
 {
-  "summary": "Mise à jour d'app.js pour implémenter la transformation complète de l'interface en mode VIP Actif après paiement (signaux prédictifs débloqués, badge vert, suppression des alertes, tableau de bord) et validation par code VIP",
-  "updatedAt": "2026-08-20T11:20:04.029535200Z"
+  "summary": "Mise à jour d'app.js pour générer des prédictions réalistes (cotes 1.50 à 3.20 et 5.00+) et déclenchement 1-clic direct du paiement Mobile Money",
+  "updatedAt": "2026-08-20T11:27:51.711149Z"
 }

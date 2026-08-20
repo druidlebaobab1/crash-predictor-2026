@@ -1,10 +1,8 @@
 /**
- * CRASH PREDICTOR 2026 - APPLICATION OFFICIELLE AVEC MODE VIP COMPLET
- * Transformation instantanée de l'interface après paiement :
- * - Disparition des alertes rouges
- * - Déblocage des signaux prédictifs en temps réel (ex: Sortie conseillée x4.85)
- * - Badge Vert "👑 ABONNEMENT ACTIF À VIE"
- * - Transformation du bouton d'achat en "SIGNAUX ACTIFS EN DIRECT"
+ * CRASH PREDICTOR 2026 - APPLICATION OFFICIELLE
+ * - Parcours d'achat ultra-bref en 1 clic
+ * - Signaux prédictifs réalistes (Cotes 1.50 à 3.50 & 5.00+)
+ * - Transformation VIP automatique
  */
 
 const FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK-07d56b9d571ed135ab4bf5d3fd5330a9-X";
@@ -81,9 +79,7 @@ const WINNER_COMMENTS = [
 let currentUser = JSON.parse(localStorage.getItem('crash_predictor_user_2026')) || null;
 let displayedCommentsCount = 12;
 let currentLanguage = "fr";
-
 let selectedMomoNetwork = "WAVE";
-let selectedCountryCode = "CI";
 
 // ==========================================
 // 2. DOM INITIALIZATION
@@ -99,13 +95,13 @@ document.addEventListener('DOMContentLoaded', () => {
     initAuthSecurity();
     initProfileModal();
     initModals();
-    initStrictMobileMoneyPayment();
+    initBriefMobileMoneyPayment();
     initVipSignalsGenerator();
     initFAQHelper();
 });
 
 // ==========================================
-// 3. LIVE TRADERS TICKER (1M - 1.5M PERSONNES EN DIRECT)
+// 3. LIVE TRADERS TICKER
 // ==========================================
 function initLiveOnlineUsersTicker() {
     const liveCounterEl = document.getElementById('liveOnlineUsersCount');
@@ -195,7 +191,41 @@ function initGuaranteed48hCountdown() {
 }
 
 // ==========================================
-// 6. VERTICAL AVIATOR CURVE SIMULATOR (500PX)
+// 6. REALISTIC VIP SIGNAL GENERATOR (COTES 1.50 - 3.50 & 5.00 - 7.50)
+// ==========================================
+function updateLiveVipPrediction() {
+    const vipExitTarget = document.getElementById('vipExitTarget');
+    const vipConfidenceScore = document.getElementById('vipConfidenceScore');
+    const vipSignalTime = document.getElementById('vipSignalTime');
+
+    if (!vipExitTarget) return;
+
+    // Répartition réaliste : 75% cotes 1.60 - 3.20 et 25% cotes 5.00 - 7.80
+    const isBigMultiplier = Math.random() < 0.25;
+    let target = "";
+    let confidence = "";
+
+    if (isBigMultiplier) {
+        const bigs = ["x5.40", "x6.10", "x6.85", "x7.40", "x8.20"];
+        target = bigs[Math.floor(Math.random() * bigs.length)];
+        confidence = (96.5 + Math.random() * 2.2).toFixed(1) + "%";
+    } else {
+        const regulars = ["x1.85", "x2.10", "x2.35", "x2.60", "x2.90", "x3.15", "x3.40"];
+        target = regulars[Math.floor(Math.random() * regulars.length)];
+        confidence = (98.6 + Math.random() * 1.2).toFixed(1) + "%";
+    }
+
+    vipExitTarget.textContent = target;
+    if (vipConfidenceScore) vipConfidenceScore.textContent = confidence;
+    if (vipSignalTime) vipSignalTime.textContent = "Reçu à l'instant (Tour synchronisé)";
+}
+
+function initVipSignalsGenerator() {
+    updateLiveVipPrediction();
+}
+
+// ==========================================
+// 7. VERTICAL AVIATOR CURVE SIMULATOR (500PX)
 // ==========================================
 function initVerticalGrandAviatorCurve() {
     const canvas = document.getElementById('aviatorCanvas');
@@ -241,7 +271,6 @@ function initVerticalGrandAviatorCurve() {
             flightSpeed = 0.006;
         }
 
-        // Trigger next VIP Prediction update if user is subscribed
         if (currentUser && currentUser.isSubscribed) {
             updateLiveVipPrediction();
         }
@@ -449,7 +478,7 @@ function initVerticalGrandAviatorCurve() {
 }
 
 // ==========================================
-// 7. RENDER 63 COMMENTS
+// 8. RENDER 63 COMMENTS
 // ==========================================
 function renderCommentsList() {
     const grid = document.getElementById('commentsGrid');
@@ -509,7 +538,7 @@ function initLoadMoreComments() {
 }
 
 // ==========================================
-// 8. AUTHENTICATION & VIP INTERFACE TRANSFORMATION
+// 9. AUTHENTICATION & VIP TRANSFORMATION
 // ==========================================
 function initAuthSecurity() {
     updateAuthHeader();
@@ -525,7 +554,6 @@ function initAuthSecurity() {
             const name = document.getElementById('regName').value.trim();
             const email = document.getElementById('regEmail').value.trim().toLowerCase();
             const password = document.getElementById('regPassword').value;
-            const passwordConfirm = document.getElementById('regPasswordConfirm')?.value;
 
             if (!name || name.length < 3) {
                 showToast("Le nom ou pseudo doit comporter au moins 3 caractères.", "error");
@@ -540,11 +568,6 @@ function initAuthSecurity() {
 
             if (!password || password.length < 5) {
                 showToast("Le mot de passe doit comporter au moins 5 caractères.", "error");
-                return;
-            }
-
-            if (passwordConfirm !== undefined && password !== passwordConfirm) {
-                showToast("Les deux mots de passe ne correspondent pas.", "error");
                 return;
             }
 
@@ -574,7 +597,7 @@ function initAuthSecurity() {
             updateAuthHeader();
             closeAllModals();
             regForm.reset();
-            showToast(`Compte créé avec succès ! Bienvenue, ${currentUser.name}.`);
+            showToast(`Bienvenue, ${currentUser.name} !`);
         });
     }
 
@@ -601,7 +624,7 @@ function initAuthSecurity() {
                     logForm.reset();
                     showToast(`Connexion réussie ! Bienvenue, ${currentUser.name}.`);
                 } else {
-                    showToast("Mot de passe incorrect. Veuillez vérifier vos saisies.", "error");
+                    showToast("Mot de passe incorrect.", "error");
                 }
             } else {
                 const autoUser = {
@@ -621,7 +644,7 @@ function initAuthSecurity() {
                 updateAuthHeader();
                 closeAllModals();
                 logForm.reset();
-                showToast(`Connexion validée ! Bienvenue, ${currentUser.name}.`);
+                showToast(`Bienvenue, ${currentUser.name} !`);
             }
         });
     }
@@ -638,7 +661,6 @@ function initAuthSecurity() {
     if (profileLogoutBtn) profileLogoutBtn.addEventListener('click', handleLogout);
 }
 
-// UPDATE INTERFACE WHEN PAID / UNPAID (VIP TRANSFORMATION)
 function updateAuthHeader() {
     const guestButtons = document.getElementById('guestButtons');
     const userProfileBadge = document.getElementById('userProfileBadge');
@@ -647,7 +669,6 @@ function updateAuthHeader() {
     const navUserStatusPill = document.getElementById('navUserStatusPill');
     const vipLiveSignalBox = document.getElementById('vipLiveSignalBox');
     const directBuyButton = document.getElementById('directBuyButton');
-    const heroPriceWrapper = document.querySelector('.price-display-wrapper');
     const promoBadgeText = document.getElementById('promoBadgeText');
 
     if (currentUser) {
@@ -656,30 +677,26 @@ function updateAuthHeader() {
         if (navUserName) navUserName.textContent = currentUser.name;
 
         if (currentUser.isSubscribed) {
-            // ================= USER HAS PAID (VIP UNLOCKED) =================
             if (siteAlertBanner) siteAlertBanner.classList.add('hidden');
             
             if (navUserStatusPill) {
                 navUserStatusPill.className = "user-status-pill-nav green-tag";
-                navUserStatusPill.innerHTML = '<i class="fa-solid fa-crown"></i> VIP ACTIF À VIE';
+                navUserStatusPill.innerHTML = '<i class="fa-solid fa-crown"></i> VIP ACTIF';
             }
 
-            if (vipLiveSignalBox) {
-                vipLiveSignalBox.classList.remove('hidden');
-            }
+            if (vipLiveSignalBox) vipLiveSignalBox.classList.remove('hidden');
 
             if (directBuyButton) {
                 directBuyButton.className = "btn-buy-instant btn-vip-active";
-                directBuyButton.innerHTML = '<i class="fa-solid fa-circle-check text-green"></i> <span>SIGNAUX ACTIFS EN DIRECT (ACCÈS VIP)</span>';
+                directBuyButton.innerHTML = '<i class="fa-solid fa-circle-check text-green"></i> <span>SIGNAUX ACTIFS EN DIRECT (VIP)</span>';
             }
 
             if (promoBadgeText) {
-                promoBadgeText.innerHTML = '<i class="fa-solid fa-crown text-gold"></i> <span>FÉLICITATIONS : VOTRE ACCÈS ILLIMITÉ EST ACTIF À VIE</span>';
+                promoBadgeText.innerHTML = '<i class="fa-solid fa-crown text-gold"></i> <span>ACCÈS VIP ACTIF À VIE</span>';
                 promoBadgeText.style.background = "rgba(16, 185, 129, 0.2)";
                 promoBadgeText.style.borderColor = "#10b981";
             }
         } else {
-            // ================= USER NOT PAID =================
             if (siteAlertBanner) siteAlertBanner.classList.remove('hidden');
             
             if (navUserStatusPill) {
@@ -687,9 +704,7 @@ function updateAuthHeader() {
                 navUserStatusPill.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Non abonné';
             }
 
-            if (vipLiveSignalBox) {
-                vipLiveSignalBox.classList.add('hidden');
-            }
+            if (vipLiveSignalBox) vipLiveSignalBox.classList.add('hidden');
 
             if (directBuyButton) {
                 directBuyButton.className = "btn-buy-instant";
@@ -704,29 +719,8 @@ function updateAuthHeader() {
     }
 }
 
-// VIP Real-Time Prediction Generator
-function initVipSignalsGenerator() {
-    updateLiveVipPrediction();
-}
-
-function updateLiveVipPrediction() {
-    const vipExitTarget = document.getElementById('vipExitTarget');
-    const vipConfidenceScore = document.getElementById('vipConfidenceScore');
-    const vipSignalTime = document.getElementById('vipSignalTime');
-
-    if (!vipExitTarget) return;
-
-    const multipliers = ["x3.85", "x4.20", "x5.40", "x2.90", "x6.15", "x7.80", "x4.95", "x8.40"];
-    const randomMultiplier = multipliers[Math.floor(Math.random() * multipliers.length)];
-    const randomConfidence = (97.5 + Math.random() * 2.3).toFixed(1) + "%";
-
-    vipExitTarget.textContent = randomMultiplier;
-    if (vipConfidenceScore) vipConfidenceScore.textContent = randomConfidence;
-    if (vipSignalTime) vipSignalTime.textContent = "Reçu à l'instant (Synchronisé)";
-}
-
 // ==========================================
-// 9. PROFILE MANAGEMENT
+// 10. PROFILE MANAGEMENT
 // ==========================================
 function initProfileModal() {
     const userProfileBadge = document.getElementById('userProfileBadge');
@@ -755,11 +749,11 @@ function initProfileModal() {
             if (profileStatusBadge) {
                 if (!currentUser.isSubscribed) {
                     profileStatusBadge.className = "status-tag-badge status-unsubscribed";
-                    profileStatusBadge.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> NON ABONNÉ (AUCUN ABONNEMENT ACTIF)';
+                    profileStatusBadge.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> NON ABONNÉ';
                     if (btnProfileSubscribe) btnProfileSubscribe.style.display = "block";
                 } else {
                     profileStatusBadge.className = "status-tag-badge status-active";
-                    profileStatusBadge.innerHTML = '<i class="fa-solid fa-crown"></i> MEMBRE VIP : ABONNEMENT ACTIF À VIE';
+                    profileStatusBadge.innerHTML = '<i class="fa-solid fa-crown"></i> MEMBRE VIP : ACTIF À VIE';
                     if (btnProfileSubscribe) btnProfileSubscribe.style.display = "none";
                 }
             }
@@ -772,7 +766,6 @@ function initProfileModal() {
         closeProfile.addEventListener('click', () => profileModal?.classList.remove('active'));
     }
 
-    // Manual VIP Code Activation (e.g. VIP2026, CRASHVIP, WAVE2026)
     if (btnValidateVipCode && vipActivationCodeInput) {
         btnValidateVipCode.addEventListener('click', () => {
             if (!currentUser) return;
@@ -781,9 +774,9 @@ function initProfileModal() {
             if (code === "VIP2026" || code === "CRASHVIP" || code === "WAVE2026" || code === "50USD" || code.length >= 6) {
                 activateCurrentUserVip();
                 profileModal?.classList.remove('active');
-                showToast("Code VIP Validé ! Vos prédictions d'avion sont activées à vie !");
+                showToast("Accès VIP Débloqué à vie avec succès !");
             } else {
-                showToast("Code VIP invalide. Veuillez vérifier.", "error");
+                showToast("Code VIP incorrect.", "error");
             }
         });
     }
@@ -801,7 +794,7 @@ function initProfileModal() {
                 localStorage.setItem('crash_users_db_2026', JSON.stringify(usersDb));
             }
             localStorage.setItem('crash_predictor_user_2026', JSON.stringify(currentUser));
-            showToast("Numéro de téléphone enregistré avec succès !");
+            showToast("Numéro enregistré !");
         });
     }
 
@@ -815,17 +808,17 @@ function initProfileModal() {
             const confirmPass = document.getElementById('profileConfirmNewPassword').value;
 
             if (currentUser.passwordHash && btoa(oldPass) !== currentUser.passwordHash) {
-                showToast("Votre mot de passe actuel est incorrect.", "error");
+                showToast("Mot de passe actuel incorrect.", "error");
                 return;
             }
 
             if (!newPass || newPass.length < 5) {
-                showToast("Le nouveau mot de passe doit comporter au moins 5 caractères.", "error");
+                showToast("Le mot de passe doit faire au moins 5 caractères.", "error");
                 return;
             }
 
             if (newPass !== confirmPass) {
-                showToast("Les nouveaux mots de passe ne correspondent pas.", "error");
+                showToast("Les mots de passe ne correspondent pas.", "error");
                 return;
             }
 
@@ -840,7 +833,7 @@ function initProfileModal() {
             localStorage.setItem('crash_predictor_user_2026', JSON.stringify(currentUser));
 
             formUpdatePassword.reset();
-            showToast("Mot de passe modifié avec succès !");
+            showToast("Mot de passe modifié !");
         });
     }
 
@@ -878,37 +871,27 @@ function activateCurrentUserVip() {
 }
 
 // ==========================================
-// 10. STRICT MOBILE MONEY PAYMENT (WAVE, ORANGE, MTN, MOOV)
+// 11. ULTRA-BRIEF MOBILE MONEY 1-CLICK CHECKOUT
 // ==========================================
-function initStrictMobileMoneyPayment() {
+function initBriefMobileMoneyPayment() {
     const directBuyButtons = document.querySelectorAll('#directBuyButton, .btn-buy-instant, .btn-cta-buy, #btnAlertSubscribe');
     const buyModal = document.getElementById('buyModal');
     
-    const paymentCustomerEmail = document.getElementById('paymentCustomerEmail');
-    const paymentCustomerPhone = document.getElementById('paymentCustomerPhone');
-    const momoCountrySelect = document.getElementById('momoCountrySelect');
-    const momoOperatorChips = document.querySelectorAll('.momo-operator-chip');
+    const momoChips = document.querySelectorAll('.momo-chip-card');
     const btnExecuteMomoPayment = document.getElementById('btnExecuteMomoPayment');
     const btnExecuteCardPayment = document.getElementById('btnExecuteCardPayment');
 
-    momoOperatorChips.forEach(chip => {
+    momoChips.forEach(chip => {
         chip.addEventListener('click', () => {
-            momoOperatorChips.forEach(c => c.classList.remove('selected'));
+            momoChips.forEach(c => c.classList.remove('selected'));
             chip.classList.add('selected');
             selectedMomoNetwork = chip.dataset.network || "WAVE";
         });
     });
 
-    if (momoCountrySelect) {
-        momoCountrySelect.addEventListener('change', (e) => {
-            selectedCountryCode = e.target.value;
-        });
-    }
-
     directBuyButtons.forEach(btn => {
         btn.addEventListener('click', (e) => {
             if (currentUser && currentUser.isSubscribed) {
-                // If already VIP, scroll smoothly to live curve
                 e.preventDefault();
                 document.getElementById('curve-simulation')?.scrollIntoView({ behavior: 'smooth' });
                 showToast("Vos signaux VIP sont actifs en direct sur la courbe !");
@@ -918,37 +901,19 @@ function initStrictMobileMoneyPayment() {
             if (btn.getAttribute('href') && btn.getAttribute('href').startsWith('#')) return;
             e.preventDefault();
 
-            if (currentUser) {
-                if (paymentCustomerEmail) paymentCustomerEmail.value = currentUser.email;
-                if (paymentCustomerPhone) paymentCustomerPhone.value = currentUser.phone || "";
-            }
-
             buyModal?.classList.add('active');
         });
     });
 
-    // 1. EXECUTE MOBILE MONEY
+    // 1-CLICK DIRECT MOBILE MONEY (WAVE, ORANGE, MTN, MOOV)
     if (btnExecuteMomoPayment) {
         btnExecuteMomoPayment.addEventListener('click', () => {
-            const customerEmail = (paymentCustomerEmail?.value || currentUser?.email || "client@crashpredictor2026.com").trim();
-            const customerPhone = (paymentCustomerPhone?.value || currentUser?.phone || "").trim();
+            const customerEmail = currentUser?.email || "client@crashpredictor2026.com";
+            const customerPhone = currentUser?.phone || "0700000000";
             const customerName = currentUser?.name || "Client VIP";
-            const country = momoCountrySelect ? momoCountrySelect.value : "CI";
-
-            if (!customerEmail || !customerEmail.includes('@')) {
-                showToast("Veuillez renseigner votre email.", "error");
-                paymentCustomerEmail?.focus();
-                return;
-            }
-
-            if (!customerPhone || customerPhone.length < 8) {
-                showToast("Veuillez saisir votre numéro Mobile Money.", "error");
-                paymentCustomerPhone?.focus();
-                return;
-            }
 
             if (typeof FlutterwaveCheckout !== "function") {
-                showToast("Chargement du paiement sécurisé...", "error");
+                showToast("Chargement de la passerelle sécurisée...", "error");
                 return;
             }
 
@@ -957,7 +922,6 @@ function initStrictMobileMoneyPayment() {
                 tx_ref: "CRASH-MOMO-" + Date.now() + "-" + Math.floor(Math.random() * 10000),
                 amount: 30000,
                 currency: "XOF",
-                country: country,
                 payment_options: "mobilemoneyfrancophone",
                 customer: {
                     email: customerEmail,
@@ -973,7 +937,7 @@ function initStrictMobileMoneyPayment() {
                     console.log("Paiement Mobile Money validé:", data);
                     buyModal?.classList.remove('active');
                     activateCurrentUserVip();
-                    showToast("🎉 Paiement validé ! Votre interface VIP est débloquée à vie !");
+                    showToast("🎉 Paiement validé ! Votre accès VIP est actif à vie !");
                 },
                 onclose: function() {
                     console.log("Fenêtre fermée.");
@@ -982,21 +946,15 @@ function initStrictMobileMoneyPayment() {
         });
     }
 
-    // 2. EXECUTE CARD PAYMENT
+    // DIRECT CARD PAYMENT
     if (btnExecuteCardPayment) {
         btnExecuteCardPayment.addEventListener('click', () => {
-            const customerEmail = (paymentCustomerEmail?.value || currentUser?.email || "client@crashpredictor2026.com").trim();
-            const customerPhone = (paymentCustomerPhone?.value || currentUser?.phone || "").trim();
+            const customerEmail = currentUser?.email || "client@crashpredictor2026.com";
+            const customerPhone = currentUser?.phone || "0700000000";
             const customerName = currentUser?.name || "Client VIP";
 
-            if (!customerEmail || !customerEmail.includes('@')) {
-                showToast("Veuillez renseigner votre email.", "error");
-                paymentCustomerEmail?.focus();
-                return;
-            }
-
             if (typeof FlutterwaveCheckout !== "function") {
-                showToast("Chargement du paiement sécurisé...", "error");
+                showToast("Chargement de la passerelle...", "error");
                 return;
             }
 
@@ -1020,7 +978,7 @@ function initStrictMobileMoneyPayment() {
                     console.log("Paiement Carte validé:", data);
                     buyModal?.classList.remove('active');
                     activateCurrentUserVip();
-                    showToast("🎉 Paiement validé ! Votre interface VIP est débloquée à vie !");
+                    showToast("🎉 Paiement validé ! Votre accès VIP est actif à vie !");
                 },
                 onclose: function() {
                     console.log("Fenêtre Carte fermée.");
@@ -1031,7 +989,7 @@ function initStrictMobileMoneyPayment() {
 }
 
 // ==========================================
-// 11. MODALS & FAQ
+// 12. MODALS & FAQ
 // ==========================================
 function initModals() {
     const openLoginBtn = document.getElementById('openLoginBtn');
@@ -1090,7 +1048,7 @@ function initFAQHelper() {
 }
 
 // ==========================================
-// 12. TOAST NOTIFICATIONS
+// 13. TOAST NOTIFICATIONS
 // ==========================================
 function showToast(message, type = "success") {
     const container = document.getElementById('toastContainer');

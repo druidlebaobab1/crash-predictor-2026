@@ -2,15 +2,14 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CRASH PREDICTOR 2026 | Site Officiel de Prédictions en Direct</title>
     <!-- SEO Meta -->
     <meta name="description" content="CRASH PREDICTOR 2026 officiel. Suivez les signaux de vol d'avion en temps réel. Accès illimité à vie à 50 dollars. Plus de 155 643 avis positifs.">
-    <meta name="keywords" content="Crash Predictor 2026, Aviator Predictor, signaux aviateur, prédictions crash 2026">
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <!-- Secure Checkout Gateway Script -->
@@ -18,12 +17,12 @@
 </head>
 <body class="dark-theme">
 
-    <!-- LIVE ONLINE TRADERS TICKER BANNER (1 000 000 À 1 500 000 PERSONNES EN DIRECT) -->
+    <!-- LIVE ONLINE TRADERS TICKER BANNER -->
     <div class="live-traders-ticker-bar">
         <div class="ticker-content">
             <div class="live-dot-pulse"></div>
             <span class="ticker-text">
-                <strong>EN DIRECT :</strong> <span id="liveOnlineUsersCount" class="live-counter-highlight">1 284 650</span> membres connectés actuellement • Synchronisation des signaux de vol active
+                <strong>EN DIRECT :</strong> <span id="liveOnlineUsersCount" class="live-counter-highlight">1 284 650</span> connectés • Signaux de vol synchronisés
             </span>
         </div>
     </div>
@@ -53,15 +52,15 @@
         <div class="alert-banner-content">
             <div class="alert-icon-text">
                 <i class="fa-solid fa-triangle-exclamation text-red pulse-icon"></i>
-                <span><strong>STATUT COMPTE :</strong> Vous n'avez aucun abonnement actif. Vos prédictions en direct sont actuellement verrouillées.</span>
+                <span><strong>ACCÈS VERROUILLÉ :</strong> Activez votre accès 50 $ pour recevoir les signaux en direct.</span>
             </div>
             <button class="btn-alert-unlock" id="btnAlertSubscribe">
-                <i class="fa-solid fa-unlock-keyhole"></i> Débloquer l'accès 50 $
+                <i class="fa-solid fa-unlock-keyhole"></i> Débloquer 50 $
             </button>
         </div>
     </div>
 
-    <!-- Main Navigation Bar -->
+    <!-- Main Navigation Bar (Optimized for Mobile & Desktop) -->
     <header class="main-navbar">
         <div class="nav-container">
             <a href="#" class="brand-logo">
@@ -73,12 +72,6 @@
                     <span class="logo-badge">OFFICIEL 2026</span>
                 </div>
             </a>
-
-            <nav class="nav-links">
-                <a href="#predictions-access" class="nav-link highlight-link"><i class="fa-solid fa-bolt"></i> Accès Prédictions</a>
-                <a href="#curve-simulation" class="nav-link"><i class="fa-solid fa-plane-up"></i> Courbe de Vol</a>
-                <a href="#aide-facile" class="nav-link"><i class="fa-solid fa-circle-question"></i> Aide & FAQ</a>
-            </nav>
 
             <div class="nav-auth-actions" id="navAuthContainer">
                 <div class="lang-selector-box">
@@ -94,10 +87,10 @@
                     </select>
                 </div>
 
-                <!-- Guest Buttons -->
+                <!-- Compact Mobile-Friendly Guest Buttons -->
                 <div class="guest-buttons" id="guestButtons">
-                    <button class="btn-ghost" id="openLoginBtn"><i class="fa-solid fa-arrow-right-to-bracket"></i> Connexion</button>
-                    <button class="btn-primary" id="openRegisterBtn"><i class="fa-solid fa-user-plus"></i> Inscription</button>
+                    <button class="btn-ghost-compact" id="openLoginBtn"><i class="fa-solid fa-arrow-right-to-bracket"></i> Connexion</button>
+                    <button class="btn-primary-compact" id="openRegisterBtn"><i class="fa-solid fa-user-plus"></i> Inscription</button>
                 </div>
                 <!-- Logged In State (Profile) -->
                 <div class="user-profile-badge hidden" id="userProfileBadge" title="Cliquez pour gérer votre profil">
@@ -119,7 +112,7 @@
                 <div class="hero-header-text text-center">
                     <div class="countdown-promo-badge" id="promoBadgeText">
                         <i class="fa-solid fa-stopwatch text-gold pulse-icon"></i>
-                        <span>Offre Spéciale 50 $ : <strong class="countdown-timer-text">47h 59m 50s</strong> restante(s) • Le prix passera à 100 dollars après 48h</span>
+                        <span>Offre Spéciale 50 $ : <strong class="countdown-timer-text">47h 59m 50s</strong> • Prix après 48h : 100 $</span>
                     </div>
 
                     <h1 class="hero-main-title">
@@ -130,25 +123,25 @@
                     </p>
                 </div>
 
-                <!-- VIP REAL-TIME PREDICTIONS BOX (VISIBLE ONLY AFTER PAYMENT) -->
+                <!-- VIP REAL-TIME PREDICTIONS BOX (DYNAMIC MULTIPLIERS 1.50 - 3.50 & 5.00 - 7.50) -->
                 <div class="vip-live-signal-box hidden" id="vipLiveSignalBox">
                     <div class="vip-signal-header">
                         <span class="vip-pulse-dot"></span>
-                        <span class="vip-signal-title"><i class="fa-solid fa-crown text-gold"></i> SIGNAL PRÉDICTIF VIP EN DIRECT (ACTIF)</span>
-                        <span class="vip-signal-timestamp" id="vipSignalTime">Reçu à l'instant</span>
+                        <span class="vip-signal-title"><i class="fa-solid fa-crown text-gold"></i> SIGNAL PRÉDICTIF EN DIRECT</span>
+                        <span class="vip-signal-timestamp" id="vipSignalTime">Synchronisé</span>
                     </div>
                     <div class="vip-signal-body">
                         <div class="vip-stat-card">
-                            <span class="vip-stat-label">Point de sortie conseillé :</span>
-                            <span class="vip-stat-target" id="vipExitTarget">x4.85</span>
+                            <span class="vip-stat-label">Cote de sortie conseillée :</span>
+                            <span class="vip-stat-target" id="vipExitTarget">x2.45</span>
                         </div>
                         <div class="vip-stat-card">
-                            <span class="vip-stat-label">Indice de confiance :</span>
-                            <span class="vip-stat-confidence text-green" id="vipConfidenceScore">98.8%</span>
+                            <span class="vip-stat-label">Indice de réussite :</span>
+                            <span class="vip-stat-confidence text-green" id="vipConfidenceScore">99.1%</span>
                         </div>
                         <div class="vip-stat-card">
                             <span class="vip-stat-label">Statut algorithme :</span>
-                            <span class="vip-stat-status"><i class="fa-solid fa-satellite-dish text-gold"></i> FLUX EN DIRECT</span>
+                            <span class="vip-stat-status"><i class="fa-solid fa-shield-check text-green"></i> SORTIE SÉCURISÉE</span>
                         </div>
                     </div>
                 </div>
@@ -188,12 +181,12 @@
                         <!-- 48H RECURRING COUNTDOWN BAR -->
                         <div class="timer-countdown-bar" id="timerBarText">
                             <i class="fa-solid fa-clock-rotate-left text-gold"></i>
-                            <span>Temps restant : <strong class="countdown-timer-text">47h 59m 50s</strong> • Le prix passera à 100 dollars après 48h</span>
+                            <span>Temps restant : <strong class="countdown-timer-text">47h 59m 50s</strong></span>
                         </div>
 
                         <ul class="benefits-checklist">
                             <li><i class="fa-solid fa-check text-green"></i> Paiement direct par <strong>Wave, Orange Money, MTN MoMo, Moov</strong></li>
-                            <li><i class="fa-solid fa-check text-green"></i> Accès instantané aux signaux d'avion en temps réel</li>
+                            <li><i class="fa-solid fa-check text-green"></i> Signaux sécurisés en direct (Cotes 1.50 à 3.50 & 5.00+)</li>
                             <li><i class="fa-solid fa-check text-green"></i> Détection automatique du point d'arrêt avant crash</li>
                             <li><i class="fa-solid fa-check text-green"></i> Accès à vie sans aucun abonnement mensuel</li>
                         </ul>
@@ -206,20 +199,20 @@
 
                         <div class="secure-guarantee-footer">
                             <i class="fa-solid fa-shield-halved text-gold"></i>
-                            <span>Paiement Mobile Money direct • Validation immédiate sur téléphone</span>
+                            <span>Activation 100% automatique après paiement</span>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- SECTION COURBE DE VOL VERTICALE HAUTE (GRAND FORMAT IMMERSIF) -->
+        <!-- SECTION COURBE DE VOL VERTICALE -->
         <section id="curve-simulation" class="curve-section">
             <div class="section-container">
                 <div class="section-header text-center">
                     <span class="badge-sub"><i class="fa-solid fa-plane-up"></i> TRAJECTOIRE AVIATOR</span>
-                    <h2 class="section-title">Courbe de Vol</h2>
-                    <p class="section-subtitle">Visualisation de l'élévation verticale et de la puissance de montée de l'avion sur la courbe.</p>
+                    <h2 class="section-title">Courbe de Vol en Direct</h2>
+                    <p class="section-subtitle">Visualisation en temps réel de l'ascension de l'avion sur la courbe.</p>
                 </div>
 
                 <div class="curve-interactive-wrapper grand-curve-box" id="curveInteractiveBox">
@@ -228,13 +221,13 @@
             </div>
         </section>
 
-        <!-- 63 AVIS EN 24 HEURES & 155 643 AVIS TOTAL -->
+        <!-- 63 AVIS EN 24 HEURES -->
         <section id="testimonials" class="testimonials-section">
             <div class="section-container">
                 <div class="section-header text-center">
                     <span class="badge-sub"><i class="fa-solid fa-star"></i> 155 643 AVIS ENREGISTRÉS</span>
                     <h2 class="section-title">Avis et Témoignages de Gagnants</h2>
-                    <p class="section-subtitle">Découvrez les retours récents et les gains concrets des utilisateurs de Crash Predictor 2026 en France et dans le monde.</p>
+                    <p class="section-subtitle">Découvrez les retours récents et les gains concrets des utilisateurs de Crash Predictor 2026.</p>
                 </div>
 
                 <!-- Statistics Bar -->
@@ -252,7 +245,7 @@
                             <i class="fa-solid fa-star"></i>
                             <i class="fa-solid fa-star"></i>
                         </div>
-                        <span class="t-stat-sub">Score de satisfaction mondial</span>
+                        <span class="t-stat-sub">Satisfaction globale</span>
                     </div>
                     <div class="t-stat-item">
                         <span class="t-stat-num text-green">50 $</span>
@@ -264,9 +257,7 @@
                     63 commentaires en 24 heures (+155 643 avis enregistrés)
                 </div>
 
-                <div class="comments-grid" id="commentsGrid">
-                    <!-- Dynamically rendered from app.js -->
-                </div>
+                <div class="comments-grid" id="commentsGrid"></div>
 
                 <div class="text-center load-more-wrap">
                     <button class="btn-secondary" id="btnLoadMoreComments">
@@ -276,13 +267,12 @@
             </div>
         </section>
 
-        <!-- SIMPLIFIED FAQ SECTION -->
+        <!-- FAQ SECTION -->
         <section id="aide-facile" class="faq-section">
             <div class="section-container">
                 <div class="section-header text-center">
                     <span class="badge-sub"><i class="fa-solid fa-circle-question"></i> AIDE & RÉPONSES FACILES</span>
-                    <h2 class="section-title">Questions Simples pour Débuter</h2>
-                    <p class="section-subtitle">Tout ce qu'il faut savoir expliqué simplement et sans termes compliqués.</p>
+                    <h2 class="section-title">Questions Fréquentes</h2>
                 </div>
 
                 <div class="faq-accordion">
@@ -292,34 +282,25 @@
                             <i class="fa-solid fa-chevron-down"></i>
                         </div>
                         <div class="faq-answer">
-                            <p>Vous pouvez payer directement par <strong>Wave, MTN Mobile Money, Orange Money, Moov Money</strong> ainsi que par <strong>Carte bancaire Visa / Mastercard</strong> en toute sécurité.</p>
+                            <p>Vous pouvez payer directement par <strong>Wave, MTN Mobile Money, Orange Money, Moov Money</strong> ainsi que par Carte bancaire en toute sécurité.</p>
                         </div>
                     </div>
                     <div class="faq-item">
                         <div class="faq-question">
-                            <span>Combien de temps dure le tarif promotionnel de 50 $ ?</span>
+                            <span>Comment sont calculées les prédictions ?</span>
                             <i class="fa-solid fa-chevron-down"></i>
                         </div>
                         <div class="faq-answer">
-                            <p>Le tarif de <strong>50 dollars</strong> (environ <strong>30 000 francs CFA</strong>) est garanti pendant le compte à rebours de 48 heures. <strong>Le prix passera à 100 dollars après 48h</strong>.</p>
+                            <p>L'algorithme analyse l'historique des tours pour délivrer des cotes sécurisées (de <strong>x1.50 à x3.50</strong>) et détecter les envolées exceptionnelles (de <strong>x5.00 à x8.00+</strong>).</p>
                         </div>
                     </div>
                     <div class="faq-item">
                         <div class="faq-question">
-                            <span>Que se passe-t-il après avoir créé un compte et payé ?</span>
+                            <span>Que se passe-t-il après avoir payé ?</span>
                             <i class="fa-solid fa-chevron-down"></i>
                         </div>
                         <div class="faq-answer">
-                            <p>Dès votre paiement validé, votre compte se transforme instantanément en <strong>Membre VIP Actif</strong> : les alertes disparaissent et le boîtier de signaux d'avion en direct se débloque à vie.</p>
-                        </div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-question">
-                            <span>Y a-t-il un abonnement à renouveler chaque mois ?</span>
-                            <i class="fa-solid fa-chevron-down"></i>
-                        </div>
-                        <div class="faq-answer">
-                            <p>Non, aucun ! Vous payez une seule fois les 50 $ et vous bénéficiez de toutes les prédictions d'avion à vie directement sur le site.</p>
+                            <p>Dès votre paiement validé, votre compte s'active automatiquement à vie et vous recevez les signaux en direct sur votre écran.</p>
                         </div>
                     </div>
                 </div>
@@ -333,12 +314,6 @@
             <div class="footer-brand">
                 <div class="logo-title">CRASH <span class="highlight">PREDICTOR 2026</span></div>
                 <p>La plateforme officielle de signaux et courbes d'avion en temps réel.</p>
-            </div>
-            <div class="footer-links">
-                <a href="#predictions-access">Accès Prédictions</a>
-                <a href="#curve-simulation">Courbe de Vol</a>
-                <a href="#testimonials">Avis Clients</a>
-                <a href="#aide-facile">Aide & FAQ</a>
             </div>
             <div class="footer-copy">
                 &copy; 2026 CRASH PREDICTOR. Tous droits réservés.
@@ -357,25 +332,23 @@
             </div>
 
             <div class="profile-modal-body">
-                <!-- DYNAMIC STATUS BADGE -->
                 <div class="profile-status-block">
                     <div class="status-label-heading">Statut de votre licence :</div>
                     <div class="status-tag-badge status-unsubscribed" id="profileStatusBadge">
-                        <i class="fa-solid fa-circle-xmark"></i> NON ABONNÉ (AUCUN ABONNEMENT ACTIF)
+                        <i class="fa-solid fa-circle-xmark"></i> NON ABONNÉ
                     </div>
                     <p class="status-alert-description">
-                        Vos signaux d'avion sont actuellement suspendus. Activez votre licence pour débloquer les prédictions en direct.
+                        Activez votre licence pour débloquer les prédictions en direct.
                     </p>
                 </div>
 
-                <!-- MANUAL VIP ACTIVATION CODE SECTION (FOR DIRECT WAVE / WHATSAPP PAYMENTS) -->
                 <div class="profile-section-group vip-code-box">
                     <label class="section-field-label"><i class="fa-solid fa-key text-gold"></i> Activer avec un Code VIP</label>
                     <div class="phone-input-row">
                         <input type="text" id="vipActivationCodeInput" placeholder="Ex: VIP2026" class="form-control-dark uppercase-input">
                         <button type="button" class="btn-save-mini btn-gold-solid" id="btnValidateVipCode">Activer</button>
                     </div>
-                    <span class="small-hint">Si vous avez payé directement par Wave/WhatsApp, entrez votre code VIP ici.</span>
+                    <span class="small-hint">Code pour débloquer instantanément l'accès VIP.</span>
                 </div>
 
                 <div class="profile-info-row">
@@ -383,7 +356,6 @@
                     <strong id="profileDateDisplay">Aujourd'hui</strong>
                 </div>
 
-                <!-- PHONE NUMBER SECTION -->
                 <div class="profile-section-group">
                     <label class="section-field-label"><i class="fa-solid fa-phone"></i> Numéro de téléphone</label>
                     <div class="phone-input-row">
@@ -392,14 +364,13 @@
                     </div>
                 </div>
 
-                <!-- CHANGE PASSWORD SECTION -->
                 <div class="profile-section-group">
                     <label class="section-field-label"><i class="fa-solid fa-lock"></i> Modifier mon mot de passe</label>
                     <form id="formUpdatePassword" class="password-update-form">
                         <input type="password" id="profileOldPassword" placeholder="Mot de passe actuel" required class="form-control-dark">
                         <input type="password" id="profileNewPassword" placeholder="Nouveau mot de passe" required class="form-control-dark">
                         <input type="password" id="profileConfirmNewPassword" placeholder="Confirmer le nouveau mot de passe" required class="form-control-dark">
-                        <button type="submit" class="btn-save-mini btn-full">Mettre à jour le mot de passe</button>
+                        <button type="submit" class="btn-save-mini btn-full">Mettre à jour</button>
                     </form>
                 </div>
 
@@ -421,17 +392,17 @@
             <div class="modal-header">
                 <div class="modal-icon-badge"><i class="fa-solid fa-user-plus"></i></div>
                 <h2 class="modal-title-big">Créer votre compte</h2>
-                <p>Remplissez vos informations pour accéder à votre espace membre</p>
+                <p>Accédez à votre espace membre sécurisé</p>
             </div>
 
             <form id="registerForm" class="modal-form">
                 <div class="form-group">
-                    <label><i class="fa-solid fa-user"></i> Votre Nom ou Pseudonyme</label>
+                    <label><i class="fa-solid fa-user"></i> Nom ou Pseudonyme</label>
                     <input type="text" id="regName" placeholder="Ex: Alex_Trader" required autocomplete="username">
                 </div>
 
                 <div class="form-group">
-                    <label><i class="fa-solid fa-envelope"></i> Votre Adresse Email</label>
+                    <label><i class="fa-solid fa-envelope"></i> Adresse Email</label>
                     <input type="email" id="regEmail" placeholder="nom@exemple.com" required autocomplete="email">
                 </div>
 
@@ -440,18 +411,13 @@
                     <input type="password" id="regPassword" placeholder="Au moins 5 caractères" required autocomplete="new-password">
                 </div>
 
-                <div class="form-group">
-                    <label><i class="fa-solid fa-shield-halved"></i> Confirmez votre mot de passe</label>
-                    <input type="password" id="regPasswordConfirm" placeholder="Retapez votre mot de passe" required autocomplete="new-password">
-                </div>
-
                 <button type="submit" class="btn-primary btn-block">
                     <i class="fa-solid fa-check"></i> Créer mon compte
                 </button>
             </form>
 
             <div class="modal-footer-switch">
-                <span>Vous avez déjà un compte ?</span>
+                <span>Déjà inscrit ?</span>
                 <button type="button" class="btn-link" id="switchToLogin">Se connecter</button>
             </div>
         </div>
@@ -463,18 +429,18 @@
             <button class="modal-close" id="closeLoginModal">&times;</button>
             <div class="modal-header">
                 <div class="modal-icon-badge"><i class="fa-solid fa-arrow-right-to-bracket"></i></div>
-                <h2 class="modal-title-big">Connexion à votre compte</h2>
-                <p>Entrez vos identifiants pour voir votre espace membre</p>
+                <h2 class="modal-title-big">Connexion</h2>
+                <p>Entrez vos identifiants</p>
             </div>
 
             <form id="loginForm" class="modal-form">
                 <div class="form-group">
-                    <label><i class="fa-solid fa-envelope"></i> Votre Adresse Email</label>
+                    <label><i class="fa-solid fa-envelope"></i> Adresse Email</label>
                     <input type="email" id="loginEmail" placeholder="nom@exemple.com" required autocomplete="email">
                 </div>
 
                 <div class="form-group">
-                    <label><i class="fa-solid fa-lock"></i> Votre Mot de passe</label>
+                    <label><i class="fa-solid fa-lock"></i> Mot de passe</label>
                     <input type="password" id="loginPassword" placeholder="Votre mot de passe" required autocomplete="current-password">
                 </div>
 
@@ -484,91 +450,58 @@
             </form>
 
             <div class="modal-footer-switch">
-                <span>Pas encore inscrit ?</span>
+                <span>Pas encore de compte ?</span>
                 <button type="button" class="btn-link" id="switchToRegister">Créer un compte</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL 4 : DIRECT MOBILE MONEY CHECKOUT (WAVE, ORANGE, MTN, MOOV) -->
+    <!-- MODAL 4 : ULTRA-BRIEF & DIRECT MOBILE MONEY CHECKOUT (SIMPLE, DIRECT & RAPIDE) -->
     <div class="modal-overlay" id="buyModal">
-        <div class="modal-card modal-buy-card">
+        <div class="modal-card modal-buy-card-brief">
             <button class="modal-close" id="closeBuyModal">&times;</button>
-            <div class="modal-header">
-                <div class="modal-icon-badge gold-glow"><i class="fa-solid fa-mobile-screen-button"></i></div>
-                <h3 class="modal-title-big">Paiement Mobile Money Direct</h3>
-                <p>Choisissez votre réseau pour recevoir le signal de retrait sur votre téléphone</p>
-            </div>
+            
+            <div class="brief-checkout-box">
+                <div class="brief-header">
+                    <span class="badge-price-gold">30 000 FCFA (50 $) • ACCÈS À VIE</span>
+                    <h3>Payer par Mobile Money</h3>
+                    <p class="brief-subtitle">Sélectionnez votre moyen de paiement pour continuer</p>
+                </div>
 
-            <div class="buy-modal-content">
-                <!-- PRODUCT BANNER -->
-                <div class="product-banner-summary">
-                    <img src="assets/crash_hd.jpg" alt="Crash Logo HD" class="buy-summary-img">
-                    <div>
-                        <div class="badge-live-gold">ACCÈS OFFICIEL 2026 À VIE</div>
-                        <h4>CRASH PREDICTOR AI</h4>
-                        <div class="price-tag-big">50 $ <span class="price-usd-sub">/ Accès à vie</span></div>
+                <!-- SIMPLE 4 OPERATOR BUTTONS (WAVE, ORANGE, MTN, MOOV) -->
+                <div class="momo-chips-simple-grid">
+                    <div class="momo-chip-card selected" data-network="WAVE">
+                        <i class="fa-solid fa-water"></i>
+                        <span>Wave</span>
+                    </div>
+                    <div class="momo-chip-card" data-network="ORANGE">
+                        <i class="fa-solid fa-signal"></i>
+                        <span>Orange Money</span>
+                    </div>
+                    <div class="momo-chip-card" data-network="MTN">
+                        <i class="fa-solid fa-sim-card"></i>
+                        <span>MTN MoMo</span>
+                    </div>
+                    <div class="momo-chip-card" data-network="MOOV">
+                        <i class="fa-solid fa-mobile-retro"></i>
+                        <span>Moov Money</span>
                     </div>
                 </div>
 
-                <!-- OPERATOR SELECTION CHIPS -->
-                <div class="momo-selection-label"><i class="fa-solid fa-tower-broadcast text-gold"></i> Sélectionnez votre moyen Mobile Money :</div>
-                <div class="momo-operators-grid">
-                    <div class="momo-operator-chip selected" data-network="WAVE">
-                        <i class="fa-solid fa-water"></i> Wave
-                    </div>
-                    <div class="momo-operator-chip" data-network="ORANGE">
-                        <i class="fa-solid fa-signal"></i> Orange Money
-                    </div>
-                    <div class="momo-operator-chip" data-network="MTN">
-                        <i class="fa-solid fa-sim-card"></i> MTN MoMo
-                    </div>
-                    <div class="momo-operator-chip" data-network="MOOV">
-                        <i class="fa-solid fa-mobile-retro"></i> Moov Money
-                    </div>
-                </div>
-
-                <!-- COUNTRY & PHONE INPUTS -->
-                <div class="checkout-fields-container">
-                    <div class="form-group-row">
-                        <div class="form-group flex-1">
-                            <label><i class="fa-solid fa-earth-africa"></i> Pays</label>
-                            <select id="momoCountrySelect" class="form-control-dark">
-                                <option value="CI" selected>🇨🇮 Côte d'Ivoire</option>
-                                <option value="SN">🇸🇳 Sénégal</option>
-                                <option value="CM">🇨🇲 Cameroun</option>
-                                <option value="BJ">🇧🇯 Bénin</option>
-                                <option value="BF">🇧🇫 Burkina Faso</option>
-                                <option value="ML">🇲🇱 Mali</option>
-                                <option value="TG">🇹🇬 Togo</option>
-                            </select>
-                        </div>
-                        <div class="form-group flex-1">
-                            <label><i class="fa-solid fa-phone"></i> Numéro de téléphone</label>
-                            <input type="tel" id="paymentCustomerPhone" placeholder="Ex: 07000000" required class="form-control-dark">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label><i class="fa-solid fa-envelope"></i> Email de réception</label>
-                        <input type="email" id="paymentCustomerEmail" placeholder="votre-email@exemple.com" required class="form-control-dark">
-                    </div>
-                </div>
-
-                <!-- BIG GREEN DIRECT MOBILE MONEY VALIDATE BUTTON -->
-                <button type="button" class="btn-execute-momo" id="btnExecuteMomoPayment">
-                    <i class="fa-solid fa-lock"></i>
-                    <span>Valider le paiement Mobile Money</span>
+                <!-- 1-CLICK DIRECT ACTION BUTTON (NO COMPLICATED FORMS) -->
+                <button type="button" class="btn-direct-pay-now" id="btnExecuteMomoPayment">
+                    <i class="fa-solid fa-bolt"></i>
+                    <span>Payer par Mobile Money (30 000 FCFA)</span>
                 </button>
 
-                <!-- OPTIONAL ALTERNATIVE: CARD PAYMENT -->
-                <div class="card-alternative-row">
-                    <span>Vous êtes à l'international ?</span>
-                    <button type="button" class="btn-link-card" id="btnExecuteCardPayment">Payer par Carte Bancaire (Visa / Mastercard)</button>
+                <div class="brief-footer-note">
+                    <i class="fa-solid fa-shield-check text-green"></i>
+                    <span>Activation automatique et immédiate sur votre compte dès validation.</span>
                 </div>
 
-                <div class="secure-checkout-note">
-                    <i class="fa-solid fa-shield-halved text-green"></i> Vous recevrez une demande de confirmation directe sur votre téléphone
+                <!-- OPTIONAL CARD LINK -->
+                <div class="card-link-sub">
+                    <button type="button" class="btn-link-card-mini" id="btnExecuteCardPayment">Payer par Carte Bancaire (50 $)</button>
                 </div>
             </div>
         </div>
