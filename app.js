@@ -1,6 +1,7 @@
 /**
- * CRASH PREDICTOR 2026 - APPLICATION OFFICIELLE
- * - 100% ID Membres anonymes (Aucun nom réel)
+ * CRASH PREDICTOR 2026 - APPLICATION OFFICIELLE & SUPABASE CLOUD
+ * - Base de données Supabase Cloud en temps réel (tnxyrvjrxxrsqnpviknz)
+ * - 100% ID Membres anonymes
  * - Simulation de vol verticale, fluide et réaliste
  * - Phase de calibration satellite professionnelle entre les tours
  * - Dashboard Administrateur par ID Unique (Code: ADMIN2026)
@@ -10,7 +11,24 @@ const FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK-07d56b9d571ed135ab4bf5d3fd5330a9-X";
 const ADMIN_SECRET_KEY = "ADMIN2026";
 
 // ==========================================
-// 1. DATA: AVIS 100% ID MEMBRES ANONYMES (SANS AUCUN "IL Y A")
+// CONFIGURATION SUPABASE CLOUD
+// ==========================================
+const SUPABASE_PROJECT_ID = "tnxyrvjrxxrsqnpviknz";
+const SUPABASE_URL = `https://${SUPABASE_PROJECT_ID}.supabase.co`;
+const SUPABASE_ANON_KEY = "sb_publishable_Hl6nmMnRAM1mfdDdudH2_w_kYIJAXdF";
+
+let supabaseClient = null;
+if (typeof supabase !== "undefined" && supabase.createClient) {
+    try {
+        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log("Supabase Cloud connecté avec succès !");
+    } catch (err) {
+        console.warn("Erreur d'initialisation Supabase:", err);
+    }
+}
+
+// ==========================================
+// 1. DATA: AVIS 100% ID MEMBRES ANONYMES
 // ==========================================
 const WINNER_COMMENTS = [
     { id: 1, username: "ID: CRASH-9142", lang: "FR", gain: "+$450", rating: 5, status: "Licence Activée", comment: "50 dollars rentabilisés dès la première session. L'avion sur la courbe aide vraiment à visualiser l'instant idéal de sortie." },
@@ -60,10 +78,11 @@ document.addEventListener('DOMContentLoaded', () => {
     initModals();
     initBriefMobileMoneyPayment();
     initMasterAdminDashboard();
+    syncUserFromSupabaseCloud();
 });
 
 // ==========================================
-// 3. USER UNIQUE ID & IDENTITY
+// 3. USER UNIQUE ID & SYNC (LOCAL + SUPABASE CLOUD)
 // ==========================================
 function initUserIdentity() {
     if (!currentUser) {
@@ -81,7 +100,7 @@ function initUserIdentity() {
     }
 }
 
-function saveUserSession(user) {
+async function saveUserSession(user) {
     localStorage.setItem('crash_predictor_user_2026', JSON.stringify(user));
     let usersDb = JSON.parse(localStorage.getItem('crash_users_db_2026')) || [];
     const idx = usersDb.findIndex(u => u.email === user.email);
@@ -91,6 +110,43 @@ function saveUserSession(user) {
         usersDb.push(user);
     }
     localStorage.setItem('crash_users_db_2026', JSON.stringify(usersDb));
+
+    // Sauvegarde dans Supabase Cloud si connecté
+    if (supabaseClient) {
+        try {
+            await supabaseClient.from('users').upsert({
+                unique_id: user.uniqueId,
+                name: user.name,
+                email: user.email,
+                phone: user.phone || '',
+                is_subscribed: user.isSubscribed || false,
+                updated_at: new Date().toISOString()
+            }, { onConflict: 'email' });
+        } catch (e) {
+            console.log("Sync Cloud background:", e);
+        }
+    }
+}
+
+async function syncUserFromSupabaseCloud() {
+    if (!supabaseClient || !currentUser) return;
+    try {
+        const { data, error } = await supabaseClient
+            .from('users')
+            .select('*')
+            .eq('email', currentUser.email)
+            .maybeSingle();
+
+        if (data && !error) {
+            if (data.is_subscribed !== currentUser.isSubscribed) {
+                currentUser.isSubscribed = data.is_subscribed;
+                localStorage.setItem('crash_predictor_user_2026', JSON.stringify(currentUser));
+                initGlobalViewRouter();
+            }
+        }
+    } catch (e) {
+        console.log("Cloud check:", e);
+    }
 }
 
 // ==========================================
@@ -173,10 +229,10 @@ function startVipGrandVerticalRadarEngine() {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    let flightState = 'scanning'; // 'scanning' -> 'flying' -> 'crashed'
+    let flightState = 'scanning';
     let currentMultiplier = 1.00;
     let flightProgress = 0;
-    let flightSpeed = 0.0014; // Ultra-realistic & smooth flight duration (~20-25 seconds)
+    let flightSpeed = 0.0014;
     let explosionTimer = 0;
     let particles = [];
 
@@ -240,7 +296,7 @@ function startVipGrandVerticalRadarEngine() {
         scannerLoader?.classList.remove('hidden');
         if (scanProgressFill) scanProgressFill.style.width = '0%';
         if (statusMessage) {
-            statusMessage.innerHTML = `🛰️ <strong>CALIBRATION DU SIGNAL SATELLITE...</strong> Veuillez patienter pour le prochain tour...`;
+            statusMessage.innerHTML = `🛰️ <strong>CALIBRATION DU SIGNAL SATELLITE...</strong> Veuillez patienter pour le prochain vol...`;
         }
 
         let progress = 0;
@@ -257,7 +313,7 @@ function startVipGrandVerticalRadarEngine() {
                 particles = [];
                 generateNextTarget();
             }
-        }, 120); // ~6 seconds of high-tech calibration scanner
+        }, 120);
     }
 
     function renderVIPCockpit() {
@@ -266,7 +322,6 @@ function startVipGrandVerticalRadarEngine() {
 
         ctx.clearRect(0, 0, W, H);
 
-        // Cockpit Grid
         ctx.fillStyle = '#060a18';
         ctx.fillRect(0, 0, W, H);
 
@@ -288,7 +343,6 @@ function startVipGrandVerticalRadarEngine() {
         }
         ctx.setLineDash([]);
 
-        // Axis Lines
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
         ctx.lineWidth = 2;
         ctx.beginPath();
@@ -304,11 +358,9 @@ function startVipGrandVerticalRadarEngine() {
         const startX = 25;
         const startY = H - 25;
 
-        // PROPORTIONAL VERTICAL FLIGHT PATH
-        // Vertical climb is emphasized: higher multipliers climb steep to top of canvas
         const multiplierRatio = Math.min(Math.max((vipTargetMultiplier - 1.2) / 6.8, 0.15), 0.95);
         const targetX = startX + (W - startX - 35) * (0.3 + multiplierRatio * 0.7);
-        const targetY = startY - (startY - 35) * (0.25 + multiplierRatio * 0.75); // Strong vertical elevation
+        const targetY = startY - (startY - 35) * (0.25 + multiplierRatio * 0.75);
 
         const cpX = startX + (targetX - startX) * 0.25;
         const cpY = startY;
@@ -323,7 +375,6 @@ function startVipGrandVerticalRadarEngine() {
             const curX = (1 - p) * (1 - p) * startX + 2 * (1 - p) * p * cpX + p * p * targetX;
             const curY = (1 - p) * (1 - p) * startY + 2 * (1 - p) * p * cpY + p * p * targetY;
 
-            // Grand Glowing Flight Path
             ctx.beginPath();
             ctx.moveTo(startX, startY);
             for (let s = 0; s <= p; s += 0.01) {
@@ -339,7 +390,6 @@ function startVipGrandVerticalRadarEngine() {
             ctx.stroke();
             ctx.shadowBlur = 0;
 
-            // Jet Plane with Steep Angle
             const dx = 2 * (1 - p) * (cpX - startX) + 2 * p * (targetX - cpX);
             const dy = 2 * (1 - p) * (cpY - startY) + 2 * p * (targetY - cpY);
             const angle = Math.atan2(dy, dx);
@@ -373,7 +423,6 @@ function startVipGrandVerticalRadarEngine() {
             ctx.closePath();
             ctx.fill();
 
-            // Fire Trail
             ctx.fillStyle = '#ef4444';
             ctx.beginPath();
             ctx.moveTo(-24, -4);
@@ -423,7 +472,7 @@ function startVipGrandVerticalRadarEngine() {
 }
 
 // ==========================================
-// 6. LIVE FLASH NOTIFICATIONS (100% ID MEMBRES)
+// 6. LIVE FLASH NOTIFICATIONS
 // ==========================================
 function initLiveFlashSocialNotifications() {
     const flashBox = document.getElementById('liveFlashSocialBox');
@@ -496,7 +545,6 @@ function initGuaranteed48hCountdown() {
     setInterval(updateTimer, 1000);
 }
 
-// RENDER COMMENTS (100% ID MEMBRES)
 function renderCommentsList() {
     const grid = document.getElementById('commentsGrid');
     if (!grid) return;
@@ -527,7 +575,7 @@ function initLoadMoreComments() {
 }
 
 // ==========================================
-// 7. MASTER ADMIN DASHBOARD
+// 7. MASTER ADMIN DASHBOARD (LOCAL + SUPABASE CLOUD SYNC)
 // ==========================================
 function initMasterAdminDashboard() {
     const linkOpenAdmin = document.getElementById('linkOpenAdminLogin');
@@ -565,7 +613,7 @@ function initMasterAdminDashboard() {
     }
 
     if (btnAdminActivate && adminTargetIdInput) {
-        btnAdminActivate.addEventListener('click', () => {
+        btnAdminActivate.addEventListener('click', async () => {
             const targetId = adminTargetIdInput.value.trim().toUpperCase();
             if (!targetId) {
                 showToast("Veuillez saisir un ID Membre (ex: CRASH-8491).", "error");
@@ -590,6 +638,14 @@ function initMasterAdminDashboard() {
                     localStorage.setItem('crash_predictor_user_2026', JSON.stringify(currentUser));
                     initGlobalViewRouter();
                 }
+
+                // Sync Supabase Cloud
+                if (supabaseClient) {
+                    try {
+                        await supabaseClient.from('users').update({ is_subscribed: true }).eq('unique_id', targetId);
+                    } catch (e) { console.log(e); }
+                }
+
                 renderAdminUsersTable();
                 adminTargetIdInput.value = "";
                 showToast(`Succès : L'accès VIP pour l'ID ${targetId} est maintenant activé !`);
@@ -613,6 +669,17 @@ function initMasterAdminDashboard() {
                     initGlobalViewRouter();
                 }
 
+                if (supabaseClient) {
+                    try {
+                        await supabaseClient.from('users').upsert({
+                            unique_id: targetId,
+                            name: `Membre_${targetId}`,
+                            email: `${targetId.toLowerCase()}@client.com`,
+                            is_subscribed: true
+                        });
+                    } catch (e) { console.log(e); }
+                }
+
                 renderAdminUsersTable();
                 adminTargetIdInput.value = "";
                 showToast(`Nouvel ID ${targetId} créé et activé en Mode VIP !`);
@@ -621,11 +688,37 @@ function initMasterAdminDashboard() {
     }
 }
 
-function renderAdminUsersTable() {
+async function renderAdminUsersTable() {
     const tbody = document.getElementById('adminUsersTableBody');
     if (!tbody) return;
 
     let usersDb = JSON.parse(localStorage.getItem('crash_users_db_2026')) || [];
+
+    // Tente de récupérer aussi depuis Supabase Cloud
+    if (supabaseClient) {
+        try {
+            const { data } = await supabaseClient.from('users').select('*');
+            if (data && data.length > 0) {
+                data.forEach(cloudUser => {
+                    const idx = usersDb.findIndex(u => u.email === cloudUser.email || u.uniqueId === cloudUser.unique_id);
+                    if (idx !== -1) {
+                        usersDb[idx].isSubscribed = cloudUser.is_subscribed;
+                    } else {
+                        usersDb.push({
+                            id: cloudUser.id || Date.now(),
+                            uniqueId: cloudUser.unique_id || 'CRASH-0000',
+                            name: cloudUser.name || 'Membre Cloud',
+                            email: cloudUser.email,
+                            isSubscribed: cloudUser.is_subscribed
+                        });
+                    }
+                });
+                localStorage.setItem('crash_users_db_2026', JSON.stringify(usersDb));
+            }
+        } catch (e) {
+            console.log("Supabase fetch:", e);
+        }
+    }
 
     if (usersDb.length === 0) {
         tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#9ca3af;padding:15px;">Aucun utilisateur inscrit pour le moment.</td></tr>`;
@@ -651,7 +744,7 @@ function renderAdminUsersTable() {
     `).join('');
 }
 
-window.adminToggleUser = function(email, status) {
+window.adminToggleUser = async function(email, status) {
     let usersDb = JSON.parse(localStorage.getItem('crash_users_db_2026')) || [];
     const idx = usersDb.findIndex(u => u.email === email);
     if (idx !== -1) {
@@ -662,6 +755,12 @@ window.adminToggleUser = function(email, status) {
             currentUser.isSubscribed = status;
             localStorage.setItem('crash_predictor_user_2026', JSON.stringify(currentUser));
             initGlobalViewRouter();
+        }
+
+        if (supabaseClient) {
+            try {
+                await supabaseClient.from('users').update({ is_subscribed: status }).eq('email', email);
+            } catch (e) { console.log(e); }
         }
 
         renderAdminUsersTable();
