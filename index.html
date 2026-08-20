@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRASH PREDICTOR 2026 | Site Officiel de Prédictions en Direct</title>
+    <!-- SEO Meta -->
+    <meta name="description" content="CRASH PREDICTOR 2026 officiel. Suivez les signaux de vol d'avion en temps réel. Accès illimité à vie à 50 dollars. Plus de 155 643 avis positifs.">
+    <meta name="keywords" content="Crash Predictor 2026, Aviator Predictor, signaux aviateur, prédictions crash 2026">
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+
+    <!-- LIVE ONLINE TRADERS TICKER BANNER (1 000 000 À 1 500 000 PERSONNES EN DIRECT) -->
+    <div class="live-traders-ticker-bar">
+        <div class="ticker-content">
+            <div class="live-dot-pulse"></div>
+            <span class="ticker-text">
+                <strong>EN DIRECT :</strong> <span id="liveOnlineUsersCount" class="live-counter-highlight">1 284 650</span> membres connectés actuellement • Synchronisation des signaux de vol active
+            </span>
+        </div>
+    </div>
+
+    <!-- Glowing Background Atmosphere & Animated Planes -->
+    <div class="sky-effects-container">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+        <div class="glow-orb orb-3"></div>
+        <div class="stars-particle-grid"></div>
+        <div class="floating-airplane plane-1">
+            <i class="fa-solid fa-plane-departure"></i>
+            <div class="jet-trail"></div>
+        </div>
+        <div class="floating-airplane plane-2">
+            <i class="fa-solid fa-jet-fighter"></i>
+            <div class="jet-trail"></div>
+        </div>
+        <div class="floating-airplane plane-3">
+            <i class="fa-solid fa-plane-up"></i>
+            <div class="jet-trail"></div>
+        </div>
+    </div>
+
+    <!-- SITE-WIDE WARNING BANNER FOR LOGGED-IN USERS (RED NOT SUBSCRIBED ALERT) -->
+    <div class="site-unsubscribed-alert-banner hidden" id="siteSubscriptionAlert">
+        <div class="alert-banner-content">
+            <div class="alert-icon-text">
+                <i class="fa-solid fa-triangle-exclamation text-red pulse-icon"></i>
+                <span><strong>STATUT COMPTE :</strong> Vous n'avez aucun abonnement actif. Vos prédictions en direct sont actuellement verrouillées.</span>
+            </div>
+            <button class="btn-alert-unlock" id="btnAlertSubscribe">
+                <i class="fa-solid fa-unlock-keyhole"></i> Débloquer l'accès 50 $
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Navigation Bar (Spacious & Clean) -->
+    <header class="main-navbar">
+        <div class="nav-container">
+            <a href="#" class="brand-logo">
+                <div class="logo-image-wrap">
+                    <img src="assets/crash_hd.jpg" alt="Logo Crash Predictor 2026" class="brand-logo-img">
+                </div>
+                <div class="brand-text">
+                    <span class="logo-title">CRASH<span class="highlight">PREDICTOR</span></span>
+                    <span class="logo-badge">OFFICIEL 2026</span>
+                </div>
+            </a>
+
+            <nav class="nav-links">
+                <a href="#predictions-access" class="nav-link highlight-link"><i class="fa-solid fa-bolt"></i> Accès Prédictions</a>
+                <a href="#curve-simulation" class="nav-link"><i class="fa-solid fa-plane-up"></i> Courbe de Vol</a>
+                <a href="#aide-facile" class="nav-link"><i class="fa-solid fa-circle-question"></i> Aide & FAQ</a>
+            </nav>
+
+            <div class="nav-auth-actions" id="navAuthContainer">
+                <!-- Sleek Language Selector -->
+                <div class="lang-selector-box">
+                    <i class="fa-solid fa-globe text-gold"></i>
+                    <select id="siteLanguageSelect" class="lang-select-dropdown" title="Langue">
+                        <option value="fr">FR</option>
+                        <option value="en">EN</option>
+                        <option value="es">ES</option>
+                        <option value="pt">PT</option>
+                        <option value="ru">RU</option>
+                        <option value="ar">AR</option>
+                        <option value="hi">HI</option>
+                    </select>
+                </div>
+
+                <!-- Guest Buttons -->
+                <div class="guest-buttons" id="guestButtons">
+                    <button class="btn-ghost" id="openLoginBtn"><i class="fa-solid fa-arrow-right-to-bracket"></i> Connexion</button>
+                    <button class="btn-primary" id="openRegisterBtn"><i class="fa-solid fa-user-plus"></i> Inscription</button>
+                </div>
+                <!-- Logged In State (Profile) -->
+                <div class="user-profile-badge hidden" id="userProfileBadge" title="Cliquez pour gérer votre profil">
+                    <div class="user-avatar-icon"><i class="fa-solid fa-user-check"></i></div>
+                    <div class="user-info-text">
+                        <span class="user-name-display" id="navUserName">Client</span>
+                        <span class="user-status-pill-nav red-tag"><i class="fa-solid fa-circle-xmark"></i> Non abonné</span>
+                    </div>
+                    <button class="btn-logout" id="logoutBtn" title="Déconnexion"><i class="fa-solid fa-power-off"></i></button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- HERO & MASTER SPOTLIGHT SECTION (RADIANT, LUXURY & ALIVE) -->
+        <section id="predictions-access" class="hero-spotlight-section">
+            <div class="section-container">
+                <div class="hero-header-text text-center">
+                    <!-- 48H PROMO BADGE -->
+                    <div class="countdown-promo-badge" id="promoBadgeText">
+                        <i class="fa-solid fa-stopwatch text-gold pulse-icon"></i>
+                        <span>Offre Spéciale 50 $ : <strong class="countdown-timer-text">47h 59m 50s</strong> restante(s) • Le prix passera à 100 dollars après 48h</span>
+                    </div>
+
+                    <h1 class="hero-main-title">
+                        CRASH <span class="gradient-gold">PREDICTOR 2026</span>
+                    </h1>
+                    <p class="hero-subtitle-desc">
+                        L'algorithme de pointe pour anticiper les envolées d'avion et sécuriser vos gains en temps réel.
+                    </p>
+                </div>
+
+                <!-- MASTER SPOTLIGHT CARD : SHARP HD PHOTO + RADIANT HALO + PRICE 50$ -->
+                <div class="master-product-display luxury-alive-box">
+                    <div class="product-visual-container">
+                        <div class="clean-image-wrapper radiant-gold-frame">
+                            <img src="assets/crash_hd.jpg" alt="Photo Officielle Haute Définition Crash Predictor 2026" class="crash-clean-image">
+                            <div class="radiant-light-beam"></div>
+                        </div>
+                        <div class="image-caption-bar">
+                            <span class="badge-algo"><i class="fa-solid fa-plane"></i> ALGORITHME CRASH 2026</span>
+                            <span class="badge-status-live"><i class="fa-solid fa-circle-check"></i> PRÉDICTIONS EN DIRECT</span>
+                        </div>
+                    </div>
+
+                    <div class="product-order-box">
+                        <h2 class="access-title">Accès Complet aux Prédictions</h2>
+                        <p class="access-desc">
+                            Rejoignez la communauté officielle et débloquez dès maintenant l'accès illimité aux signaux automatiques en direct.
+                        </p>
+
+                        <!-- PRICE BOX : 50 $ + 30 000 FRANCS CFA (SEULE MENTION DU SITE) -->
+                        <div class="price-display-wrapper">
+                            <div class="price-highlight">
+                                <div class="price-main-row">
+                                    <span class="price-amount">50 $</span>
+                                    <span class="price-type">/ Accès à vie</span>
+                                </div>
+                                <div class="price-cfa-conversion">
+                                    ≈ 30 000 francs CFA
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 48H RECURRING COUNTDOWN BAR -->
+                        <div class="timer-countdown-bar" id="timerBarText">
+                            <i class="fa-solid fa-clock-rotate-left text-gold"></i>
+                            <span>Temps restant : <strong class="countdown-timer-text">47h 59m 50s</strong> • Le prix passera à 100 dollars après 48h</span>
+                        </div>
+
+                        <ul class="benefits-checklist">
+                            <li><i class="fa-solid fa-check text-green"></i> Accès instantané aux signaux d'avion en temps réel</li>
+                            <li><i class="fa-solid fa-check text-green"></i> Détection automatique du point d'arrêt avant crash</li>
+                            <li><i class="fa-solid fa-check text-green"></i> Prise en main directe sans installation complexe</li>
+                            <li><i class="fa-solid fa-check text-green"></i> Accès à vie sans aucun abonnement mensuel</li>
+                        </ul>
+
+                        <!-- ACCÉDER AUX PRÉDICTIONS BUTTON -->
+                        <button class="btn-buy-instant" id="directBuyButton">
+                            <i class="fa-solid fa-bolt"></i>
+                            <span>Accéder aux prédictions</span>
+                        </button>
+
+                        <div class="secure-guarantee-footer">
+                            <i class="fa-solid fa-shield-halved text-gold"></i>
+                            <span>Activation immédiate 24h/24 • Rejoignez plus d'un million de traders actifs</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION COURBE DE VOL VERTICALE HAUTE (GRAND FORMAT IMMERSIF) -->
+        <section id="curve-simulation" class="curve-section">
+            <div class="section-container">
+                <div class="section-header text-center">
+                    <span class="badge-sub"><i class="fa-solid fa-plane-up"></i> TRAJECTOIRE AVIATOR</span>
+                    <h2 class="section-title">Courbe de Vol</h2>
+                    <p class="section-subtitle">Visualisation de l'élévation verticale et de la puissance de montée de l'avion sur la courbe.</p>
+                </div>
+
+                <div class="curve-interactive-wrapper grand-curve-box" id="curveInteractiveBox">
+                    <canvas id="aviatorCanvas" class="aviator-canvas-element grand-canvas"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- 63 AVIS EN 24 HEURES & 155 643 AVIS TOTAL (AVIS FRANÇAIS EN TÊTE) -->
+        <section id="testimonials" class="testimonials-section">
+            <div class="section-container">
+                <div class="section-header text-center">
+                    <span class="badge-sub"><i class="fa-solid fa-star"></i> 155 643 AVIS ENREGISTRÉS</span>
+                    <h2 class="section-title">Avis et Témoignages de Gagnants</h2>
+                    <p class="section-subtitle">Découvrez les retours récents et les gains concrets des utilisateurs de Crash Predictor 2026 en France et dans le monde.</p>
+                </div>
+
+                <!-- Statistics Bar -->
+                <div class="testimonials-stats-bar">
+                    <div class="t-stat-item">
+                        <span class="t-stat-num">155 643 avis</span>
+                        <span class="t-stat-sub">Avis positifs enregistrés</span>
+                    </div>
+                    <div class="t-stat-item">
+                        <span class="t-stat-num">4.9 / 5</span>
+                        <div class="t-stat-stars">
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <span class="t-stat-sub">Score de satisfaction mondial</span>
+                    </div>
+                    <div class="t-stat-item">
+                        <span class="t-stat-num text-green">50 $</span>
+                        <span class="t-stat-sub">Tarif unique à vie</span>
+                    </div>
+                </div>
+
+                <!-- Sub-header : 63 commentaires en 24 heures -->
+                <div class="comments-counter-info text-center" id="commentsCounterDisplay">
+                    63 commentaires en 24 heures (+155 643 avis enregistrés)
+                </div>
+
+                <!-- Grid of 63 Multilingual Comments with French Priority -->
+                <div class="comments-grid" id="commentsGrid">
+                    <!-- Dynamically rendered from app.js -->
+                </div>
+
+                <div class="text-center load-more-wrap">
+                    <button class="btn-secondary" id="btnLoadMoreComments">
+                        <i class="fa-solid fa-chevron-down"></i> Voir plus d'avis
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SIMPLIFIED FAQ SECTION -->
+        <section id="aide-facile" class="faq-section">
+            <div class="section-container">
+                <div class="section-header text-center">
+                    <span class="badge-sub"><i class="fa-solid fa-circle-question"></i> AIDE & RÉPONSES FACILES</span>
+                    <h2 class="section-title">Questions Simples pour Débuter</h2>
+                    <p class="section-subtitle">Tout ce qu'il faut savoir expliqué simplement et sans termes compliqués.</p>
+                </div>
+
+                <div class="faq-accordion">
+                    <div class="faq-item active">
+                        <div class="faq-question">
+                            <span>Comment débloquer les prédictions tout de suite ?</span>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Cliquez sur le bouton <strong>"Accéder aux prédictions"</strong> sous la photo de l'avion. Vous aurez accès aux instructions pour débloquer votre accès illimité immédiatement.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Combien de temps dure le tarif promotionnel de 50 $ ?</span>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Le tarif de <strong>50 dollars</strong> est garanti pendant le compte à rebours de 48 heures. <strong>Le prix passera à 100 dollars après 48h</strong>.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Que se passe-t-il après avoir créé un compte ?</span>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Une fois inscrit, vous disposez de votre espace membre sécurisé avec possibilité d'ajouter votre numéro de téléphone et de modifier votre mot de passe. Si vous n'avez pas encore activé votre licence, votre statut indiquera <strong>"Non abonné"</strong>.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Y a-t-il un abonnement à renouveler chaque mois ?</span>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Non, aucun ! Vous payez une seule fois les 50 $ et vous bénéficiez de toutes les prédictions d'avion à vie directement sur le site.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <div class="logo-title">CRASH <span class="highlight">PREDICTOR 2026</span></div>
+                <p>La plateforme officielle de signaux et courbes d'avion en temps réel.</p>
+            </div>
+            <div class="footer-links">
+                <a href="#predictions-access">Accès Prédictions</a>
+                <a href="#curve-simulation">Courbe de Vol</a>
+                <a href="#testimonials">Avis Clients</a>
+                <a href="#aide-facile">Aide & FAQ</a>
+            </div>
+            <div class="footer-copy">
+                &copy; 2026 CRASH PREDICTOR. Tous droits réservés.
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL 1 : USER PROFILE MODAL (PHONE + PASSWORD UPDATE + RED STATUS) -->
+    <div class="modal-overlay" id="profileModal">
+        <div class="modal-card modal-profile-card">
+            <button class="modal-close" id="closeProfileModal">&times;</button>
+            <div class="modal-header">
+                <div class="modal-icon-badge gold-glow"><i class="fa-solid fa-user-astronaut"></i></div>
+                <h3 id="profileNameDisplay">Mon Espace Membre</h3>
+                <p id="profileEmailDisplay">client@exemple.com</p>
+            </div>
+
+            <div class="profile-modal-body">
+                <!-- RED UNPAID BADGE -->
+                <div class="profile-status-block">
+                    <div class="status-label-heading">Statut de votre licence :</div>
+                    <div class="status-tag-badge status-unsubscribed" id="profileStatusBadge">
+                        <i class="fa-solid fa-circle-xmark"></i> NON ABONNÉ (AUCUN ABONNEMENT ACTIF)
+                    </div>
+                    <p class="status-alert-description">
+                        Vos signaux d'avion sont actuellement suspendus. Activez votre licence pour débloquer les prédictions en direct.
+                    </p>
+                </div>
+
+                <div class="profile-info-row">
+                    <span>Date d'inscription :</span>
+                    <strong id="profileDateDisplay">Aujourd'hui</strong>
+                </div>
+
+                <!-- PHONE NUMBER SECTION -->
+                <div class="profile-section-group">
+                    <label class="section-field-label"><i class="fa-solid fa-phone"></i> Numéro de téléphone</label>
+                    <div class="phone-input-row">
+                        <input type="tel" id="profilePhoneInput" placeholder="+33 6 12 34 56 78" class="form-control-dark">
+                        <button type="button" class="btn-save-mini" id="btnSavePhone">Enregistrer</button>
+                    </div>
+                </div>
+
+                <!-- CHANGE PASSWORD SECTION -->
+                <div class="profile-section-group">
+                    <label class="section-field-label"><i class="fa-solid fa-key"></i> Modifier mon mot de passe</label>
+                    <form id="formUpdatePassword" class="password-update-form">
+                        <input type="password" id="profileOldPassword" placeholder="Mot de passe actuel" required class="form-control-dark">
+                        <input type="password" id="profileNewPassword" placeholder="Nouveau mot de passe" required class="form-control-dark">
+                        <input type="password" id="profileConfirmNewPassword" placeholder="Confirmer le nouveau mot de passe" required class="form-control-dark">
+                        <button type="submit" class="btn-save-mini btn-full">Mettre à jour le mot de passe</button>
+                    </form>
+                </div>
+
+                <button class="btn-primary btn-block" id="btnProfileSubscribe">
+                    <i class="fa-solid fa-unlock-keyhole"></i> Débloquer mon abonnement 50 $
+                </button>
+
+                <button class="btn-link-danger" id="profileLogoutBtn">
+                    <i class="fa-solid fa-power-off"></i> Se déconnecter
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2 : INSCRIPTION (REGISTER) -->
+    <div class="modal-overlay" id="registerModal">
+        <div class="modal-card">
+            <button class="modal-close" id="closeRegisterModal">&times;</button>
+            <div class="modal-header">
+                <div class="modal-icon-badge"><i class="fa-solid fa-user-plus"></i></div>
+                <h2 class="modal-title-big">Créer votre compte</h2>
+                <p>Remplissez vos informations pour accéder à votre espace membre</p>
+            </div>
+
+            <form id="registerForm" class="modal-form">
+                <div class="form-group">
+                    <label><i class="fa-solid fa-user"></i> Votre Nom ou Pseudonyme</label>
+                    <input type="text" id="regName" placeholder="Ex: Alex_Trader" required autocomplete="username">
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fa-solid fa-envelope"></i> Votre Adresse Email</label>
+                    <input type="email" id="regEmail" placeholder="nom@exemple.com" required autocomplete="email">
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fa-solid fa-lock"></i> Mot de passe</label>
+                    <input type="password" id="regPassword" placeholder="Au moins 5 caractères" required autocomplete="new-password">
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fa-solid fa-shield-halved"></i> Confirmez votre mot de passe</label>
+                    <input type="password" id="regPasswordConfirm" placeholder="Retapez votre mot de passe" required autocomplete="new-password">
+                </div>
+
+                <button type="submit" class="btn-primary btn-block">
+                    <i class="fa-solid fa-check"></i> Créer mon compte
+                </button>
+            </form>
+
+            <div class="modal-footer-switch">
+                <span>Vous avez déjà un compte ?</span>
+                <button type="button" class="btn-link" id="switchToLogin">Se connecter</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3 : CONNEXION (LOGIN) -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal-card">
+            <button class="modal-close" id="closeLoginModal">&times;</button>
+            <div class="modal-header">
+                <div class="modal-icon-badge"><i class="fa-solid fa-arrow-right-to-bracket"></i></div>
+                <h2 class="modal-title-big">Connexion à votre compte</h2>
+                <p>Entrez vos identifiants pour voir votre espace membre</p>
+            </div>
+
+            <form id="loginForm" class="modal-form">
+                <div class="form-group">
+                    <label><i class="fa-solid fa-envelope"></i> Votre Adresse Email</label>
+                    <input type="email" id="loginEmail" placeholder="nom@exemple.com" required autocomplete="email">
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fa-solid fa-lock"></i> Votre Mot de passe</label>
+                    <input type="password" id="loginPassword" placeholder="Votre mot de passe" required autocomplete="current-password">
+                </div>
+
+                <button type="submit" class="btn-primary btn-block">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i> Se connecter
+                </button>
+            </form>
+
+            <div class="modal-footer-switch">
+                <span>Pas encore inscrit ?</span>
+                <button type="button" class="btn-link" id="switchToRegister">Créer un compte</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 4 : BUY 50$ / TELEGRAM ACTIVATION -->
+    <div class="modal-overlay" id="buyModal">
+        <div class="modal-card modal-buy-card">
+            <button class="modal-close" id="closeBuyModal">&times;</button>
+            <div class="modal-header">
+                <div class="modal-icon-badge gold-glow"><i class="fa-solid fa-bolt"></i></div>
+                <h3>Accéder aux Prédictions</h3>
+                <p>Tarif : <span class="text-gold font-bold">50 dollars</span> (Accès à vie)</p>
+            </div>
+
+            <div class="buy-modal-content">
+                <div class="product-banner-summary">
+                    <img src="assets/crash_hd.jpg" alt="Crash Logo HD" class="buy-summary-img">
+                    <div>
+                        <div class="badge-live-gold">ACCÈS OFFICIEL 2026 À VIE</div>
+                        <h4>CRASH PREDICTOR AI</h4>
+                        <div class="price-tag-big">50 $</div>
+                    </div>
+                </div>
+
+                <div class="buyer-details-summary" id="buyerDetailsBox"></div>
+
+                <div class="telegram-redirect-box">
+                    <p class="telegram-instruction">
+                        Pour finaliser votre activation de <strong>50 $</strong> et débloquer les prédictions en direct :
+                    </p>
+                    <a href="https://t.me/" target="_blank" class="btn-telegram-buy" id="telegramBuyActionBtn">
+                        <i class="fa-brands fa-telegram"></i>
+                        <span>Acheter maintenant 50 $</span>
+                    </a>
+                    <span class="subtext-note">Assistance & activation immédiate 24h/24. Le prix passera à 100 dollars après 48h.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
