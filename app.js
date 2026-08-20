@@ -1,201 +1,35 @@
 /**
- * CRASH PREDICTOR 2026 - APPLICATION COMPLETE & HAUTE PERFORMANCE
- * - Compteur Live Temps Réel (1 150 000 à 1 480 000 personnes connectées)
- * - Simulation Courbe Verticale Haute & Trajectoires Variables Réelles
- * - Avis Français mis en avant en 1ère page avec 63 avis en 24h ($ USD)
- * - Espace Profil : Badge Rouge Non Abonné + Ajout Téléphone + Modification Mot de Passe
- * - Compte à Rebours 48h Garanti ("Le prix passera à 100 dollars après 48h")
+ * CRASH PREDICTOR 2026 - APPLICATION AVEC FLUTTERWAVE V3 OFFICIEL
+ * Clé Publique : FLWPUBK-07d56b9d571ed135ab4bf5d3fd5330a9-X
+ * Support Direct : Wave, MTN Mobile Money, Orange Money, Moov Money, Carte Bancaire
  */
 
+const FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK-07d56b9d571ed135ab4bf5d3fd5330a9-X";
+
 // ==========================================
-// 1. DATA: 63 AVIS AUTHENTIQUES (AVIS FRANÇAIS EN PREMIÈRE LIGNE)
+// 1. DATA: 63 AVIS AUTHENTIQUES (AVIS FRANÇAIS EN TÊTE)
 // ==========================================
 const WINNER_COMMENTS = [
-    // AVIS FRANÇAIS EN TÊTE DE LISTE (POUR LE PUBLIC PRINCIPAL)
-    {
-        id: 1,
-        username: "Julien_Paris",
-        lang: "FR",
-        gain: "+$450",
-        rating: 5,
-        time: "Il y a 3 min",
-        comment: "50 dollars rentabilisés dès la première session. L'avion sur la courbe aide vraiment à visualiser l'instant idéal de sortie."
-    },
-    {
-        id: 2,
-        username: "Marc_Bruxelles",
-        lang: "FR",
-        gain: "+$820",
-        rating: 5,
-        time: "Il y a 8 min",
-        comment: "Très sérieux. L'accès à vie permet d'être tranquille. Les signaux en direct sont très nets et sans latence."
-    },
-    {
-        id: 3,
-        username: "Kevin_Geneve",
-        lang: "FR",
-        gain: "+$1,100",
-        rating: 5,
-        time: "Il y a 14 min",
-        comment: "La plateforme est ultra rapide et rassurante. Rien à installer, tout se fait directement sur le site."
-    },
-    {
-        id: 4,
-        username: "Sophie_Lyon",
-        lang: "FR",
-        gain: "+$390",
-        rating: 5,
-        time: "Il y a 22 min",
-        comment: "Compte créé en 30 secondes, interface très claire et signaux d'avion impeccables."
-    },
-    {
-        id: 5,
-        username: "Cedric_Nantes",
-        lang: "FR",
-        gain: "+$640",
-        rating: 5,
-        time: "Il y a 31 min",
-        comment: "Le compte à rebours de 48h m'a convaincu pour les 50$, aucun regret. Très bon suivi des montées."
-    },
-
-    // AVIS INTERNATIONAUX ENRICHIS (ESPAGNOL, ANGLAIS, PORTUGAIS, RUSSE, ARABE, HINDI, ALLEMAND, ITALIEN)
-    {
-        id: 6,
-        username: "Carlos_Madrid",
-        lang: "ES",
-        gain: "+$580",
-        rating: 5,
-        time: "Hace 4 min",
-        comment: "Increíble precisión. Pagué los 50 dólares y en menos de una hora ya había recuperado la inversión con dos señales seguras a x3.20."
-    },
-    {
-        id: 7,
-        username: "James_London",
-        lang: "EN",
-        gain: "+$1,380",
-        rating: 5,
-        time: "10 mins ago",
-        comment: "The algorithm predicts the exit threshold with remarkable consistency. Lifetime access for $50 is a steal."
-    },
-    {
-        id: 8,
-        username: "Rafael_SaoPaulo",
-        lang: "PT",
-        gain: "+$1,650",
-        rating: 5,
-        time: "Há 12 min",
-        comment: "Sensacional! O sinal bateu certinho no x5.20. Paguei os 50 dólares e já estou no lucro absurdo."
-    },
-    {
-        id: 9,
-        username: "Dmitry_Moscow",
-        lang: "RU",
-        gain: "+$1,850",
-        rating: 5,
-        time: "15 мин назад",
-        comment: "Отличный алгоритм! Точность выхода до краша поражает. Доступ за 50$ окупился моментально."
-    },
-    {
-        id: 10,
-        username: "Tariq_Dubai",
-        lang: "AR",
-        gain: "+$2,100",
-        rating: 5,
-        time: "منذ 18 دقيقة",
-        comment: "برنامج ممتاز جداً، التوقعات دقيقة للغاية وتم استرجاع المبلغ في أول جلسة بسهولة."
-    },
-    {
-        id: 11,
-        username: "Aarav_Mumbai",
-        lang: "HI",
-        gain: "+$1,250",
-        rating: 5,
-        time: "20 min ago",
-        comment: "बहुत ही शानदार एल्गोरिदम है! $50 में लाइफटाइम एक्सेस पूरी तरह से पैसा वसूल है।"
-    },
-    {
-        id: 12,
-        username: "Lukas_Berlin",
-        lang: "DE",
-        gain: "+$750",
-        rating: 5,
-        time: "Vor 25 Min.",
-        comment: "Hervorragende Vorhersage-Algorithmen. Der 50-Dollar-Zugang hat sich bereits am ersten Abend mehrfach bezahlt gemacht."
-    },
-    {
-        id: 13,
-        username: "Marco_Milano",
-        lang: "IT",
-        gain: "+$830",
-        rating: 5,
-        time: "28 min fa",
-        comment: "Strumento eccezionale! Ho seguito le indicazioni per il cashout a x4.50 e ho chiuso con un ottimo profitto netto."
-    },
-    {
-        id: 14,
-        username: "Alexandre_Marseille",
-        lang: "FR",
-        gain: "+$530",
-        rating: 5,
-        time: "Il y a 35 min",
-        comment: "Les alertes tombent sans latence. Très bon outil pour cadrer ses parties avec discipline."
-    },
-    {
-        id: 15,
-        username: "Mateo_BuenosAires",
-        lang: "ES",
-        gain: "+$1,420",
-        rating: 5,
-        time: "Hace 40 min",
-        comment: "La curva del avión muestra exactamente el momento antes del corte. Muy profesional y sin suscripciones mensuales."
-    },
-    {
-        id: 16,
-        username: "Brandon_Toronto",
-        lang: "EN",
-        gain: "+$940",
-        rating: 5,
-        time: "45 mins ago",
-        comment: "Clean dashboard and live signals on point. Cashed out 3 consecutive winning flights today."
-    },
-    {
-        id: 17,
-        username: "Thiago_Rio",
-        lang: "PT",
-        gain: "+$920",
-        rating: 5,
-        time: "Há 50 min",
-        comment: "Melhor investimento para quem joga Crash. A curva do avião dourado é perfeita para antecipar."
-    },
-    {
-        id: 18,
-        username: "Alexey_SPB",
-        lang: "RU",
-        gain: "+$980",
-        rating: 5,
-        time: "55 мин назад",
-        comment: "Очень чистый интерфейс, никаких скрытых подписок. Сигналы приходят без задержек."
-    },
-    {
-        id: 19,
-        username: "Youssef_Casablanca",
-        lang: "AR",
-        gain: "+$850",
-        rating: 5,
-        time: "منذ ساعة",
-        comment: "سعر 50 دولار لمدى الحياة عرض لا يعوض. الإشارات واضحة والنتائج ممتازة."
-    },
-    {
-        id: 20,
-        username: "Rohan_Delhi",
-        lang: "HI",
-        gain: "+$890",
-        rating: 5,
-        time: "1 hr ago",
-        comment: "Crash Predictor 2026 एकदम सटीक सिग्नल देता है। आज ही 3 बार लगातार जीत हासिल की।"
-    },
-
-    // SUITE 21 A 63
+    { id: 1, username: "Julien_Paris", lang: "FR", gain: "+$450", rating: 5, time: "Il y a 3 min", comment: "50 dollars rentabilisés dès la première session. L'avion sur la courbe aide vraiment à visualiser l'instant idéal de sortie." },
+    { id: 2, username: "Marc_Bruxelles", lang: "FR", gain: "+$820", rating: 5, time: "Il y a 8 min", comment: "Très sérieux. L'accès à vie permet d'être tranquille. Les signaux en direct sont très nets et sans latence." },
+    { id: 3, username: "Kevin_Geneve", lang: "FR", gain: "+$1,100", rating: 5, time: "Il y a 14 min", comment: "La plateforme est ultra rapide et rassurante. Rien à installer, tout se fait directement sur le site." },
+    { id: 4, username: "Sophie_Lyon", lang: "FR", gain: "+$390", rating: 5, time: "Il y a 22 min", comment: "Compte créé en 30 secondes, interface très claire et signaux d'avion impeccables." },
+    { id: 5, username: "Cedric_Nantes", lang: "FR", gain: "+$640", rating: 5, time: "Il y a 31 min", comment: "Le compte à rebours de 48h m'a convaincu pour les 50$, aucun regret. Très bon suivi des montées." },
+    { id: 6, username: "Carlos_Madrid", lang: "ES", gain: "+$580", rating: 5, time: "Hace 4 min", comment: "Increíble precisión. Pagué los 50 dólares y en menos de una hora ya había recuperado la inversión con dos señales seguras a x3.20." },
+    { id: 7, username: "James_London", lang: "EN", gain: "+$1,380", rating: 5, time: "10 mins ago", comment: "The algorithm predicts the exit threshold with remarkable consistency. Lifetime access for $50 is a steal." },
+    { id: 8, username: "Rafael_SaoPaulo", lang: "PT", gain: "+$1,650", rating: 5, time: "Há 12 min", comment: "Sensacional! O sinal bateu certinho no x5.20. Paguei os 50 dólares e já estou no lucro absurdo." },
+    { id: 9, username: "Dmitry_Moscow", lang: "RU", gain: "+$1,850", rating: 5, time: "15 мин назад", comment: "Отличный алгоритм! Точность выхода до краша поражает. Доступ за 50$ окупился моментально." },
+    { id: 10, username: "Tariq_Dubai", lang: "AR", gain: "+$2,100", rating: 5, time: "منذ 18 دقيقة", comment: "برنامج ممتاز جداً، التوقعات دقيقة للغاية وتم استرجاع المبلغ في أول جلسة بسهولة." },
+    { id: 11, username: "Aarav_Mumbai", lang: "HI", gain: "+$1,250", rating: 5, time: "20 min ago", comment: "बहुत ही शानदार एल्गोरिदम है! $50 में लाइफटाइम एक्सेस पूरी तरह से पैसा वसूल है।" },
+    { id: 12, username: "Lukas_Berlin", lang: "DE", gain: "+$750", rating: 5, time: "Vor 25 Min.", comment: "Hervorragende Vorhersage-Algorithmen. Der 50-Dollar-Zugang hat sich bereits am ersten Abend mehrfach bezahlt gemacht." },
+    { id: 13, username: "Marco_Milano", lang: "IT", gain: "+$830", rating: 5, time: "28 min fa", comment: "Strumento eccezionale! Ho seguito le indicazioni per il cashout a x4.50 e ho chiuso con un ottimo profitto netto." },
+    { id: 14, username: "Alexandre_Marseille", lang: "FR", gain: "+$530", rating: 5, time: "Il y a 35 min", comment: "Les alertes tombent sans latence. Très bon outil pour cadrer ses parties avec discipline." },
+    { id: 15, username: "Mateo_BuenosAires", lang: "ES", gain: "+$1,420", rating: 5, time: "Hace 40 min", comment: "La curva del avión muestra exactamente el momento antes del corte. Muy profesional." },
+    { id: 16, username: "Brandon_Toronto", lang: "EN", gain: "+$940", rating: 5, time: "45 mins ago", comment: "Clean dashboard and live signals on point. Cashed out 3 consecutive winning flights today." },
+    { id: 17, username: "Thiago_Rio", lang: "PT", gain: "+$920", rating: 5, time: "Há 50 min", comment: "Melhor investimento para quem joga Crash. A curva do avião dourado é perfeita." },
+    { id: 18, username: "Alexey_SPB", lang: "RU", gain: "+$980", rating: 5, time: "55 мин назад", comment: "Очень чистый интерфейс, никаких скрытых подписок. Сигналы приходят без задержек." },
+    { id: 19, username: "Youssef_Casablanca", lang: "AR", gain: "+$850", rating: 5, time: "منذ ساعة", comment: "سعر 50 دولار لمدى الحياة عرض لا يعوض. الإشارات واضحة والنتائج ممتازة." },
+    { id: 20, username: "Rohan_Delhi", lang: "HI", gain: "+$890", rating: 5, time: "1 hr ago", comment: "Crash Predictor 2026 एकदम सटीक सिग्नल देता है। आज ही 3 बार जीत हासिल की।" },
     { id: 21, username: "Maximilian_Munich", lang: "DE", gain: "+$1,850", rating: 5, time: "Vor 1 Std.", comment: "Die Flugkurve und die Signale sind extrem präzise. Einfach einmalig freischalten." },
     { id: 22, username: "Giovanni_Roma", lang: "IT", gain: "+$1,270", rating: 5, time: "1 ora fa", comment: "Accesso a vita a 50$ davvero conveniente. Grafica pulita e segnali ottimi." },
     { id: 23, username: "Liam_Sydney", lang: "EN", gain: "+$1,720", rating: 5, time: "1 hr ago", comment: "Great UI, no hidden monthly fees. Full live access directly on the browser." },
@@ -224,7 +58,7 @@ const WINNER_COMMENTS = [
     { id: 46, username: "Bruno_Recife", lang: "PT", gain: "+$860", rating: 5, time: "Há 5h 30", comment: "Muito top! As previsões do avião amarelo não falham." },
     { id: 47, username: "Ahmed_Algiers", lang: "AR", gain: "+$1,120", rating: 5, time: "منذ 6 ساعات", comment: "منصة احترافية وسهلة الاستخدام للغاية." },
     { id: 48, username: "Ryan_Miami", lang: "EN", gain: "+$670", rating: 5, time: "6 hrs ago", comment: "Solid predictions. Smooth curve flight on the dashboard." },
-    { id: 49, username: "Mikhail_Sochi", lang: "RU", gain: "+$1,560", rating: 5, time: "6 часов назад", comment: "Поддержка в Telegram ответила сразу, доступ активен." },
+    { id: 49, username: "Mikhail_Sochi", lang: "RU", gain: "+$1,560", rating: 5, time: "6 часов назад", comment: "Поддержка ответила сразу, доступ активен." },
     { id: 50, username: "Pooja_Jaipur", lang: "HI", gain: "+$920", rating: 5, time: "7 hrs ago", comment: "Superb experience! Highly recommended." },
     { id: 51, username: "Florian_Koln", lang: "DE", gain: "+$1,370", rating: 5, time: "Vor 7 Std.", comment: "Funktioniert einwandfrei im Browser. Sehr zufrieden." },
     { id: 52, username: "Enzo_Firenze", lang: "IT", gain: "+$540", rating: 5, time: "7 ore fa", comment: "Tutto automatico e preciso. Vale ogni singolo dollaro." },
@@ -238,13 +72,11 @@ const WINNER_COMMENTS = [
     { id: 60, username: "Omar_Muscat", lang: "AR", gain: "+$1,340", rating: 5, time: "منذ 12 ساعة", comment: "دقة عالية في تحديد نقطة القفز، شكراً لكم." },
     { id: 61, username: "Lucas_Austin", lang: "EN", gain: "+$830", rating: 5, time: "13 hrs ago", comment: "Fast activation, transparent pricing, awesome software." },
     { id: 62, username: "Elena_Samara", lang: "RU", gain: "+$1,270", rating: 5, time: "15 часов назад", comment: "Очень довольна результатами за первые сутки." },
-    { id: 63, username: "Karan_Ahmedabad", lang: "HI", gain: "+$680", rating: 5, time: "18 hrs ago", comment: "Smooth UI, fast Telegram response, genuine signals." }
+    { id: 63, username: "Karan_Ahmedabad", lang: "HI", gain: "+$680", rating: 5, time: "18 hrs ago", comment: "Smooth UI, fast response, genuine signals." }
 ];
 
-// App State
 let currentUser = JSON.parse(localStorage.getItem('crash_predictor_user_2026')) || null;
 let displayedCommentsCount = 12;
-let telegramCustomLink = "https://t.me/";
 let currentLanguage = "fr";
 
 // ==========================================
@@ -261,18 +93,17 @@ document.addEventListener('DOMContentLoaded', () => {
     initAuthSecurity();
     initProfileModal();
     initModals();
-    initDirectBuy();
+    initFlutterwaveCheckoutSystem();
     initFAQHelper();
 });
 
 // ==========================================
-// 3. LIVE ONLINE TRADERS COUNTER (1 000 000 A 1 500 000 PERSONNES EN DIRECT)
+// 3. LIVE TRADERS TICKER (1M - 1.5M PERSONNES EN DIRECT)
 // ==========================================
 function initLiveOnlineUsersTicker() {
     const liveCounterEl = document.getElementById('liveOnlineUsersCount');
     if (!liveCounterEl) return;
 
-    // Start around 1 284 650
     let currentUsers = 1284650;
 
     function formatNumber(num) {
@@ -280,7 +111,6 @@ function initLiveOnlineUsersTicker() {
     }
 
     function updateLiveTraders() {
-        // Random natural fluctuation between 1 150 000 and 1 490 000
         const delta = Math.floor((Math.random() - 0.48) * 140);
         currentUsers += delta;
 
@@ -299,11 +129,7 @@ function initLiveOnlineUsersTicker() {
 // ==========================================
 function initAutoLanguageDetector() {
     const saved = localStorage.getItem('crash_lang_pref_2026');
-    if (saved) {
-        currentLanguage = saved;
-    } else {
-        currentLanguage = 'fr'; // French primary as requested
-    }
+    currentLanguage = saved || 'fr';
 }
 
 function initLanguageSelector() {
@@ -318,7 +144,7 @@ function initLanguageSelector() {
 }
 
 // ==========================================
-// 5. GUARANTEED 48-HOUR PERSISTENT COUNTDOWN
+// 5. GUARANTEED 48H COUNTDOWN
 // ==========================================
 function initGuaranteed48hCountdown() {
     const timerElements = document.querySelectorAll('.countdown-timer-text');
@@ -362,7 +188,7 @@ function initGuaranteed48hCountdown() {
 }
 
 // ==========================================
-// 6. GRAND VERTICAL AVIATOR CURVE SIMULATOR (MONTE BIEN VERTICAL, LOIN, EXPLOSE ET REDESCEND)
+// 6. VERTICAL AVIATOR CURVE SIMULATOR (500PX)
 // ==========================================
 function initVerticalGrandAviatorCurve() {
     const canvas = document.getElementById('aviatorCanvas');
@@ -374,7 +200,7 @@ function initVerticalGrandAviatorCurve() {
     function resizeCanvas() {
         if (container) {
             canvas.width = container.clientWidth || 920;
-            canvas.height = 500; // Grand format bien vertical et haut
+            canvas.height = 500;
         }
     }
 
@@ -383,13 +209,12 @@ function initVerticalGrandAviatorCurve() {
 
     let t = 0;
     let flightSpeed = 0.0055;
-    let state = 'flying'; // 'flying', 'exploding', 'waiting'
+    let state = 'flying';
     let explosionTimer = 0;
     let particles = [];
     let blastRadius = 0;
 
-    // Flights alternate between vertical steep climbs (high levels) and medium/lower levels
-    let targetMaxHeightRatio = 0.08; // Very high vertical climb by default
+    let targetMaxHeightRatio = 0.08;
     let targetMaxXOffset = 80;
 
     function resetFlight() {
@@ -400,12 +225,10 @@ function initVerticalGrandAviatorCurve() {
 
         const rand = Math.random();
         if (rand > 0.35) {
-            // NIVEAU SUPÉRIEUR TRÈS VERTICAL (Montée haute et lointaine)
             targetMaxHeightRatio = 0.05 + Math.random() * 0.08;
             targetMaxXOffset = 50 + Math.random() * 70;
             flightSpeed = 0.0048 + Math.random() * 0.0015;
         } else {
-            // NIVEAU INTERMÉDIAIRE
             targetMaxHeightRatio = 0.22 + Math.random() * 0.15;
             targetMaxXOffset = 130 + Math.random() * 50;
             flightSpeed = 0.006;
@@ -439,11 +262,9 @@ function initVerticalGrandAviatorCurve() {
         const W = canvas.width;
         const H = canvas.height;
 
-        // 1. Dark Blue Night Sky
         ctx.fillStyle = '#070c1e';
         ctx.fillRect(0, 0, W, H);
 
-        // 2. Dotted Grid (Vertical & Horizontal)
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
         ctx.lineWidth = 1;
         ctx.setLineDash([4, 4]);
@@ -462,24 +283,20 @@ function initVerticalGrandAviatorCurve() {
             ctx.stroke();
         }
 
-        // 3. Axes
         ctx.setLineDash([]);
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.28)';
         ctx.lineWidth = 2.5;
 
-        // X Axis (Bottom)
         ctx.beginPath();
         ctx.moveTo(40, H - 40);
         ctx.lineTo(W - 10, H - 40);
         ctx.stroke();
 
-        // Y Axis (Vertical Left)
         ctx.beginPath();
         ctx.moveTo(40, 15);
         ctx.lineTo(40, H - 40);
         ctx.stroke();
 
-        // Axis Dots
         ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
         for (let y = 35; y <= H - 40; y += 65) {
             ctx.beginPath();
@@ -492,14 +309,13 @@ function initVerticalGrandAviatorCurve() {
             ctx.fill();
         }
 
-        // 4. Steep Vertical Quadratic Curve Calculation
         const startX = 40;
         const startY = H - 40;
         const targetMaxX = W - targetMaxXOffset;
         const targetMaxY = H * targetMaxHeightRatio;
 
         const progress = Math.min(t, 1);
-        const cpX = startX + (targetMaxX - startX) * 0.35; // Sharper steep climb
+        const cpX = startX + (targetMaxX - startX) * 0.35;
         const cpY = startY;
 
         const currentX = (1 - progress) * (1 - progress) * startX + 2 * (1 - progress) * progress * cpX + progress * progress * targetMaxX;
@@ -509,7 +325,6 @@ function initVerticalGrandAviatorCurve() {
         const dy = 2 * (1 - progress) * (cpY - startY) + 2 * progress * (targetMaxY - cpY);
         const angle = Math.atan2(dy, dx);
 
-        // Draw Glowing Yellow Vertical Curve
         ctx.beginPath();
         ctx.moveTo(startX, startY);
         for (let step = 0; step <= progress; step += 0.01) {
@@ -525,7 +340,6 @@ function initVerticalGrandAviatorCurve() {
         ctx.stroke();
         ctx.shadowBlur = 0;
 
-        // 5. Plane / Explosion Animation
         if (state === 'flying') {
             ctx.save();
             ctx.translate(currentX, currentY);
@@ -534,19 +348,16 @@ function initVerticalGrandAviatorCurve() {
             ctx.shadowColor = '#ffc837';
             ctx.shadowBlur = 22;
 
-            // Fuselage
             ctx.fillStyle = '#ffc837';
             ctx.beginPath();
             ctx.ellipse(0, 0, 25, 11.5, 0, 0, Math.PI * 2);
             ctx.fill();
 
-            // Cockpit
             ctx.fillStyle = '#1e1b4b';
             ctx.beginPath();
             ctx.arc(7.5, -3, 4.5, 0, Math.PI * 2);
             ctx.fill();
 
-            // Wings
             ctx.fillStyle = '#f59e0b';
             ctx.beginPath();
             ctx.moveTo(-4, 0);
@@ -562,11 +373,9 @@ function initVerticalGrandAviatorCurve() {
             ctx.closePath();
             ctx.fill();
 
-            // Nose
             ctx.fillStyle = '#d97706';
             ctx.fillRect(20, -7, 4, 14);
 
-            // Jet Flame
             ctx.fillStyle = '#ef4444';
             ctx.beginPath();
             ctx.moveTo(-25, -5);
@@ -628,7 +437,7 @@ function initVerticalGrandAviatorCurve() {
 }
 
 // ==========================================
-// 7. RENDER 63 COMMENTS (FRENCH REVIEWS IN FIRST PAGE SPOTLIGHT)
+// 7. RENDER 63 COMMENTS
 // ==========================================
 function renderCommentsList() {
     const grid = document.getElementById('commentsGrid');
@@ -688,7 +497,7 @@ function initLoadMoreComments() {
 }
 
 // ==========================================
-// 8. AUTHENTICATION & SECURE PROFILE SYSTEM (TÉLÉPHONE + MOT DE PASSE + BADGE ROUGE)
+// 8. AUTHENTICATION & SECURE PROFILE SYSTEM
 // ==========================================
 function initAuthSecurity() {
     updateAuthHeader();
@@ -698,7 +507,6 @@ function initAuthSecurity() {
     const logoutBtn = document.getElementById('logoutBtn');
     const profileLogoutBtn = document.getElementById('profileLogoutBtn');
 
-    // Inscription
     if (regForm) {
         regForm.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -758,7 +566,6 @@ function initAuthSecurity() {
         });
     }
 
-    // Connexion
     if (logForm) {
         logForm.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -845,7 +652,7 @@ function updateAuthHeader() {
 }
 
 // ==========================================
-// 9. PROFILE MANAGEMENT (PHONE NUMBER + CHANGE PASSWORD)
+// 9. PROFILE MANAGEMENT
 // ==========================================
 function initProfileModal() {
     const userProfileBadge = document.getElementById('userProfileBadge');
@@ -887,7 +694,6 @@ function initProfileModal() {
         closeProfile.addEventListener('click', () => profileModal?.classList.remove('active'));
     }
 
-    // Save / Update Phone Number
     if (btnSavePhone) {
         btnSavePhone.addEventListener('click', () => {
             if (!currentUser) return;
@@ -905,7 +711,6 @@ function initProfileModal() {
         });
     }
 
-    // Change Password
     if (formUpdatePassword) {
         formUpdatePassword.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -954,51 +759,99 @@ function initProfileModal() {
 }
 
 // ==========================================
-// 10. DIRECT BUY / ACCÉDER AUX PRÉDICTIONS
+// 10. FLUTTERWAVE V3 DIRECT CHECKOUT (WAVE, MTN, ORANGE, MOOV, CARTE)
 // ==========================================
-function initDirectBuy() {
+function initFlutterwaveCheckoutSystem() {
     const directBuyButtons = document.querySelectorAll('#directBuyButton, .btn-buy-instant, .btn-cta-buy, #btnAlertSubscribe');
     const buyModal = document.getElementById('buyModal');
     const buyerDetailsBox = document.getElementById('buyerDetailsBox');
-    const telegramBuyActionBtn = document.getElementById('telegramBuyActionBtn');
+    const btnLaunchFlutterwave = document.getElementById('btnLaunchFlutterwave');
+    const paymentCustomerEmail = document.getElementById('paymentCustomerEmail');
+    const paymentCustomerName = document.getElementById('paymentCustomerName');
+    const paymentCustomerPhone = document.getElementById('paymentCustomerPhone');
+    const paymentCurrencySelect = document.getElementById('paymentCurrencySelect');
 
-    window.setTelegramLink = function(url) {
-        telegramCustomLink = url;
-        if (telegramBuyActionBtn) {
-            telegramBuyActionBtn.href = url;
-        }
-    };
-
+    // Open Checkout Modal
     directBuyButtons.forEach(btn => {
         btn.addEventListener('click', (e) => {
-            if (btn.getAttribute('href') && btn.getAttribute('href').startsWith('#')) {
-                return;
-            }
+            if (btn.getAttribute('href') && btn.getAttribute('href').startsWith('#')) return;
             e.preventDefault();
-            if (buyerDetailsBox) {
-                if (currentUser) {
-                    buyerDetailsBox.innerHTML = `
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <div style="width:38px; height:38px; border-radius:50%; background:#ffc837; color:#0d0614; display:flex; align-items:center; justify-content:center; font-size:18px;">
-                                <i class="fa-solid fa-user-check"></i>
-                            </div>
-                            <div>
-                                <strong>Compte : ${currentUser.name}</strong> (${currentUser.email})
-                                <div style="font-size:0.78rem; color:#ef4444; font-weight:700;"><i class="fa-solid fa-circle-exclamation"></i> Statut actuel : Non abonné • Le prix passera à 100 dollars après 48h</div>
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    buyerDetailsBox.innerHTML = `
-                        <div style="color: #ffc837; font-size:0.85rem;">
-                            <i class="fa-solid fa-info-circle"></i> Accès officiel <strong>CRASH PREDICTOR 2026</strong> à 50 dollars. Le prix passera à 100 dollars après 48h.
-                        </div>
-                    `;
-                }
+
+            // Pre-fill user data if logged in
+            if (currentUser) {
+                if (paymentCustomerName) paymentCustomerName.value = currentUser.name;
+                if (paymentCustomerEmail) paymentCustomerEmail.value = currentUser.email;
+                if (paymentCustomerPhone) paymentCustomerPhone.value = currentUser.phone || "";
             }
+
             buyModal?.classList.add('active');
         });
     });
+
+    // Launch Flutterwave Checkout
+    if (btnLaunchFlutterwave) {
+        btnLaunchFlutterwave.addEventListener('click', () => {
+            const customerEmail = (paymentCustomerEmail?.value || currentUser?.email || "client@crashpredictor2026.com").trim();
+            const customerName = (paymentCustomerName?.value || currentUser?.name || "Membre VIP").trim();
+            const customerPhone = (paymentCustomerPhone?.value || currentUser?.phone || "").trim();
+            const currency = paymentCurrencySelect ? paymentCurrencySelect.value : "XOF";
+
+            const amount = currency === "XOF" ? 30000 : 50;
+
+            if (!customerEmail || !customerEmail.includes('@')) {
+                showToast("Veuillez saisir une adresse email valide pour recevoir vos accès.", "error");
+                paymentCustomerEmail?.focus();
+                return;
+            }
+
+            if (typeof FlutterwaveCheckout !== "function") {
+                showToast("Chargement de la passerelle de paiement sécurisée...", "error");
+                return;
+            }
+
+            // Execute Flutterwave Inline Popup
+            FlutterwaveCheckout({
+                public_key: FLUTTERWAVE_PUBLIC_KEY,
+                tx_ref: "CRASH-" + Date.now() + "-" + Math.floor(Math.random() * 10000),
+                amount: amount,
+                currency: currency,
+                payment_options: "mobilemoneyfrancophone, mobilemoneyci, mobilemoneyghana, ussd, card, opay, barter, account, banktransfer",
+                customer: {
+                    email: customerEmail,
+                    phone_number: customerPhone,
+                    name: customerName,
+                },
+                customizations: {
+                    title: "CRASH PREDICTOR 2026",
+                    description: "Accès Officiel à Vie aux Prédictions d'Avion",
+                    logo: window.location.origin + "/assets/crash_hd.jpg",
+                },
+                callback: function (data) {
+                    console.log("Paiement Flutterwave réussi:", data);
+                    buyModal?.classList.remove('active');
+
+                    // Activate user license automatically
+                    if (currentUser) {
+                        currentUser.isSubscribed = true;
+                        localStorage.setItem('crash_predictor_user_2026', JSON.stringify(currentUser));
+
+                        let usersDb = JSON.parse(localStorage.getItem('crash_users_db_2026')) || [];
+                        const idx = usersDb.findIndex(u => u.email === currentUser.email);
+                        if (idx !== -1) {
+                            usersDb[idx].isSubscribed = true;
+                            localStorage.setItem('crash_users_db_2026', JSON.stringify(usersDb));
+                        }
+                        updateAuthHeader();
+                    }
+
+                    showToast("Félicitations ! Votre accès CRASH PREDICTOR 2026 est activé à vie !");
+                },
+                onclose: function() {
+                    console.log("Fenêtre de paiement fermée.");
+                }
+            });
+        });
+    }
 }
 
 // ==========================================

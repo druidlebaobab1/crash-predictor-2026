@@ -13,6 +13,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <!-- Flutterwave Checkout v3 Official SDK -->
+    <script src="https://checkout.flutterwave.com/v3.js"></script>
 </head>
 <body class="dark-theme">
 
@@ -112,7 +114,7 @@
     </header>
 
     <main>
-        <!-- HERO & MASTER SPOTLIGHT SECTION (RADIANT, LUXURY & ALIVE) -->
+        <!-- HERO & MASTER SPOTLIGHT SECTION -->
         <section id="predictions-access" class="hero-spotlight-section">
             <div class="section-container">
                 <div class="hero-header-text text-center">
@@ -126,7 +128,7 @@
                         CRASH <span class="gradient-gold">PREDICTOR 2026</span>
                     </h1>
                     <p class="hero-subtitle-desc">
-                        L'algorithme de pointe pour anticiper les envolées d'avion et sécuriser vos gains en temps réel.
+                        L'algorithme officiel pour anticiper les envolées d'avion et sécuriser vos gains en temps réel.
                     </p>
                 </div>
 
@@ -169,9 +171,9 @@
                         </div>
 
                         <ul class="benefits-checklist">
+                            <li><i class="fa-solid fa-check text-green"></i> Paiement direct par <strong>Wave, MTN MoMo, Orange Money, Moov</strong> ou <strong>Carte</strong></li>
                             <li><i class="fa-solid fa-check text-green"></i> Accès instantané aux signaux d'avion en temps réel</li>
                             <li><i class="fa-solid fa-check text-green"></i> Détection automatique du point d'arrêt avant crash</li>
-                            <li><i class="fa-solid fa-check text-green"></i> Prise en main directe sans installation complexe</li>
                             <li><i class="fa-solid fa-check text-green"></i> Accès à vie sans aucun abonnement mensuel</li>
                         </ul>
 
@@ -183,7 +185,7 @@
 
                         <div class="secure-guarantee-footer">
                             <i class="fa-solid fa-shield-halved text-gold"></i>
-                            <span>Activation immédiate 24h/24 • Rejoignez plus d'un million de traders actifs</span>
+                            <span>Paiement sécurisé par Flutterwave • Wave & Mobile Money prioritaires</span>
                         </div>
                     </div>
                 </div>
@@ -267,11 +269,11 @@
                 <div class="faq-accordion">
                     <div class="faq-item active">
                         <div class="faq-question">
-                            <span>Comment débloquer les prédictions tout de suite ?</span>
+                            <span>Quels moyens de paiement sont acceptés ?</span>
                             <i class="fa-solid fa-chevron-down"></i>
                         </div>
                         <div class="faq-answer">
-                            <p>Cliquez sur le bouton <strong>"Accéder aux prédictions"</strong> sous la photo de l'avion. Vous aurez accès aux instructions pour débloquer votre accès illimité immédiatement.</p>
+                            <p>Vous pouvez payer directement par <strong>Wave, MTN Mobile Money, Orange Money, Moov Money</strong> ainsi que par <strong>Carte bancaire Visa / Mastercard</strong> en toute sécurité via Flutterwave.</p>
                         </div>
                     </div>
                     <div class="faq-item">
@@ -280,7 +282,7 @@
                             <i class="fa-solid fa-chevron-down"></i>
                         </div>
                         <div class="faq-answer">
-                            <p>Le tarif de <strong>50 dollars</strong> est garanti pendant le compte à rebours de 48 heures. <strong>Le prix passera à 100 dollars après 48h</strong>.</p>
+                            <p>Le tarif de <strong>50 dollars</strong> (environ <strong>30 000 francs CFA</strong>) est garanti pendant le compte à rebours de 48 heures. <strong>Le prix passera à 100 dollars après 48h</strong>.</p>
                         </div>
                     </div>
                     <div class="faq-item">
@@ -289,7 +291,7 @@
                             <i class="fa-solid fa-chevron-down"></i>
                         </div>
                         <div class="faq-answer">
-                            <p>Une fois inscrit, vous disposez de votre espace membre sécurisé avec possibilité d'ajouter votre numéro de téléphone et de modifier votre mot de passe. Si vous n'avez pas encore activé votre licence, votre statut indiquera <strong>"Non abonné"</strong>.</p>
+                            <p>Une fois inscrit, vous disposez de votre espace membre sécurisé avec possibilité d'ajouter votre numéro de téléphone et de modifier votre mot de passe. Dès votre paiement validé, votre licence est automatiquement activée à vie.</p>
                         </div>
                     </div>
                     <div class="faq-item">
@@ -298,7 +300,7 @@
                             <i class="fa-solid fa-chevron-down"></i>
                         </div>
                         <div class="faq-answer">
-                            <p>Non, aucun ! Vous payez une seule fois les 50 $ et vous bénéficiez de toutes les prédictions d'avion à vie directement sur le site.</p>
+                            <p>Non, aucun ! Vous payez une seule fois les 50 $ (30 000 FCFA) et vous bénéficiez de toutes les prédictions d'avion à vie directement sur le site.</p>
                         </div>
                     </div>
                 </div>
@@ -325,7 +327,7 @@
         </div>
     </footer>
 
-    <!-- MODAL 1 : USER PROFILE MODAL (PHONE + PASSWORD UPDATE + RED STATUS) -->
+    <!-- MODAL 1 : USER PROFILE MODAL -->
     <div class="modal-overlay" id="profileModal">
         <div class="modal-card modal-profile-card">
             <button class="modal-close" id="closeProfileModal">&times;</button>
@@ -459,37 +461,71 @@
         </div>
     </div>
 
-    <!-- MODAL 4 : BUY 50$ / TELEGRAM ACTIVATION -->
+    <!-- MODAL 4 : DIRECT FLUTTERWAVE CHECKOUT (WAVE, MTN, ORANGE, MOOV, CARTE) -->
     <div class="modal-overlay" id="buyModal">
         <div class="modal-card modal-buy-card">
             <button class="modal-close" id="closeBuyModal">&times;</button>
             <div class="modal-header">
                 <div class="modal-icon-badge gold-glow"><i class="fa-solid fa-bolt"></i></div>
-                <h3>Accéder aux Prédictions</h3>
-                <p>Tarif : <span class="text-gold font-bold">50 dollars</span> (Accès à vie)</p>
+                <h3 class="modal-title-big">Finaliser votre Accès</h3>
+                <p>Paiement sécurisé direct via <strong>Flutterwave</strong></p>
             </div>
 
             <div class="buy-modal-content">
+                <!-- PRODUCT BANNER -->
                 <div class="product-banner-summary">
                     <img src="assets/crash_hd.jpg" alt="Crash Logo HD" class="buy-summary-img">
                     <div>
                         <div class="badge-live-gold">ACCÈS OFFICIEL 2026 À VIE</div>
                         <h4>CRASH PREDICTOR AI</h4>
-                        <div class="price-tag-big">50 $</div>
+                        <div class="price-tag-big">30 000 FCFA <span class="price-usd-sub">(50 $)</span></div>
                     </div>
                 </div>
 
-                <div class="buyer-details-summary" id="buyerDetailsBox"></div>
+                <!-- PAYMENT METHODS BADGES (WAVE, MTN, ORANGE, MOOV, CARTE) -->
+                <div class="payment-methods-showcase">
+                    <div class="payment-badge-chip active-chip"><i class="fa-solid fa-mobile-screen-button"></i> Wave</div>
+                    <div class="payment-badge-chip active-chip"><i class="fa-solid fa-sim-card"></i> MTN MoMo</div>
+                    <div class="payment-badge-chip active-chip"><i class="fa-solid fa-tower-cell"></i> Orange Money</div>
+                    <div class="payment-badge-chip active-chip"><i class="fa-solid fa-signal"></i> Moov</div>
+                    <div class="payment-badge-chip active-chip"><i class="fa-solid fa-credit-card"></i> Carte Bancaire</div>
+                </div>
 
-                <div class="telegram-redirect-box">
-                    <p class="telegram-instruction">
-                        Pour finaliser votre activation de <strong>50 $</strong> et débloquer les prédictions en direct :
-                    </p>
-                    <a href="https://t.me/" target="_blank" class="btn-telegram-buy" id="telegramBuyActionBtn">
-                        <i class="fa-brands fa-telegram"></i>
-                        <span>Acheter maintenant 50 $</span>
-                    </a>
-                    <span class="subtext-note">Assistance & activation immédiate 24h/24. Le prix passera à 100 dollars après 48h.</span>
+                <!-- CHECKOUT FORM INPUTS -->
+                <div class="checkout-fields-container">
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-envelope"></i> Votre Email (pour recevoir vos identifiants)</label>
+                        <input type="email" id="paymentCustomerEmail" placeholder="votre-email@exemple.com" required class="form-control-dark">
+                    </div>
+
+                    <div class="form-group-row">
+                        <div class="form-group flex-1">
+                            <label><i class="fa-solid fa-user"></i> Nom / Prénom</label>
+                            <input type="text" id="paymentCustomerName" placeholder="Votre nom" class="form-control-dark">
+                        </div>
+                        <div class="form-group flex-1">
+                            <label><i class="fa-solid fa-phone"></i> Téléphone Mobile Money</label>
+                            <input type="tel" id="paymentCustomerPhone" placeholder="Ex: 07000000" class="form-control-dark">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-money-bill-wave"></i> Devise de paiement</label>
+                        <select id="paymentCurrencySelect" class="form-control-dark">
+                            <option value="XOF" selected>Franc CFA (XOF) — 30 000 FCFA (Wave, Orange, MTN, Moov)</option>
+                            <option value="USD">Dollars (USD) — 50 $ (Cartes Bancaires Internationales)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- LAUNCH FLUTTERWAVE POPUP BUTTON -->
+                <button type="button" class="btn-launch-flutterwave" id="btnLaunchFlutterwave">
+                    <i class="fa-solid fa-lock"></i>
+                    <span>Payer en direct (Wave / MTN / Orange / Carte)</span>
+                </button>
+
+                <div class="secure-checkout-note">
+                    <i class="fa-solid fa-shield-halved text-green"></i> Passerelle sécurisée par cryptage bancaire SSL 256 bits
                 </div>
             </div>
         </div>
