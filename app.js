@@ -1,6 +1,6 @@
 /**
- * CRASH PREDICTOR 2026 - APPLICATION COMPLETE
- * Paiement Direct Cible : Mobile Money (Wave, Orange, MTN, Moov) ou Carte Bancaire
+ * CRASH PREDICTOR 2026 - APPLICATION OFFICIELLE
+ * Paiement Mobile Money Pur (Wave, Orange, MTN, Moov) sans carte & Paiement Carte séparé
  */
 
 const FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK-07d56b9d571ed135ab4bf5d3fd5330a9-X";
@@ -785,10 +785,9 @@ function initDirectPaymentGateways() {
         });
     });
 
-    // Helper: Execute Flutterwave with customized params
     function launchPaymentGateway(mode) {
         const customerEmail = (paymentCustomerEmail?.value || currentUser?.email || "client@crashpredictor2026.com").trim();
-        const customerPhone = (paymentCustomerPhone?.value || currentUser?.phone || "").trim();
+        const customerPhone = (paymentCustomerPhone?.value || currentUser?.phone || "0700000000").trim();
         const customerName = currentUser?.name || "Client VIP";
 
         if (!customerEmail || !customerEmail.includes('@')) {
@@ -802,64 +801,92 @@ function initDirectPaymentGateways() {
             return;
         }
 
-        let paymentOptions = "mobilemoneyfrancophone, mobilemoneyci, ussd";
-        let currency = "XOF";
-        let amount = 30000;
+        if (mode === "momo") {
+            // PAIEMENT EXCLUSIF MOBILE MONEY FRANCOPHONE (Wave, Orange, MTN, Moov) EN XOF
+            FlutterwaveCheckout({
+                public_key: FLUTTERWAVE_PUBLIC_KEY,
+                tx_ref: "CRASH-MOMO-" + Date.now() + "-" + Math.floor(Math.random() * 10000),
+                amount: 30000,
+                currency: "XOF",
+                payment_options: "mobilemoneyfrancophone",
+                customer: {
+                    email: customerEmail,
+                    phone_number: customerPhone,
+                    name: customerName,
+                },
+                customizations: {
+                    title: "CRASH PREDICTOR 2026",
+                    description: "Paiement Wave / MTN / Orange Money (30 000 FCFA)",
+                    logo: window.location.origin + "/assets/crash_hd.jpg",
+                },
+                callback: function (data) {
+                    console.log("Paiement Mobile Money validé:", data);
+                    buyModal?.classList.remove('active');
 
-        if (mode === "card") {
-            // ONLY CARD PAYMENT IN USD ($50)
-            paymentOptions = "card";
-            currency = "USD";
-            amount = 50;
-        } else {
-            // ONLY DIRECT MOBILE MONEY IN XOF (30 000 FCFA)
-            paymentOptions = "mobilemoneyfrancophone, mobilemoneyci, ussd";
-            currency = "XOF";
-            amount = 30000;
-        }
+                    if (currentUser) {
+                        currentUser.isSubscribed = true;
+                        localStorage.setItem('crash_predictor_user_2026', JSON.stringify(currentUser));
 
-        FlutterwaveCheckout({
-            public_key: FLUTTERWAVE_PUBLIC_KEY,
-            tx_ref: "CRASH-" + Date.now() + "-" + Math.floor(Math.random() * 10000),
-            amount: amount,
-            currency: currency,
-            payment_options: paymentOptions,
-            customer: {
-                email: customerEmail,
-                phone_number: customerPhone,
-                name: customerName,
-            },
-            customizations: {
-                title: "CRASH PREDICTOR 2026",
-                description: mode === "card" ? "Accès à Vie - 50 $" : "Accès à Vie - Wave / MTN / Orange",
-                logo: window.location.origin + "/assets/crash_hd.jpg",
-            },
-            callback: function (data) {
-                console.log("Paiement validé:", data);
-                buyModal?.classList.remove('active');
-
-                if (currentUser) {
-                    currentUser.isSubscribed = true;
-                    localStorage.setItem('crash_predictor_user_2026', JSON.stringify(currentUser));
-
-                    let usersDb = JSON.parse(localStorage.getItem('crash_users_db_2026')) || [];
-                    const idx = usersDb.findIndex(u => u.email === currentUser.email);
-                    if (idx !== -1) {
-                        usersDb[idx].isSubscribed = true;
-                        localStorage.setItem('crash_users_db_2026', JSON.stringify(usersDb));
+                        let usersDb = JSON.parse(localStorage.getItem('crash_users_db_2026')) || [];
+                        const idx = usersDb.findIndex(u => u.email === currentUser.email);
+                        if (idx !== -1) {
+                            usersDb[idx].isSubscribed = true;
+                            localStorage.setItem('crash_users_db_2026', JSON.stringify(usersDb));
+                        }
+                        updateAuthHeader();
                     }
-                    updateAuthHeader();
-                }
 
-                showToast("Paiement reçu ! Votre accès CRASH PREDICTOR 2026 est débloqué à vie !");
-            },
-            onclose: function() {
-                console.log("Paiement annulé ou fermé.");
-            }
-        });
+                    showToast("Paiement validé ! Votre accès CRASH PREDICTOR 2026 est actif à vie !");
+                },
+                onclose: function() {
+                    console.log("Fenêtre Mobile Money fermée.");
+                }
+            });
+        } else if (mode === "card") {
+            // PAIEMENT EXCLUSIF CARTE BANCAIRE (Visa, Mastercard) EN USD
+            FlutterwaveCheckout({
+                public_key: FLUTTERWAVE_PUBLIC_KEY,
+                tx_ref: "CRASH-CARD-" + Date.now() + "-" + Math.floor(Math.random() * 10000),
+                amount: 50,
+                currency: "USD",
+                payment_options: "card",
+                customer: {
+                    email: customerEmail,
+                    phone_number: customerPhone,
+                    name: customerName,
+                },
+                customizations: {
+                    title: "CRASH PREDICTOR 2026",
+                    description: "Accès Officiel à Vie - 50 $ (Carte Bancaire)",
+                    logo: window.location.origin + "/assets/crash_hd.jpg",
+                },
+                callback: function (data) {
+                    console.log("Paiement Carte validé:", data);
+                    buyModal?.classList.remove('active');
+
+                    if (currentUser) {
+                        currentUser.isSubscribed = true;
+                        localStorage.setItem('crash_predictor_user_2026', JSON.stringify(currentUser));
+
+                        let usersDb = JSON.parse(localStorage.getItem('crash_users_db_2026')) || [];
+                        const idx = usersDb.findIndex(u => u.email === currentUser.email);
+                        if (idx !== -1) {
+                            usersDb[idx].isSubscribed = true;
+                            localStorage.setItem('crash_users_db_2026', JSON.stringify(usersDb));
+                        }
+                        updateAuthHeader();
+                    }
+
+                    showToast("Paiement validé ! Votre accès CRASH PREDICTOR 2026 est actif à vie !");
+                },
+                onclose: function() {
+                    console.log("Fenêtre Carte fermée.");
+                }
+            });
+        }
     }
 
-    // 1. Bouton DIRECT MOBILE MONEY (Wave, Orange, MTN, Moov)
+    // 1. Bouton DIRECT MOBILE MONEY
     if (btnPayMobileMoney) {
         btnPayMobileMoney.addEventListener('click', () => {
             launchPaymentGateway("momo");

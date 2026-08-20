@@ -1,4 +1,4 @@
 {
-  "summary": "Mise à jour d'app.js pour séparer le paiement direct Mobile Money (Wave, Orange, MTN, Moov) et Carte Bancaire avec affichage 50$ et suppression de tout texte Flutterwave visible",
-  "updatedAt": "2026-08-20T10:33:02.492358Z"
+  "summary": "Mise à jour d'app.js pour forcer le paiement Mobile Money pur (Wave, MTN, Orange, Moov) en XOF sans aucun champ de carte bancaire, et paiement carte bancaire séparé en USD",
+  "updatedAt": "2026-08-20T10:44:04.241750900Z"
 }
