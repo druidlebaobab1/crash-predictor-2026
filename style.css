@@ -53,7 +53,7 @@ body {
 .gold-text { color: #ffc837; }
 .gold-code { color: #ffc837; font-family: var(--font-mono); font-weight: 800; letter-spacing: 0.5px; }
 
-/* ================= PROMINENT LIVE TICKER (1M - 1.5M TRADERS) ================= */
+/* ================= PROMINENT LIVE TICKER WITH FLASH ================= */
 .live-traders-ticker-bar.prominent-live-bar {
     background: linear-gradient(90deg, #090d1f 0%, #1e153b 50%, #090d1f 100%);
     border-bottom: 2px solid var(--gold-primary);
@@ -82,6 +82,15 @@ body {
     padding: 3px 10px;
     border-radius: 20px;
     box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+}
+
+.live-pulse-badge.flash-effect {
+    animation: flashBadgePulse 2s infinite ease-in-out;
+}
+
+@keyframes flashBadgePulse {
+    0%, 100% { box-shadow: 0 0 8px rgba(16, 185, 129, 0.4); }
+    50% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.9), 0 0 30px rgba(255, 200, 55, 0.6); }
 }
 
 .live-dot-pulse {
@@ -153,7 +162,7 @@ body {
     opacity: 0.4;
 }
 
-/* ================= PUBLIC NAVBAR ================= */
+/* ================= PUBLIC NAVBAR (MOBILE OPTIMIZED) ================= */
 .main-navbar {
     position: sticky;
     top: 0;
@@ -171,7 +180,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
+    gap: 8px;
 }
 
 .brand-logo {
@@ -234,7 +243,7 @@ body {
 .btn-ghost-compact {
     background: rgba(255, 255, 255, 0.08);
     color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1.5px solid rgba(255, 255, 255, 0.25);
     padding: 6px 12px;
     border-radius: var(--radius-md);
     font-weight: 700;
@@ -355,15 +364,17 @@ body {
     border: 1px solid rgba(255, 200, 55, 0.35);
     border-radius: var(--radius-md);
     padding: 12px 18px;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
 }
 
 .price-main-row { display: flex; align-items: baseline; gap: 8px; }
 .price-amount { font-family: var(--font-heading); font-size: 2.3rem; font-weight: 900; color: var(--gold-primary); }
 .price-type { color: #10b981; font-weight: 800; font-size: 0.9rem; }
+.price-cfa-conversion { font-size: 0.85rem; color: #f3f4f6; margin-top: 2px; }
 
-.benefits-checklist { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
-.benefits-checklist li { display: flex; align-items: center; gap: 8px; font-size: 0.88rem; font-weight: 600; }
+.benefits-checklist { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.benefits-checklist li { display: flex; align-items: flex-start; gap: 8px; font-size: 0.88rem; font-weight: 500; line-height: 1.4; }
+.benefits-checklist li i { margin-top: 3px; font-size: 0.95rem; }
 
 .btn-buy-instant {
     background: var(--gold-gradient);
@@ -387,7 +398,7 @@ body {
 .btn-buy-instant:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255, 200, 55, 0.8); }
 .secure-guarantee-footer { font-size: 0.74rem; color: var(--text-muted); text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px; }
 
-/* ================= TESTIMONIALS (PUBLIC ONLY) ================= */
+/* ================= TESTIMONIALS (WITHOUT ANY "IL Y A") ================= */
 .testimonials-section { padding: 40px 0; }
 .testimonials-stats-bar {
     display: grid;
@@ -416,9 +427,64 @@ body {
 .admin-discrete-link { color: #4b5563; font-size: 0.72rem; text-decoration: none; margin-top: 6px; display: inline-block; }
 .admin-discrete-link:hover { color: var(--gold-primary); }
 
-/* ==========================================================================
-   INTERFACE 2 : VIP LIVE SOFTWARE COCKPIT (EXCLUSIVE PAID SCREEN)
-   ========================================================================== */
+/* ================= LIVE FLASH SOCIAL NOTIFICATION POPUP ================= */
+.live-flash-social-box {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    background: rgba(13, 7, 24, 0.95);
+    border: 1.5px solid var(--gold-primary);
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 200, 55, 0.3);
+    z-index: 999;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+    backdrop-filter: blur(10px);
+}
+
+.live-flash-social-box.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.flash-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--gold-gradient);
+    color: #0d0614;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+    box-shadow: 0 0 10px var(--gold-glow);
+}
+
+.flash-text-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.flash-title {
+    font-weight: 800;
+    font-size: 0.82rem;
+    color: #fff;
+}
+
+.flash-subtitle {
+    font-size: 0.74rem;
+    color: #34d399;
+    font-weight: 600;
+}
+
+/* ================= VIP LIVE COCKPIT ================= */
 .vip-software-navbar {
     background: #06040d;
     border-bottom: 1.5px solid var(--gold-primary);
@@ -488,7 +554,6 @@ body {
     gap: 20px;
 }
 
-/* RADAR CARD */
 .vip-radar-card {
     background: linear-gradient(135deg, rgba(14, 8, 26, 0.95), rgba(6, 4, 14, 0.98));
     border: 2px solid var(--gold-primary);
@@ -511,7 +576,6 @@ body {
 .radar-title-group { display: flex; align-items: center; gap: 8px; font-family: var(--font-heading); font-size: 0.95rem; font-weight: 800; }
 .radar-session-badge { font-size: 0.72rem; color: var(--gold-primary); background: rgba(255, 200, 55, 0.1); border: 1px solid var(--border-color); padding: 3px 10px; border-radius: 12px; font-weight: 700; }
 
-/* SPOTLIGHT PREDICTION BOX */
 .vip-prediction-spotlight {
     background: linear-gradient(135deg, rgba(5, 150, 105, 0.25) 0%, rgba(16, 185, 129, 0.1) 100%);
     border: 2px solid #10b981;
@@ -537,7 +601,6 @@ body {
 .pred-confidence { color: #fff; font-weight: 700; }
 .pred-advice { color: #cbd5e1; font-style: italic; }
 
-/* CANVAS VIEWPORT & HUD */
 .vip-canvas-viewport {
     position: relative;
     background: #060a18;
@@ -579,7 +642,6 @@ body {
 
 .status-indicator-dot { width: 8px; height: 8px; background-color: #3b82f6; border-radius: 50%; box-shadow: 0 0 8px #3b82f6; }
 
-/* SIDEBAR STATS & HISTORY */
 .vip-sidebar-panel { display: flex; flex-direction: column; gap: 16px; }
 
 .vip-stats-box, .vip-history-box {
@@ -628,7 +690,7 @@ body {
 .h-badge.green { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
 .h-badge.gold { background: rgba(255, 200, 55, 0.2); color: #ffc837; border: 1px solid #ffc837; }
 
-/* ================= ULTRA-BRIEF 1-CLICK CHECKOUT MODAL ================= */
+/* ================= MODALS ================= */
 .modal-overlay {
     position: fixed;
     inset: 0;
@@ -714,7 +776,6 @@ body {
 .btn-link { background: transparent; border: none; color: var(--gold-primary); font-weight: 700; cursor: pointer; text-decoration: underline; }
 .modal-footer-switch { margin-top: 12px; text-align: center; font-size: 0.78rem; color: var(--text-muted); }
 
-/* UNIQUE ID BOX IN PROFILE */
 .profile-user-id-box {
     background: rgba(255, 200, 55, 0.15);
     border: 1.5px solid var(--gold-primary);
@@ -795,7 +856,7 @@ body {
 .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
 .toast-message { background: #190e29; border: 1px solid var(--gold-primary); color: #fff; padding: 10px 16px; border-radius: var(--radius-md); box-shadow: 0 8px 20px rgba(0,0,0,0.6); font-size: 0.82rem; display: flex; align-items: center; gap: 10px; }
 
-/* ================= MOBILE RESPONSIVENESS ================= */
+/* ================= MOBILE RESPONSIVENESS (PERFECT BUTTON FIT) ================= */
 @media (max-width: 992px) {
     .luxury-alive-box { grid-template-columns: 1fr; text-align: center; }
     .vip-dashboard-grid { grid-template-columns: 1fr; }
@@ -803,13 +864,17 @@ body {
 }
 
 @media (max-width: 600px) {
-    .nav-container { padding: 0 12px; }
+    .nav-container { padding: 0 10px; }
     .brand-logo { gap: 6px; }
-    .logo-title { font-size: 0.95rem; }
+    .logo-title { font-size: 0.92rem; }
     .logo-badge { display: none; }
-    .nav-auth-actions { gap: 6px; }
-    .btn-ghost-compact { padding: 6px 10px; font-size: 0.76rem; }
-    .btn-primary-compact { padding: 6px 12px; font-size: 0.76rem; }
+    .nav-auth-actions { gap: 4px; }
+    .lang-selector-box { padding: 3px 5px; }
+    .lang-select-dropdown { font-size: 0.7rem; }
+    
+    .guest-buttons { gap: 4px; }
+    .btn-ghost-compact { padding: 5px 8px; font-size: 0.72rem; }
+    .btn-primary-compact { padding: 5px 9px; font-size: 0.72rem; }
     
     .hero-main-title { font-size: 1.8rem; }
     .price-amount { font-size: 2rem; }
@@ -818,4 +883,11 @@ body {
     .vip-flight-canvas { height: 280px; }
     .ticker-content { font-size: 0.74rem; }
     .live-counter-highlight { font-size: 0.92rem; }
+    
+    .live-flash-social-box {
+        bottom: 12px;
+        left: 12px;
+        right: 12px;
+        padding: 8px 10px;
+    }
 }

@@ -1,4 +1,4 @@
 {
-  "summary": "Mise à jour d'app.js avec simulation de vol ralentie et proportionnelle à la cote, compteur live dynamique et mot de passe admin",
-  "updatedAt": "2026-08-20T11:50:06.942684400Z"
+  "summary": "Mise à jour d'app.js avec suppression totale des 'il y a' et ajout du système de flash notifications de connexions/gains en direct",
+  "updatedAt": "2026-08-20T12:21:00.330127600Z"
 }

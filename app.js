@@ -1,25 +1,37 @@
 /**
  * CRASH PREDICTOR 2026 - APPLICATION OFFICIELLE
- * - Simulation de vol ralentie et proportionnelle à la cote prédite (Hauteur & Distance réelles)
- * - Compteur de traders en direct ultra-dynamique (1 180 000 à 1 490 000)
- * - Attribution ID Unique & Dashboard Admin sécurisé (Mot de passe: ADMIN2026)
+ * - Suppression totale des "il y a"
+ * - Système de notifications Flash de traders en direct
+ * - Simulation de vol fluide et proportionnelle
+ * - Dashboard Administrateur par ID Unique (Code: ADMIN2026)
  */
 
 const FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK-07d56b9d571ed135ab4bf5d3fd5330a9-X";
 const ADMIN_SECRET_KEY = "ADMIN2026";
 
 // ==========================================
-// 1. DATA: AVIS POUR LE SITE PUBLIC
+// 1. DATA: AVIS AUTHENTIQUES (AUCUN "IL Y A")
 // ==========================================
 const WINNER_COMMENTS = [
-    { id: 1, username: "Julien_Paris", lang: "FR", gain: "+$450", rating: 5, time: "Il y a 3 min", comment: "50 dollars rentabilisés dès la première session. L'avion sur la courbe aide vraiment à visualiser l'instant idéal de sortie." },
-    { id: 2, username: "Marc_Bruxelles", lang: "FR", gain: "+$820", rating: 5, time: "Il y a 8 min", comment: "Très sérieux. L'accès à vie permet d'être tranquille. Les signaux en direct sont très nets et sans latence." },
-    { id: 3, username: "Kevin_Geneve", lang: "FR", gain: "+$1,100", rating: 5, time: "Il y a 14 min", comment: "La plateforme est ultra rapide et rassurante. Rien à installer, tout se fait directement sur le site." },
-    { id: 4, username: "Sophie_Lyon", lang: "FR", gain: "+$390", rating: 5, time: "Il y a 22 min", comment: "Compte créé en 30 secondes, interface très claire et signaux d'avion impeccables." },
-    { id: 5, username: "Cedric_Nantes", lang: "FR", gain: "+$640", rating: 5, time: "Il y a 31 min", comment: "Le compte à rebours de 48h m'a convaincu pour les 50$, aucun regret. Très bon suivi des montées." },
-    { id: 6, username: "Carlos_Madrid", lang: "ES", gain: "+$580", rating: 5, time: "Hace 4 min", comment: "Increíble precisión. Pagué los 50 dólares y en menos de una hora ya había recuperado la inversión con dos señales seguras a x3.20." },
-    { id: 7, username: "James_London", lang: "EN", gain: "+$1,380", rating: 5, time: "10 mins ago", comment: "The algorithm predicts the exit threshold with remarkable consistency. Lifetime access for $50 is a steal." },
-    { id: 8, username: "Rafael_SaoPaulo", lang: "PT", gain: "+$1,650", rating: 5, time: "Há 12 min", comment: "Sensacional! O sinal bateu certinho no x5.20. Paguei os 50 dólares e já estou no lucro absurdo." }
+    { id: 1, username: "Julien_Paris", lang: "FR", gain: "+$450", rating: 5, status: "Session Validée", comment: "50 dollars rentabilisés dès la première session. L'avion sur la courbe aide vraiment à visualiser l'instant idéal de sortie." },
+    { id: 2, username: "Marc_Bruxelles", lang: "FR", gain: "+$820", rating: 5, status: "VIP Actif", comment: "Très sérieux. L'accès à vie permet d'être tranquille. Les signaux en direct sont très nets et sans latence." },
+    { id: 3, username: "Kevin_Geneve", lang: "FR", gain: "+$1,100", rating: 5, status: "Gain Encaissé", comment: "La plateforme est ultra rapide et rassurante. Rien à installer, tout se fait directement sur le site." },
+    { id: 4, username: "Sophie_Lyon", lang: "FR", gain: "+$390", rating: 5, status: "Session Validée", comment: "Compte créé en 30 secondes, interface très claire et signaux d'avion impeccables." },
+    { id: 5, username: "Cedric_Nantes", lang: "FR", gain: "+$640", rating: 5, status: "VIP Actif", comment: "Le compte à rebours de 48h m'a convaincu pour les 50$, aucun regret. Très bon suivi des montées." },
+    { id: 6, username: "Carlos_Madrid", lang: "ES", gain: "+$580", rating: 5, status: "Gain Encaissé", comment: "Increíble precisión. Pagué los 50 dólares y en menos de una hora ya había recuperado la inversión con dos señales seguras a x3.20." },
+    { id: 7, username: "James_London", lang: "EN", gain: "+$1,380", rating: 5, status: "Session Validée", comment: "The algorithm predicts the exit threshold with remarkable consistency. Lifetime access for $50 is a steal." },
+    { id: 8, username: "Rafael_SaoPaulo", lang: "PT", gain: "+$1,650", rating: 5, status: "VIP Actif", comment: "Sensacional! O sinal bateu certinho no x5.20. Paguei os 50 dólares e já estou no lucro absurdo." }
+];
+
+// LIVE FLASH NOTIFICATIONS DATA
+const FLASH_NOTIFICATIONS = [
+    { name: "Karim_Abidjan", text: "vient d'activer sa licence VIP (+1 850 $)" },
+    { name: "Moussa_Dakar", text: "a encaissé un multiplicateur à x3.40 (+620 $)" },
+    { name: "Oumar_Bamako", text: "vient de rejoindre la session VIP en direct" },
+    { name: "Cedric_Douala", text: "a validé son retrait de 940 $" },
+    { name: "Alexandre_Paris", text: "a validé un vol prédictif à x5.20" },
+    { name: "David_Lome", text: "vient d'activer son ID Membre VIP" },
+    { name: "Ibrahim_Conakry", text: "a encaissé à x2.80 avec succès" }
 ];
 
 let currentUser = JSON.parse(localStorage.getItem('crash_predictor_user_2026')) || null;
@@ -39,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initUserIdentity();
     initGlobalViewRouter();
     initLiveOnlineUsersTicker();
+    initLiveFlashSocialNotifications();
     initGuaranteed48hCountdown();
     renderCommentsList();
     initLoadMoreComments();
@@ -50,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ==========================================
-// 3. USER UNIQUE ID & SESSION
+// 3. USER UNIQUE ID & IDENTITY
 // ==========================================
 function initUserIdentity() {
     if (!currentUser) {
@@ -81,14 +94,13 @@ function saveUserSession(user) {
 }
 
 // ==========================================
-// 4. GLOBAL VIEW ROUTER (PUBLIC LANDING VS VIP COCKPIT)
+// 4. GLOBAL VIEW ROUTER
 // ==========================================
 function initGlobalViewRouter() {
     const publicSite = document.getElementById('publicSiteWrapper');
     const vipSoftware = document.getElementById('vipSoftwareWrapper');
 
     if (currentUser && currentUser.isSubscribed) {
-        // HIDE PUBLIC SITE 100% & SHOW VIP COCKPIT
         if (publicSite) publicSite.classList.add('hidden');
         if (vipSoftware) vipSoftware.classList.remove('hidden');
 
@@ -136,7 +148,7 @@ function updateAuthPublicHeader() {
 }
 
 // ==========================================
-// 5. VIP PROPORTIONAL & REALISTIC FLIGHT ENGINE (SLOWER & PROPORTIONAL ALTITUDE)
+// 5. VIP PROPORTIONAL & REALISTIC FLIGHT ENGINE
 // ==========================================
 function startVipProportionalRadarEngine() {
     const canvas = document.getElementById('vipFlightCanvas');
@@ -161,23 +173,22 @@ function startVipProportionalRadarEngine() {
 
     let flightState = 'analyzing';
     let currentMultiplier = 1.00;
-    let flightProgress = 0; // 0 to 1
-    let flightSpeed = 0.0028; // Slower and more realistic (approx 5 to 8 seconds per flight)
+    let flightProgress = 0;
+    let flightSpeed = 0.0028;
     let explosionTimer = 0;
     let particles = [];
     let blastRadius = 0;
 
     function generateNextTarget() {
-        // 75% cotes de sécurité 1.60 à 3.40 | 25% grosses cotes 5.00 à 7.80
         const isBig = Math.random() < 0.25;
         if (isBig) {
             const bigs = [5.20, 5.85, 6.40, 7.15, 7.90];
             vipTargetMultiplier = bigs[Math.floor(Math.random() * bigs.length)];
-            flightSpeed = 0.0022; // Longer flight for high multipliers
+            flightSpeed = 0.0022;
         } else {
             const regulars = [1.65, 1.85, 2.10, 2.35, 2.65, 2.95, 3.25];
             vipTargetMultiplier = regulars[Math.floor(Math.random() * regulars.length)];
-            flightSpeed = 0.0032; // Normal realistic speed
+            flightSpeed = 0.0032;
         }
 
         const conf = (98.4 + Math.random() * 1.4).toFixed(1) + "%";
@@ -243,7 +254,6 @@ function startVipProportionalRadarEngine() {
 
         ctx.clearRect(0, 0, W, H);
 
-        // Cockpit Grid
         ctx.fillStyle = '#060a18';
         ctx.fillRect(0, 0, W, H);
 
@@ -265,7 +275,6 @@ function startVipProportionalRadarEngine() {
         }
         ctx.setLineDash([]);
 
-        // Axis Lines
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
         ctx.lineWidth = 2;
         ctx.beginPath();
@@ -281,8 +290,6 @@ function startVipProportionalRadarEngine() {
         const startX = 30;
         const startY = H - 30;
 
-        // PROPORTIONAL FLIGHT ENDPOINT BASED ON MULTIPLIER
-        // Multipliers from 1.5 to 8.0 map to X and Y coordinates
         const multiplierRatio = Math.min(Math.max((vipTargetMultiplier - 1.2) / 6.8, 0.15), 0.95);
         const targetX = startX + (W - startX - 40) * (0.35 + multiplierRatio * 0.65);
         const targetY = startY - (startY - 40) * multiplierRatio;
@@ -294,14 +301,12 @@ function startVipProportionalRadarEngine() {
             flightProgress += flightSpeed;
             const p = Math.min(flightProgress, 1);
 
-            // Multiplier counts up realistically with deceleration
             currentMultiplier = 1.00 + (vipTargetMultiplier - 1.00) * Math.pow(p, 1.15);
             if (hudNumber) hudNumber.textContent = `x${currentMultiplier.toFixed(2)}`;
 
             const curX = (1 - p) * (1 - p) * startX + 2 * (1 - p) * p * cpX + p * p * targetX;
             const curY = (1 - p) * (1 - p) * startY + 2 * (1 - p) * p * cpY + p * p * targetY;
 
-            // Draw glowing curve
             ctx.beginPath();
             ctx.moveTo(startX, startY);
             for (let s = 0; s <= p; s += 0.01) {
@@ -317,7 +322,6 @@ function startVipProportionalRadarEngine() {
             ctx.stroke();
             ctx.shadowBlur = 0;
 
-            // Jet Angle & Body
             const dx = 2 * (1 - p) * (cpX - startX) + 2 * p * (targetX - cpX);
             const dy = 2 * (1 - p) * (cpY - startY) + 2 * p * (targetY - cpY);
             const angle = Math.atan2(dy, dx);
@@ -351,7 +355,6 @@ function startVipProportionalRadarEngine() {
             ctx.closePath();
             ctx.fill();
 
-            // Reactor flame
             ctx.fillStyle = '#ef4444';
             ctx.beginPath();
             ctx.moveTo(-22, -4);
@@ -362,7 +365,6 @@ function startVipProportionalRadarEngine() {
 
             ctx.restore();
 
-            // When reaches exact target -> stop and explode
             if (p >= 1) {
                 flightState = 'crashed';
                 createExplosion(curX, curY);
@@ -403,7 +405,111 @@ function startVipProportionalRadarEngine() {
 }
 
 // ==========================================
-// 6. MASTER ADMIN DASHBOARD (GESTION & SÉCURITÉ)
+// 6. LIVE FLASH NOTIFICATIONS & TICKER
+// ==========================================
+function initLiveFlashSocialNotifications() {
+    const flashBox = document.getElementById('liveFlashSocialBox');
+    const flashTitle = document.getElementById('flashTitle');
+    const flashSubtitle = document.getElementById('flashSubtitle');
+    if (!flashBox) return;
+
+    let flashIdx = 0;
+
+    function triggerFlash() {
+        const item = FLASH_NOTIFICATIONS[flashIdx % FLASH_NOTIFICATIONS.length];
+        flashIdx++;
+
+        if (flashTitle) flashTitle.textContent = item.name;
+        if (flashSubtitle) flashSubtitle.textContent = item.text;
+
+        flashBox.classList.add('visible');
+
+        setTimeout(() => {
+            flashBox.classList.remove('visible');
+        }, 3800);
+    }
+
+    setTimeout(triggerFlash, 4000);
+    setInterval(triggerFlash, 9500);
+}
+
+function initLiveOnlineUsersTicker() {
+    const liveCounterEl = document.getElementById('liveOnlineUsersCount');
+    if (!liveCounterEl) return;
+    let currentUsers = 1348290;
+
+    function formatNumber(num) {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    }
+
+    setInterval(() => {
+        const delta = Math.floor((Math.random() - 0.47) * 160);
+        currentUsers += delta;
+        if (currentUsers < 1180000) currentUsers = 1195000;
+        if (currentUsers > 1492000) currentUsers = 1485000;
+        liveCounterEl.textContent = formatNumber(currentUsers);
+    }, 1400);
+}
+
+function initGuaranteed48hCountdown() {
+    const timerElements = document.querySelectorAll('.countdown-timer-text');
+    if (!timerElements.length) return;
+    const DURATION_48H = 48 * 60 * 60 * 1000;
+    let timerStart = localStorage.getItem('crash_timer_start_48h_v4');
+    const now = Date.now();
+
+    if (!timerStart || isNaN(timerStart) || (now - parseInt(timerStart, 10)) > DURATION_48H) {
+        timerStart = now;
+        localStorage.setItem('crash_timer_start_48h_v4', timerStart);
+    } else {
+        timerStart = parseInt(timerStart, 10);
+    }
+
+    function updateTimer() {
+        const remaining = Math.max(0, DURATION_48H - (Date.now() - timerStart));
+        const hours = Math.floor(remaining / (1000 * 60 * 60));
+        const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+        const formatted = `${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
+
+        timerElements.forEach(el => el.textContent = formatted);
+    }
+    updateTimer();
+    setInterval(updateTimer, 1000);
+}
+
+// RENDER COMMENTS WITHOUT ANY "IL Y A"
+function renderCommentsList() {
+    const grid = document.getElementById('commentsGrid');
+    if (!grid) return;
+    const visibleComments = WINNER_COMMENTS.slice(0, displayedCommentsCount);
+    grid.innerHTML = visibleComments.map(c => `
+        <div class="comment-card">
+            <div class="comment-header">
+                <div class="comment-user-box">
+                    <div class="comment-lang-badge">${c.lang}</div>
+                    <div class="comment-username">${c.username} <i class="fa-solid fa-circle-check text-green"></i></div>
+                </div>
+                <div class="comment-gain-badge">${c.gain}</div>
+            </div>
+            <p class="comment-text">"${c.comment}"</p>
+        </div>
+    `).join('');
+}
+
+function initLoadMoreComments() {
+    const btnLoadMore = document.getElementById('btnLoadMoreComments');
+    if (btnLoadMore) {
+        btnLoadMore.addEventListener('click', () => {
+            displayedCommentsCount = WINNER_COMMENTS.length;
+            renderCommentsList();
+            btnLoadMore.style.display = 'none';
+        });
+    }
+}
+
+// ==========================================
+// 7. MASTER ADMIN DASHBOARD (GESTION & SÉCURITÉ)
 // ==========================================
 function initMasterAdminDashboard() {
     const linkOpenAdmin = document.getElementById('linkOpenAdminLogin');
@@ -425,7 +531,6 @@ function initMasterAdminDashboard() {
         closeAdminModal.addEventListener('click', () => adminModal?.classList.remove('active'));
     }
 
-    // Admin Login Verification
     if (formAdminAuth) {
         formAdminAuth.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -441,7 +546,6 @@ function initMasterAdminDashboard() {
         });
     }
 
-    // Activate/Unlock by typing ID
     if (btnAdminActivate && adminTargetIdInput) {
         btnAdminActivate.addEventListener('click', () => {
             const targetId = adminTargetIdInput.value.trim().toUpperCase();
@@ -548,7 +652,7 @@ window.adminToggleUser = function(email, status) {
 };
 
 // ==========================================
-// 7. ULTRA-BRIEF 1-CLICK CHECKOUT (50 $ / 30 000 FCFA)
+// 8. 1-CLICK BRIEF CHECKOUT
 // ==========================================
 function initBriefMobileMoneyPayment() {
     const directBuyButtons = document.querySelectorAll('#directBuyButton, .btn-buy-instant, #btnAlertSubscribe');
@@ -572,7 +676,6 @@ function initBriefMobileMoneyPayment() {
         });
     });
 
-    // 1-CLICK DIRECT MOBILE MONEY
     if (btnExecuteMomoPayment) {
         btnExecuteMomoPayment.addEventListener('click', () => {
             const customerEmail = currentUser?.email || "client@crashpredictor2026.com";
@@ -629,7 +732,6 @@ function initBriefMobileMoneyPayment() {
         });
     }
 
-    // DIRECT CARD PAYMENT
     if (btnExecuteCardPayment) {
         btnExecuteCardPayment.addEventListener('click', () => {
             const customerEmail = currentUser?.email || "client@crashpredictor2026.com";
@@ -686,7 +788,7 @@ function initBriefMobileMoneyPayment() {
 }
 
 // ==========================================
-// 8. AUTHENTICATION (REGISTER & LOGIN)
+// 9. AUTHENTICATION & MODALS
 // ==========================================
 function initAuthSecurity() {
     const regForm = document.getElementById('registerForm');
@@ -791,9 +893,6 @@ function initAuthSecurity() {
     if (vipLogoutBtn) vipLogoutBtn.addEventListener('click', handleLogout);
 }
 
-// ==========================================
-// 9. PROFILE MODAL
-// ==========================================
 function initProfileModal() {
     const userProfileBadge = document.getElementById('userProfileBadge');
     const profileModal = document.getElementById('profileModal');
@@ -879,86 +978,6 @@ function initProfileModal() {
     }
 }
 
-// ==========================================
-// 10. PUBLIC TICKER (1M - 1.5M PROMINENT) & 48H COUNTDOWN
-// ==========================================
-function initLiveOnlineUsersTicker() {
-    const liveCounterEl = document.getElementById('liveOnlineUsersCount');
-    if (!liveCounterEl) return;
-    let currentUsers = 1348290;
-
-    function formatNumber(num) {
-        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-    }
-
-    setInterval(() => {
-        const delta = Math.floor((Math.random() - 0.47) * 160);
-        currentUsers += delta;
-        if (currentUsers < 1180000) currentUsers = 1195000;
-        if (currentUsers > 1492000) currentUsers = 1485000;
-        liveCounterEl.textContent = formatNumber(currentUsers);
-    }, 1400);
-}
-
-function initGuaranteed48hCountdown() {
-    const timerElements = document.querySelectorAll('.countdown-timer-text');
-    if (!timerElements.length) return;
-    const DURATION_48H = 48 * 60 * 60 * 1000;
-    let timerStart = localStorage.getItem('crash_timer_start_48h_v4');
-    const now = Date.now();
-
-    if (!timerStart || isNaN(timerStart) || (now - parseInt(timerStart, 10)) > DURATION_48H) {
-        timerStart = now;
-        localStorage.setItem('crash_timer_start_48h_v4', timerStart);
-    } else {
-        timerStart = parseInt(timerStart, 10);
-    }
-
-    function updateTimer() {
-        const remaining = Math.max(0, DURATION_48H - (Date.now() - timerStart));
-        const hours = Math.floor(remaining / (1000 * 60 * 60));
-        const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
-        const formatted = `${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
-
-        timerElements.forEach(el => el.textContent = formatted);
-    }
-    updateTimer();
-    setInterval(updateTimer, 1000);
-}
-
-function renderCommentsList() {
-    const grid = document.getElementById('commentsGrid');
-    if (!grid) return;
-    const visibleComments = WINNER_COMMENTS.slice(0, displayedCommentsCount);
-    grid.innerHTML = visibleComments.map(c => `
-        <div class="comment-card">
-            <div class="comment-header">
-                <div class="comment-user-box">
-                    <div class="comment-lang-badge">${c.lang}</div>
-                    <div class="comment-username">${c.username} <i class="fa-solid fa-circle-check text-green"></i></div>
-                </div>
-                <div class="comment-gain-badge">${c.gain}</div>
-            </div>
-            <p class="comment-text">"${c.comment}"</p>
-        </div>
-    `).join('');
-}
-
-function initLoadMoreComments() {
-    const btnLoadMore = document.getElementById('btnLoadMoreComments');
-    if (btnLoadMore) {
-        btnLoadMore.addEventListener('click', () => {
-            displayedCommentsCount = WINNER_COMMENTS.length;
-            renderCommentsList();
-            btnLoadMore.style.display = 'none';
-        });
-    }
-}
-
-// ==========================================
-// 11. MODAL HELPERS & TOASTS
-// ==========================================
 function initModals() {
     const openLoginBtn = document.getElementById('openLoginBtn');
     const openRegisterBtn = document.getElementById('openRegisterBtn');
