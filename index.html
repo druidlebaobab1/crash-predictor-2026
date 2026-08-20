@@ -48,7 +48,7 @@
         </div>
     </div>
 
-    <!-- SITE-WIDE WARNING BANNER FOR LOGGED-IN USERS (RED NOT SUBSCRIBED ALERT) -->
+    <!-- SITE-WIDE WARNING BANNER FOR UNPAID USERS -->
     <div class="site-unsubscribed-alert-banner hidden" id="siteSubscriptionAlert">
         <div class="alert-banner-content">
             <div class="alert-icon-text">
@@ -61,7 +61,7 @@
         </div>
     </div>
 
-    <!-- Main Navigation Bar (Spacious & Clean) -->
+    <!-- Main Navigation Bar -->
     <header class="main-navbar">
         <div class="nav-container">
             <a href="#" class="brand-logo">
@@ -81,7 +81,6 @@
             </nav>
 
             <div class="nav-auth-actions" id="navAuthContainer">
-                <!-- Sleek Language Selector -->
                 <div class="lang-selector-box">
                     <i class="fa-solid fa-globe text-gold"></i>
                     <select id="siteLanguageSelect" class="lang-select-dropdown" title="Langue">
@@ -105,7 +104,7 @@
                     <div class="user-avatar-icon"><i class="fa-solid fa-user-check"></i></div>
                     <div class="user-info-text">
                         <span class="user-name-display" id="navUserName">Client</span>
-                        <span class="user-status-pill-nav red-tag"><i class="fa-solid fa-circle-xmark"></i> Non abonné</span>
+                        <span class="user-status-pill-nav red-tag" id="navUserStatusPill"><i class="fa-solid fa-circle-xmark"></i> Non abonné</span>
                     </div>
                     <button class="btn-logout" id="logoutBtn" title="Déconnexion"><i class="fa-solid fa-power-off"></i></button>
                 </div>
@@ -118,7 +117,6 @@
         <section id="predictions-access" class="hero-spotlight-section">
             <div class="section-container">
                 <div class="hero-header-text text-center">
-                    <!-- 48H PROMO BADGE -->
                     <div class="countdown-promo-badge" id="promoBadgeText">
                         <i class="fa-solid fa-stopwatch text-gold pulse-icon"></i>
                         <span>Offre Spéciale 50 $ : <strong class="countdown-timer-text">47h 59m 50s</strong> restante(s) • Le prix passera à 100 dollars après 48h</span>
@@ -132,7 +130,30 @@
                     </p>
                 </div>
 
-                <!-- MASTER SPOTLIGHT CARD : SHARP HD PHOTO + RADIANT HALO + PRICE 50$ -->
+                <!-- VIP REAL-TIME PREDICTIONS BOX (VISIBLE ONLY AFTER PAYMENT) -->
+                <div class="vip-live-signal-box hidden" id="vipLiveSignalBox">
+                    <div class="vip-signal-header">
+                        <span class="vip-pulse-dot"></span>
+                        <span class="vip-signal-title"><i class="fa-solid fa-crown text-gold"></i> SIGNAL PRÉDICTIF VIP EN DIRECT (ACTIF)</span>
+                        <span class="vip-signal-timestamp" id="vipSignalTime">Reçu à l'instant</span>
+                    </div>
+                    <div class="vip-signal-body">
+                        <div class="vip-stat-card">
+                            <span class="vip-stat-label">Point de sortie conseillé :</span>
+                            <span class="vip-stat-target" id="vipExitTarget">x4.85</span>
+                        </div>
+                        <div class="vip-stat-card">
+                            <span class="vip-stat-label">Indice de confiance :</span>
+                            <span class="vip-stat-confidence text-green" id="vipConfidenceScore">98.8%</span>
+                        </div>
+                        <div class="vip-stat-card">
+                            <span class="vip-stat-label">Statut algorithme :</span>
+                            <span class="vip-stat-status"><i class="fa-solid fa-satellite-dish text-gold"></i> FLUX EN DIRECT</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MASTER SPOTLIGHT CARD -->
                 <div class="master-product-display luxury-alive-box">
                     <div class="product-visual-container">
                         <div class="clean-image-wrapper radiant-gold-frame">
@@ -151,7 +172,7 @@
                             Rejoignez la communauté officielle et débloquez dès maintenant l'accès illimité aux signaux automatiques en direct.
                         </p>
 
-                        <!-- PRICE BOX : 50 $ + 30 000 FRANCS CFA (SEULE MENTION DU SITE) -->
+                        <!-- PRICE BOX -->
                         <div class="price-display-wrapper">
                             <div class="price-highlight">
                                 <div class="price-main-row">
@@ -177,7 +198,7 @@
                             <li><i class="fa-solid fa-check text-green"></i> Accès à vie sans aucun abonnement mensuel</li>
                         </ul>
 
-                        <!-- ACCÉDER AUX PRÉDICTIONS BUTTON -->
+                        <!-- ACTION BUTTON -->
                         <button class="btn-buy-instant" id="directBuyButton">
                             <i class="fa-solid fa-bolt"></i>
                             <span>Accéder aux prédictions</span>
@@ -207,7 +228,7 @@
             </div>
         </section>
 
-        <!-- 63 AVIS EN 24 HEURES & 155 643 AVIS TOTAL (AVIS FRANÇAIS EN TÊTE) -->
+        <!-- 63 AVIS EN 24 HEURES & 155 643 AVIS TOTAL -->
         <section id="testimonials" class="testimonials-section">
             <div class="section-container">
                 <div class="section-header text-center">
@@ -239,12 +260,10 @@
                     </div>
                 </div>
 
-                <!-- Sub-header : 63 commentaires en 24 heures -->
                 <div class="comments-counter-info text-center" id="commentsCounterDisplay">
                     63 commentaires en 24 heures (+155 643 avis enregistrés)
                 </div>
 
-                <!-- Grid of 63 Multilingual Comments with French Priority -->
                 <div class="comments-grid" id="commentsGrid">
                     <!-- Dynamically rendered from app.js -->
                 </div>
@@ -287,11 +306,11 @@
                     </div>
                     <div class="faq-item">
                         <div class="faq-question">
-                            <span>Que se passe-t-il après avoir créé un compte ?</span>
+                            <span>Que se passe-t-il après avoir créé un compte et payé ?</span>
                             <i class="fa-solid fa-chevron-down"></i>
                         </div>
                         <div class="faq-answer">
-                            <p>Une fois inscrit, vous disposez de votre espace membre sécurisé avec possibilité d'ajouter votre numéro de téléphone et de modifier votre mot de passe. Dès votre paiement validé, votre licence est automatiquement activée à vie.</p>
+                            <p>Dès votre paiement validé, votre compte se transforme instantanément en <strong>Membre VIP Actif</strong> : les alertes disparaissent et le boîtier de signaux d'avion en direct se débloque à vie.</p>
                         </div>
                     </div>
                     <div class="faq-item">
@@ -327,7 +346,7 @@
         </div>
     </footer>
 
-    <!-- MODAL 1 : USER PROFILE MODAL -->
+    <!-- MODAL 1 : USER PROFILE & VIP CODE ACTIVATION -->
     <div class="modal-overlay" id="profileModal">
         <div class="modal-card modal-profile-card">
             <button class="modal-close" id="closeProfileModal">&times;</button>
@@ -338,7 +357,7 @@
             </div>
 
             <div class="profile-modal-body">
-                <!-- RED UNPAID BADGE -->
+                <!-- DYNAMIC STATUS BADGE -->
                 <div class="profile-status-block">
                     <div class="status-label-heading">Statut de votre licence :</div>
                     <div class="status-tag-badge status-unsubscribed" id="profileStatusBadge">
@@ -347,6 +366,16 @@
                     <p class="status-alert-description">
                         Vos signaux d'avion sont actuellement suspendus. Activez votre licence pour débloquer les prédictions en direct.
                     </p>
+                </div>
+
+                <!-- MANUAL VIP ACTIVATION CODE SECTION (FOR DIRECT WAVE / WHATSAPP PAYMENTS) -->
+                <div class="profile-section-group vip-code-box">
+                    <label class="section-field-label"><i class="fa-solid fa-key text-gold"></i> Activer avec un Code VIP</label>
+                    <div class="phone-input-row">
+                        <input type="text" id="vipActivationCodeInput" placeholder="Ex: VIP2026" class="form-control-dark uppercase-input">
+                        <button type="button" class="btn-save-mini btn-gold-solid" id="btnValidateVipCode">Activer</button>
+                    </div>
+                    <span class="small-hint">Si vous avez payé directement par Wave/WhatsApp, entrez votre code VIP ici.</span>
                 </div>
 
                 <div class="profile-info-row">
@@ -365,7 +394,7 @@
 
                 <!-- CHANGE PASSWORD SECTION -->
                 <div class="profile-section-group">
-                    <label class="section-field-label"><i class="fa-solid fa-key"></i> Modifier mon mot de passe</label>
+                    <label class="section-field-label"><i class="fa-solid fa-lock"></i> Modifier mon mot de passe</label>
                     <form id="formUpdatePassword" class="password-update-form">
                         <input type="password" id="profileOldPassword" placeholder="Mot de passe actuel" required class="form-control-dark">
                         <input type="password" id="profileNewPassword" placeholder="Nouveau mot de passe" required class="form-control-dark">
@@ -385,7 +414,7 @@
         </div>
     </div>
 
-    <!-- MODAL 2 : INSCRIPTION (REGISTER) -->
+    <!-- MODAL 2 : REGISTER -->
     <div class="modal-overlay" id="registerModal">
         <div class="modal-card">
             <button class="modal-close" id="closeRegisterModal">&times;</button>
@@ -428,7 +457,7 @@
         </div>
     </div>
 
-    <!-- MODAL 3 : CONNEXION (LOGIN) -->
+    <!-- MODAL 3 : LOGIN -->
     <div class="modal-overlay" id="loginModal">
         <div class="modal-card">
             <button class="modal-close" id="closeLoginModal">&times;</button>
@@ -482,7 +511,7 @@
                     </div>
                 </div>
 
-                <!-- OPERATOR SELECTION CHIPS (WAVE, ORANGE, MTN, MOOV) -->
+                <!-- OPERATOR SELECTION CHIPS -->
                 <div class="momo-selection-label"><i class="fa-solid fa-tower-broadcast text-gold"></i> Sélectionnez votre moyen Mobile Money :</div>
                 <div class="momo-operators-grid">
                     <div class="momo-operator-chip selected" data-network="WAVE">

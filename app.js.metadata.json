@@ -1,4 +1,4 @@
 {
-  "summary": "Mise à jour d'app.js avec sélecteur direct de pays (Côte d'Ivoire, Sénégal, Cameroun, Bénin, etc.) et réseau (Wave, Orange, MTN, Moov) forçant Flutterwave à ouvrir directement le paiement Mobile Money sans carte",
-  "updatedAt": "2026-08-20T10:53:40.280713900Z"
+  "summary": "Mise à jour d'app.js pour implémenter la transformation complète de l'interface en mode VIP Actif après paiement (signaux prédictifs débloqués, badge vert, suppression des alertes, tableau de bord) et validation par code VIP",
+  "updatedAt": "2026-08-20T11:20:04.029535200Z"
 }

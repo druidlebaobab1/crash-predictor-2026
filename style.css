@@ -1,6 +1,6 @@
 /* ==========================================================================
    CRASH PREDICTOR 2026 - STYLE OFFICIEL LUXE AVIATOR
-   Paiement Mobile Money Direct (Wave, Orange, MTN, Moov)
+   Mode VIP Débloqué, Signaux en Temps Réel & Mobile Money Direct
    ========================================================================== */
 
 :root {
@@ -515,6 +515,13 @@ body {
     font-weight: 700;
 }
 
+.user-status-pill-nav.green-tag {
+    font-size: 0.68rem;
+    color: #34d399;
+    font-weight: 800;
+    text-shadow: 0 0 8px rgba(52, 211, 153, 0.6);
+}
+
 .btn-logout {
     background: transparent;
     border: none;
@@ -527,6 +534,101 @@ body {
 
 .btn-logout:hover { color: var(--accent-red); }
 .hidden { display: none !important; }
+
+/* ================= VIP REAL-TIME SIGNALS BOX ================= */
+.vip-live-signal-box {
+    background: linear-gradient(135deg, rgba(5, 150, 105, 0.25) 0%, rgba(16, 185, 129, 0.15) 100%);
+    border: 2px solid #10b981;
+    border-radius: var(--radius-lg);
+    padding: 20px 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 0 35px rgba(16, 185, 129, 0.4), inset 0 0 15px rgba(16, 185, 129, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.vip-signal-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.vip-pulse-dot {
+    width: 12px;
+    height: 12px;
+    background-color: #34d399;
+    border-radius: 50%;
+    box-shadow: 0 0 12px #34d399;
+    animation: liveDotBlink 1.2s infinite;
+}
+
+.vip-signal-title {
+    font-family: var(--font-heading);
+    font-weight: 900;
+    font-size: 0.95rem;
+    color: #fff;
+    letter-spacing: 0.5px;
+}
+
+.vip-signal-timestamp {
+    margin-left: auto;
+    font-size: 0.78rem;
+    color: #a7f3d0;
+    background: rgba(16, 185, 129, 0.2);
+    padding: 3px 10px;
+    border-radius: 12px;
+}
+
+.vip-signal-body {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.vip-stat-card {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.vip-stat-label {
+    font-size: 0.76rem;
+    color: #d1d5db;
+    margin-bottom: 4px;
+}
+
+.vip-stat-target {
+    font-family: var(--font-heading);
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: #ffc837;
+    text-shadow: 0 0 15px rgba(255, 200, 55, 0.8);
+}
+
+.vip-stat-confidence {
+    font-family: var(--font-heading);
+    font-size: 1.4rem;
+    font-weight: 900;
+}
+
+.vip-stat-status {
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: #fff;
+    margin-top: 4px;
+}
+
+.btn-buy-instant.btn-vip-active {
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    color: #fff;
+    box-shadow: 0 8px 30px rgba(16, 185, 129, 0.6);
+}
 
 /* ================= HERO & MASTER SPOTLIGHT SECTION ================= */
 .hero-spotlight-section {
@@ -1214,6 +1316,8 @@ section {
     background: rgba(255, 255, 255, 0.08);
 }
 
+.uppercase-input { text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+
 .btn-block {
     width: 100%;
     justify-content: center;
@@ -1279,6 +1383,7 @@ section {
     font-weight: 900;
     padding: 6px 14px;
     border-radius: 20px;
+    box-shadow: 0 0 18px rgba(16, 185, 129, 0.6);
 }
 
 .status-alert-description {
@@ -1304,6 +1409,18 @@ section {
     border-radius: var(--radius-md);
     padding: 12px 14px;
     margin-bottom: 14px;
+}
+
+.vip-code-box {
+    border: 1.5px dashed var(--gold-primary);
+    background: rgba(255, 200, 55, 0.06);
+}
+
+.small-hint {
+    font-size: 0.73rem;
+    color: #cbd5e1;
+    margin-top: 6px;
+    display: block;
 }
 
 .section-field-label {
@@ -1335,6 +1452,13 @@ section {
 .btn-save-mini:hover {
     background: var(--gold-primary);
     color: #0d0614;
+}
+
+.btn-gold-solid {
+    background: var(--gold-gradient);
+    color: #0d0614;
+    border: none;
+    font-weight: 800;
 }
 
 .btn-save-mini.btn-full {
@@ -1577,6 +1701,7 @@ section {
     .nav-links { display: none; }
     .testimonials-stats-bar { grid-template-columns: 1fr; }
     .grand-canvas { height: 420px; }
+    .vip-signal-body { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 600px) {
@@ -1589,4 +1714,5 @@ section {
     .grand-canvas { height: 350px; }
     .ticker-content { font-size: 0.78rem; }
     .btn-execute-momo { font-size: 0.92rem; }
+    .vip-signal-body { grid-template-columns: 1fr; }
 }
