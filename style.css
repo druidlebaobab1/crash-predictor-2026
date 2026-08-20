@@ -1,6 +1,6 @@
 /* ==========================================================================
    CRASH PREDICTOR 2026 - STYLE OFFICIEL LUXE AVIATOR
-   Paiement Direct : Mobile Money (Wave, Orange, MTN, Moov) & Carte Bancaire
+   Paiement Mobile Money Direct (Wave, Orange, MTN, Moov)
    ========================================================================== */
 
 :root {
@@ -1152,11 +1152,11 @@ section {
 }
 
 .modal-close:hover { color: #fff; }
-.modal-header { text-align: center; margin-bottom: 22px; }
+.modal-header { text-align: center; margin-bottom: 20px; }
 
 .modal-title-big {
     font-family: var(--font-heading);
-    font-size: 1.6rem;
+    font-size: 1.5rem;
     font-weight: 900;
     color: #fff;
     margin-bottom: 4px;
@@ -1367,9 +1367,9 @@ section {
     text-decoration: underline;
 }
 
-/* ================= DIRECT TARGETED PAYMENT MODAL ================= */
+/* ================= DIRECT MOBILE MONEY MODAL STYLING ================= */
 .modal-buy-card {
-    max-width: 520px;
+    max-width: 530px;
 }
 
 .product-banner-summary {
@@ -1379,13 +1379,13 @@ section {
     background: rgba(255, 200, 55, 0.08);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
-    padding: 14px;
-    margin-bottom: 16px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
 }
 
 .buy-summary-img {
-    width: 60px;
-    height: 60px;
+    width: 55px;
+    height: 55px;
     border-radius: 10px;
     object-fit: cover;
     background: #000;
@@ -1400,12 +1400,12 @@ section {
     background: var(--gold-primary);
     padding: 2px 6px;
     border-radius: 12px;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 }
 
 .price-tag-big {
     font-family: var(--font-heading);
-    font-size: 1.4rem;
+    font-size: 1.35rem;
     font-weight: 900;
     color: var(--gold-primary);
 }
@@ -1416,93 +1416,120 @@ section {
     font-weight: normal;
 }
 
+.momo-selection-label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #e5e7eb;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.momo-operators-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.momo-operator-chip {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1.5px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    padding: 10px 4px;
+    text-align: center;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #d1d5db;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.momo-operator-chip i { font-size: 1.1rem; }
+
+.momo-operator-chip:hover {
+    border-color: var(--gold-primary);
+    background: rgba(255, 200, 55, 0.1);
+    color: #fff;
+}
+
+.momo-operator-chip.selected {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: #10b981;
+    color: #34d399;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.35);
+}
+
 .checkout-fields-container {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    margin-bottom: 18px;
+    margin-bottom: 16px;
 }
 
-/* TWO SEPARATED DIRECT PAYMENT BUTTONS */
-.payment-direct-actions {
+.form-group-row {
     display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-bottom: 12px;
+    gap: 10px;
 }
 
-.btn-direct-momo {
+.flex-1 { flex: 1; }
+
+.btn-execute-momo {
+    width: 100%;
     background: linear-gradient(135deg, #059669 0%, #10b981 100%);
     color: #fff;
-    border: 2px solid #34d399;
+    border: none;
     padding: 16px 20px;
     border-radius: var(--radius-md);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
-    transition: var(--transition-smooth);
-    width: 100%;
-}
-
-.btn-direct-momo:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 28px rgba(16, 185, 129, 0.6);
-    background: linear-gradient(135deg, #047857 0%, #059669 100%);
-}
-
-.btn-direct-card {
-    background: rgba(255, 255, 255, 0.07);
-    color: #fff;
-    border: 1px solid rgba(255, 200, 55, 0.4);
-    padding: 16px 20px;
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    transition: var(--transition-smooth);
-    width: 100%;
-}
-
-.btn-direct-card:hover {
-    background: rgba(255, 200, 55, 0.15);
-    border-color: var(--gold-primary);
-    transform: translateY(-2px);
-}
-
-.btn-momo-left {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    text-align: left;
-}
-
-.btn-action-icon {
-    font-size: 1.6rem;
-}
-
-.btn-action-text {
-    display: flex;
-    flex-direction: column;
-}
-
-.btn-title-main {
     font-family: var(--font-heading);
-    font-weight: 800;
-    font-size: 1rem;
+    font-weight: 900;
+    font-size: 1.05rem;
+    cursor: pointer;
+    box-shadow: 0 6px 25px rgba(16, 185, 129, 0.5);
+    transition: var(--transition-smooth);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
     letter-spacing: 0.3px;
 }
 
-.btn-sub-badges {
-    font-size: 0.76rem;
-    opacity: 0.9;
-    font-weight: 500;
+.btn-execute-momo:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 32px rgba(16, 185, 129, 0.7);
+    background: linear-gradient(135deg, #047857 0%, #059669 100%);
 }
 
+.card-alternative-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.btn-link-card {
+    background: transparent;
+    border: none;
+    color: var(--gold-primary);
+    font-weight: 700;
+    font-size: 0.78rem;
+    cursor: pointer;
+    text-decoration: underline;
+    transition: var(--transition-smooth);
+}
+
+.btn-link-card:hover { color: #fff; }
+
 .secure-checkout-note {
-    font-size: 0.75rem;
+    font-size: 0.74rem;
     color: var(--text-muted);
     text-align: center;
     margin-top: 10px;
@@ -1556,9 +1583,10 @@ section {
     .hero-main-title { font-size: 2rem; }
     .price-amount { font-size: 2.2rem; }
     .comments-grid { grid-template-columns: 1fr; }
+    .form-group-row { flex-direction: column; }
+    .momo-operators-grid { grid-template-columns: repeat(2, 1fr); }
     .alert-banner-content { text-align: center; justify-content: center; }
     .grand-canvas { height: 350px; }
     .ticker-content { font-size: 0.78rem; }
-    .btn-title-main { font-size: 0.9rem; }
-    .btn-sub-badges { font-size: 0.7rem; }
+    .btn-execute-momo { font-size: 0.92rem; }
 }

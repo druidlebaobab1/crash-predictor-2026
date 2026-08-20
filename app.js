@@ -1,6 +1,6 @@
 /**
  * CRASH PREDICTOR 2026 - APPLICATION OFFICIELLE
- * Paiement Mobile Money Pur (Wave, Orange, MTN, Moov) sans carte & Paiement Carte séparé
+ * Intégration Mobile Money Directe Strictement Verrouillée (Wave, Orange, MTN, Moov)
  */
 
 const FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK-07d56b9d571ed135ab4bf5d3fd5330a9-X";
@@ -53,7 +53,7 @@ const WINNER_COMMENTS = [
     { id: 42, username: "Felipe_Curitiba", lang: "PT", gain: "+$1,480", rating: 5, time: "Há 4h 30", comment: "Acertos constantes nas saídas rápidas." },
     { id: 43, username: "Gonzalo_Sevilla", lang: "ES", gain: "+$440", rating: 5, time: "Hace 5h", comment: "Sencillo, rápido y rentable. 50 dólares bien aprovechados." },
     { id: 44, username: "Hans_Stuttgart", lang: "DE", gain: "+$1,050", rating: 5, time: "Vor 5 Std.", comment: "Sehr gute Trefferquote bei den mittleren Multiplikatoren." },
-    { id: 45, username: "Andrea_Palermo", lang: "IT", gain: "+$720", rating: 5, time: "5 ore fa", comment: "Ho recuperato il costo della licenza già al secondo tentativo." },
+    { id: 45, username: "Andrea_Palermo", lang: "IT", gain: "+$720", rating: 5, time: "5 ore fa", comment: "Ho recuperato il costo della licenza déjà au 2e tour." },
     { id: 46, username: "Bruno_Recife", lang: "PT", gain: "+$860", rating: 5, time: "Há 5h 30", comment: "Muito top! As previsões do avião amarelo não falham." },
     { id: 47, username: "Ahmed_Algiers", lang: "AR", gain: "+$1,120", rating: 5, time: "منذ 6 ساعات", comment: "منصة احترافية وسهلة الاستخدام للغاية." },
     { id: 48, username: "Ryan_Miami", lang: "EN", gain: "+$670", rating: 5, time: "6 hrs ago", comment: "Solid predictions. Smooth curve flight on the dashboard." },
@@ -78,6 +78,10 @@ let currentUser = JSON.parse(localStorage.getItem('crash_predictor_user_2026')) 
 let displayedCommentsCount = 12;
 let currentLanguage = "fr";
 
+// Selected Mobile Money network
+let selectedMomoNetwork = "WAVE"; // 'WAVE', 'ORANGE', 'MTN', 'MOOV'
+let selectedCountryCode = "CI"; // 'CI', 'SN', 'CM', 'BJ', 'BF', 'TG', 'ML'
+
 // ==========================================
 // 2. DOM INITIALIZATION
 // ==========================================
@@ -92,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initAuthSecurity();
     initProfileModal();
     initModals();
-    initDirectPaymentGateways();
+    initStrictMobileMoneyPayment();
     initFAQHelper();
 });
 
@@ -758,17 +762,33 @@ function initProfileModal() {
 }
 
 // ==========================================
-// 10. DIRECT TARGETED PAYMENT GATEWAYS (MOBILE MONEY VS CARTE BANCAIRE)
+// 10. STRICT MOBILE MONEY PAYMENT (WAVE, ORANGE, MTN, MOOV)
 // ==========================================
-function initDirectPaymentGateways() {
+function initStrictMobileMoneyPayment() {
     const directBuyButtons = document.querySelectorAll('#directBuyButton, .btn-buy-instant, .btn-cta-buy, #btnAlertSubscribe');
     const buyModal = document.getElementById('buyModal');
     
-    const btnPayMobileMoney = document.getElementById('btnPayMobileMoney');
-    const btnPayCard = document.getElementById('btnPayCard');
-    
     const paymentCustomerEmail = document.getElementById('paymentCustomerEmail');
     const paymentCustomerPhone = document.getElementById('paymentCustomerPhone');
+    const momoCountrySelect = document.getElementById('momoCountrySelect');
+    const momoOperatorChips = document.querySelectorAll('.momo-operator-chip');
+    const btnExecuteMomoPayment = document.getElementById('btnExecuteMomoPayment');
+    const btnExecuteCardPayment = document.getElementById('btnExecuteCardPayment');
+
+    // Operator selection chips
+    momoOperatorChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            momoOperatorChips.forEach(c => c.classList.remove('selected'));
+            chip.classList.add('selected');
+            selectedMomoNetwork = chip.dataset.network || "WAVE";
+        });
+    });
+
+    if (momoCountrySelect) {
+        momoCountrySelect.addEventListener('change', (e) => {
+            selectedCountryCode = e.target.value;
+        });
+    }
 
     // Open Checkout Modal
     directBuyButtons.forEach(btn => {
@@ -785,29 +805,38 @@ function initDirectPaymentGateways() {
         });
     });
 
-    function launchPaymentGateway(mode) {
-        const customerEmail = (paymentCustomerEmail?.value || currentUser?.email || "client@crashpredictor2026.com").trim();
-        const customerPhone = (paymentCustomerPhone?.value || currentUser?.phone || "0700000000").trim();
-        const customerName = currentUser?.name || "Client VIP";
+    // 1. EXECUTE PURE MOBILE MONEY (Wave, Orange, MTN, Moov)
+    if (btnExecuteMomoPayment) {
+        btnExecuteMomoPayment.addEventListener('click', () => {
+            const customerEmail = (paymentCustomerEmail?.value || currentUser?.email || "client@crashpredictor2026.com").trim();
+            const customerPhone = (paymentCustomerPhone?.value || currentUser?.phone || "").trim();
+            const customerName = currentUser?.name || "Client Mobile Money";
+            const country = momoCountrySelect ? momoCountrySelect.value : "CI";
 
-        if (!customerEmail || !customerEmail.includes('@')) {
-            showToast("Veuillez saisir votre adresse email.", "error");
-            paymentCustomerEmail?.focus();
-            return;
-        }
+            if (!customerEmail || !customerEmail.includes('@')) {
+                showToast("Veuillez renseigner votre email.", "error");
+                paymentCustomerEmail?.focus();
+                return;
+            }
 
-        if (typeof FlutterwaveCheckout !== "function") {
-            showToast("Chargement de la passerelle sécurisée...", "error");
-            return;
-        }
+            if (!customerPhone || customerPhone.length < 8) {
+                showToast("Veuillez saisir votre numéro de téléphone Mobile Money.", "error");
+                paymentCustomerPhone?.focus();
+                return;
+            }
 
-        if (mode === "momo") {
-            // PAIEMENT EXCLUSIF MOBILE MONEY FRANCOPHONE (Wave, Orange, MTN, Moov) EN XOF
+            if (typeof FlutterwaveCheckout !== "function") {
+                showToast("Chargement du paiement sécurisé...", "error");
+                return;
+            }
+
+            // PURE MOBILE MONEY CONFIGURATION
             FlutterwaveCheckout({
                 public_key: FLUTTERWAVE_PUBLIC_KEY,
                 tx_ref: "CRASH-MOMO-" + Date.now() + "-" + Math.floor(Math.random() * 10000),
                 amount: 30000,
                 currency: "XOF",
+                country: country,
                 payment_options: "mobilemoneyfrancophone",
                 customer: {
                     email: customerEmail,
@@ -816,7 +845,7 @@ function initDirectPaymentGateways() {
                 },
                 customizations: {
                     title: "CRASH PREDICTOR 2026",
-                    description: "Paiement Wave / MTN / Orange Money (30 000 FCFA)",
+                    description: `Paiement ${selectedMomoNetwork} (30 000 FCFA)`,
                     logo: window.location.origin + "/assets/crash_hd.jpg",
                 },
                 callback: function (data) {
@@ -842,8 +871,27 @@ function initDirectPaymentGateways() {
                     console.log("Fenêtre Mobile Money fermée.");
                 }
             });
-        } else if (mode === "card") {
-            // PAIEMENT EXCLUSIF CARTE BANCAIRE (Visa, Mastercard) EN USD
+        });
+    }
+
+    // 2. EXECUTE PURE CARD PAYMENT (VISA, MASTERCARD)
+    if (btnExecuteCardPayment) {
+        btnExecuteCardPayment.addEventListener('click', () => {
+            const customerEmail = (paymentCustomerEmail?.value || currentUser?.email || "client@crashpredictor2026.com").trim();
+            const customerPhone = (paymentCustomerPhone?.value || currentUser?.phone || "").trim();
+            const customerName = currentUser?.name || "Client VIP";
+
+            if (!customerEmail || !customerEmail.includes('@')) {
+                showToast("Veuillez renseigner votre email.", "error");
+                paymentCustomerEmail?.focus();
+                return;
+            }
+
+            if (typeof FlutterwaveCheckout !== "function") {
+                showToast("Chargement du paiement sécurisé...", "error");
+                return;
+            }
+
             FlutterwaveCheckout({
                 public_key: FLUTTERWAVE_PUBLIC_KEY,
                 tx_ref: "CRASH-CARD-" + Date.now() + "-" + Math.floor(Math.random() * 10000),
@@ -883,20 +931,6 @@ function initDirectPaymentGateways() {
                     console.log("Fenêtre Carte fermée.");
                 }
             });
-        }
-    }
-
-    // 1. Bouton DIRECT MOBILE MONEY
-    if (btnPayMobileMoney) {
-        btnPayMobileMoney.addEventListener('click', () => {
-            launchPaymentGateway("momo");
-        });
-    }
-
-    // 2. Bouton DIRECT CARTE BANCAIRE
-    if (btnPayCard) {
-        btnPayCard.addEventListener('click', () => {
-            launchPaymentGateway("card");
         });
     }
 }

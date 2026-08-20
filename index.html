@@ -171,7 +171,7 @@
                         </div>
 
                         <ul class="benefits-checklist">
-                            <li><i class="fa-solid fa-check text-green"></i> Paiement direct par <strong>Wave, MTN MoMo, Orange Money, Moov</strong> ou <strong>Carte</strong></li>
+                            <li><i class="fa-solid fa-check text-green"></i> Paiement direct par <strong>Wave, Orange Money, MTN MoMo, Moov</strong></li>
                             <li><i class="fa-solid fa-check text-green"></i> Accès instantané aux signaux d'avion en temps réel</li>
                             <li><i class="fa-solid fa-check text-green"></i> Détection automatique du point d'arrêt avant crash</li>
                             <li><i class="fa-solid fa-check text-green"></i> Accès à vie sans aucun abonnement mensuel</li>
@@ -185,7 +185,7 @@
 
                         <div class="secure-guarantee-footer">
                             <i class="fa-solid fa-shield-halved text-gold"></i>
-                            <span>Activation immédiate 24h/24 • Plus d'un million de membres actifs</span>
+                            <span>Paiement Mobile Money direct • Validation immédiate sur téléphone</span>
                         </div>
                     </div>
                 </div>
@@ -461,14 +461,14 @@
         </div>
     </div>
 
-    <!-- MODAL 4 : DIRECT TARGETED PAYMENT MODAL (MOBILE MONEY OU CARTE BANCAIRE) -->
+    <!-- MODAL 4 : DIRECT MOBILE MONEY CHECKOUT (WAVE, ORANGE, MTN, MOOV) -->
     <div class="modal-overlay" id="buyModal">
         <div class="modal-card modal-buy-card">
             <button class="modal-close" id="closeBuyModal">&times;</button>
             <div class="modal-header">
-                <div class="modal-icon-badge gold-glow"><i class="fa-solid fa-bolt"></i></div>
-                <h3 class="modal-title-big">Finaliser votre Accès</h3>
-                <p>Choisissez votre moyen de paiement pour activer vos signaux</p>
+                <div class="modal-icon-badge gold-glow"><i class="fa-solid fa-mobile-screen-button"></i></div>
+                <h3 class="modal-title-big">Paiement Mobile Money Direct</h3>
+                <p>Choisissez votre réseau pour recevoir le signal de retrait sur votre téléphone</p>
             </div>
 
             <div class="buy-modal-content">
@@ -482,47 +482,64 @@
                     </div>
                 </div>
 
-                <!-- QUICK EMAIL & PHONE (AUTOMATIC PRE-FILL) -->
-                <div class="checkout-fields-container">
-                    <div class="form-group">
-                        <label><i class="fa-solid fa-envelope"></i> Votre Email (pour recevoir vos accès)</label>
-                        <input type="email" id="paymentCustomerEmail" placeholder="votre-email@exemple.com" required class="form-control-dark">
+                <!-- OPERATOR SELECTION CHIPS (WAVE, ORANGE, MTN, MOOV) -->
+                <div class="momo-selection-label"><i class="fa-solid fa-tower-broadcast text-gold"></i> Sélectionnez votre moyen Mobile Money :</div>
+                <div class="momo-operators-grid">
+                    <div class="momo-operator-chip selected" data-network="WAVE">
+                        <i class="fa-solid fa-water"></i> Wave
                     </div>
-                    <div class="form-group">
-                        <label><i class="fa-solid fa-phone"></i> Numéro de téléphone (optionnel)</label>
-                        <input type="tel" id="paymentCustomerPhone" placeholder="Ex: 07000000" class="form-control-dark">
+                    <div class="momo-operator-chip" data-network="ORANGE">
+                        <i class="fa-solid fa-signal"></i> Orange Money
+                    </div>
+                    <div class="momo-operator-chip" data-network="MTN">
+                        <i class="fa-solid fa-sim-card"></i> MTN MoMo
+                    </div>
+                    <div class="momo-operator-chip" data-network="MOOV">
+                        <i class="fa-solid fa-mobile-retro"></i> Moov Money
                     </div>
                 </div>
 
-                <!-- DIRECT PAYMENT BUTTONS (SEPARATED & ACCESSIBLE) -->
-                <div class="payment-direct-actions">
-                    <!-- OPTION 1 : DIRECT MOBILE MONEY -->
-                    <button type="button" class="btn-direct-momo" id="btnPayMobileMoney">
-                        <div class="btn-momo-left">
-                            <i class="fa-solid fa-mobile-screen-button btn-action-icon"></i>
-                            <div class="btn-action-text">
-                                <span class="btn-title-main">Payer par Mobile Money</span>
-                                <span class="btn-sub-badges">Wave • Orange Money • MTN MoMo • Moov</span>
-                            </div>
+                <!-- COUNTRY & PHONE INPUTS -->
+                <div class="checkout-fields-container">
+                    <div class="form-group-row">
+                        <div class="form-group flex-1">
+                            <label><i class="fa-solid fa-earth-africa"></i> Pays</label>
+                            <select id="momoCountrySelect" class="form-control-dark">
+                                <option value="CI" selected>🇨🇮 Côte d'Ivoire</option>
+                                <option value="SN">🇸🇳 Sénégal</option>
+                                <option value="CM">🇨🇲 Cameroun</option>
+                                <option value="BJ">🇧🇯 Bénin</option>
+                                <option value="BF">🇧🇫 Burkina Faso</option>
+                                <option value="ML">🇲🇱 Mali</option>
+                                <option value="TG">🇹🇬 Togo</option>
+                            </select>
                         </div>
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </button>
+                        <div class="form-group flex-1">
+                            <label><i class="fa-solid fa-phone"></i> Numéro de téléphone</label>
+                            <input type="tel" id="paymentCustomerPhone" placeholder="Ex: 07000000" required class="form-control-dark">
+                        </div>
+                    </div>
 
-                    <!-- OPTION 2 : DIRECT CARTE BANCAIRE -->
-                    <button type="button" class="btn-direct-card" id="btnPayCard">
-                        <div class="btn-momo-left">
-                            <i class="fa-solid fa-credit-card btn-action-icon"></i>
-                            <div class="btn-action-text">
-                                <span class="btn-title-main">Payer par Carte Bancaire</span>
-                                <span class="btn-sub-badges">Visa • Mastercard • International</span>
-                            </div>
-                        </div>
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </button>
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-envelope"></i> Email de réception</label>
+                        <input type="email" id="paymentCustomerEmail" placeholder="votre-email@exemple.com" required class="form-control-dark">
+                    </div>
+                </div>
+
+                <!-- BIG GREEN DIRECT MOBILE MONEY VALIDATE BUTTON -->
+                <button type="button" class="btn-execute-momo" id="btnExecuteMomoPayment">
+                    <i class="fa-solid fa-lock"></i>
+                    <span>Valider le paiement Mobile Money</span>
+                </button>
+
+                <!-- OPTIONAL ALTERNATIVE: CARD PAYMENT -->
+                <div class="card-alternative-row">
+                    <span>Vous êtes à l'international ?</span>
+                    <button type="button" class="btn-link-card" id="btnExecuteCardPayment">Payer par Carte Bancaire (Visa / Mastercard)</button>
                 </div>
 
                 <div class="secure-checkout-note">
-                    <i class="fa-solid fa-shield-halved text-green"></i> Paiement 100% sécurisé avec activation immédiate
+                    <i class="fa-solid fa-shield-halved text-green"></i> Vous recevrez une demande de confirmation directe sur votre téléphone
                 </div>
             </div>
         </div>
