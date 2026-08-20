@@ -53,13 +53,14 @@ body {
 .gold-text { color: #ffc837; }
 .gold-code { color: #ffc837; font-family: var(--font-mono); font-weight: 800; letter-spacing: 0.5px; }
 
-/* ================= LIVE TICKER ================= */
-.live-traders-ticker-bar {
-    background: linear-gradient(90deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
-    border-bottom: 1px solid rgba(255, 200, 55, 0.25);
-    padding: 6px 14px;
+/* ================= PROMINENT LIVE TICKER (1M - 1.5M TRADERS) ================= */
+.live-traders-ticker-bar.prominent-live-bar {
+    background: linear-gradient(90deg, #090d1f 0%, #1e153b 50%, #090d1f 100%);
+    border-bottom: 2px solid var(--gold-primary);
+    padding: 8px 16px;
     position: relative;
     z-index: 106;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 200, 55, 0.2);
 }
 
 .ticker-content {
@@ -68,8 +69,19 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    text-align: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.live-pulse-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(16, 185, 129, 0.2);
+    border: 1px solid #10b981;
+    padding: 3px 10px;
+    border-radius: 20px;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
 }
 
 .live-dot-pulse {
@@ -77,8 +89,8 @@ body {
     height: 8px;
     background-color: #10b981;
     border-radius: 50%;
-    box-shadow: 0 0 10px #10b981;
-    animation: liveDotBlink 1.5s infinite;
+    box-shadow: 0 0 10px #10b981, 0 0 20px #10b981;
+    animation: liveDotBlink 1.2s infinite;
 }
 
 @keyframes liveDotBlink {
@@ -86,8 +98,31 @@ body {
     50% { opacity: 0.4; transform: scale(1.3); }
 }
 
-.ticker-text { font-size: 0.78rem; color: #e2e8f0; }
-.live-counter-highlight { color: var(--gold-primary); font-family: var(--font-heading); font-weight: 900; }
+.live-tag-text {
+    font-size: 0.72rem;
+    color: #34d399;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+}
+
+.live-counter-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #f3f4f6;
+    font-size: 0.84rem;
+}
+
+.live-counter-highlight {
+    color: var(--gold-primary);
+    font-family: var(--font-heading);
+    font-weight: 900;
+    font-size: 1.05rem;
+    text-shadow: 0 0 15px rgba(255, 200, 55, 0.7);
+    letter-spacing: 0.5px;
+}
+
+.live-sub-label { color: #cbd5e1; font-size: 0.78rem; }
 
 /* ================= BACKGROUND ================= */
 .sky-effects-container {
@@ -162,7 +197,12 @@ body {
 .logo-title .highlight { color: var(--gold-primary); }
 .logo-badge { font-size: 0.55rem; color: #fff; background: rgba(168, 85, 247, 0.4); border: 1px solid var(--purple-neon); padding: 1px 5px; border-radius: 20px; }
 
-.nav-auth-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.nav-auth-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
 
 .lang-selector-box {
     display: flex;
@@ -185,7 +225,11 @@ body {
 }
 .lang-select-dropdown option { background: #140b20; color: #fff; }
 
-.guest-buttons { display: flex; align-items: center; gap: 6px; }
+.guest-buttons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
 
 .btn-ghost-compact {
     background: rgba(255, 255, 255, 0.08);
@@ -197,6 +241,12 @@ body {
     font-size: 0.8rem;
     cursor: pointer;
     white-space: nowrap;
+    transition: var(--transition-smooth);
+}
+
+.btn-ghost-compact:hover {
+    border-color: var(--gold-primary);
+    color: var(--gold-primary);
 }
 
 .btn-primary-compact {
@@ -210,6 +260,12 @@ body {
     cursor: pointer;
     box-shadow: 0 2px 10px var(--gold-glow);
     white-space: nowrap;
+    transition: var(--transition-smooth);
+}
+
+.btn-primary-compact:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(255, 200, 55, 0.6);
 }
 
 .user-profile-badge {
@@ -305,7 +361,6 @@ body {
 .price-main-row { display: flex; align-items: baseline; gap: 8px; }
 .price-amount { font-family: var(--font-heading); font-size: 2.3rem; font-weight: 900; color: var(--gold-primary); }
 .price-type { color: #10b981; font-weight: 800; font-size: 0.9rem; }
-.price-cfa-conversion { font-size: 0.85rem; color: #f3f4f6; }
 
 .benefits-checklist { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
 .benefits-checklist li { display: flex; align-items: center; gap: 8px; font-size: 0.88rem; font-weight: 600; }
@@ -385,15 +440,6 @@ body {
 .vip-logo-box img { width: 100%; height: 100%; object-fit: cover; }
 .vip-software-name { font-family: var(--font-heading); font-weight: 900; font-size: 1.15rem; letter-spacing: 0.5px; }
 .vip-live-indicator { font-size: 0.7rem; color: #34d399; font-weight: 800; display: flex; align-items: center; gap: 6px; }
-
-.pulse-dot-green {
-    width: 8px;
-    height: 8px;
-    background-color: #10b981;
-    border-radius: 50%;
-    box-shadow: 0 0 10px #10b981;
-    animation: liveDotBlink 1.2s infinite;
-}
 
 .vip-user-meta { display: flex; align-items: center; gap: 12px; }
 .vip-member-tag {
@@ -757,14 +803,19 @@ body {
 }
 
 @media (max-width: 600px) {
-    .nav-container { padding: 0 10px; }
+    .nav-container { padding: 0 12px; }
+    .brand-logo { gap: 6px; }
     .logo-title { font-size: 0.95rem; }
     .logo-badge { display: none; }
-    .btn-ghost-compact { padding: 5px 8px; font-size: 0.72rem; }
-    .btn-primary-compact { padding: 5px 10px; font-size: 0.72rem; }
+    .nav-auth-actions { gap: 6px; }
+    .btn-ghost-compact { padding: 6px 10px; font-size: 0.76rem; }
+    .btn-primary-compact { padding: 6px 12px; font-size: 0.76rem; }
+    
     .hero-main-title { font-size: 1.8rem; }
     .price-amount { font-size: 2rem; }
     .pred-multiplier-value { font-size: 2.6rem; }
     .momo-chips-simple-grid { grid-template-columns: repeat(2, 1fr); }
     .vip-flight-canvas { height: 280px; }
+    .ticker-content { font-size: 0.74rem; }
+    .live-counter-highlight { font-size: 0.92rem; }
 }

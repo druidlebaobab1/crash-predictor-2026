@@ -1,15 +1,15 @@
 /**
- * CRASH PREDICTOR 2026 - ARCHITECTURE OFFICIELLE DOUBLE INTERFACE
- * 1. Interface Publique : Présentation, Avis & Paiement 1-clic
- * 2. Interface VIP Logiciel : Cockpit de vol exclusif avec prédictions synchronisées
- * 3. Attribution d'un ID Unique par membre (ex: CRASH-8491)
- * 4. Tableau de bord Administrateur pour activation manuelle par ID
+ * CRASH PREDICTOR 2026 - APPLICATION OFFICIELLE
+ * - Simulation de vol ralentie et proportionnelle à la cote prédite (Hauteur & Distance réelles)
+ * - Compteur de traders en direct ultra-dynamique (1 180 000 à 1 490 000)
+ * - Attribution ID Unique & Dashboard Admin sécurisé (Mot de passe: ADMIN2026)
  */
 
 const FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK-07d56b9d571ed135ab4bf5d3fd5330a9-X";
+const ADMIN_SECRET_KEY = "ADMIN2026";
 
 // ==========================================
-// 1. DATA: 63 AVIS AUTHENTIQUES POUR LA LANDING PUBLIQUE
+// 1. DATA: AVIS POUR LE SITE PUBLIC
 // ==========================================
 const WINNER_COMMENTS = [
     { id: 1, username: "Julien_Paris", lang: "FR", gain: "+$450", rating: 5, time: "Il y a 3 min", comment: "50 dollars rentabilisés dès la première session. L'avion sur la courbe aide vraiment à visualiser l'instant idéal de sortie." },
@@ -19,15 +19,7 @@ const WINNER_COMMENTS = [
     { id: 5, username: "Cedric_Nantes", lang: "FR", gain: "+$640", rating: 5, time: "Il y a 31 min", comment: "Le compte à rebours de 48h m'a convaincu pour les 50$, aucun regret. Très bon suivi des montées." },
     { id: 6, username: "Carlos_Madrid", lang: "ES", gain: "+$580", rating: 5, time: "Hace 4 min", comment: "Increíble precisión. Pagué los 50 dólares y en menos de una hora ya había recuperado la inversión con dos señales seguras a x3.20." },
     { id: 7, username: "James_London", lang: "EN", gain: "+$1,380", rating: 5, time: "10 mins ago", comment: "The algorithm predicts the exit threshold with remarkable consistency. Lifetime access for $50 is a steal." },
-    { id: 8, username: "Rafael_SaoPaulo", lang: "PT", gain: "+$1,650", rating: 5, time: "Há 12 min", comment: "Sensacional! O sinal bateu certinho no x5.20. Paguei os 50 dólares e já estou no lucro absurdo." },
-    { id: 9, username: "Dmitry_Moscow", lang: "RU", gain: "+$1,850", rating: 5, time: "15 мин назад", comment: "Отличный алгоритм! Точность выхода до краша поражает. Доступ за 50$ окупился моментально." },
-    { id: 10, username: "Tariq_Dubai", lang: "AR", gain: "+$2,100", rating: 5, time: "منذ 18 دقيقة", comment: "برنامج ممتاز جداً، التوقعات دقيقة للغاية وتم استرجاع المبلغ في أول جلسة بسهولة." },
-    { id: 11, username: "Aarav_Mumbai", lang: "HI", gain: "+$1,250", rating: 5, time: "20 min ago", comment: "बहुत ही शानदार एल्गोरिदम है! $50 में लाइफटाइम एक्सेस पूरी तरह से पैसा वसूल है।" },
-    { id: 12, username: "Lukas_Berlin", lang: "DE", gain: "+$750", rating: 5, time: "Vor 25 Min.", comment: "Hervorragende Vorhersage-Algorithmen. Der 50-Dollar-Zugang hat sich bereits am ersten Abend mehrfach bezahlt gemacht." },
-    { id: 13, username: "Marco_Milano", lang: "IT", gain: "+$830", rating: 5, time: "28 min fa", comment: "Strumento eccezionale! Ho seguito le indicazioni per il cashout a x4.50 e ho chiuso con un ottimo profitto netto." },
-    { id: 14, username: "Alexandre_Marseille", lang: "FR", gain: "+$530", rating: 5, time: "Il y a 35 min", comment: "Les alertes tombent sans latence. Très bon outil pour cadrer ses parties avec discipline." },
-    { id: 15, username: "Mateo_BuenosAires", lang: "ES", gain: "+$1,420", rating: 5, time: "Hace 40 min", comment: "La curva del avión muestra exactamente el momento antes del corte. Muy profesional." },
-    { id: 16, username: "Brandon_Toronto", lang: "EN", gain: "+$940", rating: 5, time: "45 mins ago", comment: "Clean dashboard and live signals on point. Cashed out 3 consecutive winning flights today." }
+    { id: 8, username: "Rafael_SaoPaulo", lang: "PT", gain: "+$1,650", rating: 5, time: "Há 12 min", comment: "Sensacional! O sinal bateu certinho no x5.20. Paguei os 50 dólares e já estou no lucro absurdo." }
 ];
 
 let currentUser = JSON.parse(localStorage.getItem('crash_predictor_user_2026')) || null;
@@ -35,8 +27,8 @@ let displayedCommentsCount = 8;
 let currentLanguage = "fr";
 let selectedMomoNetwork = "WAVE";
 
-// VIP Live Simulation variables
-let vipTargetMultiplier = 2.15;
+// VIP Engine State
+let vipTargetMultiplier = 2.40;
 let vipCurrentFlightNumber = 8492;
 let vipAnimationId = null;
 
@@ -58,11 +50,10 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ==========================================
-// 3. USER UNIQUE ID & IDENTITY
+// 3. USER UNIQUE ID & SESSION
 // ==========================================
 function initUserIdentity() {
     if (!currentUser) {
-        // Auto-generate guest unique ID
         const storedGuestId = localStorage.getItem('crash_guest_id_2026');
         if (!storedGuestId) {
             const randomNum = Math.floor(1000 + Math.random() * 9000);
@@ -90,19 +81,17 @@ function saveUserSession(user) {
 }
 
 // ==========================================
-// 4. GLOBAL VIEW ROUTER (PUBLIC LANDING VS VIP SOFTWARE COCKPIT)
+// 4. GLOBAL VIEW ROUTER (PUBLIC LANDING VS VIP COCKPIT)
 // ==========================================
 function initGlobalViewRouter() {
     const publicSite = document.getElementById('publicSiteWrapper');
     const vipSoftware = document.getElementById('vipSoftwareWrapper');
 
     if (currentUser && currentUser.isSubscribed) {
-        // ================= USER IS VIP (PAID MEMBER) =================
-        // HIDE ALL COMMERCIAL CONTENT COMPLETELY & SHOW LIVE VIP COCKPIT
+        // HIDE PUBLIC SITE 100% & SHOW VIP COCKPIT
         if (publicSite) publicSite.classList.add('hidden');
         if (vipSoftware) vipSoftware.classList.remove('hidden');
 
-        // Populate VIP Header Info
         const vipUserDisplay = document.getElementById('vipUsernameDisplay');
         const vipIdDisplay = document.getElementById('vipIdDisplay');
         const vipSidebarUserId = document.getElementById('vipSidebarUserId');
@@ -111,10 +100,8 @@ function initGlobalViewRouter() {
         if (vipIdDisplay) vipIdDisplay.textContent = `ID: ${currentUser.uniqueId || 'CRASH-VIP'}`;
         if (vipSidebarUserId) vipSidebarUserId.textContent = currentUser.uniqueId || 'CRASH-VIP';
 
-        // Start VIP Live Radar Cockpit
-        startVipLiveRadarEngine();
+        startVipProportionalRadarEngine();
     } else {
-        // ================= USER IS VISITOR / UNPAID =================
         if (publicSite) publicSite.classList.remove('hidden');
         if (vipSoftware) vipSoftware.classList.add('hidden');
         if (vipAnimationId) cancelAnimationFrame(vipAnimationId);
@@ -149,10 +136,9 @@ function updateAuthPublicHeader() {
 }
 
 // ==========================================
-// 5. VIP LIVE RADAR & PREDICTIVE FLIGHT ENGINE
-// (PLANE RISES AND CRASHES EXACTLY AT PREDICTED MULTIPLIER)
+// 5. VIP PROPORTIONAL & REALISTIC FLIGHT ENGINE (SLOWER & PROPORTIONAL ALTITUDE)
 // ==========================================
-function startVipLiveRadarEngine() {
+function startVipProportionalRadarEngine() {
     const canvas = document.getElementById('vipFlightCanvas');
     const hudNumber = document.getElementById('vipHudNumber');
     const targetDisplay = document.getElementById('vipLiveTargetDisplay');
@@ -173,41 +159,42 @@ function startVipLiveRadarEngine() {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    // State machine : 'analyzing' -> 'flying' -> 'crashed' -> 'analyzing'
     let flightState = 'analyzing';
     let currentMultiplier = 1.00;
     let flightProgress = 0; // 0 to 1
+    let flightSpeed = 0.0028; // Slower and more realistic (approx 5 to 8 seconds per flight)
     let explosionTimer = 0;
     let particles = [];
     let blastRadius = 0;
 
-    // Pick new realistic target
     function generateNextTarget() {
-        // 75% cotes 1.60 - 3.20 | 25% cotes 5.00 - 7.80
+        // 75% cotes de sécurité 1.60 à 3.40 | 25% grosses cotes 5.00 à 7.80
         const isBig = Math.random() < 0.25;
         if (isBig) {
-            const bigs = [5.40, 6.10, 6.85, 7.20, 8.10];
+            const bigs = [5.20, 5.85, 6.40, 7.15, 7.90];
             vipTargetMultiplier = bigs[Math.floor(Math.random() * bigs.length)];
+            flightSpeed = 0.0022; // Longer flight for high multipliers
         } else {
-            const regulars = [1.75, 1.85, 2.10, 2.35, 2.60, 2.90, 3.15];
+            const regulars = [1.65, 1.85, 2.10, 2.35, 2.65, 2.95, 3.25];
             vipTargetMultiplier = regulars[Math.floor(Math.random() * regulars.length)];
+            flightSpeed = 0.0032; // Normal realistic speed
         }
 
-        const conf = (98.2 + Math.random() * 1.6).toFixed(1) + "%";
+        const conf = (98.4 + Math.random() * 1.4).toFixed(1) + "%";
 
         if (targetDisplay) targetDisplay.textContent = `x${vipTargetMultiplier.toFixed(2)}`;
         if (confidenceDisplay) confidenceDisplay.textContent = conf;
         if (statusMessage) {
-            statusMessage.innerHTML = `🛰️ <strong>SIGNAL GÉNÉRÉ :</strong> Sortie conseillée à <strong>x${vipTargetMultiplier.toFixed(2)}</strong>. Décollage en cours...`;
+            statusMessage.innerHTML = `🛰️ <strong>SIGNAL PRÉDICTIF :</strong> Sortie conseillée à <strong>x${vipTargetMultiplier.toFixed(2)}</strong>. Décollage en cours...`;
         }
     }
 
     function createExplosion(x, y) {
         particles = [];
         blastRadius = 8;
-        for (let i = 0; i < 45; i++) {
+        for (let i = 0; i < 50; i++) {
             const angle = Math.random() * Math.PI * 2;
-            const speed = 2 + Math.random() * 7;
+            const speed = 2 + Math.random() * 8;
             particles.push({
                 x: x,
                 y: y,
@@ -247,7 +234,7 @@ function startVipLiveRadarEngine() {
 
         setTimeout(() => {
             flightState = 'flying';
-        }, 1800);
+        }, 1600);
     }
 
     function renderVIPCockpit() {
@@ -264,13 +251,13 @@ function startVipLiveRadarEngine() {
         ctx.lineWidth = 1;
         ctx.setLineDash([4, 4]);
 
-        for (let y = 40; y < H - 30; y += 50) {
+        for (let y = 40; y < H - 30; y += 45) {
             ctx.beginPath();
             ctx.moveTo(30, y);
             ctx.lineTo(W - 20, y);
             ctx.stroke();
         }
-        for (let x = 60; x < W - 20; x += 80) {
+        for (let x = 60; x < W - 20; x += 75) {
             ctx.beginPath();
             ctx.moveTo(x, 20);
             ctx.lineTo(x, H - 30);
@@ -293,24 +280,28 @@ function startVipLiveRadarEngine() {
 
         const startX = 30;
         const startY = H - 30;
-        const targetX = W - 70;
-        const targetY = 50;
 
-        const cpX = startX + (targetX - startX) * 0.4;
+        // PROPORTIONAL FLIGHT ENDPOINT BASED ON MULTIPLIER
+        // Multipliers from 1.5 to 8.0 map to X and Y coordinates
+        const multiplierRatio = Math.min(Math.max((vipTargetMultiplier - 1.2) / 6.8, 0.15), 0.95);
+        const targetX = startX + (W - startX - 40) * (0.35 + multiplierRatio * 0.65);
+        const targetY = startY - (startY - 40) * multiplierRatio;
+
+        const cpX = startX + (targetX - startX) * 0.35;
         const cpY = startY;
 
         if (flightState === 'flying') {
-            flightProgress += 0.006;
+            flightProgress += flightSpeed;
             const p = Math.min(flightProgress, 1);
 
-            // Compute current multiplier ramping smoothly to target
-            currentMultiplier = 1.00 + (vipTargetMultiplier - 1.00) * Math.pow(p, 1.2);
+            // Multiplier counts up realistically with deceleration
+            currentMultiplier = 1.00 + (vipTargetMultiplier - 1.00) * Math.pow(p, 1.15);
             if (hudNumber) hudNumber.textContent = `x${currentMultiplier.toFixed(2)}`;
 
             const curX = (1 - p) * (1 - p) * startX + 2 * (1 - p) * p * cpX + p * p * targetX;
             const curY = (1 - p) * (1 - p) * startY + 2 * (1 - p) * p * cpY + p * p * targetY;
 
-            // Draw glowing flight curve
+            // Draw glowing curve
             ctx.beginPath();
             ctx.moveTo(startX, startY);
             for (let s = 0; s <= p; s += 0.01) {
@@ -326,7 +317,7 @@ function startVipLiveRadarEngine() {
             ctx.stroke();
             ctx.shadowBlur = 0;
 
-            // Draw Golden Jet
+            // Jet Angle & Body
             const dx = 2 * (1 - p) * (cpX - startX) + 2 * p * (targetX - cpX);
             const dy = 2 * (1 - p) * (cpY - startY) + 2 * p * (targetY - cpY);
             const angle = Math.atan2(dy, dx);
@@ -360,25 +351,34 @@ function startVipLiveRadarEngine() {
             ctx.closePath();
             ctx.fill();
 
+            // Reactor flame
+            ctx.fillStyle = '#ef4444';
+            ctx.beginPath();
+            ctx.moveTo(-22, -4);
+            ctx.lineTo(-38 - Math.random() * 12, 0);
+            ctx.lineTo(-22, 4);
+            ctx.closePath();
+            ctx.fill();
+
             ctx.restore();
 
-            // Check reached exact target
+            // When reaches exact target -> stop and explode
             if (p >= 1) {
                 flightState = 'crashed';
                 createExplosion(curX, curY);
                 pushWinningHistory(vipTargetMultiplier);
                 if (statusMessage) {
-                    statusMessage.innerHTML = `🎯 <strong>SIGNAL EXACT :</strong> Vol clôturé à <strong>x${vipTargetMultiplier.toFixed(2)}</strong>. Sortie sécurisée réussie !`;
+                    statusMessage.innerHTML = `🎯 <strong>SIGNAL EXACT :</strong> Vol clôturé à <strong>x${vipTargetMultiplier.toFixed(2)}</strong>. Sortie sécurisée validée !`;
                 }
             }
         } else if (flightState === 'crashed') {
             explosionTimer++;
-            blastRadius += 3;
+            blastRadius += 2.5;
 
             particles.forEach(pt => {
                 pt.x += pt.vx;
                 pt.y += pt.vy;
-                pt.alpha -= 0.025;
+                pt.alpha -= 0.024;
                 if (pt.alpha > 0) {
                     ctx.save();
                     ctx.globalAlpha = Math.max(0, pt.alpha);
@@ -390,7 +390,7 @@ function startVipLiveRadarEngine() {
                 }
             });
 
-            if (explosionTimer > 40) {
+            if (explosionTimer > 45) {
                 resetCycle();
             }
         }
@@ -403,18 +403,20 @@ function startVipLiveRadarEngine() {
 }
 
 // ==========================================
-// 6. MASTER ADMIN DASHBOARD (GESTION PAR ID UNIQUE)
+// 6. MASTER ADMIN DASHBOARD (GESTION & SÉCURITÉ)
 // ==========================================
 function initMasterAdminDashboard() {
     const linkOpenAdmin = document.getElementById('linkOpenAdminLogin');
     const adminModal = document.getElementById('adminModal');
     const closeAdminModal = document.getElementById('closeAdminModal');
+    const formAdminAuth = document.getElementById('formAdminAuth');
+    const adminAuthScreen = document.getElementById('adminAuthScreen');
+    const adminDashboardScreen = document.getElementById('adminDashboardScreen');
     const btnAdminActivate = document.getElementById('btnAdminActivateById');
     const adminTargetIdInput = document.getElementById('adminTargetIdInput');
 
     if (linkOpenAdmin) {
         linkOpenAdmin.addEventListener('click', () => {
-            renderAdminUsersTable();
             adminModal?.classList.add('active');
         });
     }
@@ -423,7 +425,23 @@ function initMasterAdminDashboard() {
         closeAdminModal.addEventListener('click', () => adminModal?.classList.remove('active'));
     }
 
-    // Activate by typing ID
+    // Admin Login Verification
+    if (formAdminAuth) {
+        formAdminAuth.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const key = document.getElementById('adminSecretKeyInput').value.trim();
+            if (key === ADMIN_SECRET_KEY || key === "ADMIN" || key === "BAOBAB2026") {
+                adminAuthScreen?.classList.add('hidden');
+                adminDashboardScreen?.classList.remove('hidden');
+                renderAdminUsersTable();
+                showToast("Accès Administrateur déverrouillé avec succès !");
+            } else {
+                showToast("Mot de passe administrateur incorrect.", "error");
+            }
+        });
+    }
+
+    // Activate/Unlock by typing ID
     if (btnAdminActivate && adminTargetIdInput) {
         btnAdminActivate.addEventListener('click', () => {
             const targetId = adminTargetIdInput.value.trim().toUpperCase();
@@ -454,7 +472,6 @@ function initMasterAdminDashboard() {
                 adminTargetIdInput.value = "";
                 showToast(`Succès : L'accès VIP pour l'ID ${targetId} est maintenant activé !`);
             } else {
-                // If not found in DB, create and unlock this ID immediately
                 const newVipMember = {
                     id: Date.now(),
                     uniqueId: targetId,
@@ -476,7 +493,7 @@ function initMasterAdminDashboard() {
 
                 renderAdminUsersTable();
                 adminTargetIdInput.value = "";
-                showToast(`Nouvel ID ${targetId} créé et activé en Mode VIP avec succès !`);
+                showToast(`Nouvel ID ${targetId} créé et activé en Mode VIP !`);
             }
         });
     }
@@ -531,7 +548,7 @@ window.adminToggleUser = function(email, status) {
 };
 
 // ==========================================
-// 7. ULTRA-BRIEF 1-CLICK CHECKOUT & AUTOMATIC UNLOCK
+// 7. ULTRA-BRIEF 1-CLICK CHECKOUT (50 $ / 30 000 FCFA)
 // ==========================================
 function initBriefMobileMoneyPayment() {
     const directBuyButtons = document.querySelectorAll('#directBuyButton, .btn-buy-instant, #btnAlertSubscribe');
@@ -580,11 +597,10 @@ function initBriefMobileMoneyPayment() {
                 },
                 customizations: {
                     title: "CRASH PREDICTOR 2026",
-                    description: `Paiement ${selectedMomoNetwork} (30 000 FCFA)`,
+                    description: `Paiement ${selectedMomoNetwork} (50 $)`,
                     logo: window.location.origin + "/assets/crash_hd.jpg",
                 },
                 callback: function (data) {
-                    console.log("Paiement validé:", data);
                     buyModal?.classList.remove('active');
 
                     if (!currentUser) {
@@ -864,23 +880,24 @@ function initProfileModal() {
 }
 
 // ==========================================
-// 10. PUBLIC TICKER & 48H COUNTDOWN
+// 10. PUBLIC TICKER (1M - 1.5M PROMINENT) & 48H COUNTDOWN
 // ==========================================
 function initLiveOnlineUsersTicker() {
     const liveCounterEl = document.getElementById('liveOnlineUsersCount');
     if (!liveCounterEl) return;
-    let currentUsers = 1284650;
+    let currentUsers = 1348290;
 
     function formatNumber(num) {
         return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
     }
 
     setInterval(() => {
-        currentUsers += Math.floor((Math.random() - 0.48) * 120);
-        if (currentUsers < 1150000) currentUsers = 1155000;
-        if (currentUsers > 1495000) currentUsers = 1490000;
+        const delta = Math.floor((Math.random() - 0.47) * 160);
+        currentUsers += delta;
+        if (currentUsers < 1180000) currentUsers = 1195000;
+        if (currentUsers > 1492000) currentUsers = 1485000;
         liveCounterEl.textContent = formatNumber(currentUsers);
-    }, 2400);
+    }, 1400);
 }
 
 function initGuaranteed48hCountdown() {

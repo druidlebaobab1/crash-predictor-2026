@@ -1,4 +1,4 @@
 {
-  "summary": "Mise à jour d'app.js avec le Cockpit de vol VIP synchronisé qui s'arrête exactement à la cote prédite, le basculement total d'interface payant/non-payant, l'attribution d'ID Unique par membre et le panneau Administrateur de déblocage par ID",
-  "updatedAt": "2026-08-20T11:40:10.494133600Z"
+  "summary": "Mise à jour d'app.js avec simulation de vol ralentie et proportionnelle à la cote, compteur live dynamique et mot de passe admin",
+  "updatedAt": "2026-08-20T11:50:06.942684400Z"
 }
