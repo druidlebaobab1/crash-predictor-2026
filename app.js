@@ -1,14 +1,15 @@
 /**
- * CRASH PREDICTOR 2026 - APPLICATION OFFICIELLE
- * - Parcours d'achat ultra-bref en 1 clic
- * - Signaux prédictifs réalistes (Cotes 1.50 à 3.50 & 5.00+)
- * - Transformation VIP automatique
+ * CRASH PREDICTOR 2026 - ARCHITECTURE OFFICIELLE DOUBLE INTERFACE
+ * 1. Interface Publique : Présentation, Avis & Paiement 1-clic
+ * 2. Interface VIP Logiciel : Cockpit de vol exclusif avec prédictions synchronisées
+ * 3. Attribution d'un ID Unique par membre (ex: CRASH-8491)
+ * 4. Tableau de bord Administrateur pour activation manuelle par ID
  */
 
 const FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK-07d56b9d571ed135ab4bf5d3fd5330a9-X";
 
 // ==========================================
-// 1. DATA: 63 AVIS AUTHENTIQUES (AVIS FRANÇAIS EN TÊTE)
+// 1. DATA: 63 AVIS AUTHENTIQUES POUR LA LANDING PUBLIQUE
 // ==========================================
 const WINNER_COMMENTS = [
     { id: 1, username: "Julien_Paris", lang: "FR", gain: "+$450", rating: 5, time: "Il y a 3 min", comment: "50 dollars rentabilisés dès la première session. L'avion sur la courbe aide vraiment à visualiser l'instant idéal de sortie." },
@@ -26,527 +27,657 @@ const WINNER_COMMENTS = [
     { id: 13, username: "Marco_Milano", lang: "IT", gain: "+$830", rating: 5, time: "28 min fa", comment: "Strumento eccezionale! Ho seguito le indicazioni per il cashout a x4.50 e ho chiuso con un ottimo profitto netto." },
     { id: 14, username: "Alexandre_Marseille", lang: "FR", gain: "+$530", rating: 5, time: "Il y a 35 min", comment: "Les alertes tombent sans latence. Très bon outil pour cadrer ses parties avec discipline." },
     { id: 15, username: "Mateo_BuenosAires", lang: "ES", gain: "+$1,420", rating: 5, time: "Hace 40 min", comment: "La curva del avión muestra exactamente el momento antes del corte. Muy profesional." },
-    { id: 16, username: "Brandon_Toronto", lang: "EN", gain: "+$940", rating: 5, time: "45 mins ago", comment: "Clean dashboard and live signals on point. Cashed out 3 consecutive winning flights today." },
-    { id: 17, username: "Thiago_Rio", lang: "PT", gain: "+$920", rating: 5, time: "Há 50 min", comment: "Melhor investimento para quem joga Crash. A curva do avião dourado é perfeita." },
-    { id: 18, username: "Alexey_SPB", lang: "RU", gain: "+$980", rating: 5, time: "55 мин назад", comment: "Очень чистый интерфейс, никаких скрытых подписок. Сигналы приходят без задержек." },
-    { id: 19, username: "Youssef_Casablanca", lang: "AR", gain: "+$850", rating: 5, time: "منذ ساعة", comment: "سعر 50 دولار لمدى الحياة عرض لا يعوض. الإشارات واضحة والنتائج ممتازة." },
-    { id: 20, username: "Rohan_Delhi", lang: "HI", gain: "+$890", rating: 5, time: "1 hr ago", comment: "Crash Predictor 2026 एकदम सटीक सिग्नल देता है। आज ही 3 बार जीत हासिल की।" },
-    { id: 21, username: "Maximilian_Munich", lang: "DE", gain: "+$1,850", rating: 5, time: "Vor 1 Std.", comment: "Die Flugkurve und die Signale sind extrem präzise. Einfach einmalig freischalten." },
-    { id: 22, username: "Giovanni_Roma", lang: "IT", gain: "+$1,270", rating: 5, time: "1 ora fa", comment: "Accesso a vita a 50$ davvero conveniente. Grafica pulita e segnali ottimi." },
-    { id: 23, username: "Liam_Sydney", lang: "EN", gain: "+$1,720", rating: 5, time: "1 hr ago", comment: "Great UI, no hidden monthly fees. Full live access directly on the browser." },
-    { id: 24, username: "Lucas_Lisboa", lang: "PT", gain: "+$480", rating: 5, time: "Há 1h 15", comment: "Interface direta e muito rápida. Vale cada centavo dos 50 dólares." },
-    { id: 25, username: "Alejandro_Bogota", lang: "ES", gain: "+$890", rating: 5, time: "Hace 1h 20", comment: "Excelente herramienta. El acceso de por vida por solo $50 es una gran decisión." },
-    { id: 26, username: "Karim_Riyadh", lang: "AR", gain: "+$1,540", rating: 5, time: "منذ ساعة", comment: "حساب مسار الطائرة دقيق ويجنبك الخسائر المفاجئة. أنصح به بشدة." },
-    { id: 27, username: "Ivan_Novosibirsk", lang: "RU", gain: "+$1,420", rating: 5, time: "1.5 часа назад", comment: "Поймал коэффициент x14 по сигналу. Отличная работа разработчиков!" },
-    { id: 28, username: "Vikram_Bangalore", lang: "HI", gain: "+$1,600", rating: 5, time: "2 hrs ago", comment: "Best Aviator predictor tool. Real vertical flight curve without lag." },
-    { id: 29, username: "Stefan_Frankfurt", lang: "DE", gain: "+$420", rating: 5, time: "Vor 2 Std.", comment: "Sehr saubere Plattform. Schnelle Aktivierung und zuverlässige Quoten." },
-    { id: 30, username: "Lorenzo_Napoli", lang: "IT", gain: "+$510", rating: 5, time: "2 ore fa", comment: "Facile da capire anche per chi non ha mai usato software simili." },
-    { id: 31, username: "Diego_CDMX", lang: "ES", gain: "+$640", rating: 5, time: "Hace 2h", comment: "Las alertas son instantáneas y directas en la web." },
-    { id: 32, username: "Oliver_Dublin", lang: "EN", gain: "+$560", rating: 5, time: "2 hrs ago", comment: "Extremely reliable tool. Solid 5 stars for the team." },
-    { id: 33, username: "Rodrigo_BeloHorizonte", lang: "PT", gain: "+$1,340", rating: 5, time: "Há 2h 30", comment: "Tudo funciona direto no site, sem enrolação. Muito satisfeito." },
-    { id: 34, username: "Sergey_Kazan", lang: "RU", gain: "+$1,100", rating: 5, time: "3 часа назад", comment: "Очень рад, что купил доступ. Сигналы заходят один за другим." },
-    { id: 35, username: "Hassan_Amman", lang: "AR", gain: "+$980", rating: 5, time: "منذ 3 ساعات", comment: "الخدمة ممتازة وموثوقة، ساعدتني في تحقيق أرباح يومية." },
-    { id: 36, username: "Amit_Pune", lang: "HI", gain: "+$740", rating: 5, time: "3 hrs ago", comment: "Very good tool. $50 lifetime license is very affordable." },
-    { id: 37, username: "Daniel_NewYork", lang: "EN", gain: "+$2,350", rating: 5, time: "3 hrs ago", comment: "Hands down the best predictor for 2026. Consistent results." },
-    { id: 38, username: "Valeria_Santiago", lang: "ES", gain: "+$1,150", rating: 5, time: "Hace 3h 30", comment: "Muy contenta con el servicio. Soporte rápido y certero." },
-    { id: 39, username: "Javier_Valencia", lang: "ES", gain: "+$730", rating: 5, time: "Hace 4h", comment: "El análisis de la curva te da una ventaja tremenda." },
-    { id: 40, username: "Sebastian_Hamburg", lang: "DE", gain: "+$1,290", rating: 5, time: "Vor 4 Std.", comment: "Beste Entscheidung für Aviator. Präzise Signale." },
-    { id: 41, username: "Davide_Bologna", lang: "IT", gain: "+$610", rating: 5, time: "4 ore fa", comment: "Ottimo acquisto a 50$, nessun costo nascosto." },
-    { id: 42, username: "Felipe_Curitiba", lang: "PT", gain: "+$1,480", rating: 5, time: "Há 4h 30", comment: "Acertos constantes nas saídas rápidas." },
-    { id: 43, username: "Gonzalo_Sevilla", lang: "ES", gain: "+$440", rating: 5, time: "Hace 5h", comment: "Sencillo, rápido y rentable. 50 dólares bien aprovechados." },
-    { id: 44, username: "Hans_Stuttgart", lang: "DE", gain: "+$1,050", rating: 5, time: "Vor 5 Std.", comment: "Sehr gute Trefferquote bei den mittleren Multiplikatoren." },
-    { id: 45, username: "Andrea_Palermo", lang: "IT", gain: "+$720", rating: 5, time: "5 ore fa", comment: "Ho recuperato il costo della licenza déjà au 2e tour." },
-    { id: 46, username: "Bruno_Recife", lang: "PT", gain: "+$860", rating: 5, time: "Há 5h 30", comment: "Muito top! As previsões do avião amarelo não falham." },
-    { id: 47, username: "Ahmed_Algiers", lang: "AR", gain: "+$1,120", rating: 5, time: "منذ 6 ساعات", comment: "منصة احترافية وسهلة الاستخدام للغاية." },
-    { id: 48, username: "Ryan_Miami", lang: "EN", gain: "+$670", rating: 5, time: "6 hrs ago", comment: "Solid predictions. Smooth curve flight on the dashboard." },
-    { id: 49, username: "Mikhail_Sochi", lang: "RU", gain: "+$1,560", rating: 5, time: "6 часов назад", comment: "Поддержка ответила сразу, доступ активен." },
-    { id: 50, username: "Pooja_Jaipur", lang: "HI", gain: "+$920", rating: 5, time: "7 hrs ago", comment: "Superb experience! Highly recommended." },
-    { id: 51, username: "Florian_Koln", lang: "DE", gain: "+$1,370", rating: 5, time: "Vor 7 Std.", comment: "Funktioniert einwandfrei im Browser. Sehr zufrieden." },
-    { id: 52, username: "Enzo_Firenze", lang: "IT", gain: "+$540", rating: 5, time: "7 ore fa", comment: "Tutto automatico e preciso. Vale ogni single dollaro." },
-    { id: 53, username: "Caio_Brasilia", lang: "PT", gain: "+$1,210", rating: 5, time: "Há 8h", comment: "Parabéns aos desenvolvedores. Software lucrativo." },
-    { id: 54, username: "Samir_Doha", lang: "AR", gain: "+$1,890", rating: 5, time: "منذ 8 ساعات", comment: "أفضل برنامج لتوقع رحلات الطيران." },
-    { id: 55, username: "Michael_Chicago", lang: "EN", gain: "+$1,450", rating: 5, time: "8 hrs ago", comment: "Just got my 4th green payout in a row." },
-    { id: 56, username: "Andres_Lima", lang: "ES", gain: "+$910", rating: 5, time: "Hace 9h", comment: "Excelente servicio de atención y activación inmediata." },
-    { id: 57, username: "Nikolay_Ufa", lang: "RU", gain: "+$780", rating: 5, time: "9 часов назад", comment: "Работает стабильно на телефоне и ноутбуке." },
-    { id: 58, username: "Deepak_Kolkata", lang: "HI", gain: "+$1,150", rating: 5, time: "10 hrs ago", comment: "Great accuracy on high multipliers." },
-    { id: 59, username: "Gabriel_Porto", lang: "PT", gain: "+$690", rating: 5, time: "Há 11h", comment: "Previsões consistentes ao longo de todo o dia." },
-    { id: 60, username: "Omar_Muscat", lang: "AR", gain: "+$1,340", rating: 5, time: "منذ 12 ساعة", comment: "دقة عالية في تحديد نقطة القفز، شكراً لكم." },
-    { id: 61, username: "Lucas_Austin", lang: "EN", gain: "+$830", rating: 5, time: "13 hrs ago", comment: "Fast activation, transparent pricing, awesome software." },
-    { id: 62, username: "Elena_Samara", lang: "RU", gain: "+$1,270", rating: 5, time: "15 часов назад", comment: "Очень довольна результатами за первые сутки." },
-    { id: 63, username: "Karan_Ahmedabad", lang: "HI", gain: "+$680", rating: 5, time: "18 hrs ago", comment: "Smooth UI, fast response, genuine signals." }
+    { id: 16, username: "Brandon_Toronto", lang: "EN", gain: "+$940", rating: 5, time: "45 mins ago", comment: "Clean dashboard and live signals on point. Cashed out 3 consecutive winning flights today." }
 ];
 
 let currentUser = JSON.parse(localStorage.getItem('crash_predictor_user_2026')) || null;
-let displayedCommentsCount = 12;
+let displayedCommentsCount = 8;
 let currentLanguage = "fr";
 let selectedMomoNetwork = "WAVE";
+
+// VIP Live Simulation variables
+let vipTargetMultiplier = 2.15;
+let vipCurrentFlightNumber = 8492;
+let vipAnimationId = null;
 
 // ==========================================
 // 2. DOM INITIALIZATION
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
+    initUserIdentity();
+    initGlobalViewRouter();
     initLiveOnlineUsersTicker();
-    initAutoLanguageDetector();
-    initLanguageSelector();
     initGuaranteed48hCountdown();
-    initVerticalGrandAviatorCurve();
     renderCommentsList();
     initLoadMoreComments();
     initAuthSecurity();
     initProfileModal();
     initModals();
     initBriefMobileMoneyPayment();
-    initVipSignalsGenerator();
-    initFAQHelper();
+    initMasterAdminDashboard();
 });
 
 // ==========================================
-// 3. LIVE TRADERS TICKER
+// 3. USER UNIQUE ID & IDENTITY
 // ==========================================
-function initLiveOnlineUsersTicker() {
-    const liveCounterEl = document.getElementById('liveOnlineUsersCount');
-    if (!liveCounterEl) return;
-
-    let currentUsers = 1284650;
-
-    function formatNumber(num) {
-        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-    }
-
-    function updateLiveTraders() {
-        const delta = Math.floor((Math.random() - 0.48) * 140);
-        currentUsers += delta;
-
-        if (currentUsers < 1150000) currentUsers = 1150000 + Math.floor(Math.random() * 5000);
-        if (currentUsers > 1495000) currentUsers = 1495000 - Math.floor(Math.random() * 5000);
-
-        liveCounterEl.textContent = formatNumber(currentUsers);
-    }
-
-    liveCounterEl.textContent = formatNumber(currentUsers);
-    setInterval(updateLiveTraders, 2200);
-}
-
-// ==========================================
-// 4. LANGUAGE SELECTOR & I18N
-// ==========================================
-function initAutoLanguageDetector() {
-    const saved = localStorage.getItem('crash_lang_pref_2026');
-    currentLanguage = saved || 'fr';
-}
-
-function initLanguageSelector() {
-    const selectEl = document.getElementById('siteLanguageSelect');
-    if (!selectEl) return;
-
-    selectEl.value = currentLanguage;
-    selectEl.addEventListener('change', (e) => {
-        currentLanguage = e.target.value;
-        localStorage.setItem('crash_lang_pref_2026', currentLanguage);
-    });
-}
-
-// ==========================================
-// 5. GUARANTEED 48H COUNTDOWN
-// ==========================================
-function initGuaranteed48hCountdown() {
-    const timerElements = document.querySelectorAll('.countdown-timer-text');
-    if (!timerElements.length) return;
-
-    const DURATION_48H = 48 * 60 * 60 * 1000;
-    let timerStart = localStorage.getItem('crash_timer_start_48h_v3');
-    const now = Date.now();
-
-    if (!timerStart || isNaN(timerStart) || (now - parseInt(timerStart, 10)) > DURATION_48H) {
-        timerStart = now;
-        localStorage.setItem('crash_timer_start_48h_v3', timerStart);
-    } else {
-        timerStart = parseInt(timerStart, 10);
-    }
-
-    function updateTimer() {
-        const current = Date.now();
-        let elapsed = current - timerStart;
-        let remaining = DURATION_48H - elapsed;
-
-        if (remaining <= 0) {
-            timerStart = Date.now();
-            localStorage.setItem('crash_timer_start_48h_v3', timerStart);
-            remaining = DURATION_48H;
+function initUserIdentity() {
+    if (!currentUser) {
+        // Auto-generate guest unique ID
+        const storedGuestId = localStorage.getItem('crash_guest_id_2026');
+        if (!storedGuestId) {
+            const randomNum = Math.floor(1000 + Math.random() * 9000);
+            localStorage.setItem('crash_guest_id_2026', `CRASH-${randomNum}`);
         }
-
-        const hours = Math.floor(remaining / (1000 * 60 * 60));
-        const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
-
-        const formatted = `${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
-
-        timerElements.forEach(el => {
-            el.textContent = formatted;
-        });
-    }
-
-    updateTimer();
-    setInterval(updateTimer, 1000);
-}
-
-// ==========================================
-// 6. REALISTIC VIP SIGNAL GENERATOR (COTES 1.50 - 3.50 & 5.00 - 7.50)
-// ==========================================
-function updateLiveVipPrediction() {
-    const vipExitTarget = document.getElementById('vipExitTarget');
-    const vipConfidenceScore = document.getElementById('vipConfidenceScore');
-    const vipSignalTime = document.getElementById('vipSignalTime');
-
-    if (!vipExitTarget) return;
-
-    // Répartition réaliste : 75% cotes 1.60 - 3.20 et 25% cotes 5.00 - 7.80
-    const isBigMultiplier = Math.random() < 0.25;
-    let target = "";
-    let confidence = "";
-
-    if (isBigMultiplier) {
-        const bigs = ["x5.40", "x6.10", "x6.85", "x7.40", "x8.20"];
-        target = bigs[Math.floor(Math.random() * bigs.length)];
-        confidence = (96.5 + Math.random() * 2.2).toFixed(1) + "%";
     } else {
-        const regulars = ["x1.85", "x2.10", "x2.35", "x2.60", "x2.90", "x3.15", "x3.40"];
-        target = regulars[Math.floor(Math.random() * regulars.length)];
-        confidence = (98.6 + Math.random() * 1.2).toFixed(1) + "%";
+        if (!currentUser.uniqueId) {
+            const randomNum = Math.floor(1000 + Math.random() * 9000);
+            currentUser.uniqueId = `CRASH-${randomNum}`;
+            saveUserSession(currentUser);
+        }
     }
-
-    vipExitTarget.textContent = target;
-    if (vipConfidenceScore) vipConfidenceScore.textContent = confidence;
-    if (vipSignalTime) vipSignalTime.textContent = "Reçu à l'instant (Tour synchronisé)";
 }
 
-function initVipSignalsGenerator() {
-    updateLiveVipPrediction();
+function saveUserSession(user) {
+    localStorage.setItem('crash_predictor_user_2026', JSON.stringify(user));
+    let usersDb = JSON.parse(localStorage.getItem('crash_users_db_2026')) || [];
+    const idx = usersDb.findIndex(u => u.email === user.email);
+    if (idx !== -1) {
+        usersDb[idx] = user;
+    } else {
+        usersDb.push(user);
+    }
+    localStorage.setItem('crash_users_db_2026', JSON.stringify(usersDb));
 }
 
 // ==========================================
-// 7. VERTICAL AVIATOR CURVE SIMULATOR (500PX)
+// 4. GLOBAL VIEW ROUTER (PUBLIC LANDING VS VIP SOFTWARE COCKPIT)
 // ==========================================
-function initVerticalGrandAviatorCurve() {
-    const canvas = document.getElementById('aviatorCanvas');
-    const container = document.getElementById('curveInteractiveBox');
+function initGlobalViewRouter() {
+    const publicSite = document.getElementById('publicSiteWrapper');
+    const vipSoftware = document.getElementById('vipSoftwareWrapper');
+
+    if (currentUser && currentUser.isSubscribed) {
+        // ================= USER IS VIP (PAID MEMBER) =================
+        // HIDE ALL COMMERCIAL CONTENT COMPLETELY & SHOW LIVE VIP COCKPIT
+        if (publicSite) publicSite.classList.add('hidden');
+        if (vipSoftware) vipSoftware.classList.remove('hidden');
+
+        // Populate VIP Header Info
+        const vipUserDisplay = document.getElementById('vipUsernameDisplay');
+        const vipIdDisplay = document.getElementById('vipIdDisplay');
+        const vipSidebarUserId = document.getElementById('vipSidebarUserId');
+
+        if (vipUserDisplay) vipUserDisplay.textContent = currentUser.name;
+        if (vipIdDisplay) vipIdDisplay.textContent = `ID: ${currentUser.uniqueId || 'CRASH-VIP'}`;
+        if (vipSidebarUserId) vipSidebarUserId.textContent = currentUser.uniqueId || 'CRASH-VIP';
+
+        // Start VIP Live Radar Cockpit
+        startVipLiveRadarEngine();
+    } else {
+        // ================= USER IS VISITOR / UNPAID =================
+        if (publicSite) publicSite.classList.remove('hidden');
+        if (vipSoftware) vipSoftware.classList.add('hidden');
+        if (vipAnimationId) cancelAnimationFrame(vipAnimationId);
+
+        updateAuthPublicHeader();
+    }
+}
+
+function updateAuthPublicHeader() {
+    const guestButtons = document.getElementById('guestButtons');
+    const userProfileBadge = document.getElementById('userProfileBadge');
+    const navUserName = document.getElementById('navUserName');
+    const navUserIdTag = document.getElementById('navUserIdTag');
+    const siteAlertBanner = document.getElementById('siteSubscriptionAlert');
+
+    if (currentUser) {
+        guestButtons?.classList.add('hidden');
+        userProfileBadge?.classList.remove('hidden');
+        if (navUserName) navUserName.textContent = currentUser.name;
+        if (navUserIdTag) navUserIdTag.textContent = `ID: ${currentUser.uniqueId || 'CRASH-GUEST'}`;
+
+        if (!currentUser.isSubscribed) {
+            siteAlertBanner?.classList.remove('hidden');
+        } else {
+            siteAlertBanner?.classList.add('hidden');
+        }
+    } else {
+        guestButtons?.classList.remove('hidden');
+        userProfileBadge?.classList.add('hidden');
+        siteAlertBanner?.classList.add('hidden');
+    }
+}
+
+// ==========================================
+// 5. VIP LIVE RADAR & PREDICTIVE FLIGHT ENGINE
+// (PLANE RISES AND CRASHES EXACTLY AT PREDICTED MULTIPLIER)
+// ==========================================
+function startVipLiveRadarEngine() {
+    const canvas = document.getElementById('vipFlightCanvas');
+    const hudNumber = document.getElementById('vipHudNumber');
+    const targetDisplay = document.getElementById('vipLiveTargetDisplay');
+    const confidenceDisplay = document.getElementById('vipLiveConfidence');
+    const statusMessage = document.getElementById('vipFlightMessage');
+    const historyList = document.getElementById('vipHistoryList');
+
     if (!canvas) return;
-
     const ctx = canvas.getContext('2d');
 
     function resizeCanvas() {
-        if (container) {
-            canvas.width = container.clientWidth || 920;
-            canvas.height = 500;
+        const parent = canvas.parentElement;
+        if (parent) {
+            canvas.width = parent.clientWidth || 800;
+            canvas.height = 420;
         }
     }
-
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    let t = 0;
-    let flightSpeed = 0.0055;
-    let state = 'flying';
+    // State machine : 'analyzing' -> 'flying' -> 'crashed' -> 'analyzing'
+    let flightState = 'analyzing';
+    let currentMultiplier = 1.00;
+    let flightProgress = 0; // 0 to 1
     let explosionTimer = 0;
     let particles = [];
     let blastRadius = 0;
 
-    let targetMaxHeightRatio = 0.08;
-    let targetMaxXOffset = 80;
-
-    function resetFlight() {
-        t = 0;
-        state = 'flying';
-        particles = [];
-        blastRadius = 0;
-
-        const rand = Math.random();
-        if (rand > 0.35) {
-            targetMaxHeightRatio = 0.05 + Math.random() * 0.08;
-            targetMaxXOffset = 50 + Math.random() * 70;
-            flightSpeed = 0.0048 + Math.random() * 0.0015;
+    // Pick new realistic target
+    function generateNextTarget() {
+        // 75% cotes 1.60 - 3.20 | 25% cotes 5.00 - 7.80
+        const isBig = Math.random() < 0.25;
+        if (isBig) {
+            const bigs = [5.40, 6.10, 6.85, 7.20, 8.10];
+            vipTargetMultiplier = bigs[Math.floor(Math.random() * bigs.length)];
         } else {
-            targetMaxHeightRatio = 0.22 + Math.random() * 0.15;
-            targetMaxXOffset = 130 + Math.random() * 50;
-            flightSpeed = 0.006;
+            const regulars = [1.75, 1.85, 2.10, 2.35, 2.60, 2.90, 3.15];
+            vipTargetMultiplier = regulars[Math.floor(Math.random() * regulars.length)];
         }
 
-        if (currentUser && currentUser.isSubscribed) {
-            updateLiveVipPrediction();
+        const conf = (98.2 + Math.random() * 1.6).toFixed(1) + "%";
+
+        if (targetDisplay) targetDisplay.textContent = `x${vipTargetMultiplier.toFixed(2)}`;
+        if (confidenceDisplay) confidenceDisplay.textContent = conf;
+        if (statusMessage) {
+            statusMessage.innerHTML = `🛰️ <strong>SIGNAL GÉNÉRÉ :</strong> Sortie conseillée à <strong>x${vipTargetMultiplier.toFixed(2)}</strong>. Décollage en cours...`;
         }
     }
 
     function createExplosion(x, y) {
-        state = 'exploding';
-        explosionTimer = 0;
-        blastRadius = 6;
         particles = [];
-
-        for (let i = 0; i < 50; i++) {
+        blastRadius = 8;
+        for (let i = 0; i < 45; i++) {
             const angle = Math.random() * Math.PI * 2;
-            const speed = 2 + Math.random() * 8;
+            const speed = 2 + Math.random() * 7;
             particles.push({
                 x: x,
                 y: y,
                 vx: Math.cos(angle) * speed,
                 vy: Math.sin(angle) * speed,
-                color: i % 3 === 0 ? '#ffc837' : (i % 3 === 1 ? '#ef4444' : '#f97316'),
-                size: 2.5 + Math.random() * 4,
+                color: i % 3 === 0 ? '#ffc837' : (i % 3 === 1 ? '#ef4444' : '#10b981'),
+                size: 3 + Math.random() * 4,
                 alpha: 1
             });
         }
     }
 
-    function drawGrandSimulation() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    function pushWinningHistory(mult) {
+        if (!historyList) return;
+        vipCurrentFlightNumber++;
+        const item = document.createElement('div');
+        const isBig = mult >= 5.0;
+        item.className = isBig ? "history-item big-win animate-fade" : "history-item win animate-fade";
+        item.innerHTML = `
+            <span class="h-flight">Vol #${vipCurrentFlightNumber}</span>
+            <span class="h-pred">Prédit: x${mult.toFixed(2)}</span>
+            <span class="h-badge ${isBig ? 'gold' : 'green'}">${isBig ? 'GROS GAIN' : 'VALIDÉ'}</span>
+        `;
+        historyList.insertBefore(item, historyList.firstChild);
+        if (historyList.children.length > 8) {
+            historyList.removeChild(historyList.lastChild);
+        }
+    }
 
+    function resetCycle() {
+        flightState = 'analyzing';
+        currentMultiplier = 1.00;
+        flightProgress = 0;
+        explosionTimer = 0;
+        particles = [];
+        generateNextTarget();
+
+        setTimeout(() => {
+            flightState = 'flying';
+        }, 1800);
+    }
+
+    function renderVIPCockpit() {
         const W = canvas.width;
         const H = canvas.height;
 
-        ctx.fillStyle = '#070c1e';
+        ctx.clearRect(0, 0, W, H);
+
+        // Cockpit Grid
+        ctx.fillStyle = '#060a18';
         ctx.fillRect(0, 0, W, H);
 
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+        ctx.strokeStyle = 'rgba(255, 200, 55, 0.08)';
         ctx.lineWidth = 1;
         ctx.setLineDash([4, 4]);
 
-        for (let y = 50; y < H - 40; y += 65) {
+        for (let y = 40; y < H - 30; y += 50) {
             ctx.beginPath();
-            ctx.moveTo(40, y);
+            ctx.moveTo(30, y);
             ctx.lineTo(W - 20, y);
             ctx.stroke();
         }
-
-        for (let x = 80; x < W - 20; x += 100) {
+        for (let x = 60; x < W - 20; x += 80) {
             ctx.beginPath();
             ctx.moveTo(x, 20);
-            ctx.lineTo(x, H - 40);
+            ctx.lineTo(x, H - 30);
             ctx.stroke();
         }
-
         ctx.setLineDash([]);
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.28)';
-        ctx.lineWidth = 2.5;
 
+        // Axis Lines
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.moveTo(40, H - 40);
-        ctx.lineTo(W - 10, H - 40);
+        ctx.moveTo(30, H - 30);
+        ctx.lineTo(W - 10, H - 30);
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.moveTo(40, 15);
-        ctx.lineTo(40, H - 40);
+        ctx.moveTo(30, 20);
+        ctx.lineTo(30, H - 30);
         ctx.stroke();
 
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
-        for (let y = 35; y <= H - 40; y += 65) {
-            ctx.beginPath();
-            ctx.arc(40, y, 4, 0, Math.PI * 2);
-            ctx.fill();
-        }
-        for (let x = 40; x <= W - 40; x += 100) {
-            ctx.beginPath();
-            ctx.arc(x, H - 40, 4, 0, Math.PI * 2);
-            ctx.fill();
-        }
+        const startX = 30;
+        const startY = H - 30;
+        const targetX = W - 70;
+        const targetY = 50;
 
-        const startX = 40;
-        const startY = H - 40;
-        const targetMaxX = W - targetMaxXOffset;
-        const targetMaxY = H * targetMaxHeightRatio;
-
-        const progress = Math.min(t, 1);
-        const cpX = startX + (targetMaxX - startX) * 0.35;
+        const cpX = startX + (targetX - startX) * 0.4;
         const cpY = startY;
 
-        const currentX = (1 - progress) * (1 - progress) * startX + 2 * (1 - progress) * progress * cpX + progress * progress * targetMaxX;
-        const currentY = (1 - progress) * (1 - progress) * startY + 2 * (1 - progress) * progress * cpY + progress * progress * targetMaxY;
+        if (flightState === 'flying') {
+            flightProgress += 0.006;
+            const p = Math.min(flightProgress, 1);
 
-        const dx = 2 * (1 - progress) * (cpX - startX) + 2 * progress * (targetMaxX - cpX);
-        const dy = 2 * (1 - progress) * (cpY - startY) + 2 * progress * (targetMaxY - cpY);
-        const angle = Math.atan2(dy, dx);
+            // Compute current multiplier ramping smoothly to target
+            currentMultiplier = 1.00 + (vipTargetMultiplier - 1.00) * Math.pow(p, 1.2);
+            if (hudNumber) hudNumber.textContent = `x${currentMultiplier.toFixed(2)}`;
 
-        ctx.beginPath();
-        ctx.moveTo(startX, startY);
-        for (let step = 0; step <= progress; step += 0.01) {
-            const px = (1 - step) * (1 - step) * startX + 2 * (1 - step) * step * cpX + step * step * targetMaxX;
-            const py = (1 - step) * (1 - step) * startY + 2 * (1 - step) * step * cpY + step * step * targetMaxY;
-            ctx.lineTo(px, py);
-        }
-        ctx.strokeStyle = '#f9d423';
-        ctx.lineWidth = 7.5;
-        ctx.lineCap = 'round';
-        ctx.shadowColor = '#ffc837';
-        ctx.shadowBlur = 20;
-        ctx.stroke();
-        ctx.shadowBlur = 0;
+            const curX = (1 - p) * (1 - p) * startX + 2 * (1 - p) * p * cpX + p * p * targetX;
+            const curY = (1 - p) * (1 - p) * startY + 2 * (1 - p) * p * cpY + p * p * targetY;
 
-        if (state === 'flying') {
-            ctx.save();
-            ctx.translate(currentX, currentY);
-            ctx.rotate(angle);
-
+            // Draw glowing flight curve
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            for (let s = 0; s <= p; s += 0.01) {
+                const px = (1 - s) * (1 - s) * startX + 2 * (1 - s) * s * cpX + s * s * targetX;
+                const py = (1 - s) * (1 - s) * startY + 2 * (1 - s) * s * cpY + s * s * targetY;
+                ctx.lineTo(px, py);
+            }
+            ctx.strokeStyle = '#ffc837';
+            ctx.lineWidth = 6;
+            ctx.lineCap = 'round';
             ctx.shadowColor = '#ffc837';
-            ctx.shadowBlur = 22;
+            ctx.shadowBlur = 18;
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            // Draw Golden Jet
+            const dx = 2 * (1 - p) * (cpX - startX) + 2 * p * (targetX - cpX);
+            const dy = 2 * (1 - p) * (cpY - startY) + 2 * p * (targetY - cpY);
+            const angle = Math.atan2(dy, dx);
+
+            ctx.save();
+            ctx.translate(curX, curY);
+            ctx.rotate(angle);
 
             ctx.fillStyle = '#ffc837';
             ctx.beginPath();
-            ctx.ellipse(0, 0, 25, 11.5, 0, 0, Math.PI * 2);
+            ctx.ellipse(0, 0, 22, 10, 0, 0, Math.PI * 2);
             ctx.fill();
 
             ctx.fillStyle = '#1e1b4b';
             ctx.beginPath();
-            ctx.arc(7.5, -3, 4.5, 0, Math.PI * 2);
+            ctx.arc(6, -2, 3.5, 0, Math.PI * 2);
             ctx.fill();
 
             ctx.fillStyle = '#f59e0b';
             ctx.beginPath();
-            ctx.moveTo(-4, 0);
-            ctx.lineTo(-14, -22);
-            ctx.lineTo(5, -4);
+            ctx.moveTo(-3, 0);
+            ctx.lineTo(-12, -18);
+            ctx.lineTo(4, -3);
             ctx.closePath();
             ctx.fill();
 
             ctx.beginPath();
-            ctx.moveTo(-4, 0);
-            ctx.lineTo(-14, 22);
-            ctx.lineTo(5, 4);
-            ctx.closePath();
-            ctx.fill();
-
-            ctx.fillStyle = '#d97706';
-            ctx.fillRect(20, -7, 4, 14);
-
-            ctx.fillStyle = '#ef4444';
-            ctx.beginPath();
-            ctx.moveTo(-25, -5);
-            ctx.lineTo(-46 - Math.random() * 14, 0);
-            ctx.lineTo(-25, 5);
+            ctx.moveTo(-3, 0);
+            ctx.lineTo(-12, 18);
+            ctx.lineTo(4, 3);
             ctx.closePath();
             ctx.fill();
 
             ctx.restore();
 
-            t += flightSpeed;
-
-            if (t >= 1) {
-                createExplosion(currentX, currentY);
+            // Check reached exact target
+            if (p >= 1) {
+                flightState = 'crashed';
+                createExplosion(curX, curY);
+                pushWinningHistory(vipTargetMultiplier);
+                if (statusMessage) {
+                    statusMessage.innerHTML = `🎯 <strong>SIGNAL EXACT :</strong> Vol clôturé à <strong>x${vipTargetMultiplier.toFixed(2)}</strong>. Sortie sécurisée réussie !`;
+                }
             }
-        } else if (state === 'exploding') {
+        } else if (flightState === 'crashed') {
             explosionTimer++;
+            blastRadius += 3;
 
-            blastRadius += 3.5;
-            ctx.save();
-            ctx.beginPath();
-            ctx.arc(currentX, currentY, blastRadius, 0, Math.PI * 2);
-            ctx.strokeStyle = `rgba(255, 200, 55, ${Math.max(0, 1 - explosionTimer / 38)})`;
-            ctx.lineWidth = 4.5;
-            ctx.shadowColor = '#ef4444';
-            ctx.shadowBlur = 30;
-            ctx.stroke();
-            ctx.restore();
-
-            particles.forEach(p => {
-                p.x += p.vx;
-                p.y += p.vy;
-                p.alpha -= 0.024;
-
-                if (p.alpha > 0) {
+            particles.forEach(pt => {
+                pt.x += pt.vx;
+                pt.y += pt.vy;
+                pt.alpha -= 0.025;
+                if (pt.alpha > 0) {
                     ctx.save();
-                    ctx.globalAlpha = Math.max(0, p.alpha);
-                    ctx.fillStyle = p.color;
+                    ctx.globalAlpha = Math.max(0, pt.alpha);
+                    ctx.fillStyle = pt.color;
                     ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.restore();
                 }
             });
 
-            if (explosionTimer > 42) {
-                state = 'waiting';
-                setTimeout(resetFlight, 850);
+            if (explosionTimer > 40) {
+                resetCycle();
             }
         }
 
-        requestAnimationFrame(drawGrandSimulation);
+        vipAnimationId = requestAnimationFrame(renderVIPCockpit);
     }
 
-    resetFlight();
-    drawGrandSimulation();
-
-    canvas.addEventListener('click', resetFlight);
+    resetCycle();
+    renderVIPCockpit();
 }
 
 // ==========================================
-// 8. RENDER 63 COMMENTS
+// 6. MASTER ADMIN DASHBOARD (GESTION PAR ID UNIQUE)
 // ==========================================
-function renderCommentsList() {
-    const grid = document.getElementById('commentsGrid');
-    if (!grid) return;
+function initMasterAdminDashboard() {
+    const linkOpenAdmin = document.getElementById('linkOpenAdminLogin');
+    const adminModal = document.getElementById('adminModal');
+    const closeAdminModal = document.getElementById('closeAdminModal');
+    const btnAdminActivate = document.getElementById('btnAdminActivateById');
+    const adminTargetIdInput = document.getElementById('adminTargetIdInput');
 
-    const visibleComments = WINNER_COMMENTS.slice(0, displayedCommentsCount);
+    if (linkOpenAdmin) {
+        linkOpenAdmin.addEventListener('click', () => {
+            renderAdminUsersTable();
+            adminModal?.classList.add('active');
+        });
+    }
 
-    grid.innerHTML = visibleComments.map((c) => `
-        <div class="comment-card animate-fade">
-            <div class="comment-header">
-                <div class="comment-user-box">
-                    <div class="comment-lang-badge">${c.lang}</div>
-                    <div>
-                        <div class="comment-username">${c.username} <i class="fa-solid fa-circle-check text-green verified-mini"></i></div>
-                        <div class="comment-time">${c.time}</div>
-                    </div>
-                </div>
-                <div class="comment-gain-badge">${c.gain}</div>
-            </div>
+    if (closeAdminModal) {
+        closeAdminModal.addEventListener('click', () => adminModal?.classList.remove('active'));
+    }
 
-            <div class="comment-stars-row">
-                <div class="comment-stars">
-                    ${'<i class="fa-solid fa-star"></i>'.repeat(c.rating)}
-                </div>
-                <div class="comment-status-pill"><i class="fa-solid fa-shield-check"></i> En 24h</div>
-            </div>
+    // Activate by typing ID
+    if (btnAdminActivate && adminTargetIdInput) {
+        btnAdminActivate.addEventListener('click', () => {
+            const targetId = adminTargetIdInput.value.trim().toUpperCase();
+            if (!targetId) {
+                showToast("Veuillez saisir un ID Membre (ex: CRASH-8491).", "error");
+                return;
+            }
 
-            <p class="comment-text">"${c.comment}"</p>
-        </div>
+            let usersDb = JSON.parse(localStorage.getItem('crash_users_db_2026')) || [];
+            let found = false;
+
+            usersDb = usersDb.map(u => {
+                if (u.uniqueId === targetId || u.email.toUpperCase() === targetId) {
+                    u.isSubscribed = true;
+                    found = true;
+                }
+                return u;
+            });
+
+            if (found) {
+                localStorage.setItem('crash_users_db_2026', JSON.stringify(usersDb));
+                if (currentUser && (currentUser.uniqueId === targetId || currentUser.email.toUpperCase() === targetId)) {
+                    currentUser.isSubscribed = true;
+                    localStorage.setItem('crash_predictor_user_2026', JSON.stringify(currentUser));
+                    initGlobalViewRouter();
+                }
+                renderAdminUsersTable();
+                adminTargetIdInput.value = "";
+                showToast(`Succès : L'accès VIP pour l'ID ${targetId} est maintenant activé !`);
+            } else {
+                // If not found in DB, create and unlock this ID immediately
+                const newVipMember = {
+                    id: Date.now(),
+                    uniqueId: targetId,
+                    name: `Membre_${targetId}`,
+                    email: `${targetId.toLowerCase()}@client.com`,
+                    phone: "",
+                    isSubscribed: true,
+                    registeredAt: new Date().toLocaleDateString('fr-FR')
+                };
+                usersDb.push(newVipMember);
+                localStorage.setItem('crash_users_db_2026', JSON.stringify(usersDb));
+
+                if (currentUser) {
+                    currentUser.isSubscribed = true;
+                    currentUser.uniqueId = targetId;
+                    localStorage.setItem('crash_predictor_user_2026', JSON.stringify(currentUser));
+                    initGlobalViewRouter();
+                }
+
+                renderAdminUsersTable();
+                adminTargetIdInput.value = "";
+                showToast(`Nouvel ID ${targetId} créé et activé en Mode VIP avec succès !`);
+            }
+        });
+    }
+}
+
+function renderAdminUsersTable() {
+    const tbody = document.getElementById('adminUsersTableBody');
+    if (!tbody) return;
+
+    let usersDb = JSON.parse(localStorage.getItem('crash_users_db_2026')) || [];
+
+    if (usersDb.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#9ca3af;padding:15px;">Aucun utilisateur inscrit pour le moment.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = usersDb.map(u => `
+        <tr>
+            <td><strong class="gold-code">${u.uniqueId || 'CRASH-0000'}</strong></td>
+            <td>${u.name}</td>
+            <td>${u.email}</td>
+            <td>
+                ${u.isSubscribed 
+                    ? '<span class="badge-tag green"><i class="fa-solid fa-crown"></i> VIP ACTIF</span>' 
+                    : '<span class="badge-tag red"><i class="fa-solid fa-circle-xmark"></i> NON ABONNÉ</span>'}
+            </td>
+            <td>
+                ${!u.isSubscribed 
+                    ? `<button class="btn-table-action activate" onclick="adminToggleUser('${u.email}', true)"><i class="fa-solid fa-bolt"></i> Activer VIP</button>` 
+                    : `<button class="btn-table-action deactivate" onclick="adminToggleUser('${u.email}', false)"><i class="fa-solid fa-ban"></i> Suspendre</button>`}
+            </td>
+        </tr>
     `).join('');
-
-    const btnLoadMore = document.getElementById('btnLoadMoreComments');
-    const totalCountText = document.getElementById('commentsCounterDisplay');
-
-    if (totalCountText) {
-        totalCountText.textContent = `Affichage de ${visibleComments.length} sur 63 commentaires en 24 heures (+155 643 avis enregistrés)`;
-    }
-
-    if (btnLoadMore) {
-        if (displayedCommentsCount >= WINNER_COMMENTS.length) {
-            btnLoadMore.style.display = 'none';
-        } else {
-            btnLoadMore.style.display = 'inline-flex';
-            btnLoadMore.innerHTML = `<i class="fa-solid fa-chevron-down"></i> Voir plus d'avis (${WINNER_COMMENTS.length - displayedCommentsCount} restants)`;
-        }
-    }
 }
 
-function initLoadMoreComments() {
-    const btnLoadMore = document.getElementById('btnLoadMoreComments');
-    if (btnLoadMore) {
-        btnLoadMore.addEventListener('click', () => {
-            displayedCommentsCount = Math.min(displayedCommentsCount + 16, WINNER_COMMENTS.length);
-            renderCommentsList();
+window.adminToggleUser = function(email, status) {
+    let usersDb = JSON.parse(localStorage.getItem('crash_users_db_2026')) || [];
+    const idx = usersDb.findIndex(u => u.email === email);
+    if (idx !== -1) {
+        usersDb[idx].isSubscribed = status;
+        localStorage.setItem('crash_users_db_2026', JSON.stringify(usersDb));
+
+        if (currentUser && currentUser.email === email) {
+            currentUser.isSubscribed = status;
+            localStorage.setItem('crash_predictor_user_2026', JSON.stringify(currentUser));
+            initGlobalViewRouter();
+        }
+
+        renderAdminUsersTable();
+        showToast(status ? "Membre activé en Mode VIP !" : "Accès membre suspendu.");
+    }
+};
+
+// ==========================================
+// 7. ULTRA-BRIEF 1-CLICK CHECKOUT & AUTOMATIC UNLOCK
+// ==========================================
+function initBriefMobileMoneyPayment() {
+    const directBuyButtons = document.querySelectorAll('#directBuyButton, .btn-buy-instant, #btnAlertSubscribe');
+    const buyModal = document.getElementById('buyModal');
+    const momoChips = document.querySelectorAll('.momo-chip-card');
+    const btnExecuteMomoPayment = document.getElementById('btnExecuteMomoPayment');
+    const btnExecuteCardPayment = document.getElementById('btnExecuteCardPayment');
+
+    momoChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            momoChips.forEach(c => c.classList.remove('selected'));
+            chip.classList.add('selected');
+            selectedMomoNetwork = chip.dataset.network || "WAVE";
+        });
+    });
+
+    directBuyButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            buyModal?.classList.add('active');
+        });
+    });
+
+    // 1-CLICK DIRECT MOBILE MONEY
+    if (btnExecuteMomoPayment) {
+        btnExecuteMomoPayment.addEventListener('click', () => {
+            const customerEmail = currentUser?.email || "client@crashpredictor2026.com";
+            const customerPhone = currentUser?.phone || "0700000000";
+            const customerName = currentUser?.name || "Client VIP";
+
+            if (typeof FlutterwaveCheckout !== "function") {
+                showToast("Chargement de la passerelle...", "error");
+                return;
+            }
+
+            FlutterwaveCheckout({
+                public_key: FLUTTERWAVE_PUBLIC_KEY,
+                tx_ref: "CRASH-" + (currentUser?.uniqueId || 'MOMO') + "-" + Date.now(),
+                amount: 30000,
+                currency: "XOF",
+                payment_options: "mobilemoneyfrancophone",
+                customer: {
+                    email: customerEmail,
+                    phone_number: customerPhone,
+                    name: customerName,
+                },
+                customizations: {
+                    title: "CRASH PREDICTOR 2026",
+                    description: `Paiement ${selectedMomoNetwork} (30 000 FCFA)`,
+                    logo: window.location.origin + "/assets/crash_hd.jpg",
+                },
+                callback: function (data) {
+                    console.log("Paiement validé:", data);
+                    buyModal?.classList.remove('active');
+
+                    if (!currentUser) {
+                        const randomNum = Math.floor(1000 + Math.random() * 9000);
+                        currentUser = {
+                            id: Date.now(),
+                            uniqueId: `CRASH-${randomNum}`,
+                            name: "Client VIP",
+                            email: customerEmail,
+                            phone: customerPhone,
+                            isSubscribed: true,
+                            registeredAt: new Date().toLocaleDateString('fr-FR')
+                        };
+                    } else {
+                        currentUser.isSubscribed = true;
+                    }
+
+                    saveUserSession(currentUser);
+                    initGlobalViewRouter();
+                    showToast("🎉 Félicitations ! Votre logiciel VIP est débloqué à vie !");
+                },
+                onclose: function() {
+                    console.log("Fenêtre fermée.");
+                }
+            });
+        });
+    }
+
+    // DIRECT CARD PAYMENT
+    if (btnExecuteCardPayment) {
+        btnExecuteCardPayment.addEventListener('click', () => {
+            const customerEmail = currentUser?.email || "client@crashpredictor2026.com";
+            const customerPhone = currentUser?.phone || "0700000000";
+            const customerName = currentUser?.name || "Client VIP";
+
+            if (typeof FlutterwaveCheckout !== "function") {
+                showToast("Chargement...", "error");
+                return;
+            }
+
+            FlutterwaveCheckout({
+                public_key: FLUTTERWAVE_PUBLIC_KEY,
+                tx_ref: "CRASH-CARD-" + Date.now(),
+                amount: 50,
+                currency: "USD",
+                payment_options: "card",
+                customer: {
+                    email: customerEmail,
+                    phone_number: customerPhone,
+                    name: customerName,
+                },
+                customizations: {
+                    title: "CRASH PREDICTOR 2026",
+                    description: "Accès Officiel à Vie - 50 $",
+                    logo: window.location.origin + "/assets/crash_hd.jpg",
+                },
+                callback: function (data) {
+                    buyModal?.classList.remove('active');
+                    if (!currentUser) {
+                        const randomNum = Math.floor(1000 + Math.random() * 9000);
+                        currentUser = {
+                            id: Date.now(),
+                            uniqueId: `CRASH-${randomNum}`,
+                            name: "Client VIP",
+                            email: customerEmail,
+                            phone: customerPhone,
+                            isSubscribed: true,
+                            registeredAt: new Date().toLocaleDateString('fr-FR')
+                        };
+                    } else {
+                        currentUser.isSubscribed = true;
+                    }
+                    saveUserSession(currentUser);
+                    initGlobalViewRouter();
+                    showToast("🎉 Félicitations ! Votre logiciel VIP est débloqué à vie !");
+                },
+                onclose: function() {
+                    console.log("Fenêtre fermée.");
+                }
+            });
         });
     }
 }
 
 // ==========================================
-// 9. AUTHENTICATION & VIP TRANSFORMATION
+// 8. AUTHENTICATION (REGISTER & LOGIN)
 // ==========================================
 function initAuthSecurity() {
-    updateAuthHeader();
-
     const regForm = document.getElementById('registerForm');
     const logForm = document.getElementById('loginForm');
     const logoutBtn = document.getElementById('logoutBtn');
     const profileLogoutBtn = document.getElementById('profileLogoutBtn');
+    const vipLogoutBtn = document.getElementById('vipLogoutBtn');
 
     if (regForm) {
         regForm.addEventListener('submit', (e) => {
@@ -556,30 +687,21 @@ function initAuthSecurity() {
             const password = document.getElementById('regPassword').value;
 
             if (!name || name.length < 3) {
-                showToast("Le nom ou pseudo doit comporter au moins 3 caractères.", "error");
-                return;
-            }
-
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                showToast("Veuillez saisir une adresse email valide.", "error");
-                return;
-            }
-
-            if (!password || password.length < 5) {
-                showToast("Le mot de passe doit comporter au moins 5 caractères.", "error");
+                showToast("Nom requis (au moins 3 caractères).", "error");
                 return;
             }
 
             let usersDb = JSON.parse(localStorage.getItem('crash_users_db_2026')) || [];
-            const existingUser = usersDb.find(u => u.email === email);
-            if (existingUser) {
-                showToast("Cet email est déjà inscrit ! Connectez-vous.", "error");
+            const exists = usersDb.find(u => u.email === email);
+            if (exists) {
+                showToast("Cet email existe déjà. Connectez-vous.", "error");
                 return;
             }
 
+            const randomNum = Math.floor(1000 + Math.random() * 9000);
             const newUser = {
                 id: Date.now(),
+                uniqueId: `CRASH-${randomNum}`,
                 name: name,
                 email: email,
                 phone: "",
@@ -588,16 +710,13 @@ function initAuthSecurity() {
                 registeredAt: new Date().toLocaleDateString('fr-FR')
             };
 
-            usersDb.push(newUser);
-            localStorage.setItem('crash_users_db_2026', JSON.stringify(usersDb));
-
             currentUser = newUser;
-            localStorage.setItem('crash_predictor_user_2026', JSON.stringify(currentUser));
+            saveUserSession(currentUser);
 
-            updateAuthHeader();
+            initGlobalViewRouter();
             closeAllModals();
             regForm.reset();
-            showToast(`Bienvenue, ${currentUser.name} !`);
+            showToast(`Compte créé ! Votre ID Unique : ${currentUser.uniqueId}`);
         });
     }
 
@@ -607,19 +726,14 @@ function initAuthSecurity() {
             const email = document.getElementById('loginEmail').value.trim().toLowerCase();
             const password = document.getElementById('loginPassword').value;
 
-            if (!email || !password) {
-                showToast("Veuillez remplir vos identifiants.", "error");
-                return;
-            }
-
             let usersDb = JSON.parse(localStorage.getItem('crash_users_db_2026')) || [];
-            const foundUser = usersDb.find(u => u.email === email);
+            const found = usersDb.find(u => u.email === email || u.uniqueId === email.toUpperCase());
 
-            if (foundUser) {
-                if (foundUser.passwordHash === btoa(password)) {
-                    currentUser = foundUser;
-                    localStorage.setItem('crash_predictor_user_2026', JSON.stringify(currentUser));
-                    updateAuthHeader();
+            if (found) {
+                if (found.passwordHash === btoa(password)) {
+                    currentUser = found;
+                    saveUserSession(currentUser);
+                    initGlobalViewRouter();
                     closeAllModals();
                     logForm.reset();
                     showToast(`Connexion réussie ! Bienvenue, ${currentUser.name}.`);
@@ -627,8 +741,10 @@ function initAuthSecurity() {
                     showToast("Mot de passe incorrect.", "error");
                 }
             } else {
+                const randomNum = Math.floor(1000 + Math.random() * 9000);
                 const autoUser = {
                     id: Date.now(),
+                    uniqueId: `CRASH-${randomNum}`,
                     name: email.split('@')[0] || "Membre",
                     email: email,
                     phone: "",
@@ -636,15 +752,12 @@ function initAuthSecurity() {
                     isSubscribed: false,
                     registeredAt: new Date().toLocaleDateString('fr-FR')
                 };
-                usersDb.push(autoUser);
-                localStorage.setItem('crash_users_db_2026', JSON.stringify(usersDb));
-
                 currentUser = autoUser;
-                localStorage.setItem('crash_predictor_user_2026', JSON.stringify(currentUser));
-                updateAuthHeader();
+                saveUserSession(currentUser);
+                initGlobalViewRouter();
                 closeAllModals();
                 logForm.reset();
-                showToast(`Bienvenue, ${currentUser.name} !`);
+                showToast(`Bienvenue ! Votre ID Unique : ${currentUser.uniqueId}`);
             }
         });
     }
@@ -652,75 +765,18 @@ function initAuthSecurity() {
     const handleLogout = () => {
         currentUser = null;
         localStorage.removeItem('crash_predictor_user_2026');
-        updateAuthHeader();
+        initGlobalViewRouter();
         closeAllModals();
         showToast("Vous avez été déconnecté.");
     };
 
     if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
     if (profileLogoutBtn) profileLogoutBtn.addEventListener('click', handleLogout);
-}
-
-function updateAuthHeader() {
-    const guestButtons = document.getElementById('guestButtons');
-    const userProfileBadge = document.getElementById('userProfileBadge');
-    const navUserName = document.getElementById('navUserName');
-    const siteAlertBanner = document.getElementById('siteSubscriptionAlert');
-    const navUserStatusPill = document.getElementById('navUserStatusPill');
-    const vipLiveSignalBox = document.getElementById('vipLiveSignalBox');
-    const directBuyButton = document.getElementById('directBuyButton');
-    const promoBadgeText = document.getElementById('promoBadgeText');
-
-    if (currentUser) {
-        guestButtons?.classList.add('hidden');
-        userProfileBadge?.classList.remove('hidden');
-        if (navUserName) navUserName.textContent = currentUser.name;
-
-        if (currentUser.isSubscribed) {
-            if (siteAlertBanner) siteAlertBanner.classList.add('hidden');
-            
-            if (navUserStatusPill) {
-                navUserStatusPill.className = "user-status-pill-nav green-tag";
-                navUserStatusPill.innerHTML = '<i class="fa-solid fa-crown"></i> VIP ACTIF';
-            }
-
-            if (vipLiveSignalBox) vipLiveSignalBox.classList.remove('hidden');
-
-            if (directBuyButton) {
-                directBuyButton.className = "btn-buy-instant btn-vip-active";
-                directBuyButton.innerHTML = '<i class="fa-solid fa-circle-check text-green"></i> <span>SIGNAUX ACTIFS EN DIRECT (VIP)</span>';
-            }
-
-            if (promoBadgeText) {
-                promoBadgeText.innerHTML = '<i class="fa-solid fa-crown text-gold"></i> <span>ACCÈS VIP ACTIF À VIE</span>';
-                promoBadgeText.style.background = "rgba(16, 185, 129, 0.2)";
-                promoBadgeText.style.borderColor = "#10b981";
-            }
-        } else {
-            if (siteAlertBanner) siteAlertBanner.classList.remove('hidden');
-            
-            if (navUserStatusPill) {
-                navUserStatusPill.className = "user-status-pill-nav red-tag";
-                navUserStatusPill.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Non abonné';
-            }
-
-            if (vipLiveSignalBox) vipLiveSignalBox.classList.add('hidden');
-
-            if (directBuyButton) {
-                directBuyButton.className = "btn-buy-instant";
-                directBuyButton.innerHTML = '<i class="fa-solid fa-bolt"></i> <span>Accéder aux prédictions</span>';
-            }
-        }
-    } else {
-        guestButtons?.classList.remove('hidden');
-        userProfileBadge?.classList.add('hidden');
-        if (siteAlertBanner) siteAlertBanner.classList.add('hidden');
-        if (vipLiveSignalBox) vipLiveSignalBox.classList.add('hidden');
-    }
+    if (vipLogoutBtn) vipLogoutBtn.addEventListener('click', handleLogout);
 }
 
 // ==========================================
-// 10. PROFILE MANAGEMENT
+// 9. PROFILE MODAL
 // ==========================================
 function initProfileModal() {
     const userProfileBadge = document.getElementById('userProfileBadge');
@@ -728,14 +784,12 @@ function initProfileModal() {
     const closeProfile = document.getElementById('closeProfileModal');
     const profileNameDisplay = document.getElementById('profileNameDisplay');
     const profileEmailDisplay = document.getElementById('profileEmailDisplay');
-    const profileDateDisplay = document.getElementById('profileDateDisplay');
+    const profileUniqueIdDisplay = document.getElementById('profileUniqueIdDisplay');
     const profilePhoneInput = document.getElementById('profilePhoneInput');
     const btnSavePhone = document.getElementById('btnSavePhone');
     const formUpdatePassword = document.getElementById('formUpdatePassword');
     const profileStatusBadge = document.getElementById('profileStatusBadge');
     const btnProfileSubscribe = document.getElementById('btnProfileSubscribe');
-    const vipActivationCodeInput = document.getElementById('vipActivationCodeInput');
-    const btnValidateVipCode = document.getElementById('btnValidateVipCode');
 
     if (userProfileBadge && profileModal) {
         userProfileBadge.addEventListener('click', () => {
@@ -743,7 +797,7 @@ function initProfileModal() {
 
             if (profileNameDisplay) profileNameDisplay.textContent = currentUser.name;
             if (profileEmailDisplay) profileEmailDisplay.textContent = currentUser.email;
-            if (profileDateDisplay) profileDateDisplay.textContent = currentUser.registeredAt || "Aujourd'hui";
+            if (profileUniqueIdDisplay) profileUniqueIdDisplay.textContent = currentUser.uniqueId || "CRASH-8491";
             if (profilePhoneInput) profilePhoneInput.value = currentUser.phone || "";
 
             if (profileStatusBadge) {
@@ -753,7 +807,7 @@ function initProfileModal() {
                     if (btnProfileSubscribe) btnProfileSubscribe.style.display = "block";
                 } else {
                     profileStatusBadge.className = "status-tag-badge status-active";
-                    profileStatusBadge.innerHTML = '<i class="fa-solid fa-crown"></i> MEMBRE VIP : ACTIF À VIE';
+                    profileStatusBadge.innerHTML = '<i class="fa-solid fa-crown"></i> MEMBRE VIP ACTIF À VIE';
                     if (btnProfileSubscribe) btnProfileSubscribe.style.display = "none";
                 }
             }
@@ -766,35 +820,12 @@ function initProfileModal() {
         closeProfile.addEventListener('click', () => profileModal?.classList.remove('active'));
     }
 
-    if (btnValidateVipCode && vipActivationCodeInput) {
-        btnValidateVipCode.addEventListener('click', () => {
-            if (!currentUser) return;
-            const code = vipActivationCodeInput.value.trim().toUpperCase();
-
-            if (code === "VIP2026" || code === "CRASHVIP" || code === "WAVE2026" || code === "50USD" || code.length >= 6) {
-                activateCurrentUserVip();
-                profileModal?.classList.remove('active');
-                showToast("Accès VIP Débloqué à vie avec succès !");
-            } else {
-                showToast("Code VIP incorrect.", "error");
-            }
-        });
-    }
-
     if (btnSavePhone) {
         btnSavePhone.addEventListener('click', () => {
             if (!currentUser) return;
-            const phone = profilePhoneInput.value.trim();
-            currentUser.phone = phone;
-
-            let usersDb = JSON.parse(localStorage.getItem('crash_users_db_2026')) || [];
-            const idx = usersDb.findIndex(u => u.email === currentUser.email);
-            if (idx !== -1) {
-                usersDb[idx].phone = phone;
-                localStorage.setItem('crash_users_db_2026', JSON.stringify(usersDb));
-            }
-            localStorage.setItem('crash_predictor_user_2026', JSON.stringify(currentUser));
-            showToast("Numéro enregistré !");
+            currentUser.phone = profilePhoneInput.value.trim();
+            saveUserSession(currentUser);
+            showToast("Numéro de téléphone enregistré !");
         });
     }
 
@@ -812,28 +843,15 @@ function initProfileModal() {
                 return;
             }
 
-            if (!newPass || newPass.length < 5) {
-                showToast("Le mot de passe doit faire au moins 5 caractères.", "error");
-                return;
-            }
-
-            if (newPass !== confirmPass) {
-                showToast("Les mots de passe ne correspondent pas.", "error");
+            if (!newPass || newPass.length < 5 || newPass !== confirmPass) {
+                showToast("Veuillez vérifier les nouveaux mots de passe.", "error");
                 return;
             }
 
             currentUser.passwordHash = btoa(newPass);
-
-            let usersDb = JSON.parse(localStorage.getItem('crash_users_db_2026')) || [];
-            const idx = usersDb.findIndex(u => u.email === currentUser.email);
-            if (idx !== -1) {
-                usersDb[idx].passwordHash = btoa(newPass);
-                localStorage.setItem('crash_users_db_2026', JSON.stringify(usersDb));
-            }
-            localStorage.setItem('crash_predictor_user_2026', JSON.stringify(currentUser));
-
+            saveUserSession(currentUser);
             formUpdatePassword.reset();
-            showToast("Mot de passe modifié !");
+            showToast("Mot de passe mis à jour !");
         });
     }
 
@@ -845,151 +863,84 @@ function initProfileModal() {
     }
 }
 
-function activateCurrentUserVip() {
-    if (!currentUser) {
-        currentUser = {
-            id: Date.now(),
-            name: "Membre VIP",
-            email: "client@crashpredictor2026.com",
-            phone: "",
-            isSubscribed: true,
-            registeredAt: new Date().toLocaleDateString('fr-FR')
-        };
+// ==========================================
+// 10. PUBLIC TICKER & 48H COUNTDOWN
+// ==========================================
+function initLiveOnlineUsersTicker() {
+    const liveCounterEl = document.getElementById('liveOnlineUsersCount');
+    if (!liveCounterEl) return;
+    let currentUsers = 1284650;
+
+    function formatNumber(num) {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    }
+
+    setInterval(() => {
+        currentUsers += Math.floor((Math.random() - 0.48) * 120);
+        if (currentUsers < 1150000) currentUsers = 1155000;
+        if (currentUsers > 1495000) currentUsers = 1490000;
+        liveCounterEl.textContent = formatNumber(currentUsers);
+    }, 2400);
+}
+
+function initGuaranteed48hCountdown() {
+    const timerElements = document.querySelectorAll('.countdown-timer-text');
+    if (!timerElements.length) return;
+    const DURATION_48H = 48 * 60 * 60 * 1000;
+    let timerStart = localStorage.getItem('crash_timer_start_48h_v4');
+    const now = Date.now();
+
+    if (!timerStart || isNaN(timerStart) || (now - parseInt(timerStart, 10)) > DURATION_48H) {
+        timerStart = now;
+        localStorage.setItem('crash_timer_start_48h_v4', timerStart);
     } else {
-        currentUser.isSubscribed = true;
+        timerStart = parseInt(timerStart, 10);
     }
 
-    localStorage.setItem('crash_predictor_user_2026', JSON.stringify(currentUser));
+    function updateTimer() {
+        const remaining = Math.max(0, DURATION_48H - (Date.now() - timerStart));
+        const hours = Math.floor(remaining / (1000 * 60 * 60));
+        const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+        const formatted = `${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
 
-    let usersDb = JSON.parse(localStorage.getItem('crash_users_db_2026')) || [];
-    const idx = usersDb.findIndex(u => u.email === currentUser.email);
-    if (idx !== -1) {
-        usersDb[idx].isSubscribed = true;
-        localStorage.setItem('crash_users_db_2026', JSON.stringify(usersDb));
+        timerElements.forEach(el => el.textContent = formatted);
     }
-    updateAuthHeader();
+    updateTimer();
+    setInterval(updateTimer, 1000);
 }
 
-// ==========================================
-// 11. ULTRA-BRIEF MOBILE MONEY 1-CLICK CHECKOUT
-// ==========================================
-function initBriefMobileMoneyPayment() {
-    const directBuyButtons = document.querySelectorAll('#directBuyButton, .btn-buy-instant, .btn-cta-buy, #btnAlertSubscribe');
-    const buyModal = document.getElementById('buyModal');
-    
-    const momoChips = document.querySelectorAll('.momo-chip-card');
-    const btnExecuteMomoPayment = document.getElementById('btnExecuteMomoPayment');
-    const btnExecuteCardPayment = document.getElementById('btnExecuteCardPayment');
+function renderCommentsList() {
+    const grid = document.getElementById('commentsGrid');
+    if (!grid) return;
+    const visibleComments = WINNER_COMMENTS.slice(0, displayedCommentsCount);
+    grid.innerHTML = visibleComments.map(c => `
+        <div class="comment-card">
+            <div class="comment-header">
+                <div class="comment-user-box">
+                    <div class="comment-lang-badge">${c.lang}</div>
+                    <div class="comment-username">${c.username} <i class="fa-solid fa-circle-check text-green"></i></div>
+                </div>
+                <div class="comment-gain-badge">${c.gain}</div>
+            </div>
+            <p class="comment-text">"${c.comment}"</p>
+        </div>
+    `).join('');
+}
 
-    momoChips.forEach(chip => {
-        chip.addEventListener('click', () => {
-            momoChips.forEach(c => c.classList.remove('selected'));
-            chip.classList.add('selected');
-            selectedMomoNetwork = chip.dataset.network || "WAVE";
-        });
-    });
-
-    directBuyButtons.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            if (currentUser && currentUser.isSubscribed) {
-                e.preventDefault();
-                document.getElementById('curve-simulation')?.scrollIntoView({ behavior: 'smooth' });
-                showToast("Vos signaux VIP sont actifs en direct sur la courbe !");
-                return;
-            }
-
-            if (btn.getAttribute('href') && btn.getAttribute('href').startsWith('#')) return;
-            e.preventDefault();
-
-            buyModal?.classList.add('active');
-        });
-    });
-
-    // 1-CLICK DIRECT MOBILE MONEY (WAVE, ORANGE, MTN, MOOV)
-    if (btnExecuteMomoPayment) {
-        btnExecuteMomoPayment.addEventListener('click', () => {
-            const customerEmail = currentUser?.email || "client@crashpredictor2026.com";
-            const customerPhone = currentUser?.phone || "0700000000";
-            const customerName = currentUser?.name || "Client VIP";
-
-            if (typeof FlutterwaveCheckout !== "function") {
-                showToast("Chargement de la passerelle sécurisée...", "error");
-                return;
-            }
-
-            FlutterwaveCheckout({
-                public_key: FLUTTERWAVE_PUBLIC_KEY,
-                tx_ref: "CRASH-MOMO-" + Date.now() + "-" + Math.floor(Math.random() * 10000),
-                amount: 30000,
-                currency: "XOF",
-                payment_options: "mobilemoneyfrancophone",
-                customer: {
-                    email: customerEmail,
-                    phone_number: customerPhone,
-                    name: customerName,
-                },
-                customizations: {
-                    title: "CRASH PREDICTOR 2026",
-                    description: `Paiement ${selectedMomoNetwork} (30 000 FCFA)`,
-                    logo: window.location.origin + "/assets/crash_hd.jpg",
-                },
-                callback: function (data) {
-                    console.log("Paiement Mobile Money validé:", data);
-                    buyModal?.classList.remove('active');
-                    activateCurrentUserVip();
-                    showToast("🎉 Paiement validé ! Votre accès VIP est actif à vie !");
-                },
-                onclose: function() {
-                    console.log("Fenêtre fermée.");
-                }
-            });
-        });
-    }
-
-    // DIRECT CARD PAYMENT
-    if (btnExecuteCardPayment) {
-        btnExecuteCardPayment.addEventListener('click', () => {
-            const customerEmail = currentUser?.email || "client@crashpredictor2026.com";
-            const customerPhone = currentUser?.phone || "0700000000";
-            const customerName = currentUser?.name || "Client VIP";
-
-            if (typeof FlutterwaveCheckout !== "function") {
-                showToast("Chargement de la passerelle...", "error");
-                return;
-            }
-
-            FlutterwaveCheckout({
-                public_key: FLUTTERWAVE_PUBLIC_KEY,
-                tx_ref: "CRASH-CARD-" + Date.now() + "-" + Math.floor(Math.random() * 10000),
-                amount: 50,
-                currency: "USD",
-                payment_options: "card",
-                customer: {
-                    email: customerEmail,
-                    phone_number: customerPhone,
-                    name: customerName,
-                },
-                customizations: {
-                    title: "CRASH PREDICTOR 2026",
-                    description: "Accès Officiel à Vie - 50 $",
-                    logo: window.location.origin + "/assets/crash_hd.jpg",
-                },
-                callback: function (data) {
-                    console.log("Paiement Carte validé:", data);
-                    buyModal?.classList.remove('active');
-                    activateCurrentUserVip();
-                    showToast("🎉 Paiement validé ! Votre accès VIP est actif à vie !");
-                },
-                onclose: function() {
-                    console.log("Fenêtre Carte fermée.");
-                }
-            });
+function initLoadMoreComments() {
+    const btnLoadMore = document.getElementById('btnLoadMoreComments');
+    if (btnLoadMore) {
+        btnLoadMore.addEventListener('click', () => {
+            displayedCommentsCount = WINNER_COMMENTS.length;
+            renderCommentsList();
+            btnLoadMore.style.display = 'none';
         });
     }
 }
 
 // ==========================================
-// 12. MODALS & FAQ
+// 11. MODAL HELPERS & TOASTS
 // ==========================================
 function initModals() {
     const openLoginBtn = document.getElementById('openLoginBtn');
@@ -1037,30 +988,13 @@ function closeAllModals() {
     document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
 }
 
-function initFAQHelper() {
-    const items = document.querySelectorAll('.faq-item');
-    items.forEach(item => {
-        const question = item.querySelector('.faq-question');
-        question?.addEventListener('click', () => {
-            item.classList.toggle('active');
-        });
-    });
-}
-
-// ==========================================
-// 13. TOAST NOTIFICATIONS
-// ==========================================
 function showToast(message, type = "success") {
     const container = document.getElementById('toastContainer');
     if (!container) return;
 
     const toast = document.createElement('div');
     toast.className = 'toast-message';
-
-    const icon = type === "error" 
-        ? '<i class="fa-solid fa-triangle-exclamation" style="color:#ef4444;"></i>' 
-        : '<i class="fa-solid fa-circle-check" style="color:#10b981;"></i>';
-
+    const icon = type === "error" ? '<i class="fa-solid fa-triangle-exclamation" style="color:#ef4444;"></i>' : '<i class="fa-solid fa-circle-check" style="color:#10b981;"></i>';
     toast.innerHTML = `${icon} <span>${message}</span>`;
     container.appendChild(toast);
 

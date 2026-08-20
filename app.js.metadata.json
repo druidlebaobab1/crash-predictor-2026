@@ -1,4 +1,4 @@
 {
-  "summary": "Mise à jour d'app.js pour générer des prédictions réalistes (cotes 1.50 à 3.20 et 5.00+) et déclenchement 1-clic direct du paiement Mobile Money",
-  "updatedAt": "2026-08-20T11:27:51.711149Z"
+  "summary": "Mise à jour d'app.js avec le Cockpit de vol VIP synchronisé qui s'arrête exactement à la cote prédite, le basculement total d'interface payant/non-payant, l'attribution d'ID Unique par membre et le panneau Administrateur de déblocage par ID",
+  "updatedAt": "2026-08-20T11:40:10.494133600Z"
 }
