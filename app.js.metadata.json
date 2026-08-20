@@ -1,4 +1,4 @@
 {
-  "summary": "Intégration complète de l'API Flutterwave v3 avec clé publique pour paiement direct Wave, MTN, Orange, Moov et Carte Bancaire avec validation automatique du compte client",
-  "updatedAt": "2026-08-20T10:23:48.353764Z"
+  "summary": "Mise à jour d'app.js pour séparer le paiement direct Mobile Money (Wave, Orange, MTN, Moov) et Carte Bancaire avec affichage 50$ et suppression de tout texte Flutterwave visible",
+  "updatedAt": "2026-08-20T10:33:02.492358Z"
 }

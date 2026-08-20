@@ -1,6 +1,6 @@
 /* ==========================================================================
    CRASH PREDICTOR 2026 - STYLE OFFICIEL LUXE AVIATOR
-   Intégration Flutterwave v3 (Wave, MTN, Orange, Moov, Carte)
+   Paiement Direct : Mobile Money (Wave, Orange, MTN, Moov) & Carte Bancaire
    ========================================================================== */
 
 :root {
@@ -1367,9 +1367,9 @@ section {
     text-decoration: underline;
 }
 
-/* ================= FLUTTERWAVE CHECKOUT MODAL STYLING ================= */
+/* ================= DIRECT TARGETED PAYMENT MODAL ================= */
 .modal-buy-card {
-    max-width: 530px;
+    max-width: 520px;
 }
 
 .product-banner-summary {
@@ -1380,12 +1380,12 @@ section {
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     padding: 14px;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
 }
 
 .buy-summary-img {
-    width: 65px;
-    height: 65px;
+    width: 60px;
+    height: 60px;
     border-radius: 10px;
     object-fit: cover;
     background: #000;
@@ -1405,91 +1405,107 @@ section {
 
 .price-tag-big {
     font-family: var(--font-heading);
-    font-size: 1.35rem;
+    font-size: 1.4rem;
     font-weight: 900;
     color: var(--gold-primary);
 }
 
 .price-usd-sub {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: var(--text-muted);
     font-weight: normal;
-}
-
-/* Payment Badges Chips (Wave, MTN, Orange, Moov, Carte) */
-.payment-methods-showcase {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 16px;
-    justify-content: center;
-}
-
-.payment-badge-chip {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 0.78rem;
-    font-weight: 700;
-    color: #e5e7eb;
-}
-
-.payment-badge-chip.active-chip {
-    background: rgba(255, 200, 55, 0.12);
-    border-color: var(--gold-primary);
-    color: var(--gold-primary);
-    box-shadow: 0 0 10px rgba(255, 200, 55, 0.2);
 }
 
 .checkout-fields-container {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
     margin-bottom: 18px;
 }
 
-.form-group-row {
+/* TWO SEPARATED DIRECT PAYMENT BUTTONS */
+.payment-direct-actions {
     display: flex;
-    gap: 10px;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 12px;
 }
 
-.flex-1 {
-    flex: 1;
-}
-
-.btn-launch-flutterwave {
-    width: 100%;
-    background: linear-gradient(135deg, #ffc837 0%, #f97316 100%);
-    color: #0d0614;
-    border: none;
+.btn-direct-momo {
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    color: #fff;
+    border: 2px solid #34d399;
     padding: 16px 20px;
     border-radius: var(--radius-md);
-    font-family: var(--font-heading);
-    font-weight: 900;
-    font-size: 1.05rem;
     cursor: pointer;
-    box-shadow: 0 8px 25px rgba(255, 200, 55, 0.6);
-    transition: var(--transition-smooth);
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 10px;
+    justify-content: space-between;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    transition: var(--transition-smooth);
+    width: 100%;
 }
 
-.btn-launch-flutterwave:hover {
+.btn-direct-momo:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 35px rgba(255, 200, 55, 0.85);
+    box-shadow: 0 10px 28px rgba(16, 185, 129, 0.6);
+    background: linear-gradient(135deg, #047857 0%, #059669 100%);
+}
+
+.btn-direct-card {
+    background: rgba(255, 255, 255, 0.07);
+    color: #fff;
+    border: 1px solid rgba(255, 200, 55, 0.4);
+    padding: 16px 20px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: var(--transition-smooth);
+    width: 100%;
+}
+
+.btn-direct-card:hover {
+    background: rgba(255, 200, 55, 0.15);
+    border-color: var(--gold-primary);
+    transform: translateY(-2px);
+}
+
+.btn-momo-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-align: left;
+}
+
+.btn-action-icon {
+    font-size: 1.6rem;
+}
+
+.btn-action-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.btn-title-main {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 1rem;
+    letter-spacing: 0.3px;
+}
+
+.btn-sub-badges {
+    font-size: 0.76rem;
+    opacity: 0.9;
+    font-weight: 500;
 }
 
 .secure-checkout-note {
     font-size: 0.75rem;
     color: var(--text-muted);
     text-align: center;
-    margin-top: 12px;
+    margin-top: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1540,9 +1556,9 @@ section {
     .hero-main-title { font-size: 2rem; }
     .price-amount { font-size: 2.2rem; }
     .comments-grid { grid-template-columns: 1fr; }
-    .form-group-row { flex-direction: column; }
     .alert-banner-content { text-align: center; justify-content: center; }
     .grand-canvas { height: 350px; }
     .ticker-content { font-size: 0.78rem; }
-    .btn-launch-flutterwave { font-size: 0.92rem; }
+    .btn-title-main { font-size: 0.9rem; }
+    .btn-sub-badges { font-size: 0.7rem; }
 }

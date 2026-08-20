@@ -1,7 +1,6 @@
 /**
- * CRASH PREDICTOR 2026 - APPLICATION AVEC FLUTTERWAVE V3 OFFICIEL
- * Clé Publique : FLWPUBK-07d56b9d571ed135ab4bf5d3fd5330a9-X
- * Support Direct : Wave, MTN Mobile Money, Orange Money, Moov Money, Carte Bancaire
+ * CRASH PREDICTOR 2026 - APPLICATION COMPLETE
+ * Paiement Direct Cible : Mobile Money (Wave, Orange, MTN, Moov) ou Carte Bancaire
  */
 
 const FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK-07d56b9d571ed135ab4bf5d3fd5330a9-X";
@@ -93,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initAuthSecurity();
     initProfileModal();
     initModals();
-    initFlutterwaveCheckoutSystem();
+    initDirectPaymentGateways();
     initFAQHelper();
 });
 
@@ -497,7 +496,7 @@ function initLoadMoreComments() {
 }
 
 // ==========================================
-// 8. AUTHENTICATION & SECURE PROFILE SYSTEM
+// 8. AUTHENTICATION SYSTEM
 // ==========================================
 function initAuthSecurity() {
     updateAuthHeader();
@@ -759,17 +758,17 @@ function initProfileModal() {
 }
 
 // ==========================================
-// 10. FLUTTERWAVE V3 DIRECT CHECKOUT (WAVE, MTN, ORANGE, MOOV, CARTE)
+// 10. DIRECT TARGETED PAYMENT GATEWAYS (MOBILE MONEY VS CARTE BANCAIRE)
 // ==========================================
-function initFlutterwaveCheckoutSystem() {
+function initDirectPaymentGateways() {
     const directBuyButtons = document.querySelectorAll('#directBuyButton, .btn-buy-instant, .btn-cta-buy, #btnAlertSubscribe');
     const buyModal = document.getElementById('buyModal');
-    const buyerDetailsBox = document.getElementById('buyerDetailsBox');
-    const btnLaunchFlutterwave = document.getElementById('btnLaunchFlutterwave');
+    
+    const btnPayMobileMoney = document.getElementById('btnPayMobileMoney');
+    const btnPayCard = document.getElementById('btnPayCard');
+    
     const paymentCustomerEmail = document.getElementById('paymentCustomerEmail');
-    const paymentCustomerName = document.getElementById('paymentCustomerName');
     const paymentCustomerPhone = document.getElementById('paymentCustomerPhone');
-    const paymentCurrencySelect = document.getElementById('paymentCurrencySelect');
 
     // Open Checkout Modal
     directBuyButtons.forEach(btn => {
@@ -777,9 +776,7 @@ function initFlutterwaveCheckoutSystem() {
             if (btn.getAttribute('href') && btn.getAttribute('href').startsWith('#')) return;
             e.preventDefault();
 
-            // Pre-fill user data if logged in
             if (currentUser) {
-                if (paymentCustomerName) paymentCustomerName.value = currentUser.name;
                 if (paymentCustomerEmail) paymentCustomerEmail.value = currentUser.email;
                 if (paymentCustomerPhone) paymentCustomerPhone.value = currentUser.phone || "";
             }
@@ -788,68 +785,91 @@ function initFlutterwaveCheckoutSystem() {
         });
     });
 
-    // Launch Flutterwave Checkout
-    if (btnLaunchFlutterwave) {
-        btnLaunchFlutterwave.addEventListener('click', () => {
-            const customerEmail = (paymentCustomerEmail?.value || currentUser?.email || "client@crashpredictor2026.com").trim();
-            const customerName = (paymentCustomerName?.value || currentUser?.name || "Membre VIP").trim();
-            const customerPhone = (paymentCustomerPhone?.value || currentUser?.phone || "").trim();
-            const currency = paymentCurrencySelect ? paymentCurrencySelect.value : "XOF";
+    // Helper: Execute Flutterwave with customized params
+    function launchPaymentGateway(mode) {
+        const customerEmail = (paymentCustomerEmail?.value || currentUser?.email || "client@crashpredictor2026.com").trim();
+        const customerPhone = (paymentCustomerPhone?.value || currentUser?.phone || "").trim();
+        const customerName = currentUser?.name || "Client VIP";
 
-            const amount = currency === "XOF" ? 30000 : 50;
+        if (!customerEmail || !customerEmail.includes('@')) {
+            showToast("Veuillez saisir votre adresse email.", "error");
+            paymentCustomerEmail?.focus();
+            return;
+        }
 
-            if (!customerEmail || !customerEmail.includes('@')) {
-                showToast("Veuillez saisir une adresse email valide pour recevoir vos accès.", "error");
-                paymentCustomerEmail?.focus();
-                return;
-            }
+        if (typeof FlutterwaveCheckout !== "function") {
+            showToast("Chargement de la passerelle sécurisée...", "error");
+            return;
+        }
 
-            if (typeof FlutterwaveCheckout !== "function") {
-                showToast("Chargement de la passerelle de paiement sécurisée...", "error");
-                return;
-            }
+        let paymentOptions = "mobilemoneyfrancophone, mobilemoneyci, ussd";
+        let currency = "XOF";
+        let amount = 30000;
 
-            // Execute Flutterwave Inline Popup
-            FlutterwaveCheckout({
-                public_key: FLUTTERWAVE_PUBLIC_KEY,
-                tx_ref: "CRASH-" + Date.now() + "-" + Math.floor(Math.random() * 10000),
-                amount: amount,
-                currency: currency,
-                payment_options: "mobilemoneyfrancophone, mobilemoneyci, mobilemoneyghana, ussd, card, opay, barter, account, banktransfer",
-                customer: {
-                    email: customerEmail,
-                    phone_number: customerPhone,
-                    name: customerName,
-                },
-                customizations: {
-                    title: "CRASH PREDICTOR 2026",
-                    description: "Accès Officiel à Vie aux Prédictions d'Avion",
-                    logo: window.location.origin + "/assets/crash_hd.jpg",
-                },
-                callback: function (data) {
-                    console.log("Paiement Flutterwave réussi:", data);
-                    buyModal?.classList.remove('active');
+        if (mode === "card") {
+            // ONLY CARD PAYMENT IN USD ($50)
+            paymentOptions = "card";
+            currency = "USD";
+            amount = 50;
+        } else {
+            // ONLY DIRECT MOBILE MONEY IN XOF (30 000 FCFA)
+            paymentOptions = "mobilemoneyfrancophone, mobilemoneyci, ussd";
+            currency = "XOF";
+            amount = 30000;
+        }
 
-                    // Activate user license automatically
-                    if (currentUser) {
-                        currentUser.isSubscribed = true;
-                        localStorage.setItem('crash_predictor_user_2026', JSON.stringify(currentUser));
+        FlutterwaveCheckout({
+            public_key: FLUTTERWAVE_PUBLIC_KEY,
+            tx_ref: "CRASH-" + Date.now() + "-" + Math.floor(Math.random() * 10000),
+            amount: amount,
+            currency: currency,
+            payment_options: paymentOptions,
+            customer: {
+                email: customerEmail,
+                phone_number: customerPhone,
+                name: customerName,
+            },
+            customizations: {
+                title: "CRASH PREDICTOR 2026",
+                description: mode === "card" ? "Accès à Vie - 50 $" : "Accès à Vie - Wave / MTN / Orange",
+                logo: window.location.origin + "/assets/crash_hd.jpg",
+            },
+            callback: function (data) {
+                console.log("Paiement validé:", data);
+                buyModal?.classList.remove('active');
 
-                        let usersDb = JSON.parse(localStorage.getItem('crash_users_db_2026')) || [];
-                        const idx = usersDb.findIndex(u => u.email === currentUser.email);
-                        if (idx !== -1) {
-                            usersDb[idx].isSubscribed = true;
-                            localStorage.setItem('crash_users_db_2026', JSON.stringify(usersDb));
-                        }
-                        updateAuthHeader();
+                if (currentUser) {
+                    currentUser.isSubscribed = true;
+                    localStorage.setItem('crash_predictor_user_2026', JSON.stringify(currentUser));
+
+                    let usersDb = JSON.parse(localStorage.getItem('crash_users_db_2026')) || [];
+                    const idx = usersDb.findIndex(u => u.email === currentUser.email);
+                    if (idx !== -1) {
+                        usersDb[idx].isSubscribed = true;
+                        localStorage.setItem('crash_users_db_2026', JSON.stringify(usersDb));
                     }
-
-                    showToast("Félicitations ! Votre accès CRASH PREDICTOR 2026 est activé à vie !");
-                },
-                onclose: function() {
-                    console.log("Fenêtre de paiement fermée.");
+                    updateAuthHeader();
                 }
-            });
+
+                showToast("Paiement reçu ! Votre accès CRASH PREDICTOR 2026 est débloqué à vie !");
+            },
+            onclose: function() {
+                console.log("Paiement annulé ou fermé.");
+            }
+        });
+    }
+
+    // 1. Bouton DIRECT MOBILE MONEY (Wave, Orange, MTN, Moov)
+    if (btnPayMobileMoney) {
+        btnPayMobileMoney.addEventListener('click', () => {
+            launchPaymentGateway("momo");
+        });
+    }
+
+    // 2. Bouton DIRECT CARTE BANCAIRE
+    if (btnPayCard) {
+        btnPayCard.addEventListener('click', () => {
+            launchPaymentGateway("card");
         });
     }
 }

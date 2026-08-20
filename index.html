@@ -13,7 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-    <!-- Flutterwave Checkout v3 Official SDK -->
+    <!-- Secure Checkout Gateway Script -->
     <script src="https://checkout.flutterwave.com/v3.js"></script>
 </head>
 <body class="dark-theme">
@@ -185,7 +185,7 @@
 
                         <div class="secure-guarantee-footer">
                             <i class="fa-solid fa-shield-halved text-gold"></i>
-                            <span>Paiement sécurisé par Flutterwave • Wave & Mobile Money prioritaires</span>
+                            <span>Activation immédiate 24h/24 • Plus d'un million de membres actifs</span>
                         </div>
                     </div>
                 </div>
@@ -273,7 +273,7 @@
                             <i class="fa-solid fa-chevron-down"></i>
                         </div>
                         <div class="faq-answer">
-                            <p>Vous pouvez payer directement par <strong>Wave, MTN Mobile Money, Orange Money, Moov Money</strong> ainsi que par <strong>Carte bancaire Visa / Mastercard</strong> en toute sécurité via Flutterwave.</p>
+                            <p>Vous pouvez payer directement par <strong>Wave, MTN Mobile Money, Orange Money, Moov Money</strong> ainsi que par <strong>Carte bancaire Visa / Mastercard</strong> en toute sécurité.</p>
                         </div>
                     </div>
                     <div class="faq-item">
@@ -300,7 +300,7 @@
                             <i class="fa-solid fa-chevron-down"></i>
                         </div>
                         <div class="faq-answer">
-                            <p>Non, aucun ! Vous payez une seule fois les 50 $ (30 000 FCFA) et vous bénéficiez de toutes les prédictions d'avion à vie directement sur le site.</p>
+                            <p>Non, aucun ! Vous payez une seule fois les 50 $ et vous bénéficiez de toutes les prédictions d'avion à vie directement sur le site.</p>
                         </div>
                     </div>
                 </div>
@@ -461,14 +461,14 @@
         </div>
     </div>
 
-    <!-- MODAL 4 : DIRECT FLUTTERWAVE CHECKOUT (WAVE, MTN, ORANGE, MOOV, CARTE) -->
+    <!-- MODAL 4 : DIRECT TARGETED PAYMENT MODAL (MOBILE MONEY OU CARTE BANCAIRE) -->
     <div class="modal-overlay" id="buyModal">
         <div class="modal-card modal-buy-card">
             <button class="modal-close" id="closeBuyModal">&times;</button>
             <div class="modal-header">
                 <div class="modal-icon-badge gold-glow"><i class="fa-solid fa-bolt"></i></div>
                 <h3 class="modal-title-big">Finaliser votre Accès</h3>
-                <p>Paiement sécurisé direct via <strong>Flutterwave</strong></p>
+                <p>Choisissez votre moyen de paiement pour activer vos signaux</p>
             </div>
 
             <div class="buy-modal-content">
@@ -478,54 +478,51 @@
                     <div>
                         <div class="badge-live-gold">ACCÈS OFFICIEL 2026 À VIE</div>
                         <h4>CRASH PREDICTOR AI</h4>
-                        <div class="price-tag-big">30 000 FCFA <span class="price-usd-sub">(50 $)</span></div>
+                        <div class="price-tag-big">50 $ <span class="price-usd-sub">/ Accès à vie</span></div>
                     </div>
                 </div>
 
-                <!-- PAYMENT METHODS BADGES (WAVE, MTN, ORANGE, MOOV, CARTE) -->
-                <div class="payment-methods-showcase">
-                    <div class="payment-badge-chip active-chip"><i class="fa-solid fa-mobile-screen-button"></i> Wave</div>
-                    <div class="payment-badge-chip active-chip"><i class="fa-solid fa-sim-card"></i> MTN MoMo</div>
-                    <div class="payment-badge-chip active-chip"><i class="fa-solid fa-tower-cell"></i> Orange Money</div>
-                    <div class="payment-badge-chip active-chip"><i class="fa-solid fa-signal"></i> Moov</div>
-                    <div class="payment-badge-chip active-chip"><i class="fa-solid fa-credit-card"></i> Carte Bancaire</div>
-                </div>
-
-                <!-- CHECKOUT FORM INPUTS -->
+                <!-- QUICK EMAIL & PHONE (AUTOMATIC PRE-FILL) -->
                 <div class="checkout-fields-container">
                     <div class="form-group">
-                        <label><i class="fa-solid fa-envelope"></i> Votre Email (pour recevoir vos identifiants)</label>
+                        <label><i class="fa-solid fa-envelope"></i> Votre Email (pour recevoir vos accès)</label>
                         <input type="email" id="paymentCustomerEmail" placeholder="votre-email@exemple.com" required class="form-control-dark">
                     </div>
-
-                    <div class="form-group-row">
-                        <div class="form-group flex-1">
-                            <label><i class="fa-solid fa-user"></i> Nom / Prénom</label>
-                            <input type="text" id="paymentCustomerName" placeholder="Votre nom" class="form-control-dark">
-                        </div>
-                        <div class="form-group flex-1">
-                            <label><i class="fa-solid fa-phone"></i> Téléphone Mobile Money</label>
-                            <input type="tel" id="paymentCustomerPhone" placeholder="Ex: 07000000" class="form-control-dark">
-                        </div>
-                    </div>
-
                     <div class="form-group">
-                        <label><i class="fa-solid fa-money-bill-wave"></i> Devise de paiement</label>
-                        <select id="paymentCurrencySelect" class="form-control-dark">
-                            <option value="XOF" selected>Franc CFA (XOF) — 30 000 FCFA (Wave, Orange, MTN, Moov)</option>
-                            <option value="USD">Dollars (USD) — 50 $ (Cartes Bancaires Internationales)</option>
-                        </select>
+                        <label><i class="fa-solid fa-phone"></i> Numéro de téléphone (optionnel)</label>
+                        <input type="tel" id="paymentCustomerPhone" placeholder="Ex: 07000000" class="form-control-dark">
                     </div>
                 </div>
 
-                <!-- LAUNCH FLUTTERWAVE POPUP BUTTON -->
-                <button type="button" class="btn-launch-flutterwave" id="btnLaunchFlutterwave">
-                    <i class="fa-solid fa-lock"></i>
-                    <span>Payer en direct (Wave / MTN / Orange / Carte)</span>
-                </button>
+                <!-- DIRECT PAYMENT BUTTONS (SEPARATED & ACCESSIBLE) -->
+                <div class="payment-direct-actions">
+                    <!-- OPTION 1 : DIRECT MOBILE MONEY -->
+                    <button type="button" class="btn-direct-momo" id="btnPayMobileMoney">
+                        <div class="btn-momo-left">
+                            <i class="fa-solid fa-mobile-screen-button btn-action-icon"></i>
+                            <div class="btn-action-text">
+                                <span class="btn-title-main">Payer par Mobile Money</span>
+                                <span class="btn-sub-badges">Wave • Orange Money • MTN MoMo • Moov</span>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+
+                    <!-- OPTION 2 : DIRECT CARTE BANCAIRE -->
+                    <button type="button" class="btn-direct-card" id="btnPayCard">
+                        <div class="btn-momo-left">
+                            <i class="fa-solid fa-credit-card btn-action-icon"></i>
+                            <div class="btn-action-text">
+                                <span class="btn-title-main">Payer par Carte Bancaire</span>
+                                <span class="btn-sub-badges">Visa • Mastercard • International</span>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
 
                 <div class="secure-checkout-note">
-                    <i class="fa-solid fa-shield-halved text-green"></i> Passerelle sécurisée par cryptage bancaire SSL 256 bits
+                    <i class="fa-solid fa-shield-halved text-green"></i> Paiement 100% sécurisé avec activation immédiate
                 </div>
             </div>
         </div>
