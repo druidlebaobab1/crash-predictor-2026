@@ -162,7 +162,7 @@ body {
     opacity: 0.4;
 }
 
-/* ================= PUBLIC NAVBAR (MOBILE OPTIMIZED) ================= */
+/* ================= PUBLIC NAVBAR (MOBILE 100% VISIBLE) ================= */
 .main-navbar {
     position: sticky;
     top: 0;
@@ -180,7 +180,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
+    gap: 10px;
 }
 
 .brand-logo {
@@ -213,41 +213,21 @@ body {
     flex-shrink: 0;
 }
 
-.lang-selector-box {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 200, 55, 0.35);
-    border-radius: 16px;
-    padding: 4px 8px;
-}
-
-.lang-select-dropdown {
-    background: transparent;
-    border: none;
-    color: #fff;
-    font-family: var(--font-body);
-    font-size: 0.78rem;
-    font-weight: 700;
-    cursor: pointer;
-}
-.lang-select-dropdown option { background: #140b20; color: #fff; }
-
 .guest-buttons {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
+    flex-shrink: 0;
 }
 
 .btn-ghost-compact {
     background: rgba(255, 255, 255, 0.08);
     color: #fff;
-    border: 1.5px solid rgba(255, 255, 255, 0.25);
-    padding: 6px 12px;
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    padding: 7px 14px;
     border-radius: var(--radius-md);
     font-weight: 700;
-    font-size: 0.8rem;
+    font-size: 0.82rem;
     cursor: pointer;
     white-space: nowrap;
     transition: var(--transition-smooth);
@@ -262,19 +242,22 @@ body {
     background: var(--gold-gradient);
     color: #0d0614;
     border: none;
-    padding: 6px 14px;
+    padding: 7px 16px;
     border-radius: var(--radius-md);
-    font-weight: 800;
-    font-size: 0.8rem;
+    font-weight: 900;
+    font-size: 0.82rem;
     cursor: pointer;
-    box-shadow: 0 2px 10px var(--gold-glow);
+    box-shadow: 0 3px 12px var(--gold-glow);
     white-space: nowrap;
     transition: var(--transition-smooth);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
 }
 
 .btn-primary-compact:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 14px rgba(255, 200, 55, 0.6);
+    box-shadow: 0 5px 16px rgba(255, 200, 55, 0.7);
 }
 
 .user-profile-badge {
@@ -398,7 +381,7 @@ body {
 .btn-buy-instant:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255, 200, 55, 0.8); }
 .secure-guarantee-footer { font-size: 0.74rem; color: var(--text-muted); text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px; }
 
-/* ================= TESTIMONIALS (WITHOUT ANY "IL Y A") ================= */
+/* ================= TESTIMONIALS (100% ID MEMBRES) ================= */
 .testimonials-section { padding: 40px 0; }
 .testimonials-stats-bar {
     display: grid;
@@ -419,7 +402,7 @@ body {
 .comment-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
 .comment-user-box { display: flex; align-items: center; gap: 8px; }
 .comment-lang-badge { width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 200, 55, 0.15); color: var(--gold-primary); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.68rem; }
-.comment-username { font-weight: 800; font-size: 0.82rem; color: #fff; }
+.comment-username { font-family: var(--font-mono); font-weight: 800; font-size: 0.82rem; color: var(--gold-primary); }
 .comment-gain-badge { font-family: var(--font-heading); font-size: 0.8rem; font-weight: 900; color: #34d399; background: rgba(16, 185, 129, 0.15); padding: 2px 6px; border-radius: 12px; }
 .comment-text { font-size: 0.8rem; color: #d1d5db; }
 
@@ -467,24 +450,11 @@ body {
     box-shadow: 0 0 10px var(--gold-glow);
 }
 
-.flash-text-content {
-    display: flex;
-    flex-direction: column;
-}
+.flash-text-content { display: flex; flex-direction: column; }
+.flash-title { font-family: var(--font-mono); font-weight: 800; font-size: 0.82rem; color: var(--gold-primary); }
+.flash-subtitle { font-size: 0.74rem; color: #34d399; font-weight: 600; }
 
-.flash-title {
-    font-weight: 800;
-    font-size: 0.82rem;
-    color: #fff;
-}
-
-.flash-subtitle {
-    font-size: 0.74rem;
-    color: #34d399;
-    font-weight: 600;
-}
-
-/* ================= VIP LIVE COCKPIT ================= */
+/* ================= VIP GRAND VERTICAL COCKPIT (520PX) ================= */
 .vip-software-navbar {
     background: #06040d;
     border-bottom: 1.5px solid var(--gold-primary);
@@ -601,32 +571,121 @@ body {
 .pred-confidence { color: #fff; font-weight: 700; }
 .pred-advice { color: #cbd5e1; font-style: italic; }
 
-.vip-canvas-viewport {
+/* GRAND VERTICAL RADAR CANVAS */
+.vip-canvas-viewport.grand-vertical-viewport {
     position: relative;
     background: #060a18;
     border: 2px solid rgba(255, 200, 55, 0.4);
     border-radius: var(--radius-md);
     overflow: hidden;
     box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
+    height: 520px;
 }
 
-.vip-flight-canvas { width: 100%; height: 400px; display: block; }
+.vip-flight-canvas.grand-canvas-height {
+    width: 100%;
+    height: 520px;
+    display: block;
+}
 
 .vip-live-hud {
     position: absolute;
     top: 20px;
     left: 20px;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.75);
     border: 1.5px solid var(--gold-primary);
     border-radius: 10px;
     padding: 8px 16px;
     display: flex;
     flex-direction: column;
     backdrop-filter: blur(8px);
+    z-index: 5;
 }
 
 .hud-label { font-size: 0.68rem; color: #9ca3af; font-weight: 700; }
 .hud-number { font-family: var(--font-heading); font-size: 1.6rem; font-weight: 900; color: #fff; }
+
+/* SATELLITE SCANNER LOADER OVERLAY */
+.vip-scanner-loader-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(6, 10, 24, 0.88);
+    backdrop-filter: blur(8px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    z-index: 10;
+}
+
+.radar-scanning-circle {
+    width: 90px;
+    height: 90px;
+    border: 2px dashed var(--gold-primary);
+    border-radius: 50%;
+    position: relative;
+    animation: rotateScanner 3s linear infinite;
+    box-shadow: 0 0 25px rgba(255, 200, 55, 0.4);
+}
+
+.radar-scanning-circle::after {
+    content: '';
+    position: absolute;
+    inset: 12px;
+    border: 2px solid #10b981;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: rotateScannerReverse 1.5s linear infinite;
+}
+
+@keyframes rotateScanner {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes rotateScannerReverse {
+    0% { transform: rotate(360deg); }
+    100% { transform: rotate(0deg); }
+}
+
+.scanner-text-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-align: center;
+}
+
+.scan-title {
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: 0.5px;
+}
+
+.scan-subtitle {
+    font-size: 0.82rem;
+    color: #34d399;
+    font-weight: 600;
+}
+
+.scan-progress-track {
+    width: 220px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.scan-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--gold-gradient);
+    box-shadow: 0 0 10px var(--gold-glow);
+    transition: width 0.1s linear;
+}
 
 .vip-flight-status-bar {
     background: rgba(0, 0, 0, 0.4);
@@ -856,31 +915,33 @@ body {
 .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
 .toast-message { background: #190e29; border: 1px solid var(--gold-primary); color: #fff; padding: 10px 16px; border-radius: var(--radius-md); box-shadow: 0 8px 20px rgba(0,0,0,0.6); font-size: 0.82rem; display: flex; align-items: center; gap: 10px; }
 
-/* ================= MOBILE RESPONSIVENESS (PERFECT BUTTON FIT) ================= */
+/* ================= MOBILE RESPONSIVENESS (PERFECT FIT ON ALL SMARTPHONES) ================= */
 @media (max-width: 992px) {
     .luxury-alive-box { grid-template-columns: 1fr; text-align: center; }
     .vip-dashboard-grid { grid-template-columns: 1fr; }
-    .vip-flight-canvas { height: 320px; }
+    .vip-canvas-viewport.grand-vertical-viewport { height: 420px; }
+    .vip-flight-canvas.grand-canvas-height { height: 420px; }
 }
 
 @media (max-width: 600px) {
-    .nav-container { padding: 0 10px; }
+    .nav-container { padding: 0 12px; }
     .brand-logo { gap: 6px; }
-    .logo-title { font-size: 0.92rem; }
+    .logo-title { font-size: 0.88rem; }
     .logo-badge { display: none; }
-    .nav-auth-actions { gap: 4px; }
-    .lang-selector-box { padding: 3px 5px; }
-    .lang-select-dropdown { font-size: 0.7rem; }
     
-    .guest-buttons { gap: 4px; }
-    .btn-ghost-compact { padding: 5px 8px; font-size: 0.72rem; }
-    .btn-primary-compact { padding: 5px 9px; font-size: 0.72rem; }
+    .nav-auth-actions { gap: 6px; }
+    .guest-buttons { gap: 6px; }
+    .btn-ghost-compact { padding: 6px 10px; font-size: 0.75rem; }
+    .btn-primary-compact { padding: 6px 12px; font-size: 0.75rem; }
     
-    .hero-main-title { font-size: 1.8rem; }
+    .hero-main-title { font-size: 1.75rem; }
     .price-amount { font-size: 2rem; }
     .pred-multiplier-value { font-size: 2.6rem; }
     .momo-chips-simple-grid { grid-template-columns: repeat(2, 1fr); }
-    .vip-flight-canvas { height: 280px; }
+    
+    .vip-canvas-viewport.grand-vertical-viewport { height: 380px; }
+    .vip-flight-canvas.grand-canvas-height { height: 380px; }
+    
     .ticker-content { font-size: 0.74rem; }
     .live-counter-highlight { font-size: 0.92rem; }
     
