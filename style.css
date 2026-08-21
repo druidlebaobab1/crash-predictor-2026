@@ -115,13 +115,15 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 }
 
 .live-dot-pulse,
-.pulse-dot-green {
+.pulse-dot-green,
+.active-radar-dot {
     width: 8px;
     height: 8px;
     background-color: #10b981;
     border-radius: 50%;
     box-shadow: 0 0 10px #10b981;
     animation: liveDotBlink 1.2s infinite;
+    flex-shrink: 0;
 }
 
 @keyframes liveDotBlink {
@@ -460,36 +462,66 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 .badge-algo { color: var(--gold-primary); background: rgba(255, 200, 55, 0.12); }
 .badge-status-live { color: var(--accent-green); background: rgba(16, 185, 129, 0.12); }
 
-/* 2. BANDEAU D'ACTIVITÉ EN FLUX NORMAL (PAS DE POSITION FIXED/ABSOLUTE) */
-.live-activity-inline-bar {
-    position: static;
+/* 2. BANDEAU D'ACTIVITÉ PRO ET ÉLÉGANT (SOUS LE VISUEL) */
+.live-activity-luxury-card {
     margin-top: 14px;
-    background: rgba(13, 7, 24, 0.95);
-    border: 1.5px solid var(--gold-primary);
+    background: rgba(12, 6, 24, 0.95);
+    border: 1.5px solid rgba(255, 200, 55, 0.35);
     border-radius: var(--radius-md);
     padding: 10px 14px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6), 0 0 10px rgba(255, 200, 55, 0.2);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6), 0 0 10px rgba(255, 200, 55, 0.15);
     width: 100%;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    transition: all 0.35s ease;
 }
 
-.live-activity-inline-bar.pulse-highlight {
+.live-activity-luxury-card.pulse-highlight {
     border-color: #34d399;
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+    box-shadow: 0 0 22px rgba(16, 185, 129, 0.45);
 }
 
-.flash-avatar {
-    width: 32px; height: 32px; border-radius: 50%;
-    background: var(--gold-gradient); color: #0d0614;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px; flex-shrink: 0;
+.luxury-card-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
-.flash-text-content { display: flex; flex-direction: column; text-align: left; }
-.flash-title { font-family: var(--font-mono); font-weight: 800; font-size: 0.82rem; color: var(--gold-primary); }
-.flash-subtitle { font-size: 0.74rem; color: #34d399; font-weight: 600; }
+
+.luxury-id-group {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.luxury-id-title {
+    font-family: var(--font-mono);
+    font-weight: 800;
+    font-size: 0.82rem;
+    color: var(--gold-primary);
+    line-height: 1.2;
+}
+
+.luxury-id-subtitle {
+    font-size: 0.72rem;
+    color: #cbd5e1;
+    font-weight: 500;
+}
+
+.luxury-verified-badge {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: #34d399;
+    background: rgba(16, 185, 129, 0.18);
+    border: 1px solid #10b981;
+    padding: 3px 8px;
+    border-radius: 12px;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
 
 .product-order-box {
     display: flex;
@@ -498,7 +530,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 }
 
 .access-title { font-family: var(--font-heading); font-size: 1.5rem; font-weight: 900; margin-bottom: 8px; }
-.access-desc { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px; }
+.access-desc { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 14px; }
 
 .price-display-wrapper {
     background: rgba(0, 0, 0, 0.45);
@@ -513,48 +545,59 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 .price-type { color: #10b981; font-weight: 800; font-size: 0.9rem; }
 .price-cfa-conversion { font-size: 0.85rem; color: #f3f4f6; margin-top: 2px; }
 
-/* 1. STRUCTURE AVANTAGES : BLOC VERTICAL EN DEUX LIGNES (ICÔNE+TITRE HAUT, DESCRIPTION BAS) */
-.benefits-checklist {
-    list-style: none;
+/* 1. STRUCTURE AVANTAGES : CARTES VERTICALES ULTRA-PROPRES & PARFAITEMENT ALIGNÉES */
+.benefits-vertical-list {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 12px;
     margin-bottom: 22px;
-    text-align: left;
+    width: 100%;
 }
 
-.benefit-item {
+.benefit-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 200, 55, 0.2);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 4px;
     text-align: left;
+    transition: var(--transition-smooth);
 }
 
-.benefit-title-row {
+.benefit-card:hover {
+    border-color: var(--gold-primary);
+    background: rgba(255, 200, 55, 0.06);
+}
+
+.benefit-head {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     font-size: 0.92rem;
+    font-weight: 800;
     color: #fff;
     text-align: left;
 }
 
-.benefit-title-row i {
+.benefit-head i {
+    font-size: 1rem;
+    color: #10b981;
     flex-shrink: 0;
-    font-size: 0.95rem;
 }
 
-.benefit-title {
-    font-weight: 800;
+.benefit-name {
     color: #fff;
+    font-weight: 800;
 }
 
-.benefit-desc {
-    font-size: 0.84rem;
+.benefit-text {
+    font-size: 0.83rem;
     color: #cbd5e1;
     line-height: 1.45;
-    padding-left: 24px;
     margin: 0;
+    padding-left: 26px;
     text-align: left;
 }
 
@@ -595,7 +638,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     gap: 6px;
 }
 
-/* ================= 105 AVIS CLIENTS ================= */
+/* ================= 113 AVIS CLIENTS ================= */
 .testimonials-section { padding: 40px 0 80px; }
 
 .section-header { margin-bottom: 18px; }
@@ -1234,10 +1277,13 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     .testimonials-stats-bar { grid-template-columns: 1fr; }
     .admin-input-row { flex-direction: column; }
     .alert-banner-content { justify-content: center; text-align: center; }
-    .luxury-alive-box { padding: 18px 14px; }
+    .luxury-alive-box { padding: 16px 12px; gap: 20px; }
     .price-display-wrapper { padding: 10px 14px; }
-    .price-amount { font-size: 2rem; }
-    .access-title { font-size: 1.25rem; }
+    .price-amount { font-size: 1.95rem; }
+    .access-title { font-size: 1.22rem; }
+    .benefit-card { padding: 10px 12px; }
+    .benefit-head { font-size: 0.86rem; }
+    .benefit-text { font-size: 0.8rem; padding-left: 24px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

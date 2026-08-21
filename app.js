@@ -1,9 +1,9 @@
 /**
  * CRASH PREDICTOR 2026 — LOGIQUE D'APPLICATION OFFICIELLE
+ * - 113 Avis Clients Vérifiés dans plusieurs langues (Français en avant)
+ * - Assainissement et garantie absolue des identifiants 7 chiffres : 5 000 000 à 10 000 000 (ex: CRASH-5829143)
  * - Compteur de trafic dynamique avec variations de 2 000 à 5 000 sessions toutes les 3 à 5s (entre 1 000 000 et 2 000 000)
- * - Identifiants membres strictement sur 7 chiffres : 5 000 000 à 10 000 000 (ex: CRASH-5829143)
- * - 105 avis clients variés et authentiques
- * - Bandeau d'activité intégré dans le flux normal (non flottant)
+ * - Bandeau d'activité moderne & professionnel intégré sous le produit
  * - Moteur radar haute précision et synchronisation Supabase / Flutterwave
  */
 
@@ -21,9 +21,10 @@ const CONFIG = {
 };
 
 // ==========================================================================
-// 105 AVIS CLIENTS DYNAMIQUES & NATURELS (IDs 7 CHIFFRES : 5 000 000 - 10 000 000)
+// EXACTEMENT 113 AVIS CLIENTS DYNAMIQUES & NATURELS (IDs 7 CHIFFRES : 5 000 000 - 10 000 000)
 // ==========================================================================
 const WINNER_COMMENTS = [
+    // --- 1 à 80 : Français Prioritaire ---
     { username: "ID: CRASH-5829143", lang: "FR", gain: "+$450", comment: "Cockpit très clair, prédictions nettes et prise en main immédiate." },
     { username: "ID: CRASH-6104829", lang: "FR", gain: "+$820", comment: "Licence rentabilisée rapidement, rien à redire sur la fluidité." },
     { username: "ID: CRASH-7391024", lang: "FR", gain: "+$1,100", comment: "Interface propre et rapide à charger. Très satisfait du service." },
@@ -104,16 +105,7 @@ const WINNER_COMMENTS = [
     { username: "ID: CRASH-6948102", lang: "FR", gain: "+$1,080", comment: "L'anticipation de sortie est très sécurisante." },
     { username: "ID: CRASH-7410294", lang: "FR", gain: "+$530", comment: "Tout se fait dans le navigateur, aucun téléchargement lourd." },
     { username: "ID: CRASH-9748102", lang: "FR", gain: "+$1,460", comment: "Très bonne fluidité sur les montées rapides." },
-    { username: "ID: CRASH-5310294", lang: "FR", gain: "+$380", comment: "Simple, clair et rentable dès le début." },
-    { username: "ID: CRASH-8649102", lang: "FR", gain: "+$820", comment: "Excellente plateforme d'analyse en direct." },
-    { username: "ID: CRASH-6190482", lang: "ES", gain: "+$580", comment: "Increíble precisión. El cockpit se abrió de inmediato tras el pago." },
-    { username: "ID: CRASH-7482910", lang: "ES", gain: "+$920", comment: "Herramienta muy limpia y rápida. Las señales son exactas." },
-    { username: "ID: CRASH-8920148", lang: "ES", gain: "+$1,340", comment: "La curva vertical ayuda mucho a visualizar el momento exacto." },
-    { username: "ID: CRASH-5648102", lang: "ES", gain: "+$410", comment: "Activación inmediata y soporte sin problemas en móvil." },
-    { username: "ID: CRASH-9102847", lang: "ES", gain: "+$760", comment: "Excelente estabilidad en cada ronda calculada." },
-    { username: "ID: CRASH-6820194", lang: "ES", gain: "+$1,120", comment: "Muy satisfecho con la licencia permanente, vale totalmente la pena." },
-    { username: "ID: CRASH-8391028", lang: "ES", gain: "+$640", comment: "Interfaz profesional, sin anuncios y muy rápida." },
-    { username: "ID: CRASH-7910482", lang: "ES", gain: "+$1,050", comment: "Gran precisión en las salidas seguras x2.00 a x3.00." },
+    // --- 81 à 95 : Anglais (International) ---
     { username: "ID: CRASH-5291048", lang: "EN", gain: "+$1,380", comment: "Clean cockpit, stable animation and instant access." },
     { username: "ID: CRASH-8740192", lang: "EN", gain: "+$890", comment: "Real-time radar works flawlessly on iPhone." },
     { username: "ID: CRASH-6490182", lang: "EN", gain: "+$560", comment: "Fast loading, no lags, lifetime license unlocked instantly." },
@@ -124,11 +116,32 @@ const WINNER_COMMENTS = [
     { username: "ID: CRASH-6910284", lang: "EN", gain: "+$980", comment: "Solid predictive stream with accurate tracking." },
     { username: "ID: CRASH-7581029", lang: "EN", gain: "+$670", comment: "Excellent performance on both tablet and laptop." },
     { username: "ID: CRASH-9481029", lang: "EN", gain: "+$1,440", comment: "Super smooth vertical canvas and instant target updates." },
-    { username: "ID: CRASH-5910284", lang: "FR", gain: "+$460", comment: "Interface claire et calculs toujours cohérents." },
-    { username: "ID: CRASH-8190284", lang: "FR", gain: "+$890", comment: "Très bon outil pour sécuriser ses objectifs quotidiens." },
-    { username: "ID: CRASH-6748102", lang: "FR", gain: "+$1,250", comment: "Accès instantané et excellente précision mathématique." },
-    { username: "ID: CRASH-7829104", lang: "FR", gain: "+$590", comment: "Cockpit moderne et agréable à utiliser." },
-    { username: "ID: CRASH-9501928", lang: "FR", gain: "+$1,580", comment: "Licence permanente de premier ordre, recommandé à 100%." }
+    { username: "ID: CRASH-5310298", lang: "EN", gain: "+$820", comment: "Great radar clarity, very easy to follow each round." },
+    { username: "ID: CRASH-8649107", lang: "EN", gain: "+$1,110", comment: "Seamless experience. The calculated cash-out points are great." },
+    { username: "ID: CRASH-6190284", lang: "EN", gain: "+$530", comment: "Instant activation, intuitive design on Android Chrome." },
+    { username: "ID: CRASH-7481029", lang: "EN", gain: "+$940", comment: "Very stable signal feed, zero lag during flights." },
+    { username: "ID: CRASH-9820148", lang: "EN", gain: "+$1,560", comment: "High accuracy predictions and excellent UI responsiveness." },
+    // --- 96 à 107 : Espagnol (International) ---
+    { username: "ID: CRASH-6190482", lang: "ES", gain: "+$580", comment: "Increíble precisión. El cockpit se abrió de inmediato tras el pago." },
+    { username: "ID: CRASH-7482910", lang: "ES", gain: "+$920", comment: "Herramienta muy limpia y rápida. Las señales son exactas." },
+    { username: "ID: CRASH-8920148", lang: "ES", gain: "+$1,340", comment: "La curva vertical ayuda mucho a visualizar el momento exacto." },
+    { username: "ID: CRASH-5648102", lang: "ES", gain: "+$410", comment: "Activación inmediata y soporte sin problemas en móvil." },
+    { username: "ID: CRASH-9102847", lang: "ES", gain: "+$760", comment: "Excelente estabilidad en cada ronda calculada." },
+    { username: "ID: CRASH-6820194", lang: "ES", gain: "+$1,120", comment: "Muy satisfecho con la licencia permanente, vale totalmente la pena." },
+    { username: "ID: CRASH-8391028", lang: "ES", gain: "+$640", comment: "Interfaz profesional, sin anuncios y muy rápida." },
+    { username: "ID: CRASH-7910482", lang: "ES", gain: "+$1,050", comment: "Gran precisión en las salidas seguras x2.00 a x3.00." },
+    { username: "ID: CRASH-5829104", lang: "ES", gain: "+$470", comment: "Muy buena herramienta para seguir los vuelos en directo." },
+    { username: "ID: CRASH-9104829", lang: "ES", gain: "+$1,290", comment: "El radar vertical funciona de maravilla sin cortes." },
+    { username: "ID: CRASH-6481029", lang: "ES", gain: "+$850", comment: "Acceso permanente verificado, excelente inversión." },
+    { username: "ID: CRASH-7820149", lang: "ES", gain: "+$690", comment: "Diseño impecable y predicciones muy claras." },
+    // --- 108 à 111 : Portugais ---
+    { username: "ID: CRASH-5520194", lang: "PT", gain: "+$1,650", comment: "Pagamento confirmado e o cockpit abriu na hora. Visual excelente." },
+    { username: "ID: CRASH-8910284", lang: "PT", gain: "+$780", comment: "Radar em tempo real muito fluido e preciso no telemóvel." },
+    { username: "ID: CRASH-6394810", lang: "PT", gain: "+$1,120", comment: "Ótima precisão nas saídas seguras, muito satisfeito." },
+    { username: "ID: CRASH-7419204", lang: "PT", gain: "+$590", comment: "Licença vitalícia sem taxas mensais, recomendo a todos." },
+    // --- 112 à 113 : Allemand ---
+    { username: "ID: CRASH-8190472", lang: "DE", gain: "+$940", comment: "Sehr stabile Signale und saubere Radar-Animation auf dem Smartphone." },
+    { username: "ID: CRASH-9648102", lang: "DE", gain: "+$1,480", comment: "Hervorragende Reaktionszeit, sofortige Freischaltung nach Zahlung." }
 ];
 
 // NOTIFICATIONS D'ACTIVATION (IDs 7 CHIFFRES : 5 000 000 - 10 000 000)
@@ -176,7 +189,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /* -------------------------------------------------------------------------- */
-/* 3. FORMAT DES NUMÉROS D'ID (7 CHIFFRES STRICTS : 5 000 000 À 10 000 000)   */
+/* 3. ASSAINISSEMENT & GARANTIE DES IDENTIFIANTS 7 CHIFFRES (5M À 10M)        */
 /* -------------------------------------------------------------------------- */
 
 function readJson(key, fallback) {
@@ -219,6 +232,16 @@ function generateUniqueId() {
         candidate = `CRASH-${random7Digits}`;
     } while (users.some((user) => user.uniqueId === candidate));
     return candidate;
+}
+
+// Valide et migre automatiquement tout ID existant vers un ID 7 chiffres
+function sanitize7DigitId(rawId) {
+    if (!rawId) return generateUniqueId();
+    const cleanNum = parseInt(String(rawId).replace(/\D/g, ""), 10);
+    if (isNaN(cleanNum) || cleanNum < 5000000 || cleanNum > 9999999) {
+        return generateUniqueId();
+    }
+    return `CRASH-${cleanNum}`;
 }
 
 async function hashPassword(password) {
@@ -274,21 +297,22 @@ function initSupabase() {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Identité & Session (Garantie 7 Chiffres)                                   */
+/* Identité & Session (Nettoyage & Migration Automatique 7 Chiffres)           */
 /* -------------------------------------------------------------------------- */
 
 function initUserIdentity() {
+    // Migration du Guest ID stocké vers 7 chiffres
     const storedGuestId = localStorage.getItem(CONFIG.guestIdKey);
-    const numPart = storedGuestId ? parseInt(storedGuestId.replace(/\D/g, ""), 10) : 0;
-
-    if (!storedGuestId || numPart < 5000000 || numPart >= 10000000) {
-        localStorage.setItem(CONFIG.guestIdKey, generateUniqueId());
+    const sanitizedGuest = sanitize7DigitId(storedGuestId);
+    if (storedGuestId !== sanitizedGuest) {
+        localStorage.setItem(CONFIG.guestIdKey, sanitizedGuest);
     }
 
+    // Migration du compte utilisateur courant si nécessaire
     if (currentUser) {
-        const userNum = parseInt(String(currentUser.uniqueId || "").replace(/\D/g, ""), 10);
-        if (!currentUser.uniqueId || userNum < 5000000 || userNum >= 10000000) {
-            currentUser.uniqueId = generateUniqueId();
+        const sanitizedUserId = sanitize7DigitId(currentUser.uniqueId);
+        if (currentUser.uniqueId !== sanitizedUserId) {
+            currentUser.uniqueId = sanitizedUserId;
             saveUserSession(currentUser, false);
         }
     }
@@ -296,6 +320,7 @@ function initUserIdentity() {
 
 async function saveUserSession(user, syncRemote = true) {
     if (!user) return;
+    user.uniqueId = sanitize7DigitId(user.uniqueId);
     currentUser = user;
     writeJson(CONFIG.sessionKey, user);
 
@@ -344,7 +369,7 @@ async function syncUserFromSupabase() {
                 changed = true;
             }
             if (data.unique_id && data.unique_id !== currentUser.uniqueId) {
-                currentUser.uniqueId = data.unique_id;
+                currentUser.uniqueId = sanitize7DigitId(data.unique_id);
                 changed = true;
             }
             if (changed) {
@@ -393,9 +418,10 @@ function initGlobalViewRouter() {
         const vipIdDisplay = document.getElementById("vipIdDisplay");
         const vipSidebarUserId = document.getElementById("vipSidebarUserId");
 
+        const user7Id = sanitize7DigitId(currentUser.uniqueId);
         if (vipUserDisplay) vipUserDisplay.textContent = currentUser.name || "Membre Actif";
-        if (vipIdDisplay) vipIdDisplay.textContent = `ID: ${currentUser.uniqueId || "CRASH-5829143"}`;
-        if (vipSidebarUserId) vipSidebarUserId.textContent = currentUser.uniqueId || "CRASH-5829143";
+        if (vipIdDisplay) vipIdDisplay.textContent = `ID: ${user7Id}`;
+        if (vipSidebarUserId) vipSidebarUserId.textContent = user7Id;
 
         startVipGrandVerticalRadarEngine();
     } else {
@@ -417,7 +443,7 @@ function updateAuthPublicHeader() {
         guestButtons?.classList.add("hidden");
         userProfileBadge?.classList.remove("hidden");
         if (navUserName) navUserName.textContent = currentUser.name || "Client";
-        if (navUserIdTag) navUserIdTag.textContent = `ID: ${currentUser.uniqueId || "CRASH-5829143"}`;
+        if (navUserIdTag) navUserIdTag.textContent = `ID: ${sanitize7DigitId(currentUser.uniqueId)}`;
 
         if (!currentUser.isSubscribed) {
             siteAlertBanner?.classList.remove("hidden");
@@ -432,7 +458,7 @@ function updateAuthPublicHeader() {
 }
 
 /* -------------------------------------------------------------------------- */
-/* 4. COMPTEUR DE DIRECT RÉALISTE : VARIATIONS 2 000 À 5 000 / 3 À 5 SECONDES */
+/* 4. COMPTEUR DE DIRECT : VARIATIONS DE 2 000 À 5 000 SESSIONS / 3 À 5 SEC   */
 /* -------------------------------------------------------------------------- */
 
 function initLiveOnlineUsersTicker() {
@@ -443,15 +469,14 @@ function initLiveOnlineUsersTicker() {
         return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
     }
 
-    // Valeur de départ réaliste dans la tranche
     let currentSessions = 1438920;
     liveCounterEl.textContent = formatNumber(currentSessions);
 
     function stepTraffic() {
-        // Paquet aléatoire entre 2 000 et 5 000
+        // Paquet aléatoire compris entre 2 000 et 5 000 sessions
         const delta = Math.floor(2000 + Math.random() * 3001);
         
-        // 55% de chance de montée, 45% de descente pour un flux vivant
+        // Mouvement naturel de trafic (55% montée / 45% descente)
         const isRise = Math.random() < 0.55;
 
         if (isRise) {
@@ -460,7 +485,7 @@ function initLiveOnlineUsersTicker() {
             currentSessions -= delta;
         }
 
-        // Maintien rigoureux dans la tranche 1 000 000 à 2 000 000
+        // Maintien rigoureux et garanti dans la tranche 1 000 000 à 2 000 000
         if (currentSessions > 1940000) {
             currentSessions -= Math.floor(7000 + Math.random() * 4000);
         } else if (currentSessions < 1060000) {
@@ -474,12 +499,11 @@ function initLiveOnlineUsersTicker() {
         setTimeout(stepTraffic, nextDelay);
     }
 
-    // Lancement du cycle
     setTimeout(stepTraffic, 3500);
 }
 
 /* -------------------------------------------------------------------------- */
-/* 2. BANDEAU D'ACTIVITÉ EN FLUX NORMAL (NON FLOTTANT)                        */
+/* 2. BANDEAU D'ACTIVITÉ PRO ET ÉLÉGANT                                       */
 /* -------------------------------------------------------------------------- */
 
 function initLiveFlashSocialNotifications() {
@@ -498,11 +522,11 @@ function initLiveFlashSocialNotifications() {
         if (flashSubtitle) flashSubtitle.textContent = item.text;
 
         flashBox.classList.add("pulse-highlight");
-        setTimeout(() => flashBox.classList.remove("pulse-highlight"), 1200);
+        setTimeout(() => flashBox.classList.remove("pulse-highlight"), 1400);
     }
 
     triggerFlash();
-    setInterval(triggerFlash, 6500);
+    setInterval(triggerFlash, 5500);
 }
 
 function initGuaranteed48hCountdown() {
@@ -531,7 +555,7 @@ function initGuaranteed48hCountdown() {
 }
 
 /* -------------------------------------------------------------------------- */
-/* 5. GESTION DES 105 AVIS CLIENTS                                            */
+/* GESTION DES 113 AVIS CLIENTS                                               */
 /* -------------------------------------------------------------------------- */
 
 function renderCommentsList() {
@@ -961,7 +985,7 @@ function initAuthSecurity() {
                     if (data) {
                         found = {
                             id: data.id || Date.now(),
-                            uniqueId: data.unique_id || generateUniqueId(),
+                            uniqueId: sanitize7DigitId(data.unique_id),
                             name: data.name || "Client",
                             email: data.email,
                             phone: data.phone || "",
@@ -1032,9 +1056,10 @@ function initProfileModal() {
     userProfileBadge?.addEventListener("click", () => {
         if (!currentUser) return;
 
+        const user7Id = sanitize7DigitId(currentUser.uniqueId);
         if (profileNameDisplay) profileNameDisplay.textContent = currentUser.name;
         if (profileEmailDisplay) profileEmailDisplay.textContent = currentUser.email;
-        if (profileUniqueIdDisplay) profileUniqueIdDisplay.textContent = currentUser.uniqueId || "CRASH-5829143";
+        if (profileUniqueIdDisplay) profileUniqueIdDisplay.textContent = user7Id;
         if (profilePhoneInput) profilePhoneInput.value = currentUser.phone || "";
 
         if (profileStatusBadge) {
@@ -1441,7 +1466,7 @@ async function renderAdminUsersTable() {
                     } else {
                         usersDb.push({
                             id: cloudUser.id || Date.now(),
-                            uniqueId: cloudUser.unique_id || generateUniqueId(),
+                            uniqueId: sanitize7DigitId(cloudUser.unique_id),
                             name: cloudUser.name || "Client",
                             email: cloudUser.email,
                             phone: cloudUser.phone || "",
@@ -1462,7 +1487,7 @@ async function renderAdminUsersTable() {
 
     tbody.innerHTML = usersDb.map((u) => `
         <tr>
-            <td><strong class="gold-code">${escapeHtml(u.uniqueId || "CRASH-5829143")}</strong></td>
+            <td><strong class="gold-code">${escapeHtml(sanitize7DigitId(u.uniqueId))}</strong></td>
             <td>${escapeHtml(u.name || "Client")}</td>
             <td>${escapeHtml(u.email || "-")}</td>
             <td>
