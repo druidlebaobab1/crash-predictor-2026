@@ -451,15 +451,30 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 .countdown-promo-badge {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    background: rgba(239, 68, 68, 0.15);
-    border: 1px solid rgba(239, 68, 68, 0.5);
-    padding: 5px 14px;
+    gap: 10px;
+    background: rgba(185, 28, 28, 0.55);
+    border: 2px solid #f87171;
+    padding: 8px 16px;
     border-radius: 20px;
-    color: #fecaca;
-    font-size: 0.8rem;
-    font-weight: 700;
+    color: #fff;
+    font-size: 0.92rem;
+    font-weight: 800;
     margin-bottom: 12px;
+    box-shadow: 0 0 18px rgba(239, 68, 68, 0.55);
+    letter-spacing: 0.02em;
+}
+
+.promo-alarm-icon {
+    font-size: 1.55rem;
+    line-height: 1;
+    filter: drop-shadow(0 0 6px rgba(255, 200, 55, 0.7));
+}
+
+.countdown-timer-text {
+    color: #ffc837;
+    font-weight: 900;
+    font-size: 1.05em;
+    text-shadow: 0 0 8px rgba(255, 200, 55, 0.45);
 }
 
 .hero-main-title {

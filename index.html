@@ -7,6 +7,35 @@
     <title data-i18n="doc_title">CRASH PREDICTOR 2026 | Cockpit d'Analyse et Prédictions Officielles</title>
     <meta name="description" content="Crash Predictor 2026 — Plateforme d'analyse algorithmique en temps réel, cockpit interactif et accès permanent.">
     <link rel="icon" href="assets/crash_hd.jpg" type="image/jpeg">
+    <script>
+    (function () {
+        try {
+            var key = "crash_user_lang_pref";
+            var lang = null;
+            try { lang = localStorage.getItem(key); } catch (e) {}
+            if (!lang) {
+                var match = document.cookie.match(/(?:^|; )crash_lang=([^;]*)/);
+                if (match) lang = decodeURIComponent(match[1]);
+            }
+            if (!lang) {
+                var list = [];
+                if (navigator.languages && navigator.languages.length) {
+                    for (var i = 0; i < navigator.languages.length; i++) list.push(navigator.languages[i]);
+                }
+                if (navigator.language) list.push(navigator.language);
+                if (navigator.userLanguage) list.push(navigator.userLanguage);
+                for (var j = 0; j < list.length; j++) {
+                    var code = String(list[j] || "").toLowerCase().split("-")[0];
+                    if (code === "fr" || code === "en" || code === "es" || code === "pt" || code === "de") {
+                        lang = code;
+                        break;
+                    }
+                }
+            }
+            if (lang) document.documentElement.lang = lang;
+        } catch (err) {}
+    })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
@@ -125,8 +154,8 @@
                 <div class="section-container">
                     <div class="hero-header-text text-center">
                         <div class="countdown-promo-badge">
-                            <i class="fa-solid fa-stopwatch text-gold pulse-icon" aria-hidden="true"></i>
-                            <span><span data-i18n="promo_offer">Offre 50 $ :</span> <strong class="countdown-timer-text">47h 59m 50s</strong> <span data-i18n="promo_remaining">restante(s)</span></span>
+                            <span class="promo-alarm-icon" aria-hidden="true">⏰</span>
+                            <span><span data-i18n="promo_offer">DERNIÈRE CHANCE 50 $ :</span> <strong class="countdown-timer-text">47h 59m 50s</strong></span>
                         </div>
                         <h1 class="hero-main-title">CRASH <span class="gradient-gold">PREDICTOR 2026</span></h1>
                         <p class="hero-subtitle-desc" data-i18n="hero_subtitle">Plateforme d'analyse haute fréquence et anticipation des trajectoires en direct.</p>

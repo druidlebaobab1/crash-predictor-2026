@@ -35,7 +35,7 @@ const TRANSLATIONS = {
         badge_edition: "ÉDITION 2026",
         nav_login: "Connexion",
         nav_register: "Inscription",
-        promo_offer: "Offre 50 $ :",
+        promo_offer: "DERNIÈRE CHANCE 50 $ :",
         promo_remaining: "restante(s)",
         hero_subtitle: "Plateforme d'analyse haute fréquence et anticipation des trajectoires en direct.",
         badge_algo: "MOTEUR 2026",
@@ -138,7 +138,7 @@ const TRANSLATIONS = {
         badge_edition: "2026 EDITION",
         nav_login: "Login",
         nav_register: "Sign Up",
-        promo_offer: "$50 Offer:",
+        promo_offer: "LAST CHANCE $50:",
         promo_remaining: "remaining",
         hero_subtitle: "High-frequency algorithmic analysis and real-time flight trajectory anticipation.",
         badge_algo: "2026 ENGINE",
@@ -241,7 +241,7 @@ const TRANSLATIONS = {
         badge_edition: "EDICIÓN 2026",
         nav_login: "Iniciar Sesión",
         nav_register: "Registrarse",
-        promo_offer: "Oferta 50 $:",
+        promo_offer: "ÚLTIMA OPORTUNIDAD 50 $:",
         promo_remaining: "restante(s)",
         hero_subtitle: "Plataforma de análisis de alta frecuencia y anticipación de trayectorias en vivo.",
         badge_algo: "MOTOR 2026",
@@ -344,7 +344,7 @@ const TRANSLATIONS = {
         badge_edition: "EDIÇÃO 2026",
         nav_login: "Entrar",
         nav_register: "Registar",
-        promo_offer: "Oferta 50 $:",
+        promo_offer: "ÚLTIMA CHANCE 50 $:",
         promo_remaining: "restante(s)",
         hero_subtitle: "Plataforma de análise de alta frequência e antecipação de trajetórias em tempo real.",
         badge_algo: "MOTOR 2026",
@@ -447,7 +447,7 @@ const TRANSLATIONS = {
         badge_edition: "EDITION 2026",
         nav_login: "Anmelden",
         nav_register: "Registrieren",
-        promo_offer: "50 $ Angebot:",
+        promo_offer: "LETZTE CHANCE 50 $:",
         promo_remaining: "verbleibend",
         hero_subtitle: "Hochfrequenz-Algorithmen und Echtzeit-Flugbahnvorhersage im Live-Cockpit.",
         badge_algo: "2026 ENGINE",
@@ -717,24 +717,56 @@ document.addEventListener("DOMContentLoaded", () => {
 /* SYSTÈME DE TRADUCTION & GÉOLOCALISATION IP (VPN SUPPORT)                   */
 /* -------------------------------------------------------------------------- */
 
+function persistLanguagePreference(lang) {
+    try {
+        localStorage.setItem(CONFIG.langKey, lang);
+    } catch (e) {}
+    document.cookie = "crash_lang=" + encodeURIComponent(lang) + ";path=/;max-age=31536000;SameSite=Lax";
+}
+
+function readLanguagePreference() {
+    try {
+        const saved = localStorage.getItem(CONFIG.langKey);
+        if (saved && TRANSLATIONS[saved]) return saved;
+    } catch (e) {}
+    const cookieMatch = document.cookie.match(/(?:^|; )crash_lang=([^;]*)/);
+    if (cookieMatch) {
+        const cookieLang = decodeURIComponent(cookieMatch[1]);
+        if (TRANSLATIONS[cookieLang]) return cookieLang;
+    }
+    return null;
+}
+
+function detectBrowserLanguage() {
+    const candidates = [];
+    try {
+        if (navigator.languages && navigator.languages.length) {
+            for (let i = 0; i < navigator.languages.length; i++) {
+                candidates.push(navigator.languages[i]);
+            }
+        }
+    } catch (e) {}
+    if (navigator.language) candidates.push(navigator.language);
+    if (navigator.userLanguage) candidates.push(navigator.userLanguage);
+    try {
+        const intlLocale = Intl.DateTimeFormat().resolvedOptions().locale;
+        if (intlLocale) candidates.push(intlLocale);
+    } catch (e) {}
+
+    for (let i = 0; i < candidates.length; i++) {
+        const code = String(candidates[i] || "").toLowerCase().split("-")[0];
+        if (TRANSLATIONS[code]) return code;
+    }
+    return "en";
+}
+
 async function initLanguageSystem() {
     initLanguageDropdown();
 
-    // 1. Initial render rapide via langue du navigateur ou préférence locale
-    const saved = localStorage.getItem(CONFIG.langKey);
-    let initialLang = saved;
-    if (!initialLang) {
-        const navLang = (navigator.language || navigator.userLanguage || "en").toLowerCase();
-        if (navLang.startsWith("fr")) initialLang = "fr";
-        else if (navLang.startsWith("es")) initialLang = "es";
-        else if (navLang.startsWith("pt")) initialLang = "pt";
-        else if (navLang.startsWith("de")) initialLang = "de";
-        else initialLang = "en";
-    }
+    const saved = readLanguagePreference();
+    const initialLang = saved || detectBrowserLanguage();
+    applyLanguage(initialLang, !saved);
 
-    applyLanguage(initialLang, false);
-
-    // 2. Détection asynchrone par IP si l'utilisateur n'a pas fixé manuellement son choix
     if (!saved) {
         detectVisitorCountryAndApplyLang();
     }
@@ -754,8 +786,8 @@ async function detectVisitorCountryAndApplyLang() {
             const data = await res.json();
             const country = (data.country_code || "").toUpperCase();
             const detected = mapCountryToLanguage(country);
-            if (detected && detected !== currentLang) {
-                applyLanguage(detected, false);
+            if (detected && detected !== currentLang && detectBrowserLanguage() === "en") {
+                applyLanguage(detected, true);
             }
             return;
         }
@@ -770,8 +802,8 @@ async function detectVisitorCountryAndApplyLang() {
                 const data2 = await res2.json();
                 const country = (data2.country_code || "").toUpperCase();
                 const detected = mapCountryToLanguage(country);
-                if (detected && detected !== currentLang) {
-                    applyLanguage(detected, false);
+                if (detected && detected !== currentLang && detectBrowserLanguage() === "en") {
+                    applyLanguage(detected, true);
                 }
             }
         } catch (err) {}
@@ -807,7 +839,7 @@ function applyLanguage(lang, saveUserChoice = true) {
     currentLang = lang;
 
     if (saveUserChoice) {
-        localStorage.setItem(CONFIG.langKey, lang);
+        persistLanguagePreference(lang);
     }
 
     const dict = TRANSLATIONS[lang];
@@ -955,8 +987,14 @@ async function hashPassword(password) {
 
 async function passwordMatches(user, password) {
     if (!user?.passwordHash) return false;
-    if (user.passwordHash === btoa(password)) return true;
-    return user.passwordHash === await hashPassword(password);
+    const candidates = [String(password || ""), String(password || "").trim()];
+    const unique = candidates.filter((value, index, arr) => value && arr.indexOf(value) === index);
+    for (let i = 0; i < unique.length; i++) {
+        const candidate = unique[i];
+        if (user.passwordHash === btoa(candidate)) return true;
+        if (user.passwordHash === await hashPassword(candidate)) return true;
+    }
+    return false;
 }
 
 function setButtonLoading(button, loading, idleHtml) {
@@ -977,6 +1015,16 @@ function digitsOnly(value) {
 
 function isValidPhone(value) {
     return digitsOnly(value).length >= 8;
+}
+
+function normalizeMemberIdInput(raw) {
+    const trimmed = String(raw || "").trim();
+    const withoutLabel = trimmed.replace(/^ID\s*:\s*/i, "").replace(/\s+/g, "");
+    const digits = withoutLabel.replace(/\D/g, "");
+    if (/^CRASH/i.test(withoutLabel) || /^\d{7}$/.test(digits)) {
+        return formatMemberId(digits);
+    }
+    return withoutLabel.toUpperCase();
 }
 
 function isValidEmail(value) {
@@ -1299,7 +1347,6 @@ function renderCommentsList() {
                     <div class="comment-lang-badge">${escapeHtml(c.lang)}</div>
                     <div class="comment-username">${escapeHtml(c.username)} <i class="fa-solid fa-circle-check text-green"></i></div>
                 </div>
-                <div class="comment-gain-badge">${escapeHtml(c.gain)}</div>
             </div>
             <p class="comment-text">"${escapeHtml(c.comment)}"</p>
         </div>
@@ -1683,7 +1730,7 @@ function initAuthSecurity() {
         logForm.addEventListener("submit", async (e) => {
             e.preventDefault();
             const identifier = document.getElementById("loginEmail").value.trim();
-            const password = document.getElementById("loginPassword").value;
+            const password = String(document.getElementById("loginPassword")?.value || "").trim();
 
             if (!identifier) {
                 showToast("Email ou ID requis.", "error");
@@ -1692,17 +1739,30 @@ function initAuthSecurity() {
 
             setButtonLoading(loginSubmitBtn, true);
             const usersDb = loadUsersDb();
-            const lowerId = identifier.toLowerCase();
-            const upperId = identifier.toUpperCase();
-            let found = usersDb.find((u) => u.email === lowerId || u.uniqueId === upperId);
+            const emailKey = identifier.toLowerCase();
+            const memberId = normalizeMemberIdInput(identifier);
+            const idDigits = identifier.replace(/\D/g, "");
+            let found = usersDb.find((u) => {
+                const email = String(u.email || "").toLowerCase();
+                const uid = String(u.uniqueId || "").toUpperCase();
+                const uidDigits = uid.replace(/\D/g, "");
+                return email === emailKey
+                    || uid === memberId
+                    || uid === identifier.toUpperCase().replace(/^ID:\s*/i, "").replace(/\s+/g, "")
+                    || (idDigits.length >= 7 && uidDigits === idDigits);
+            });
 
             if (!found && supabaseClient) {
                 try {
-                    const { data } = await supabaseClient
-                        .from("users")
-                        .select("*")
-                        .or(`email.eq.${lowerId},unique_id.eq.${upperId}`)
-                        .maybeSingle();
+                    const safeEmail = emailKey.replace(/"/g, "");
+                    const safeId = memberId.replace(/"/g, "");
+                    let query = supabaseClient.from("users").select("*");
+                    if (safeEmail.includes("@")) {
+                        query = query.or(`email.eq."${safeEmail}",unique_id.eq."${safeId}"`);
+                    } else {
+                        query = query.eq("unique_id", safeId);
+                    }
+                    const { data } = await query.maybeSingle();
 
                     if (data) {
                         found = {
@@ -1783,6 +1843,16 @@ function initProfileModal() {
         if (profileEmailDisplay) profileEmailDisplay.textContent = currentUser.email;
         if (profileUniqueIdDisplay) profileUniqueIdDisplay.textContent = user7Id;
         if (profilePhoneInput) profilePhoneInput.value = currentUser.phone || "";
+        if (profilePhoneInput) {
+            const locked = Boolean(String(currentUser.phone || "").trim());
+            profilePhoneInput.disabled = locked;
+            profilePhoneInput.readOnly = locked;
+            if (btnSavePhone) {
+                btnSavePhone.disabled = locked;
+                btnSavePhone.style.opacity = locked ? "0.5" : "";
+                btnSavePhone.style.pointerEvents = locked ? "none" : "";
+            }
+        }
 
         if (profileStatusBadge) {
             if (!currentUser.isSubscribed) {
@@ -1802,39 +1872,60 @@ function initProfileModal() {
     closeProfile?.addEventListener("click", () => profileModal?.classList.remove("active"));
 
     btnSavePhone?.addEventListener("click", async () => {
-        if (!currentUser) return;
-        const phone = profilePhoneInput.value.trim();
-        if (phone && !isValidPhone(phone)) {
-            showToast("Numéro de téléphone invalide.", "error");
-            return;
+        try {
+            if (!currentUser) return;
+            if (String(currentUser.phone || "").trim()) return;
+            if (!profilePhoneInput) return;
+            const phone = String(profilePhoneInput.value || "").trim();
+            if (!phone || !isValidPhone(phone)) {
+                showToast("Numéro de téléphone invalide.", "error");
+                return;
+            }
+            currentUser.phone = phone;
+            await saveUserSession(currentUser, true);
+            profilePhoneInput.disabled = true;
+            profilePhoneInput.readOnly = true;
+            btnSavePhone.disabled = true;
+            btnSavePhone.style.opacity = "0.5";
+            btnSavePhone.style.pointerEvents = "none";
+            showToast("Numéro de téléphone enregistré !");
+        } catch (err) {
+            showToast("Enregistrement impossible. Réessayez.", "error");
         }
-        currentUser.phone = phone;
-        await saveUserSession(currentUser, true);
-        showToast("Numéro de téléphone enregistré !");
     });
 
     formUpdatePassword?.addEventListener("submit", async (e) => {
         e.preventDefault();
         if (!currentUser) return;
 
-        const oldPass = document.getElementById("profileOldPassword").value;
-        const newPass = document.getElementById("profileNewPassword").value;
-        const confirmPass = document.getElementById("profileConfirmNewPassword").value;
+        try {
+            const oldPass = String(document.getElementById("profileOldPassword")?.value || "").trim();
+            const newPass = String(document.getElementById("profileNewPassword")?.value || "").trim();
+            const confirmPass = String(document.getElementById("profileConfirmNewPassword")?.value || "").trim();
 
-        const match = await passwordMatches(currentUser, oldPass);
-        if (!match) {
-            showToast("Mot de passe actuel incorrect.", "error");
-            return;
-        }
-        if (!newPass || newPass.length < 6 || newPass !== confirmPass) {
-            showToast("Vérifiez les nouveaux mots de passe (6+ caractères identiques).", "error");
-            return;
-        }
+            if (currentUser.passwordHash) {
+                const match = await passwordMatches(currentUser, oldPass);
+                if (!match) {
+                    showToast("Mot de passe actuel incorrect.", "error");
+                    return;
+                }
+            }
+            if (newPass.length < 6) {
+                showToast("Le nouveau mot de passe doit contenir au moins 6 caractères.", "error");
+                return;
+            }
+            if (newPass !== confirmPass) {
+                showToast("La confirmation ne correspond pas au nouveau mot de passe.", "error");
+                return;
+            }
 
-        currentUser.passwordHash = await hashPassword(newPass);
-        await saveUserSession(currentUser, true);
-        formUpdatePassword.reset();
-        showToast("Mot de passe mis à jour !");
+            currentUser.passwordHash = await hashPassword(newPass);
+            await saveUserSession(currentUser, true);
+            formUpdatePassword.reset();
+            showToast("Mot de passe mis à jour !");
+        } catch (err) {
+            showToast("Mise à jour impossible. Réessayez.", "error");
+        }
     });
 
     btnProfileSubscribe?.addEventListener("click", () => {
