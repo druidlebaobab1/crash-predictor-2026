@@ -46,6 +46,8 @@ body {
     line-height: 1.5;
     min-height: 100vh;
     -webkit-tap-highlight-color: transparent;
+    padding-left: env(safe-area-inset-left, 0);
+    padding-right: env(safe-area-inset-right, 0);
 }
 
 img { max-width: 100%; display: block; }
@@ -223,7 +225,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 }
 .btn-alert-unlock:hover { background: #dc2626; }
 
-/* ================= BARRE DE NAVIGATION (RESPONSIVE & CADRAGE) ================= */
+/* ================= BARRE DE NAVIGATION (AÉRÉE, VISIBLE & CADRÉE) ================= */
 .main-navbar {
     position: sticky;
     top: 0;
@@ -238,18 +240,19 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 .nav-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 16px;
+    padding: 0 18px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
+    gap: 12px;
     box-sizing: border-box;
+    width: 100%;
 }
 
 .brand-logo {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     text-decoration: none;
     color: #fff;
     flex-shrink: 0;
@@ -273,7 +276,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 .nav-auth-actions {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     flex-shrink: 0;
 }
 
@@ -1271,16 +1274,31 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 }
 
 @media (max-width: 600px) {
-    .nav-container { padding: 0 10px; gap: 6px; }
-    .brand-logo { gap: 6px; }
-    .logo-image-wrap { width: 28px; height: 28px; border-radius: 6px; }
-    .logo-title { font-size: 0.84rem; }
+    .main-navbar { padding: 8px 0; }
+    .nav-container { padding: 0 14px; gap: 8px; justify-content: space-between; }
+    
+    .brand-logo { gap: 6px; min-width: 0; flex-shrink: 1; }
+    .logo-image-wrap { width: 30px; height: 30px; border-radius: 6px; flex-shrink: 0; }
+    .logo-title { font-size: 0.86rem; letter-spacing: -0.2px; }
     .logo-badge { display: none; }
     
-    .nav-auth-actions { gap: 4px; }
-    .guest-buttons { gap: 4px; }
-    .btn-ghost-compact { padding: 5px 8px; font-size: 0.72rem; border-radius: 6px; gap: 4px; }
-    .btn-primary-compact { padding: 5px 10px; font-size: 0.74rem; font-weight: 800; border-radius: 6px; gap: 4px; }
+    .nav-auth-actions { flex-shrink: 0; margin-right: 0; }
+    .guest-buttons { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    
+    .btn-ghost-compact {
+        padding: 6px 9px;
+        font-size: 0.74rem;
+        border-radius: 8px;
+        gap: 4px;
+    }
+    .btn-primary-compact {
+        padding: 6px 12px;
+        font-size: 0.76rem;
+        font-weight: 800;
+        border-radius: 8px;
+        gap: 4px;
+        box-shadow: 0 2px 10px rgba(255, 200, 55, 0.4);
+    }
     
     .user-info-text { display: none; }
     .momo-chips-simple-grid { grid-template-columns: repeat(2, 1fr); }
@@ -1297,11 +1315,11 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     .benefit-text { font-size: 0.8rem; padding-left: 24px; }
 }
 
-@media (max-width: 360px) {
-    .nav-container { padding: 0 6px; }
-    .logo-title { font-size: 0.76rem; }
-    .btn-ghost-compact { padding: 4px 6px; font-size: 0.68rem; }
-    .btn-primary-compact { padding: 4px 8px; font-size: 0.70rem; }
+@media (max-width: 375px) {
+    .nav-container { padding: 0 10px; gap: 5px; }
+    .logo-title { font-size: 0.78rem; }
+    .btn-ghost-compact { padding: 5px 7px; font-size: 0.70rem; }
+    .btn-primary-compact { padding: 5px 9px; font-size: 0.72rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
