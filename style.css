@@ -223,7 +223,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 }
 .btn-alert-unlock:hover { background: #dc2626; }
 
-/* ================= BARRE DE NAVIGATION ================= */
+/* ================= BARRE DE NAVIGATION (RESPONSIVE & CADRAGE) ================= */
 .main-navbar {
     position: sticky;
     top: 0;
@@ -232,6 +232,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     background: rgba(10, 6, 20, 0.95);
     border-bottom: 1px solid rgba(255, 200, 55, 0.2);
     padding: 10px 0;
+    width: 100%;
 }
 
 .nav-container {
@@ -242,6 +243,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     align-items: center;
     justify-content: space-between;
     gap: 10px;
+    box-sizing: border-box;
 }
 
 .brand-logo {
@@ -264,7 +266,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 }
 
 .brand-logo-img { width: 100%; height: 100%; object-fit: cover; }
-.logo-title { font-family: var(--font-heading); font-weight: 900; font-size: 1.1rem; line-height: 1.1; }
+.logo-title { font-family: var(--font-heading); font-weight: 900; font-size: 1.1rem; line-height: 1.1; white-space: nowrap; }
 .logo-title .highlight { color: var(--gold-primary); }
 .logo-badge { font-size: 0.55rem; color: #fff; background: rgba(168, 85, 247, 0.4); border: 1px solid var(--purple-neon); padding: 1px 5px; border-radius: 20px; }
 
@@ -290,9 +292,11 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     cursor: pointer;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
     white-space: nowrap;
     transition: var(--transition-smooth);
+    box-sizing: border-box;
 }
 
 .btn-ghost-compact {
@@ -545,7 +549,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 .price-type { color: #10b981; font-weight: 800; font-size: 0.9rem; }
 .price-cfa-conversion { font-size: 0.85rem; color: #f3f4f6; margin-top: 2px; }
 
-/* 1. STRUCTURE AVANTAGES : CARTES VERTICALES ULTRA-PROPRES & PARFAITEMENT ALIGNÉES */
+/* 1. STRUCTURE AVANTAGES : CARTES VERTICALES ULTRA-PROPRES */
 .benefits-vertical-list {
     display: flex;
     flex-direction: column;
@@ -1267,23 +1271,37 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 }
 
 @media (max-width: 600px) {
-    .nav-container { padding: 0 12px; }
-    .logo-title { font-size: 0.88rem; }
+    .nav-container { padding: 0 10px; gap: 6px; }
+    .brand-logo { gap: 6px; }
+    .logo-image-wrap { width: 28px; height: 28px; border-radius: 6px; }
+    .logo-title { font-size: 0.84rem; }
     .logo-badge { display: none; }
-    .btn-ghost-compact, .btn-primary-compact { padding: 6px 10px; font-size: 0.75rem; }
+    
+    .nav-auth-actions { gap: 4px; }
+    .guest-buttons { gap: 4px; }
+    .btn-ghost-compact { padding: 5px 8px; font-size: 0.72rem; border-radius: 6px; gap: 4px; }
+    .btn-primary-compact { padding: 5px 10px; font-size: 0.74rem; font-weight: 800; border-radius: 6px; gap: 4px; }
+    
     .user-info-text { display: none; }
     .momo-chips-simple-grid { grid-template-columns: repeat(2, 1fr); }
     .vip-canvas-viewport.grand-vertical-viewport { height: 360px; }
     .testimonials-stats-bar { grid-template-columns: 1fr; }
     .admin-input-row { flex-direction: column; }
     .alert-banner-content { justify-content: center; text-align: center; }
-    .luxury-alive-box { padding: 16px 12px; gap: 20px; }
+    .luxury-alive-box { padding: 16px 12px; gap: 18px; }
     .price-display-wrapper { padding: 10px 14px; }
     .price-amount { font-size: 1.95rem; }
     .access-title { font-size: 1.22rem; }
     .benefit-card { padding: 10px 12px; }
     .benefit-head { font-size: 0.86rem; }
     .benefit-text { font-size: 0.8rem; padding-left: 24px; }
+}
+
+@media (max-width: 360px) {
+    .nav-container { padding: 0 6px; }
+    .logo-title { font-size: 0.76rem; }
+    .btn-ghost-compact { padding: 4px 6px; font-size: 0.68rem; }
+    .btn-primary-compact { padding: 4px 8px; font-size: 0.70rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
