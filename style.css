@@ -221,7 +221,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 }
 .btn-alert-unlock:hover { background: #dc2626; }
 
-/* ================= BARRE DE NAVIGATION (MOBILE PARFAIT) ================= */
+/* ================= BARRE DE NAVIGATION ================= */
 .main-navbar {
     position: sticky;
     top: 0;
@@ -400,7 +400,13 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     display: grid;
     grid-template-columns: 420px 1fr;
     gap: 30px;
-    align-items: center;
+    align-items: flex-start;
+}
+
+.product-visual-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
 }
 
 .radiant-gold-frame {
@@ -454,6 +460,43 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 .badge-algo { color: var(--gold-primary); background: rgba(255, 200, 55, 0.12); }
 .badge-status-live { color: var(--accent-green); background: rgba(16, 185, 129, 0.12); }
 
+/* 2. BANDEAU D'ACTIVITÉ EN FLUX NORMAL (PAS DE POSITION FIXED/ABSOLUTE) */
+.live-activity-inline-bar {
+    position: static;
+    margin-top: 14px;
+    background: rgba(13, 7, 24, 0.95);
+    border: 1.5px solid var(--gold-primary);
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6), 0 0 10px rgba(255, 200, 55, 0.2);
+    width: 100%;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.live-activity-inline-bar.pulse-highlight {
+    border-color: #34d399;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+}
+
+.flash-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--gold-gradient); color: #0d0614;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0;
+}
+.flash-text-content { display: flex; flex-direction: column; text-align: left; }
+.flash-title { font-family: var(--font-mono); font-weight: 800; font-size: 0.82rem; color: var(--gold-primary); }
+.flash-subtitle { font-size: 0.74rem; color: #34d399; font-weight: 600; }
+
+.product-order-box {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
 .access-title { font-family: var(--font-heading); font-size: 1.5rem; font-weight: 900; margin-bottom: 8px; }
 .access-desc { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px; }
 
@@ -462,7 +505,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     border: 1px solid rgba(255, 200, 55, 0.35);
     border-radius: var(--radius-md);
     padding: 12px 18px;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
 }
 
 .price-main-row { display: flex; align-items: baseline; gap: 8px; }
@@ -470,9 +513,50 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 .price-type { color: #10b981; font-weight: 800; font-size: 0.9rem; }
 .price-cfa-conversion { font-size: 0.85rem; color: #f3f4f6; margin-top: 2px; }
 
-.benefits-checklist { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-.benefits-checklist li { display: flex; align-items: flex-start; gap: 8px; font-size: 0.88rem; font-weight: 500; }
-.benefits-checklist li i { margin-top: 3px; }
+/* 1. STRUCTURE AVANTAGES : BLOC VERTICAL EN DEUX LIGNES (ICÔNE+TITRE HAUT, DESCRIPTION BAS) */
+.benefits-checklist {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 22px;
+    text-align: left;
+}
+
+.benefit-item {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    text-align: left;
+}
+
+.benefit-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.92rem;
+    color: #fff;
+    text-align: left;
+}
+
+.benefit-title-row i {
+    flex-shrink: 0;
+    font-size: 0.95rem;
+}
+
+.benefit-title {
+    font-weight: 800;
+    color: #fff;
+}
+
+.benefit-desc {
+    font-size: 0.84rem;
+    color: #cbd5e1;
+    line-height: 1.45;
+    padding-left: 24px;
+    margin: 0;
+    text-align: left;
+}
 
 .btn-buy-instant,
 .btn-direct-pay-now,
@@ -575,7 +659,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     color: #34d399; background: rgba(16, 185, 129, 0.15);
     padding: 2px 6px; border-radius: 12px; white-space: nowrap;
 }
-.comment-text { font-size: 0.8rem; color: #d1d5db; }
+.comment-text { font-size: 0.8rem; color: #d1d5db; text-align: left; }
 
 .load-more-wrap { margin-top: 8px; }
 
@@ -603,40 +687,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 .admin-discrete-link { color: #4b5563; font-size: 0.72rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
 .admin-discrete-link:hover { color: var(--gold-primary); }
 
-/* ================= LIVE FLASH SOCIAL BOX ================= */
-.live-flash-social-box {
-    position: fixed;
-    bottom: 24px;
-    left: 24px;
-    background: rgba(13, 7, 24, 0.95);
-    border: 1.5px solid var(--gold-primary);
-    border-radius: var(--radius-md);
-    padding: 10px 14px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 200, 55, 0.3);
-    z-index: 999;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    pointer-events: none;
-    backdrop-filter: blur(10px);
-}
-
-.live-flash-social-box.visible { opacity: 1; transform: translateY(0); }
-
-.flash-avatar {
-    width: 32px; height: 32px; border-radius: 50%;
-    background: var(--gold-gradient); color: #0d0614;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px; flex-shrink: 0;
-}
-.flash-text-content { display: flex; flex-direction: column; }
-.flash-title { font-family: var(--font-mono); font-weight: 800; font-size: 0.82rem; color: var(--gold-primary); }
-.flash-subtitle { font-size: 0.74rem; color: #34d399; font-weight: 600; }
-
-/* ================= COCKPIT VIP / RADAR ================= */
+/* ================= COCKPIT RADAR DE VOL ================= */
 .vip-software-navbar {
     background: #06040d;
     border-bottom: 1.5px solid var(--gold-primary);
@@ -870,7 +921,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 .h-badge.green { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
 .h-badge.gold { background: rgba(255, 200, 55, 0.2); color: #ffc837; border: 1px solid #ffc837; }
 
-/* ================= MODALES & BOUTON DE FERMETURE BIEN VISIBLE ================= */
+/* ================= MODALES & BOUTON DE FERMETURE ================= */
 .modal-overlay {
     position: fixed;
     inset: 0;
@@ -903,7 +954,6 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 }
 .modal-overlay.active .modal-card { transform: none; }
 
-/* BOUTON FERMER / CROIX HAUTE VISIBILITÉ */
 .modal-close {
     position: absolute;
     top: 12px;
@@ -1168,11 +1218,9 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 
 /* ================= RESPONSIVE SMARTPHONES & TABLETTES ================= */
 @media (max-width: 992px) {
-    .luxury-alive-box { grid-template-columns: 1fr; text-align: center; }
-    .benefits-checklist li { justify-content: center; text-align: left; }
+    .luxury-alive-box { grid-template-columns: 1fr; text-align: left; }
     .vip-dashboard-grid { grid-template-columns: 1fr; }
     .vip-canvas-viewport.grand-vertical-viewport { height: 420px; }
-    .price-main-row { justify-content: center; }
 }
 
 @media (max-width: 600px) {
@@ -1184,9 +1232,12 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     .momo-chips-simple-grid { grid-template-columns: repeat(2, 1fr); }
     .vip-canvas-viewport.grand-vertical-viewport { height: 360px; }
     .testimonials-stats-bar { grid-template-columns: 1fr; }
-    .live-flash-social-box { left: 12px; right: 12px; bottom: 20px; }
     .admin-input-row { flex-direction: column; }
     .alert-banner-content { justify-content: center; text-align: center; }
+    .luxury-alive-box { padding: 18px 14px; }
+    .price-display-wrapper { padding: 10px 14px; }
+    .price-amount { font-size: 2rem; }
+    .access-title { font-size: 1.25rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

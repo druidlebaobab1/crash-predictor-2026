@@ -1,10 +1,10 @@
 /**
  * CRASH PREDICTOR 2026 — LOGIQUE D'APPLICATION OFFICIELLE
- * - Compteur de trafic fluide 1 000 000 à 2 000 000 (cycle 12h réaliste)
- * - Identifiants membres 5 000 000 à 10 000 000 (ex: ID: CRASH-5829143)
- * - 105 avis clients dynamiques et naturels
- * - Nettoyage total du vocabulaire (aucun terme IA, VIP, Flutterwave, Supabase affiché)
- * - Moteur radar haute précision et synchronisation sécurisée
+ * - Compteur de trafic dynamique avec variations de 2 000 à 5 000 sessions toutes les 3 à 5s (entre 1 000 000 et 2 000 000)
+ * - Identifiants membres strictement sur 7 chiffres : 5 000 000 à 10 000 000 (ex: CRASH-5829143)
+ * - 105 avis clients variés et authentiques
+ * - Bandeau d'activité intégré dans le flux normal (non flottant)
+ * - Moteur radar haute précision et synchronisation Supabase / Flutterwave
  */
 
 const CONFIG = {
@@ -20,9 +20,9 @@ const CONFIG = {
     timerKey: "crash_timer_start_48h_v4"
 };
 
-// ==========================================
-// 105 AVIS CLIENTS DYNAMIQUES & NATURELS (IDs 5 000 000 - 10 000 000)
-// ==========================================
+// ==========================================================================
+// 105 AVIS CLIENTS DYNAMIQUES & NATURELS (IDs 7 CHIFFRES : 5 000 000 - 10 000 000)
+// ==========================================================================
 const WINNER_COMMENTS = [
     { username: "ID: CRASH-5829143", lang: "FR", gain: "+$450", comment: "Cockpit très clair, prédictions nettes et prise en main immédiate." },
     { username: "ID: CRASH-6104829", lang: "FR", gain: "+$820", comment: "Licence rentabilisée rapidement, rien à redire sur la fluidité." },
@@ -106,7 +106,6 @@ const WINNER_COMMENTS = [
     { username: "ID: CRASH-9748102", lang: "FR", gain: "+$1,460", comment: "Très bonne fluidité sur les montées rapides." },
     { username: "ID: CRASH-5310294", lang: "FR", gain: "+$380", comment: "Simple, clair et rentable dès le début." },
     { username: "ID: CRASH-8649102", lang: "FR", gain: "+$820", comment: "Excellente plateforme d'analyse en direct." },
-    // Avis internationaux (Anglais & Espagnol)
     { username: "ID: CRASH-6190482", lang: "ES", gain: "+$580", comment: "Increíble precisión. El cockpit se abrió de inmediato tras el pago." },
     { username: "ID: CRASH-7482910", lang: "ES", gain: "+$920", comment: "Herramienta muy limpia y rápida. Las señales son exactas." },
     { username: "ID: CRASH-8920148", lang: "ES", gain: "+$1,340", comment: "La curva vertical ayuda mucho a visualizar el momento exacto." },
@@ -132,7 +131,7 @@ const WINNER_COMMENTS = [
     { username: "ID: CRASH-9501928", lang: "FR", gain: "+$1,580", comment: "Licence permanente de premier ordre, recommandé à 100%." }
 ];
 
-// FLASH ACTIVATION NOTIFICATIONS (IDs 5M - 10M)
+// NOTIFICATIONS D'ACTIVATION (IDs 7 CHIFFRES : 5 000 000 - 10 000 000)
 const FLASH_NOTIFICATIONS = [
     { idTag: "ID: CRASH-5829143", text: "vient d'activer sa licence complète" },
     { idTag: "ID: CRASH-7104829", text: "a validé son accès permanent" },
@@ -140,7 +139,9 @@ const FLASH_NOTIFICATIONS = [
     { idTag: "ID: CRASH-8492019", text: "a activé sa licence avec succès" },
     { idTag: "ID: CRASH-9248105", text: "vient de rejoindre la session active" },
     { idTag: "ID: CRASH-5710294", text: "a déverrouillé le radar de vol" },
-    { idTag: "ID: CRASH-8910472", text: "vient d'activer son ID membre officiel" }
+    { idTag: "ID: CRASH-8910472", text: "vient d'activer son ID membre officiel" },
+    { idTag: "ID: CRASH-6749102", text: "a validé son accès à vie" },
+    { idTag: "ID: CRASH-9120485", text: "vient de débloquer le radar de vol" }
 ];
 
 let supabaseClient = null;
@@ -175,7 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /* -------------------------------------------------------------------------- */
-/* Utilitaires & ID Range 5 000 000 - 10 000 000                              */
+/* 3. FORMAT DES NUMÉROS D'ID (7 CHIFFRES STRICTS : 5 000 000 À 10 000 000)   */
 /* -------------------------------------------------------------------------- */
 
 function readJson(key, fallback) {
@@ -209,13 +210,13 @@ function escapeHtml(value) {
     }[char]));
 }
 
-// GENERATION D'IDENTIFIANTS DANS LA TRANCHE 5 000 000 A 10 000 000
+// Génération obligatoire d'un identifiant à 7 chiffres (5 000 000 à 10 000 000)
 function generateUniqueId() {
     const users = loadUsersDb();
     let candidate = "";
     do {
-        const randomNum = Math.floor(5000000 + Math.random() * 5000000);
-        candidate = `CRASH-${randomNum}`;
+        const random7Digits = Math.floor(5000000 + Math.random() * 5000000);
+        candidate = `CRASH-${random7Digits}`;
     } while (users.some((user) => user.uniqueId === candidate));
     return candidate;
 }
@@ -273,18 +274,23 @@ function initSupabase() {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Identité & Session                                                         */
+/* Identité & Session (Garantie 7 Chiffres)                                   */
 /* -------------------------------------------------------------------------- */
 
 function initUserIdentity() {
-    if (!currentUser) {
-        const storedGuestId = localStorage.getItem(CONFIG.guestIdKey);
-        if (!storedGuestId || !storedGuestId.startsWith("CRASH-") || parseInt(storedGuestId.replace(/\D/g, ""), 10) < 5000000) {
-            localStorage.setItem(CONFIG.guestIdKey, generateUniqueId());
+    const storedGuestId = localStorage.getItem(CONFIG.guestIdKey);
+    const numPart = storedGuestId ? parseInt(storedGuestId.replace(/\D/g, ""), 10) : 0;
+
+    if (!storedGuestId || numPart < 5000000 || numPart >= 10000000) {
+        localStorage.setItem(CONFIG.guestIdKey, generateUniqueId());
+    }
+
+    if (currentUser) {
+        const userNum = parseInt(String(currentUser.uniqueId || "").replace(/\D/g, ""), 10);
+        if (!currentUser.uniqueId || userNum < 5000000 || userNum >= 10000000) {
+            currentUser.uniqueId = generateUniqueId();
+            saveUserSession(currentUser, false);
         }
-    } else if (!currentUser.uniqueId || parseInt(String(currentUser.uniqueId).replace(/\D/g, ""), 10) < 5000000) {
-        currentUser.uniqueId = generateUniqueId();
-        saveUserSession(currentUser, false);
     }
 }
 
@@ -426,7 +432,7 @@ function updateAuthPublicHeader() {
 }
 
 /* -------------------------------------------------------------------------- */
-/* 1. COMPTEUR DE TRAFIC FLUIDE & NATUREL (1 000 000 À 2 000 000 - CYCLE 12H) */
+/* 4. COMPTEUR DE DIRECT RÉALISTE : VARIATIONS 2 000 À 5 000 / 3 À 5 SECONDES */
 /* -------------------------------------------------------------------------- */
 
 function initLiveOnlineUsersTicker() {
@@ -437,36 +443,43 @@ function initLiveOnlineUsersTicker() {
         return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
     }
 
-    // Calcul d'un trafic réaliste sur un cycle régulier de 12 heures
-    function calculateTraffic() {
-        const CYCLE_12H = 12 * 60 * 60 * 1000;
-        const now = Date.now();
-        const cycleProgress = (now % CYCLE_12H) / CYCLE_12H;
+    // Valeur de départ réaliste dans la tranche
+    let currentSessions = 1438920;
+    liveCounterEl.textContent = formatNumber(currentSessions);
+
+    function stepTraffic() {
+        // Paquet aléatoire entre 2 000 et 5 000
+        const delta = Math.floor(2000 + Math.random() * 3001);
         
-        // Courbe sinusoïdale fluide centrée à 1 500 000 ± 420 000
-        const sineWave = Math.sin(cycleProgress * Math.PI * 2);
-        const baseline = 1500000 + sineWave * 420000;
-        
-        // Micro-variations réalistes (bruit fluide)
-        const microNoise = Math.sin(now / 14000) * 12000 + Math.cos(now / 7000) * 8500;
-        const total = Math.max(1050000, Math.min(1980000, baseline + microNoise));
-        return total;
+        // 55% de chance de montée, 45% de descente pour un flux vivant
+        const isRise = Math.random() < 0.55;
+
+        if (isRise) {
+            currentSessions += delta;
+        } else {
+            currentSessions -= delta;
+        }
+
+        // Maintien rigoureux dans la tranche 1 000 000 à 2 000 000
+        if (currentSessions > 1940000) {
+            currentSessions -= Math.floor(7000 + Math.random() * 4000);
+        } else if (currentSessions < 1060000) {
+            currentSessions += Math.floor(7000 + Math.random() * 4000);
+        }
+
+        liveCounterEl.textContent = formatNumber(currentSessions);
+
+        // Prochain intervalle aléatoire entre 3 et 5 secondes (3000ms à 5000ms)
+        const nextDelay = Math.floor(3000 + Math.random() * 2001);
+        setTimeout(stepTraffic, nextDelay);
     }
 
-    let currentVal = calculateTraffic();
-    liveCounterEl.textContent = formatNumber(currentVal);
-
-    setInterval(() => {
-        const targetVal = calculateTraffic();
-        // Transition douce vers la nouvelle valeur
-        currentVal += (targetVal - currentVal) * 0.15 + (Math.random() - 0.49) * 120;
-        currentVal = Math.max(1005000, Math.min(1995000, currentVal));
-        liveCounterEl.textContent = formatNumber(currentVal);
-    }, 1800);
+    // Lancement du cycle
+    setTimeout(stepTraffic, 3500);
 }
 
 /* -------------------------------------------------------------------------- */
-/* Notifications Flash & Compte à Rebours                                     */
+/* 2. BANDEAU D'ACTIVITÉ EN FLUX NORMAL (NON FLOTTANT)                        */
 /* -------------------------------------------------------------------------- */
 
 function initLiveFlashSocialNotifications() {
@@ -484,12 +497,12 @@ function initLiveFlashSocialNotifications() {
         if (flashTitle) flashTitle.textContent = item.idTag;
         if (flashSubtitle) flashSubtitle.textContent = item.text;
 
-        flashBox.classList.add("visible");
-        setTimeout(() => flashBox.classList.remove("visible"), 3800);
+        flashBox.classList.add("pulse-highlight");
+        setTimeout(() => flashBox.classList.remove("pulse-highlight"), 1200);
     }
 
-    setTimeout(triggerFlash, 3200);
-    setInterval(triggerFlash, 8800);
+    triggerFlash();
+    setInterval(triggerFlash, 6500);
 }
 
 function initGuaranteed48hCountdown() {
@@ -518,7 +531,7 @@ function initGuaranteed48hCountdown() {
 }
 
 /* -------------------------------------------------------------------------- */
-/* 5. GESTION DES 105 AVIS CLIENTS & PAGINATION FLUIDE                        */
+/* 5. GESTION DES 105 AVIS CLIENTS                                            */
 /* -------------------------------------------------------------------------- */
 
 function renderCommentsList() {
@@ -559,7 +572,7 @@ function initLoadMoreComments() {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Radar de Vol & Cockpit Interactif                                          */
+/* Cockpit Radar de Vol                                                       */
 /* -------------------------------------------------------------------------- */
 
 function stopVipRadarEngine() {

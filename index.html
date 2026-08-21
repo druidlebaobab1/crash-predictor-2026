@@ -31,7 +31,7 @@
                 </div>
                 <div class="live-counter-box">
                     <i class="fa-solid fa-users text-gold" aria-hidden="true"></i>
-                    <span id="liveOnlineUsersCount" class="live-counter-highlight">1 428 590</span>
+                    <span id="liveOnlineUsersCount" class="live-counter-highlight">1 438 920</span>
                     <span class="live-sub-label">sessions actives • moteur d'analyse</span>
                 </div>
             </div>
@@ -56,7 +56,7 @@
             </div>
         </div>
 
-        <!-- BARRE DE NAVIGATION (MOBILE 100% VISIBLE ET CADRE) -->
+        <!-- BARRE DE NAVIGATION (MOBILE 100% VISIBLE ET CADRÉ) -->
         <header class="main-navbar">
             <div class="nav-container">
                 <a href="#" class="brand-logo">
@@ -116,6 +116,15 @@
                                 <span class="badge-algo"><i class="fa-solid fa-microchip" aria-hidden="true"></i> MOTEUR 2026</span>
                                 <span class="badge-status-live"><i class="fa-solid fa-bolt" aria-hidden="true"></i> SESSION TEMPS RÉEL</span>
                             </div>
+
+                            <!-- BANDEAU D'ACTIVITÉ EN FLUX NORMAL (NON FLOTTANT, NE MASQUE AUCUN CONTENU) -->
+                            <div class="live-activity-inline-bar" id="liveFlashSocialBox">
+                                <div class="flash-avatar"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i></div>
+                                <div class="flash-text-content">
+                                    <span class="flash-title" id="flashTitle">ID: CRASH-5829143</span>
+                                    <span class="flash-subtitle" id="flashSubtitle">vient d'activer sa licence complète</span>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="product-order-box">
@@ -132,11 +141,36 @@
                                 </div>
                             </div>
 
+                            <!-- 1. STRUCTURE AVANTAGES : BLOC VERTICAL EN DEUX LIGNES (ICÔNE+TITRE EN HAUT, DESCRIPTION EN DESSOUS) -->
                             <ul class="benefits-checklist">
-                                <li><i class="fa-solid fa-circle-check text-green" aria-hidden="true"></i> <strong>Précision Algorithmique Optimale :</strong> Analyse en temps réel et anticipation précise des trajectoires.</li>
-                                <li><i class="fa-solid fa-circle-check text-green" aria-hidden="true"></i> <strong>Activation Immédiate :</strong> Accès instantané à l'ensemble des prédictions et au cockpit dès la validation de votre paiement.</li>
-                                <li><i class="fa-solid fa-circle-check text-green" aria-hidden="true"></i> <strong>Accès à Vie Sans Frais :</strong> Licence permanente à paiement unique, garantie sans aucun abonnement mensuel ni prélèvement futur.</li>
-                                <li><i class="fa-solid fa-circle-check text-green" aria-hidden="true"></i> <strong>Multi-supports :</strong> Interface optimisée pour un usage fluide sur smartphone, tablette et ordinateur.</li>
+                                <li class="benefit-item">
+                                    <div class="benefit-title-row">
+                                        <i class="fa-solid fa-circle-check text-green" aria-hidden="true"></i>
+                                        <strong class="benefit-title">Précision Algorithmique Optimale</strong>
+                                    </div>
+                                    <p class="benefit-desc">Analyse en temps réel et anticipation précise des trajectoires.</p>
+                                </li>
+                                <li class="benefit-item">
+                                    <div class="benefit-title-row">
+                                        <i class="fa-solid fa-circle-check text-green" aria-hidden="true"></i>
+                                        <strong class="benefit-title">Activation Immédiate</strong>
+                                    </div>
+                                    <p class="benefit-desc">Accès instantané à l'ensemble des prédictions et au cockpit dès la validation de votre paiement.</p>
+                                </li>
+                                <li class="benefit-item">
+                                    <div class="benefit-title-row">
+                                        <i class="fa-solid fa-circle-check text-green" aria-hidden="true"></i>
+                                        <strong class="benefit-title">Accès à Vie Sans Frais</strong>
+                                    </div>
+                                    <p class="benefit-desc">Licence permanente à paiement unique, garantie sans aucun abonnement mensuel ni prélèvement futur.</p>
+                                </li>
+                                <li class="benefit-item">
+                                    <div class="benefit-title-row">
+                                        <i class="fa-solid fa-circle-check text-green" aria-hidden="true"></i>
+                                        <strong class="benefit-title">Multi-supports</strong>
+                                    </div>
+                                    <p class="benefit-desc">Interface optimisée pour un usage fluide sur smartphone, tablette et ordinateur.</p>
+                                </li>
                             </ul>
 
                             <button type="button" class="btn-buy-instant" id="directBuyButton">
@@ -153,7 +187,7 @@
                 </div>
             </section>
 
-            <!-- SECTION RETOURS D'EXPERIENCE (105 AVIS) -->
+            <!-- SECTION RETOURS D'EXPÉRIENCE (105 AVIS) -->
             <section class="testimonials-section">
                 <div class="section-container">
                     <div class="section-header text-center">
@@ -543,15 +577,6 @@
             <div class="radar-scanning-circle"></div>
             <p class="scan-title">Vérification du paiement</p>
             <p class="scan-subtitle" id="paymentProcessingText">Connexion sécurisée en cours…</p>
-        </div>
-    </div>
-
-    <!-- NOTIFICATION FLASH D'ACTIVATION EN DIRECT -->
-    <div class="live-flash-social-box" id="liveFlashSocialBox">
-        <div class="flash-avatar"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i></div>
-        <div class="flash-text-content">
-            <span class="flash-title" id="flashTitle">ID: CRASH-5829143</span>
-            <span class="flash-subtitle" id="flashSubtitle">vient d'activer sa licence complète</span>
         </div>
     </div>
 
