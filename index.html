@@ -5,18 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#080512">
     <title data-i18n="doc_title">CRASH PREDICTOR 2026 | Cockpit d'Analyse et Prédictions Officielles</title>
-    <meta name="description" content="Crash Predictor 2026 — Plateforme d'analyse algorithmique en temps réel, cockpit interactif et accès permanent.">
+    <meta name="description" content="Crash Predictor 2026 — Plateforme d'analyse algorithmique en temps réel, cockpit interactif et abonnement mensuel.">
     <link rel="icon" href="assets/crash_hd.jpg" type="image/jpeg">
     <script>
     (function () {
         try {
-            var key = "crash_user_lang_pref";
-            var lang = null;
-            try { lang = localStorage.getItem(key); } catch (e) {}
-            if (!lang) {
-                var match = document.cookie.match(/(?:^|; )crash_lang=([^;]*)/);
-                if (match) lang = decodeURIComponent(match[1]);
+            function mapCountry(c) {
+                c = String(c || "").toUpperCase();
+                if (!c || c === "XX" || c === "T1") return null;
+                if (",FR,CI,SN,CM,GA,BJ,TG,ML,GN,BF,CG,CD,BE,CH,MC,LU,MG,NE,TD,DZ,MA,TN,HT,VU,".indexOf("," + c + ",") !== -1) return "fr";
+                if (",ES,MX,CO,AR,PE,CL,EC,GT,CU,BO,DO,HN,PY,SV,NI,CR,PA,UY,PR,VE,GQ,".indexOf("," + c + ",") !== -1) return "es";
+                if (",BR,PT,AO,MZ,CV,GW,ST,TL,".indexOf("," + c + ",") !== -1) return "pt";
+                if (",DE,AT,LI,".indexOf("," + c + ",") !== -1) return "de";
+                return "en";
             }
+            var lang = mapCountry(window.__GEO_COUNTRY);
             if (!lang) {
                 var list = [];
                 if (navigator.languages && navigator.languages.length) {
@@ -40,7 +43,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=u21">
+    <link rel="stylesheet" href="style.css?v=u23">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     <script src="https://checkout.flutterwave.com/v3.js" defer></script>
 </head>
@@ -140,9 +143,6 @@
                             <span class="user-name-display" id="navUserName">Client</span>
                             <span class="user-id-tag" id="navUserIdTag">ID: CRASH-5829143</span>
                         </div>
-                        <button type="button" class="btn-logout" id="logoutBtn" title="Déconnexion">
-                            <i class="fa-solid fa-power-off" aria-hidden="true"></i>
-                        </button>
                     </div>
                 </div>
             </div>
@@ -193,9 +193,8 @@
                                 <div class="price-highlight">
                                     <div class="price-main-row">
                                         <span class="price-amount">50 $</span>
-                                        <span class="price-type" data-i18n="price_lifetime">/ Accès à vie</span>
+                                        <span class="price-type" data-i18n="price_lifetime">/ Mois</span>
                                     </div>
-                                    <div class="price-cfa-conversion" id="priceCfaConversion" data-i18n="price_cfa">≈ 30 000 francs CFA</div>
                                 </div>
                             </div>
 
@@ -218,9 +217,9 @@
                                 <div class="benefit-card">
                                     <div class="benefit-head">
                                         <i class="fa-solid fa-circle-check text-green" aria-hidden="true"></i>
-                                        <span class="benefit-name" data-i18n="benefit_3_title">Accès à Vie Sans Frais</span>
+                                        <span class="benefit-name" data-i18n="benefit_3_title">Abonnement Mensuel</span>
                                     </div>
-                                    <p class="benefit-text" data-i18n="benefit_3_desc">Licence permanente à paiement unique, garantie sans aucun abonnement mensuel ni prélèvement futur.</p>
+                                    <p class="benefit-text" data-i18n="benefit_3_desc">Accès complet renouvelé chaque mois, simple abonnement mensuel.</p>
                                 </div>
                                 <div class="benefit-card">
                                     <div class="benefit-head">
@@ -268,7 +267,7 @@
                         </div>
                         <div class="t-stat-item">
                             <span class="t-stat-num text-green">50 $</span>
-                            <span class="t-stat-sub" data-i18n="stat_license">Licence unique à vie</span>
+                            <span class="t-stat-sub" data-i18n="stat_license">Par mois</span>
                         </div>
                     </div>
 
@@ -385,7 +384,7 @@
                         <h4><i class="fa-solid fa-chart-line text-gold" aria-hidden="true"></i> <span data-i18n="sys_params">PARAMÈTRES DU SYSTÈME</span></h4>
                         <div class="stat-row"><span data-i18n="sys_algo_stab">Stabilité algorithmique</span><strong class="text-green">98.9%</strong></div>
                         <div class="stat-row"><span data-i18n="sys_latency">Latence flux</span><strong class="text-gold">12 ms</strong></div>
-                        <div class="stat-row"><span data-i18n="sys_license_status">Statut licence</span><strong class="text-green" data-i18n="sys_active_lifetime">ACTIVE À VIE</strong></div>
+                        <div class="stat-row"><span data-i18n="sys_license_status">Statut licence</span><strong class="text-green" data-i18n="sys_active_lifetime">ACTIVE / MOIS</strong></div>
                         <div class="stat-row"><span data-i18n="sys_your_id">Votre ID membre</span><strong id="vipSidebarUserId" class="gold-code">CRASH-5829143</strong></div>
                     </div>
 
@@ -527,7 +526,7 @@
 
             <div class="brief-checkout-box">
                 <div class="brief-header">
-                    <span class="badge-price-gold" data-i18n="checkout_badge">50 $ • ACCÈS À VIE</span>
+                    <span class="badge-price-gold" data-i18n="checkout_badge">50 $ / Mois</span>
                     <h3 data-i18n="checkout_title">Paiement sécurisé</h3>
                     <p class="brief-subtitle" data-i18n="checkout_sub">Mobile Money ou carte bancaire</p>
                 </div>
@@ -651,6 +650,6 @@
 
     <div class="toast-container" id="toastContainer"></div>
 
-    <script src="app.js?v=u21" defer></script>
+    <script src="app.js?v=u23" defer></script>
 </body>
 </html>

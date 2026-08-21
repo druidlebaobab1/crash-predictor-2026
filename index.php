@@ -1,6 +1,24 @@
 <?php
 // CRASH PREDICTOR 2026 - CHARGEMENT DIRECT DU SITE
 header("Cache-Control: no-cache, must-revalidate");
-include_once(__DIR__ . '/index.html');
+
+$geoCountry = strtoupper((string) (
+    $_SERVER["HTTP_CF_IPCOUNTRY"]
+    ?? $_SERVER["HTTP_X_VERCEL_IP_COUNTRY"]
+    ?? $_SERVER["HTTP_X_COUNTRY_CODE"]
+    ?? $_SERVER["GEOIP_COUNTRY_CODE"]
+    ?? $_SERVER["HTTP_X_APPENGINE_COUNTRY"]
+    ?? ""
+));
+if ($geoCountry === "XX" || $geoCountry === "T1") {
+    $geoCountry = "";
+}
+
+ob_start();
+include_once(__DIR__ . "/index.html");
+$html = ob_get_clean();
+$geoScript = "<script>window.__GEO_COUNTRY=" . json_encode($geoCountry) . ";</script>";
+$html = preg_replace("/<head>/i", "<head>" . $geoScript, $html, 1);
+echo $html;
 exit();
 ?>
