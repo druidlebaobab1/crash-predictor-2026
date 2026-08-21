@@ -2,68 +2,59 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CRASH PREDICTOR 2026 | Intelligence Artificielle Prédictive Officielle</title>
-    <meta name="description" content="CRASH PREDICTOR 2026. La technologie d'intelligence artificielle la plus avancée pour anticiper les trajectoires et sécuriser vos gains en temps réel.">
-    <!-- Fonts & Icons -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#080512">
+    <title>CRASH PREDICTOR 2026 | Simulation interactive</title>
+    <meta name="description" content="Crash Predictor 2026 — interface de simulation interactive, cockpit VIP et accès licence.">
+    <link rel="icon" href="assets/crash_hd.jpg" type="image/jpeg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-    <!-- Supabase Cloud SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Flutterwave Gateway -->
-    <script src="https://checkout.flutterwave.com/v3.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="https://checkout.flutterwave.com/v3.js" defer></script>
 </head>
 <body class="dark-theme">
 
-    <!-- ==========================================================================
-         INTERFACE 1 : SITE COMMERCIAL PUBLIC
-         ========================================================================== -->
     <div id="publicSiteWrapper" class="site-view-wrapper">
-        
-        <!-- PROMINENT LIVE BAR WITH FLASHING LIGHT -->
-        <div class="live-traders-ticker-bar prominent-live-bar">
+        <div class="live-traders-ticker-bar prominent-live-bar" role="status">
             <div class="ticker-content">
                 <div class="live-pulse-badge flash-effect">
                     <span class="live-dot-pulse"></span>
                     <span class="live-tag-text">EN DIRECT</span>
                 </div>
                 <div class="live-counter-box">
-                    <i class="fa-solid fa-users text-gold"></i>
+                    <i class="fa-solid fa-users text-gold" aria-hidden="true"></i>
                     <span id="liveOnlineUsersCount" class="live-counter-highlight">1 348 290</span>
-                    <span class="live-sub-label">membres connectés • Algorithme actif</span>
+                    <span class="live-sub-label">sessions actives • moteur de simulation</span>
                 </div>
             </div>
         </div>
 
-        <!-- Glowing Atmosphere -->
-        <div class="sky-effects-container">
+        <div class="sky-effects-container" aria-hidden="true">
             <div class="glow-orb orb-1"></div>
             <div class="glow-orb orb-2"></div>
             <div class="stars-particle-grid"></div>
         </div>
 
-        <!-- Alert for unpaid users -->
         <div class="site-unsubscribed-alert-banner hidden" id="siteSubscriptionAlert">
             <div class="alert-banner-content">
                 <div class="alert-icon-text">
-                    <i class="fa-solid fa-triangle-exclamation text-red pulse-icon"></i>
-                    <span><strong>ACCÈS SUSPENDU :</strong> Activez votre licence pour déverrouiller le flux prédictif en direct.</span>
+                    <i class="fa-solid fa-triangle-exclamation text-red pulse-icon" aria-hidden="true"></i>
+                    <span><strong>ACCÈS SUSPENDU :</strong> activez votre licence pour ouvrir le cockpit.</span>
                 </div>
-                <button class="btn-alert-unlock" id="btnAlertSubscribe">
-                    <i class="fa-solid fa-unlock-keyhole"></i> Débloquer l'accès 50 $
+                <button type="button" class="btn-alert-unlock" id="btnAlertSubscribe">
+                    <i class="fa-solid fa-unlock-keyhole" aria-hidden="true"></i> Débloquer l'accès 50 $
                 </button>
             </div>
         </div>
 
-        <!-- Public Navigation Bar : ULTRA COMPACT & 100% VISIBLE ON SMARTPHONES -->
         <header class="main-navbar">
             <div class="nav-container">
                 <a href="#" class="brand-logo">
                     <div class="logo-image-wrap">
-                        <img src="assets/crash_hd.jpg" alt="Logo Crash Predictor" class="brand-logo-img">
+                        <img src="assets/crash_hd.jpg" alt="" class="brand-logo-img">
                     </div>
                     <div class="brand-text">
                         <span class="logo-title">CRASH<span class="highlight">PREDICTOR</span></span>
@@ -72,56 +63,57 @@
                 </a>
 
                 <div class="nav-auth-actions">
-                    <!-- GUEST BUTTONS : CLEAR, BIG CONTRAST, PERFECT ON ANDROID/IPHONE -->
                     <div class="guest-buttons" id="guestButtons">
-                        <button class="btn-ghost-compact" id="openLoginBtn"><i class="fa-solid fa-arrow-right-to-bracket"></i> Connexion</button>
-                        <button class="btn-primary-compact" id="openRegisterBtn"><i class="fa-solid fa-user-plus"></i> Inscription</button>
+                        <button type="button" class="btn-ghost-compact" id="openLoginBtn">
+                            <i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i> Connexion
+                        </button>
+                        <button type="button" class="btn-primary-compact" id="openRegisterBtn">
+                            <i class="fa-solid fa-user-plus" aria-hidden="true"></i> Inscription
+                        </button>
                     </div>
 
-                    <!-- USER BADGE -->
-                    <div class="user-profile-badge hidden" id="userProfileBadge" title="Mon Profil">
-                        <div class="user-avatar-icon"><i class="fa-solid fa-user"></i></div>
+                    <div class="user-profile-badge hidden" id="userProfileBadge" title="Mon profil" role="button" tabindex="0">
+                        <div class="user-avatar-icon"><i class="fa-solid fa-user" aria-hidden="true"></i></div>
                         <div class="user-info-text">
                             <span class="user-name-display" id="navUserName">Client</span>
                             <span class="user-id-tag" id="navUserIdTag">ID: CRASH-0000</span>
                         </div>
-                        <button class="btn-logout" id="logoutBtn" title="Déconnexion"><i class="fa-solid fa-power-off"></i></button>
+                        <button type="button" class="btn-logout" id="logoutBtn" title="Déconnexion">
+                            <i class="fa-solid fa-power-off" aria-hidden="true"></i>
+                        </button>
                     </div>
                 </div>
             </div>
         </header>
 
         <main>
-            <!-- Hero Spotlight Section -->
             <section class="hero-spotlight-section">
                 <div class="section-container">
                     <div class="hero-header-text text-center">
                         <div class="countdown-promo-badge">
-                            <i class="fa-solid fa-stopwatch text-gold pulse-icon"></i>
-                            <span>Offre Spéciale 50 $ : <strong class="countdown-timer-text">47h 59m 50s</strong> restante(s)</span>
+                            <i class="fa-solid fa-stopwatch text-gold pulse-icon" aria-hidden="true"></i>
+                            <span>Offre 50 $ : <strong class="countdown-timer-text">47h 59m 50s</strong> restante(s)</span>
                         </div>
                         <h1 class="hero-main-title">CRASH <span class="gradient-gold">PREDICTOR 2026</span></h1>
-                        <p class="hero-subtitle-desc">L'algorithme de pointe conçu pour anticiper le moment précis de rupture et sécuriser vos performances.</p>
+                        <p class="hero-subtitle-desc">Cockpit de simulation haute fréquence. Licence unique, activation automatique après paiement Flutterwave.</p>
                     </div>
 
-                    <!-- Master Display -->
                     <div class="master-product-display luxury-alive-box">
                         <div class="product-visual-container">
                             <div class="clean-image-wrapper radiant-gold-frame">
                                 <img src="assets/crash_hd.jpg" alt="Crash Predictor" class="crash-clean-image">
-                                <div class="radiant-light-beam"></div>
+                                <div class="radiant-light-beam" aria-hidden="true"></div>
                             </div>
                             <div class="image-caption-bar">
-                                <span class="badge-algo"><i class="fa-solid fa-microchip"></i> IA PRÉDICTIVE 2026</span>
-                                <span class="badge-status-live"><i class="fa-solid fa-bolt"></i> SYNCHRONISATION EN DIRECT</span>
+                                <span class="badge-algo"><i class="fa-solid fa-microchip" aria-hidden="true"></i> MOTEUR 2026</span>
+                                <span class="badge-status-live"><i class="fa-solid fa-bolt" aria-hidden="true"></i> SESSION TEMPS RÉEL</span>
                             </div>
                         </div>
 
                         <div class="product-order-box">
-                            <h2 class="access-title">Licence Officielle & Accès Illimité</h2>
-                            <p class="access-desc">Rejoignez l'élite des traders et accédez immédiatement à la technologie d'analyse mathématique la plus puissante.</p>
+                            <h2 class="access-title">Licence officielle & accès illimité</h2>
+                            <p class="access-desc">Débloquez le cockpit VIP, l’historique des rounds et le radar de vol interactif.</p>
 
-                            <!-- PRICE BOX (NO PARENTHESES) -->
                             <div class="price-display-wrapper">
                                 <div class="price-highlight">
                                     <div class="price-main-row">
@@ -132,45 +124,43 @@
                                 </div>
                             </div>
 
-                            <!-- CONVINCING HIGH-END ARGUMENTS -->
                             <ul class="benefits-checklist">
-                                <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Intelligence Artificielle 2026 :</strong> Anticipation mathématique exacte des points de sortie.</li>
-                                <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Flux Satellite Haute Fréquence :</strong> Réception instantanée et continue sans décalage.</li>
-                                <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Espace Membre VIP Exclusif :</strong> Déblocage automatique de votre cockpit interactif.</li>
-                                <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Licence Illimitée à Vie :</strong> Accès permanent garanti sans aucun abonnement mensuel.</li>
+                                <li><i class="fa-solid fa-circle-check text-green" aria-hidden="true"></i> <strong>Radar vertical :</strong> visualisation fluide de la courbe de vol.</li>
+                                <li><i class="fa-solid fa-circle-check text-green" aria-hidden="true"></i> <strong>Paiement Flutterwave :</strong> Mobile Money et carte, activation immédiate.</li>
+                                <li><i class="fa-solid fa-circle-check text-green" aria-hidden="true"></i> <strong>Compte cloud Supabase :</strong> licence liée à votre ID membre.</li>
+                                <li><i class="fa-solid fa-circle-check text-green" aria-hidden="true"></i> <strong>Licence à vie :</strong> un paiement unique, sans abonnement mensuel.</li>
                             </ul>
 
-                            <button class="btn-buy-instant" id="directBuyButton">
-                                <i class="fa-solid fa-bolt"></i>
-                                <span>Débloquer mon Accès VIP - 50 $</span>
+                            <button type="button" class="btn-buy-instant" id="directBuyButton">
+                                <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+                                <span>Débloquer mon accès VIP — 50 $</span>
                             </button>
 
                             <div class="secure-guarantee-footer">
-                                <i class="fa-solid fa-shield-halved text-gold"></i>
-                                <span>Activation instantanée & Déverrouillage automatique de votre logiciel VIP</span>
+                                <i class="fa-solid fa-shield-halved text-gold" aria-hidden="true"></i>
+                                <span>Paiement chiffré Flutterwave • Activation automatique du cockpit</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- 63 Testimonials (100% Anonymized ID Members - No Real Names, No "il y a") -->
             <section class="testimonials-section">
                 <div class="section-container">
                     <div class="section-header text-center">
-                        <span class="badge-sub"><i class="fa-solid fa-star"></i> 155 643 UTILISATEURS ACTIFS</span>
-                        <h2 class="section-title">Retours d'Expérience & Gains Réalisés</h2>
-                        <p class="section-subtitle">Historique des licences activées et retours vérifiés par ID Membre.</p>
+                        <span class="badge-sub"><i class="fa-solid fa-star" aria-hidden="true"></i> RETOURS MEMBRES</span>
+                        <h2 class="section-title">Retours d'expérience</h2>
+                        <p class="section-subtitle">Commentaires associés à des identifiants membres anonymes.</p>
                     </div>
 
                     <div class="testimonials-stats-bar">
                         <div class="t-stat-item">
                             <span class="t-stat-num">155 643</span>
-                            <span class="t-stat-sub">Membres satisfaits</span>
+                            <span class="t-stat-sub">Membres inscrits</span>
                         </div>
                         <div class="t-stat-item">
                             <span class="t-stat-num">4.9 / 5</span>
-                            <div class="t-stat-stars">
+                            <div class="t-stat-stars" aria-label="Note 4.9 sur 5">
                                 <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
                             </div>
                             <span class="t-stat-sub">Indice de satisfaction</span>
@@ -184,36 +174,34 @@
                     <div class="comments-grid" id="commentsGrid"></div>
 
                     <div class="text-center load-more-wrap">
-                        <button class="btn-secondary" id="btnLoadMoreComments">
-                            <i class="fa-solid fa-chevron-down"></i> Afficher plus de témoignages
+                        <button type="button" class="btn-secondary" id="btnLoadMoreComments">
+                            <i class="fa-solid fa-chevron-down" aria-hidden="true"></i> Afficher plus de témoignages
                         </button>
                     </div>
                 </div>
             </section>
         </main>
 
-        <!-- Public Footer -->
+        <button type="button" class="sticky-mobile-cta" id="stickyMobileCta">
+            <i class="fa-solid fa-bolt" aria-hidden="true"></i> Accès VIP — 50 $
+        </button>
+
         <footer class="main-footer">
             <div class="footer-container">
                 <div class="logo-title">CRASH <span class="highlight">PREDICTOR 2026</span></div>
                 <div class="footer-copy">&copy; 2026 CRASH PREDICTOR TECHNOLOGIES. Tous droits réservés.</div>
-                <!-- Discrete Admin Link -->
-                <a href="javascript:void(0)" id="linkOpenAdminLogin" class="admin-discrete-link"><i class="fa-solid fa-lock"></i> Espace Administrateur</a>
+                <a href="#admin" id="linkOpenAdminLogin" class="admin-discrete-link">
+                    <i class="fa-solid fa-lock" aria-hidden="true"></i> Espace administrateur
+                </a>
             </div>
         </footer>
     </div>
 
-
-    <!-- ==========================================================================
-         INTERFACE 2 : LE VRAI LOGICIEL DE TRADING VIP (EXCLUSIF AUX MEMBRES PAYÉS)
-         ========================================================================== -->
     <div id="vipSoftwareWrapper" class="site-view-wrapper hidden">
-        
-        <!-- VIP Top Status Bar -->
         <header class="vip-software-navbar">
             <div class="vip-nav-container">
                 <div class="vip-brand">
-                    <div class="vip-logo-box"><img src="assets/crash_hd.jpg" alt="Logo VIP"></div>
+                    <div class="vip-logo-box"><img src="assets/crash_hd.jpg" alt=""></div>
                     <div class="vip-brand-info">
                         <span class="vip-software-name">CRASH PREDICTOR <span class="gold-text">AI VIP</span></span>
                         <span class="vip-live-indicator"><span class="pulse-dot-green"></span> FLUX RADAR EN DIRECT</span>
@@ -222,55 +210,51 @@
 
                 <div class="vip-user-meta">
                     <div class="vip-member-tag">
-                        <i class="fa-solid fa-crown text-gold"></i>
+                        <i class="fa-solid fa-crown text-gold" aria-hidden="true"></i>
                         <span id="vipUsernameDisplay">Membre VIP</span>
                         <span class="vip-badge-glow" id="vipIdDisplay">ID: CRASH-8491</span>
                     </div>
-                    <button class="btn-vip-logout" id="vipLogoutBtn" title="Se déconnecter"><i class="fa-solid fa-power-off"></i></button>
+                    <button type="button" class="btn-vip-logout" id="vipLogoutBtn" title="Se déconnecter">
+                        <i class="fa-solid fa-power-off" aria-hidden="true"></i>
+                    </button>
                 </div>
             </div>
         </header>
 
         <main class="vip-software-body">
             <div class="vip-dashboard-grid">
-
-                <!-- MAIN LIVE COCKPIT & GRAND VERTICAL PROPORTIONAL RADAR -->
                 <div class="vip-radar-card">
                     <div class="radar-card-header">
                         <div class="radar-title-group">
-                            <i class="fa-solid fa-satellite-dish text-green"></i>
-                            <h3>RADAR DE VOL VERTICAL HAUTE PRÉCISION</h3>
+                            <i class="fa-solid fa-satellite-dish text-green" aria-hidden="true"></i>
+                            <h3>RADAR DE VOL VERTICAL</h3>
                         </div>
-                        <div class="radar-session-badge">SESSION VIP ACTIVE 2026</div>
+                        <div class="radar-session-badge">SESSION VIP ACTIVE</div>
                     </div>
 
-                    <!-- BIG PREDICTION SPOTLIGHT -->
                     <div class="vip-prediction-spotlight" id="vipPredictionSpotlight">
-                        <div class="pred-label">🎯 POINT D'ENCAISSEMENT CONSEILLÉ DU VOL :</div>
+                        <div class="pred-label">POINT DE SORTIE SIMULÉ</div>
                         <div class="pred-multiplier-value" id="vipLiveTargetDisplay">x2.40</div>
                         <div class="pred-meta-row">
-                            <span class="pred-confidence"><i class="fa-solid fa-shield-check text-green"></i> Précision satellite : <strong id="vipLiveConfidence">99.4%</strong></span>
-                            <span class="pred-advice" id="vipLiveAdvice">Encaissement automatique programmé avant rupture</span>
+                            <span class="pred-confidence"><i class="fa-solid fa-shield-halved text-green" aria-hidden="true"></i> Stabilité : <strong id="vipLiveConfidence">99.4%</strong></span>
+                            <span class="pred-advice" id="vipLiveAdvice">Encaissement programmé avant rupture</span>
                         </div>
                     </div>
 
-                    <!-- REAL GRAND VERTICAL FLIGHT CANVAS (520PX HEIGHT) -->
                     <div class="vip-canvas-viewport grand-vertical-viewport">
-                        <canvas id="vipFlightCanvas" class="vip-flight-canvas grand-canvas-height"></canvas>
-                        
-                        <!-- Live Flight Multiplier HUD -->
+                        <canvas id="vipFlightCanvas" class="vip-flight-canvas grand-canvas-height" aria-label="Radar de vol"></canvas>
+
                         <div class="vip-live-hud" id="vipLiveHud">
                             <span class="hud-label">COTE EN DIRECT</span>
                             <span class="hud-number" id="vipHudNumber">x1.00</span>
                         </div>
 
-                        <!-- SCANNER / RADAR OVERLAY LOADER BETWEEN ROUNDS -->
                         <div class="vip-scanner-loader-overlay hidden" id="vipScannerLoader">
                             <div class="radar-scanning-circle"></div>
                             <div class="scanner-text-group">
-                                <i class="fa-solid fa-satellite-dish fa-spin text-gold"></i>
-                                <span class="scan-title">CALIBRATION DU SIGNAL SATELLITE</span>
-                                <span class="scan-subtitle">Veuillez patienter pour le prochain vol...</span>
+                                <i class="fa-solid fa-satellite-dish fa-spin text-gold" aria-hidden="true"></i>
+                                <span class="scan-title">CALIBRATION DU SIGNAL</span>
+                                <span class="scan-subtitle">Prochain round en préparation…</span>
                             </div>
                             <div class="scan-progress-track">
                                 <div class="scan-progress-fill" id="scanProgressFill"></div>
@@ -280,62 +264,35 @@
 
                     <div class="vip-flight-status-bar" id="vipFlightStatusBar">
                         <span class="status-indicator-dot"></span>
-                        <span class="status-message-text" id="vipFlightMessage">Analyse des flux satellites... Décollage imminent</span>
+                        <span class="status-message-text" id="vipFlightMessage">Analyse des flux… Décollage imminent</span>
                     </div>
                 </div>
 
-                <!-- SIDEBAR STATS & HISTORY -->
                 <div class="vip-sidebar-panel">
                     <div class="vip-stats-box">
-                        <h4><i class="fa-solid fa-chart-line text-gold"></i> PARAMÈTRES DU SYSTÈME</h4>
-                        <div class="stat-row">
-                            <span>Précision algorithmique :</span>
-                            <strong class="text-green">98.9%</strong>
-                        </div>
-                        <div class="stat-row">
-                            <span>Latence de traitement :</span>
-                            <strong class="text-gold">12 ms</strong>
-                        </div>
-                        <div class="stat-row">
-                            <span>Statut de la licence :</span>
-                            <strong class="text-green">ACTIVE À VIE</strong>
-                        </div>
-                        <div class="stat-row">
-                            <span>Votre ID Membre :</span>
-                            <strong id="vipSidebarUserId" class="gold-code">CRASH-8491</strong>
-                        </div>
+                        <h4><i class="fa-solid fa-chart-line text-gold" aria-hidden="true"></i> PARAMÈTRES</h4>
+                        <div class="stat-row"><span>Stabilité moteur</span><strong class="text-green">98.9%</strong></div>
+                        <div class="stat-row"><span>Latence</span><strong class="text-gold">12 ms</strong></div>
+                        <div class="stat-row"><span>Licence</span><strong class="text-green">ACTIVE À VIE</strong></div>
+                        <div class="stat-row"><span>ID membre</span><strong id="vipSidebarUserId" class="gold-code">CRASH-8491</strong></div>
                     </div>
 
                     <div class="vip-history-box">
-                        <h4><i class="fa-solid fa-clock-rotate-left text-gold"></i> DERNIÈRES PRÉDICTIONS VALIDÉES</h4>
-                        <div class="history-list" id="vipHistoryList">
-                            <div class="history-item win"><span class="h-flight">Vol #8491</span><span class="h-pred">Prédit: x2.15</span><span class="h-badge green">VALIDÉ</span></div>
-                            <div class="history-item win"><span class="h-flight">Vol #8490</span><span class="h-pred">Prédit: x1.85</span><span class="h-badge green">VALIDÉ</span></div>
-                            <div class="history-item big-win"><span class="h-flight">Vol #8489</span><span class="h-pred">Prédit: x5.40</span><span class="h-badge gold">GROS GAIN</span></div>
-                            <div class="history-item win"><span class="h-flight">Vol #8488</span><span class="h-pred">Prédit: x2.90</span><span class="h-badge green">VALIDÉ</span></div>
-                            <div class="history-item win"><span class="h-flight">Vol #8487</span><span class="h-pred">Prédit: x1.75</span><span class="h-badge green">VALIDÉ</span></div>
-                        </div>
+                        <h4><i class="fa-solid fa-clock-rotate-left text-gold" aria-hidden="true"></i> DERNIERS ROUNDS</h4>
+                        <div class="history-list" id="vipHistoryList"></div>
                     </div>
                 </div>
-
             </div>
         </main>
     </div>
 
-
-    <!-- ==========================================================================
-         MODALS (PROFILE, LOGIN, REGISTER, ULTRA-BRIEF CHECKOUT & MASTER ADMIN)
-         ========================================================================== -->
-
-    <!-- MODAL 1 : USER PROFILE (SHOWS UNIQUE ID) -->
     <div class="modal-overlay" id="profileModal">
         <div class="modal-card">
-            <button class="modal-close" id="closeProfileModal">&times;</button>
+            <button type="button" class="modal-close" id="closeProfileModal" aria-label="Fermer">&times;</button>
             <div class="modal-header">
-                <div class="modal-icon-badge gold-glow"><i class="fa-solid fa-user-astronaut"></i></div>
-                <h3 id="profileNameDisplay">Mon Espace Membre</h3>
+                <div class="modal-icon-badge gold-glow"><i class="fa-solid fa-user-astronaut" aria-hidden="true"></i></div>
+                <h3 id="profileNameDisplay">Mon espace membre</h3>
                 <p id="profileEmailDisplay">client@exemple.com</p>
-                <!-- UNIQUE ID DISPLAY -->
                 <div class="profile-user-id-box">
                     <span>VOTRE ID UNIQUE :</span>
                     <strong id="profileUniqueIdDisplay">CRASH-8491</strong>
@@ -344,72 +301,68 @@
 
             <div class="profile-modal-body">
                 <div class="profile-status-block">
-                    <div class="status-label-heading">Statut de votre licence :</div>
+                    <div class="status-label-heading">Statut de votre licence</div>
                     <div class="status-tag-badge status-unsubscribed" id="profileStatusBadge">
-                        <i class="fa-solid fa-circle-xmark"></i> NON ABONNÉ
+                        <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i> NON ABONNÉ
                     </div>
                     <p class="status-alert-description">
-                        Communiquez votre ID Unique à l'administrateur en cas de paiement privé Wave/WhatsApp ou activez ci-dessous.
+                        Votre ID sert à l’activation manuelle. Le paiement Flutterwave débloque le cockpit automatiquement.
                     </p>
                 </div>
 
                 <div class="profile-section-group">
-                    <label class="section-field-label"><i class="fa-solid fa-phone"></i> Numéro de téléphone</label>
+                    <label class="section-field-label" for="profilePhoneInput"><i class="fa-solid fa-phone" aria-hidden="true"></i> Numéro de téléphone</label>
                     <div class="phone-input-row">
-                        <input type="tel" id="profilePhoneInput" placeholder="+33 6 12 34 56 78" class="form-control-dark">
+                        <input type="tel" id="profilePhoneInput" placeholder="+225 07 00 00 00 00" class="form-control-dark" autocomplete="tel">
                         <button type="button" class="btn-save-mini" id="btnSavePhone">Enregistrer</button>
                     </div>
                 </div>
 
                 <div class="profile-section-group">
-                    <label class="section-field-label"><i class="fa-solid fa-lock"></i> Modifier mon mot de passe</label>
+                    <label class="section-field-label"><i class="fa-solid fa-lock" aria-hidden="true"></i> Modifier mon mot de passe</label>
                     <form id="formUpdatePassword" class="password-update-form">
-                        <input type="password" id="profileOldPassword" placeholder="Mot de passe actuel" required class="form-control-dark">
-                        <input type="password" id="profileNewPassword" placeholder="Nouveau mot de passe" required class="form-control-dark">
-                        <input type="password" id="profileConfirmNewPassword" placeholder="Confirmer le nouveau mot de passe" required class="form-control-dark">
+                        <input type="password" id="profileOldPassword" placeholder="Mot de passe actuel" required class="form-control-dark" autocomplete="current-password">
+                        <input type="password" id="profileNewPassword" placeholder="Nouveau mot de passe (6+ caractères)" required class="form-control-dark" autocomplete="new-password">
+                        <input type="password" id="profileConfirmNewPassword" placeholder="Confirmer le nouveau mot de passe" required class="form-control-dark" autocomplete="new-password">
                         <button type="submit" class="btn-save-mini btn-full">Mettre à jour</button>
                     </form>
                 </div>
 
-                <button class="btn-primary btn-block" id="btnProfileSubscribe">
-                    <i class="fa-solid fa-unlock-keyhole"></i> Débloquer mon accès VIP - 50 $
+                <button type="button" class="btn-primary btn-block" id="btnProfileSubscribe">
+                    <i class="fa-solid fa-unlock-keyhole" aria-hidden="true"></i> Débloquer mon accès VIP — 50 $
                 </button>
 
-                <button class="btn-link-danger" id="profileLogoutBtn">
-                    <i class="fa-solid fa-power-off"></i> Se déconnecter
+                <button type="button" class="btn-link-danger" id="profileLogoutBtn">
+                    <i class="fa-solid fa-power-off" aria-hidden="true"></i> Se déconnecter
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL 2 : REGISTER -->
     <div class="modal-overlay" id="registerModal">
         <div class="modal-card">
-            <button class="modal-close" id="closeRegisterModal">&times;</button>
+            <button type="button" class="modal-close" id="closeRegisterModal" aria-label="Fermer">&times;</button>
             <div class="modal-header">
-                <div class="modal-icon-badge"><i class="fa-solid fa-user-plus"></i></div>
-                <h2 class="modal-title-big">Créer un Compte</h2>
-                <p>Un identifiant ID unique vous sera attribué</p>
+                <div class="modal-icon-badge"><i class="fa-solid fa-user-plus" aria-hidden="true"></i></div>
+                <h2 class="modal-title-big">Créer un compte</h2>
+                <p>Un identifiant unique vous sera attribué</p>
             </div>
 
             <form id="registerForm" class="modal-form">
                 <div class="form-group">
-                    <label><i class="fa-solid fa-user"></i> Nom ou Pseudonyme</label>
-                    <input type="text" id="regName" placeholder="Ex: Alex_Trader" required autocomplete="username">
+                    <label for="regName"><i class="fa-solid fa-user" aria-hidden="true"></i> Nom ou pseudonyme</label>
+                    <input type="text" id="regName" placeholder="Ex: Alex_Trader" required autocomplete="username" minlength="3">
                 </div>
-
                 <div class="form-group">
-                    <label><i class="fa-solid fa-envelope"></i> Adresse Email</label>
+                    <label for="regEmail"><i class="fa-solid fa-envelope" aria-hidden="true"></i> Adresse email</label>
                     <input type="email" id="regEmail" placeholder="nom@exemple.com" required autocomplete="email">
                 </div>
-
                 <div class="form-group">
-                    <label><i class="fa-solid fa-lock"></i> Mot de passe</label>
-                    <input type="password" id="regPassword" placeholder="Au moins 5 caractères" required autocomplete="new-password">
+                    <label for="regPassword"><i class="fa-solid fa-lock" aria-hidden="true"></i> Mot de passe</label>
+                    <input type="password" id="regPassword" placeholder="Au moins 6 caractères" required autocomplete="new-password" minlength="6">
                 </div>
-
-                <button type="submit" class="btn-primary btn-block">
-                    <i class="fa-solid fa-check"></i> Valider mon inscription
+                <button type="submit" class="btn-primary btn-block" id="registerSubmitBtn">
+                    <i class="fa-solid fa-check" aria-hidden="true"></i> Valider mon inscription
                 </button>
             </form>
 
@@ -420,29 +373,26 @@
         </div>
     </div>
 
-    <!-- MODAL 3 : LOGIN -->
     <div class="modal-overlay" id="loginModal">
         <div class="modal-card">
-            <button class="modal-close" id="closeLoginModal">&times;</button>
+            <button type="button" class="modal-close" id="closeLoginModal" aria-label="Fermer">&times;</button>
             <div class="modal-header">
-                <div class="modal-icon-badge"><i class="fa-solid fa-arrow-right-to-bracket"></i></div>
-                <h2 class="modal-title-big">Connexion Membre</h2>
+                <div class="modal-icon-badge"><i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i></div>
+                <h2 class="modal-title-big">Connexion membre</h2>
                 <p>Accédez à votre espace</p>
             </div>
 
             <form id="loginForm" class="modal-form">
                 <div class="form-group">
-                    <label><i class="fa-solid fa-envelope"></i> Adresse Email ou ID</label>
+                    <label for="loginEmail"><i class="fa-solid fa-envelope" aria-hidden="true"></i> Email ou ID</label>
                     <input type="text" id="loginEmail" placeholder="nom@exemple.com ou CRASH-XXXX" required autocomplete="username">
                 </div>
-
                 <div class="form-group">
-                    <label><i class="fa-solid fa-lock"></i> Mot de passe</label>
+                    <label for="loginPassword"><i class="fa-solid fa-lock" aria-hidden="true"></i> Mot de passe</label>
                     <input type="password" id="loginPassword" placeholder="Votre mot de passe" required autocomplete="current-password">
                 </div>
-
-                <button type="submit" class="btn-primary btn-block">
-                    <i class="fa-solid fa-arrow-right-to-bracket"></i> Se connecter
+                <button type="submit" class="btn-primary btn-block" id="loginSubmitBtn">
+                    <i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i> Se connecter
                 </button>
             </form>
 
@@ -453,102 +403,115 @@
         </div>
     </div>
 
-    <!-- MODAL 4 : 1-CLICK MOBILE MONEY CHECKOUT (NO PARENTHESES) -->
     <div class="modal-overlay" id="buyModal">
         <div class="modal-card modal-buy-card-brief">
-            <button class="modal-close" id="closeBuyModal">&times;</button>
-            
+            <button type="button" class="modal-close" id="closeBuyModal" aria-label="Fermer">&times;</button>
+
             <div class="brief-checkout-box">
                 <div class="brief-header">
-                    <span class="badge-price-gold">50 $ • ACCÈS ILLIMITÉ À VIE</span>
-                    <h3>Payer par Mobile Money</h3>
-                    <p class="brief-subtitle">Sélectionnez votre réseau de paiement</p>
+                    <span class="badge-price-gold">50 $ • ACCÈS À VIE</span>
+                    <h3>Paiement sécurisé</h3>
+                    <p class="brief-subtitle">Flutterwave • Mobile Money ou carte</p>
                 </div>
 
-                <div class="momo-chips-simple-grid">
-                    <div class="momo-chip-card selected" data-network="WAVE">
-                        <i class="fa-solid fa-water"></i>
-                        <span>Wave</span>
-                    </div>
-                    <div class="momo-chip-card" data-network="ORANGE">
-                        <i class="fa-solid fa-signal"></i>
-                        <span>Orange</span>
-                    </div>
-                    <div class="momo-chip-card" data-network="MTN">
-                        <i class="fa-solid fa-sim-card"></i>
-                        <span>MTN MoMo</span>
-                    </div>
-                    <div class="momo-chip-card" data-network="MOOV">
-                        <i class="fa-solid fa-mobile-retro"></i>
-                        <span>Moov</span>
+                <div class="checkout-auth-gate hidden" id="checkoutAuthGate">
+                    <p>Connectez-vous ou créez un compte pour lier la licence à votre ID.</p>
+                    <div class="checkout-auth-actions">
+                        <button type="button" class="btn-primary" id="checkoutGoLogin">Connexion</button>
+                        <button type="button" class="btn-ghost-compact" id="checkoutGoRegister">Inscription</button>
                     </div>
                 </div>
 
-                <button type="button" class="btn-direct-pay-now" id="btnExecuteMomoPayment">
-                    <i class="fa-solid fa-bolt"></i>
-                    <span>Payer par Mobile Money - 50 $</span>
-                </button>
+                <div id="checkoutPaymentPanel">
+                    <div class="form-group checkout-phone-group">
+                        <label for="checkoutPhoneInput"><i class="fa-solid fa-phone" aria-hidden="true"></i> Numéro Mobile Money</label>
+                        <input type="tel" id="checkoutPhoneInput" class="form-control-dark" placeholder="07 00 00 00 00" autocomplete="tel">
+                    </div>
 
-                <div class="brief-footer-note">
-                    <i class="fa-solid fa-shield-check text-green"></i>
-                    <span>Activation automatique et immédiate du logiciel VIP après paiement.</span>
-                </div>
+                    <div class="momo-chips-simple-grid" role="listbox" aria-label="Réseau Mobile Money">
+                        <button type="button" class="momo-chip-card selected" data-network="WAVE">
+                            <i class="fa-solid fa-water" aria-hidden="true"></i>
+                            <span>Wave</span>
+                        </button>
+                        <button type="button" class="momo-chip-card" data-network="ORANGE">
+                            <i class="fa-solid fa-signal" aria-hidden="true"></i>
+                            <span>Orange</span>
+                        </button>
+                        <button type="button" class="momo-chip-card" data-network="MTN">
+                            <i class="fa-solid fa-sim-card" aria-hidden="true"></i>
+                            <span>MTN MoMo</span>
+                        </button>
+                        <button type="button" class="momo-chip-card" data-network="MOOV">
+                            <i class="fa-solid fa-mobile-retro" aria-hidden="true"></i>
+                            <span>Moov</span>
+                        </button>
+                    </div>
 
-                <div class="card-link-sub">
-                    <button type="button" class="btn-link-card-mini" id="btnExecuteCardPayment">Payer par Carte Bancaire - 50 $</button>
+                    <button type="button" class="btn-direct-pay-now" id="btnExecuteMomoPayment">
+                        <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+                        <span>Payer par Mobile Money — 30 000 F</span>
+                    </button>
+
+                    <div class="brief-footer-note">
+                        <i class="fa-solid fa-shield-halved text-green" aria-hidden="true"></i>
+                        <span>Le cockpit s’ouvre uniquement après un paiement Flutterwave confirmé.</span>
+                    </div>
+
+                    <div class="card-link-sub">
+                        <button type="button" class="btn-link-card-mini" id="btnExecuteCardPayment">Payer par carte bancaire — 50 $</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL 5 : TABLEAU DE BORD ADMINISTRATEUR MAÎTRE -->
     <div class="modal-overlay" id="adminModal">
         <div class="modal-card modal-admin-card">
-            <button class="modal-close" id="closeAdminModal">&times;</button>
-            
+            <button type="button" class="modal-close" id="closeAdminModal" aria-label="Fermer">&times;</button>
+
             <div id="adminAuthScreen">
                 <div class="modal-header">
-                    <div class="modal-icon-badge gold-glow"><i class="fa-solid fa-user-shield"></i></div>
+                    <div class="modal-icon-badge gold-glow"><i class="fa-solid fa-user-shield" aria-hidden="true"></i></div>
                     <h2>ACCÈS ADMINISTRATEUR</h2>
-                    <p>Entrez votre mot de passe d'administration</p>
+                    <p>Clé d’administration</p>
                 </div>
                 <form id="formAdminAuth" class="modal-form">
                     <div class="form-group">
-                        <label>Clé d'administration :</label>
-                        <input type="password" id="adminSecretKeyInput" placeholder="Entrez le mot de passe admin" required class="form-control-dark">
+                        <label for="adminSecretKeyInput">Clé d'administration</label>
+                        <input type="password" id="adminSecretKeyInput" placeholder="Mot de passe admin" required class="form-control-dark" autocomplete="current-password">
                     </div>
-                    <button type="submit" class="btn-primary btn-block"><i class="fa-solid fa-key"></i> Déverrouiller</button>
+                    <button type="submit" class="btn-primary btn-block"><i class="fa-solid fa-key" aria-hidden="true"></i> Déverrouiller</button>
                 </form>
             </div>
 
             <div id="adminDashboardScreen" class="hidden">
                 <div class="modal-header">
-                    <div class="modal-icon-badge gold-glow"><i class="fa-solid fa-user-shield"></i></div>
-                    <h2>PANNEAU DE CONTRÔLE ADMINISTRATEUR</h2>
-                    <p>Gestion directe des membres et activations par ID Unique</p>
+                    <div class="modal-icon-badge gold-glow"><i class="fa-solid fa-user-shield" aria-hidden="true"></i></div>
+                    <h2>PANNEAU ADMINISTRATEUR</h2>
+                    <p>Activation par ID unique • source Supabase</p>
                 </div>
 
                 <div class="admin-quick-activate-box">
-                    <label>Activer un membre manuellement par son ID :</label>
+                    <label for="adminTargetIdInput">Activer un membre par ID</label>
                     <div class="admin-input-row">
                         <input type="text" id="adminTargetIdInput" placeholder="Ex: CRASH-8491" class="form-control-dark uppercase-input">
                         <button type="button" class="btn-primary" id="btnAdminActivateById">
-                            <i class="fa-solid fa-bolt"></i> Activer VIP
+                            <i class="fa-solid fa-bolt" aria-hidden="true"></i> Activer VIP
                         </button>
                     </div>
                 </div>
 
                 <div class="admin-users-table-wrap">
-                    <h4>Membres Enregistrés :</h4>
+                    <h4>Membres enregistrés</h4>
                     <div class="table-responsive">
                         <table class="admin-table">
                             <thead>
                                 <tr>
-                                    <th>ID Membre</th>
+                                    <th>ID</th>
                                     <th>Nom</th>
                                     <th>Email</th>
                                     <th>Statut</th>
-                                    <th>Action Directe</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody id="adminUsersTableBody"></tbody>
@@ -559,18 +522,24 @@
         </div>
     </div>
 
-    <!-- LIVE FLASH ID SOCIAL PROOF NOTIFICATION -->
+    <div class="payment-processing-overlay hidden" id="paymentProcessingOverlay" aria-live="assertive">
+        <div class="payment-processing-card">
+            <div class="radar-scanning-circle"></div>
+            <p class="scan-title">Vérification du paiement</p>
+            <p class="scan-subtitle" id="paymentProcessingText">Connexion à Flutterwave…</p>
+        </div>
+    </div>
+
     <div class="live-flash-social-box" id="liveFlashSocialBox">
-        <div class="flash-avatar"><i class="fa-solid fa-shield-halved"></i></div>
+        <div class="flash-avatar"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i></div>
         <div class="flash-text-content">
             <span class="flash-title" id="flashTitle">ID: CRASH-9421</span>
             <span class="flash-subtitle" id="flashSubtitle">vient d'activer son accès VIP</span>
         </div>
     </div>
 
-    <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <script src="app.js"></script>
+    <script src="app.js" defer></script>
 </body>
 </html>
