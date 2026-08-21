@@ -41,7 +41,7 @@ const TRANSLATIONS = {
         badge_algo: "MOTEUR 2026",
         badge_live_session: "SESSION TEMPS RÉEL",
         badge_verified: "VÉRIFIÉ",
-        flash_default: "vient d'activer sa licence complète",
+        flash_default: "vient d'activer sa licence",
         offer_title: "Licence Officielle & Accès Illimité",
         offer_desc: "Débloquez l'accès complet au cockpit d'analyse, aux prédictions en direct et à l'historique complet.",
         price_lifetime: "/ Accès à vie",
@@ -144,7 +144,7 @@ const TRANSLATIONS = {
         badge_algo: "2026 ENGINE",
         badge_live_session: "REAL-TIME SESSION",
         badge_verified: "VERIFIED",
-        flash_default: "just activated their lifetime license",
+        flash_default: "just activated their license",
         offer_title: "Official License & Unlimited Access",
         offer_desc: "Unlock complete access to the analysis cockpit, live predictions and flight history.",
         price_lifetime: "/ Lifetime access",
@@ -247,7 +247,7 @@ const TRANSLATIONS = {
         badge_algo: "MOTOR 2026",
         badge_live_session: "SESIÓN EN TIEMPO REAL",
         badge_verified: "VERIFICADO",
-        flash_default: "acaba de activar su licencia de por vida",
+        flash_default: "acaba de activar su licencia",
         offer_title: "Licencia Oficial y Acceso Ilimitado",
         offer_desc: "Desbloquee el acceso completo al cockpit de análisis, predicciones en vivo e historial de vuelos.",
         price_lifetime: "/ Acceso de por vida",
@@ -350,7 +350,7 @@ const TRANSLATIONS = {
         badge_algo: "MOTOR 2026",
         badge_live_session: "SESSÃO EM TEMPO REAL",
         badge_verified: "VERIFICADO",
-        flash_default: "acabou de ativar a sua licença vitalícia",
+        flash_default: "acabou de ativar a sua licença",
         offer_title: "Licença Oficial e Acesso Ilimitado",
         offer_desc: "Desbloqueie o acesso completo ao cockpit de análise, previsões ao vivo e histórico de voos.",
         price_lifetime: "/ Acesso vitalício",
@@ -453,7 +453,7 @@ const TRANSLATIONS = {
         badge_algo: "2026 ENGINE",
         badge_live_session: "ECHTZEIT-SITZUNG",
         badge_verified: "VERIFIZIERT",
-        flash_default: "hat soeben die lebenslange Lizenz aktiviert",
+        flash_default: "hat soeben die Lizenz aktiviert",
         offer_title: "Offizielle Lizenz & Unbegrenzter Zugang",
         offer_desc: "Schalten Sie vollen Zugriff auf das Analyse-Cockpit, Live-Signale und den Flugverlauf frei.",
         price_lifetime: "/ Lebenslanger Zugang",
@@ -922,12 +922,15 @@ function escapeHtml(value) {
     }[char]));
 }
 
+function randomMemberNumber() {
+    return 5000000 + Math.floor(Math.random() * 5000000);
+}
+
 function generateUniqueId() {
     const users = loadUsersDb();
     let candidate = "";
     do {
-        const random7Digits = Math.floor(5000000 + Math.random() * 5000000);
-        candidate = `CRASH-${random7Digits}`;
+        candidate = `CRASH-${randomMemberNumber()}`;
     } while (users.some((user) => user.uniqueId === candidate));
     return candidate;
 }
@@ -1196,34 +1199,38 @@ function initLiveOnlineUsersTicker() {
 /* -------------------------------------------------------------------------- */
 
 function initLiveFlashSocialNotifications() {
-    const flashBox = document.getElementById("liveFlashSocialBox");
-    const flashTitle = document.getElementById("flashTitle");
-    const flashSubtitle = document.getElementById("flashSubtitle");
-    if (!flashBox) return;
+    const flashBoxes = document.querySelectorAll(".js-live-activity, #liveFlashSocialBox");
+    if (!flashBoxes.length) return;
 
     const flashMessages = {
-        fr: "vient d'activer sa licence complète",
-        en: "just activated their lifetime license",
-        es: "acaba de activar su licencia de por vida",
-        pt: "acabou de ativar a sua licença vitalícia",
-        de: "hat soeben die lebenslange Lizenz aktiviert"
+        fr: "vient d'activer sa licence",
+        en: "just activated their license",
+        es: "acaba de activar su licencia",
+        pt: "acabou de ativar a sua licença",
+        de: "hat soeben die Lizenz aktiviert"
     };
 
-    let flashIdx = 0;
-
     function triggerFlash() {
-        const randomId = `ID: CRASH-${Math.floor(5000000 + Math.random() * 5000000)}`;
+        const randomId = `ID: CRASH-${randomMemberNumber()}`;
         const msg = flashMessages[currentLang] || flashMessages.fr;
 
-        if (flashTitle) flashTitle.textContent = randomId;
-        if (flashSubtitle) flashSubtitle.textContent = msg;
+        document.querySelectorAll(".js-live-activity-id, #flashTitle").forEach((el) => {
+            el.textContent = randomId;
+        });
+        document.querySelectorAll(".js-live-activity-msg, #flashSubtitle").forEach((el) => {
+            el.textContent = msg;
+        });
 
-        flashBox.classList.add("pulse-highlight");
-        setTimeout(() => flashBox.classList.remove("pulse-highlight"), 1400);
+        flashBoxes.forEach((box) => {
+            box.classList.add("pulse-highlight");
+            setTimeout(() => box.classList.remove("pulse-highlight"), 1400);
+        });
+
+        const nextDelay = 7000 + Math.floor(Math.random() * 8000);
+        setTimeout(triggerFlash, nextDelay);
     }
 
     triggerFlash();
-    setInterval(triggerFlash, 5500);
 }
 
 function initGuaranteed48hCountdown() {
@@ -1817,6 +1824,11 @@ function initProfileModal() {
 
     btnProfileSubscribe?.addEventListener("click", () => {
         profileModal?.classList.remove("active");
+        if (!currentUser) {
+            pendingCheckoutAfterAuth = true;
+            document.getElementById("loginModal")?.classList.add("active");
+            return;
+        }
         document.getElementById("buyModal")?.classList.add("active");
     });
 }
@@ -1895,14 +1907,16 @@ function initCheckout() {
 
     function openCheckoutModal() {
         if (!currentUser) {
-            checkoutAuthGate?.classList.remove("hidden");
-            checkoutPaymentPanel?.classList.add("hidden");
-        } else {
-            checkoutAuthGate?.classList.add("hidden");
-            checkoutPaymentPanel?.classList.remove("hidden");
-            if (phoneInput && currentUser.phone) {
-                phoneInput.value = currentUser.phone;
-            }
+            pendingCheckoutAfterAuth = true;
+            closeAllModals();
+            document.getElementById("loginModal")?.classList.add("active");
+            return;
+        }
+
+        checkoutAuthGate?.classList.add("hidden");
+        checkoutPaymentPanel?.classList.remove("hidden");
+        if (phoneInput && currentUser.phone) {
+            phoneInput.value = currentUser.phone;
         }
         buyModal?.classList.add("active");
     }
@@ -2080,7 +2094,16 @@ function initMasterAdminDashboard() {
     btnAdminActivate?.addEventListener("click", async () => {
         const targetId = adminTargetIdInput?.value.trim().toUpperCase();
         if (!targetId) {
-            showToast("Veuillez saisir un ID membre (ex: CRASH-5829143).", "error");
+            showToast("Veuillez saisir un ID membre (ex: CRASH-5627883).", "error");
+            return;
+        }
+        if (!/^CRASH-\d{7}$/.test(targetId)) {
+            showToast("ID invalide. Format attendu : CRASH-5627883.", "error");
+            return;
+        }
+        const idNumber = parseInt(targetId.replace(/\D/g, ""), 10);
+        if (idNumber < 5000000 || idNumber > 9999999) {
+            showToast("L'ID doit être compris entre CRASH-5000000 et CRASH-9999999.", "error");
             return;
         }
 
