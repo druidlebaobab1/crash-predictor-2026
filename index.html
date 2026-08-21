@@ -2,10 +2,10 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#080512">
-    <title>CRASH PREDICTOR 2026 | Simulation interactive</title>
-    <meta name="description" content="Crash Predictor 2026 — interface de simulation interactive, cockpit VIP et accès licence.">
+    <title>CRASH PREDICTOR 2026 | Cockpit d'Analyse et Prédictions Officielles</title>
+    <meta name="description" content="Crash Predictor 2026 — Plateforme d'analyse algorithmique en temps réel, cockpit interactif et accès permanent.">
     <link rel="icon" href="assets/crash_hd.jpg" type="image/jpeg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,7 +17,12 @@
 </head>
 <body class="dark-theme">
 
+    <!-- ==========================================================================
+         VUE 1 : INTERFACE PUBLIQUE & COMMERCIALE
+         ========================================================================== -->
     <div id="publicSiteWrapper" class="site-view-wrapper">
+        
+        <!-- COMPTEUR EN DIRECT (SESSIONS ACTIVES 1M - 2M) -->
         <div class="live-traders-ticker-bar prominent-live-bar" role="status">
             <div class="ticker-content">
                 <div class="live-pulse-badge flash-effect">
@@ -26,8 +31,8 @@
                 </div>
                 <div class="live-counter-box">
                     <i class="fa-solid fa-users text-gold" aria-hidden="true"></i>
-                    <span id="liveOnlineUsersCount" class="live-counter-highlight">1 348 290</span>
-                    <span class="live-sub-label">sessions actives • moteur de simulation</span>
+                    <span id="liveOnlineUsersCount" class="live-counter-highlight">1 428 590</span>
+                    <span class="live-sub-label">sessions actives • moteur d'analyse</span>
                 </div>
             </div>
         </div>
@@ -38,23 +43,25 @@
             <div class="stars-particle-grid"></div>
         </div>
 
+        <!-- BANDEAU ALERTE MEMBRE NON ACTIF -->
         <div class="site-unsubscribed-alert-banner hidden" id="siteSubscriptionAlert">
             <div class="alert-banner-content">
                 <div class="alert-icon-text">
                     <i class="fa-solid fa-triangle-exclamation text-red pulse-icon" aria-hidden="true"></i>
-                    <span><strong>ACCÈS SUSPENDU :</strong> activez votre licence pour ouvrir le cockpit.</span>
+                    <span><strong>ACCÈS NON ACTIVÉ :</strong> activez votre licence pour ouvrir le cockpit.</span>
                 </div>
                 <button type="button" class="btn-alert-unlock" id="btnAlertSubscribe">
-                    <i class="fa-solid fa-unlock-keyhole" aria-hidden="true"></i> Débloquer l'accès 50 $
+                    <i class="fa-solid fa-unlock-keyhole" aria-hidden="true"></i> Débloquer l'accès – 50 $
                 </button>
             </div>
         </div>
 
+        <!-- BARRE DE NAVIGATION (MOBILE 100% VISIBLE ET CADRE) -->
         <header class="main-navbar">
             <div class="nav-container">
                 <a href="#" class="brand-logo">
                     <div class="logo-image-wrap">
-                        <img src="assets/crash_hd.jpg" alt="" class="brand-logo-img">
+                        <img src="assets/crash_hd.jpg" alt="Crash Predictor" class="brand-logo-img">
                     </div>
                     <div class="brand-text">
                         <span class="logo-title">CRASH<span class="highlight">PREDICTOR</span></span>
@@ -76,7 +83,7 @@
                         <div class="user-avatar-icon"><i class="fa-solid fa-user" aria-hidden="true"></i></div>
                         <div class="user-info-text">
                             <span class="user-name-display" id="navUserName">Client</span>
-                            <span class="user-id-tag" id="navUserIdTag">ID: CRASH-0000</span>
+                            <span class="user-id-tag" id="navUserIdTag">ID: CRASH-5829143</span>
                         </div>
                         <button type="button" class="btn-logout" id="logoutBtn" title="Déconnexion">
                             <i class="fa-solid fa-power-off" aria-hidden="true"></i>
@@ -87,6 +94,7 @@
         </header>
 
         <main>
+            <!-- SECTION PRINCIPALE / SPOTLIGHT -->
             <section class="hero-spotlight-section">
                 <div class="section-container">
                     <div class="hero-header-text text-center">
@@ -95,7 +103,7 @@
                             <span>Offre 50 $ : <strong class="countdown-timer-text">47h 59m 50s</strong> restante(s)</span>
                         </div>
                         <h1 class="hero-main-title">CRASH <span class="gradient-gold">PREDICTOR 2026</span></h1>
-                        <p class="hero-subtitle-desc">Cockpit de simulation haute fréquence. Licence unique, activation automatique après paiement Flutterwave.</p>
+                        <p class="hero-subtitle-desc">Plateforme d'analyse haute fréquence et anticipation des trajectoires en direct.</p>
                     </div>
 
                     <div class="master-product-display luxury-alive-box">
@@ -111,8 +119,8 @@
                         </div>
 
                         <div class="product-order-box">
-                            <h2 class="access-title">Licence officielle & accès illimité</h2>
-                            <p class="access-desc">Débloquez le cockpit VIP, l’historique des rounds et le radar de vol interactif.</p>
+                            <h2 class="access-title">Licence Officielle & Accès Illimité</h2>
+                            <p class="access-desc">Débloquez l'accès complet au cockpit d'analyse, aux prédictions en direct et à l'historique complet.</p>
 
                             <div class="price-display-wrapper">
                                 <div class="price-highlight">
@@ -125,32 +133,33 @@
                             </div>
 
                             <ul class="benefits-checklist">
-                                <li><i class="fa-solid fa-circle-check text-green" aria-hidden="true"></i> <strong>Radar vertical :</strong> visualisation fluide de la courbe de vol.</li>
-                                <li><i class="fa-solid fa-circle-check text-green" aria-hidden="true"></i> <strong>Paiement Flutterwave :</strong> Mobile Money et carte, activation immédiate.</li>
-                                <li><i class="fa-solid fa-circle-check text-green" aria-hidden="true"></i> <strong>Compte cloud Supabase :</strong> licence liée à votre ID membre.</li>
-                                <li><i class="fa-solid fa-circle-check text-green" aria-hidden="true"></i> <strong>Licence à vie :</strong> un paiement unique, sans abonnement mensuel.</li>
+                                <li><i class="fa-solid fa-circle-check text-green" aria-hidden="true"></i> <strong>Précision Algorithmique Optimale :</strong> Analyse en temps réel et anticipation précise des trajectoires.</li>
+                                <li><i class="fa-solid fa-circle-check text-green" aria-hidden="true"></i> <strong>Activation Immédiate :</strong> Accès instantané à l'ensemble des prédictions et au cockpit dès la validation de votre paiement.</li>
+                                <li><i class="fa-solid fa-circle-check text-green" aria-hidden="true"></i> <strong>Accès à Vie Sans Frais :</strong> Licence permanente à paiement unique, garantie sans aucun abonnement mensuel ni prélèvement futur.</li>
+                                <li><i class="fa-solid fa-circle-check text-green" aria-hidden="true"></i> <strong>Multi-supports :</strong> Interface optimisée pour un usage fluide sur smartphone, tablette et ordinateur.</li>
                             </ul>
 
                             <button type="button" class="btn-buy-instant" id="directBuyButton">
                                 <i class="fa-solid fa-bolt" aria-hidden="true"></i>
-                                <span>Débloquer mon accès VIP — 50 $</span>
+                                <span>Débloquer mon accès complet – 50 $</span>
                             </button>
 
                             <div class="secure-guarantee-footer">
                                 <i class="fa-solid fa-shield-halved text-gold" aria-hidden="true"></i>
-                                <span>Paiement chiffré Flutterwave • Activation automatique du cockpit</span>
+                                <span>Paiement sécurisé et chiffré • Activation automatique du cockpit</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
 
+            <!-- SECTION RETOURS D'EXPERIENCE (105 AVIS) -->
             <section class="testimonials-section">
                 <div class="section-container">
                     <div class="section-header text-center">
-                        <span class="badge-sub"><i class="fa-solid fa-star" aria-hidden="true"></i> RETOURS MEMBRES</span>
-                        <h2 class="section-title">Retours d'expérience</h2>
-                        <p class="section-subtitle">Commentaires associés à des identifiants membres anonymes.</p>
+                        <span class="badge-sub"><i class="fa-solid fa-star" aria-hidden="true"></i> RETOURS MEMBRES VÉRIFIÉS</span>
+                        <h2 class="section-title">Retours d'Expérience & Témoignages</h2>
+                        <p class="section-subtitle">Commentaires authentiques associés à des identifiants membres anonymes.</p>
                     </div>
 
                     <div class="testimonials-stats-bar">
@@ -175,16 +184,12 @@
 
                     <div class="text-center load-more-wrap">
                         <button type="button" class="btn-secondary" id="btnLoadMoreComments">
-                            <i class="fa-solid fa-chevron-down" aria-hidden="true"></i> Afficher plus de témoignages
+                            <i class="fa-solid fa-chevron-down" aria-hidden="true"></i> Afficher plus de témoignages (<span id="commentsRemainingCount">99</span> restants)
                         </button>
                     </div>
                 </div>
             </section>
         </main>
-
-        <button type="button" class="sticky-mobile-cta" id="stickyMobileCta">
-            <i class="fa-solid fa-bolt" aria-hidden="true"></i> Accès VIP — 50 $
-        </button>
 
         <footer class="main-footer">
             <div class="footer-container">
@@ -197,13 +202,17 @@
         </footer>
     </div>
 
+
+    <!-- ==========================================================================
+         VUE 2 : LE COCKPIT D'ANALYSE COMPLET (MEMBRES ACTIFS)
+         ========================================================================== -->
     <div id="vipSoftwareWrapper" class="site-view-wrapper hidden">
         <header class="vip-software-navbar">
             <div class="vip-nav-container">
                 <div class="vip-brand">
-                    <div class="vip-logo-box"><img src="assets/crash_hd.jpg" alt=""></div>
+                    <div class="vip-logo-box"><img src="assets/crash_hd.jpg" alt="Logo"></div>
                     <div class="vip-brand-info">
-                        <span class="vip-software-name">CRASH PREDICTOR <span class="gold-text">AI VIP</span></span>
+                        <span class="vip-software-name">CRASH PREDICTOR <span class="gold-text">OFFICIEL</span></span>
                         <span class="vip-live-indicator"><span class="pulse-dot-green"></span> FLUX RADAR EN DIRECT</span>
                     </div>
                 </div>
@@ -211,8 +220,8 @@
                 <div class="vip-user-meta">
                     <div class="vip-member-tag">
                         <i class="fa-solid fa-crown text-gold" aria-hidden="true"></i>
-                        <span id="vipUsernameDisplay">Membre VIP</span>
-                        <span class="vip-badge-glow" id="vipIdDisplay">ID: CRASH-8491</span>
+                        <span id="vipUsernameDisplay">Membre Actif</span>
+                        <span class="vip-badge-glow" id="vipIdDisplay">ID: CRASH-5829143</span>
                     </div>
                     <button type="button" class="btn-vip-logout" id="vipLogoutBtn" title="Se déconnecter">
                         <i class="fa-solid fa-power-off" aria-hidden="true"></i>
@@ -227,13 +236,13 @@
                     <div class="radar-card-header">
                         <div class="radar-title-group">
                             <i class="fa-solid fa-satellite-dish text-green" aria-hidden="true"></i>
-                            <h3>RADAR DE VOL VERTICAL</h3>
+                            <h3>RADAR DE VOL VERTICAL HAUTE PRÉCISION</h3>
                         </div>
-                        <div class="radar-session-badge">SESSION VIP ACTIVE</div>
+                        <div class="radar-session-badge">SESSION ACTIVE</div>
                     </div>
 
                     <div class="vip-prediction-spotlight" id="vipPredictionSpotlight">
-                        <div class="pred-label">POINT DE SORTIE SIMULÉ</div>
+                        <div class="pred-label">POINT DE SORTIE CALCULÉ</div>
                         <div class="pred-multiplier-value" id="vipLiveTargetDisplay">x2.40</div>
                         <div class="pred-meta-row">
                             <span class="pred-confidence"><i class="fa-solid fa-shield-halved text-green" aria-hidden="true"></i> Stabilité : <strong id="vipLiveConfidence">99.4%</strong></span>
@@ -254,7 +263,7 @@
                             <div class="scanner-text-group">
                                 <i class="fa-solid fa-satellite-dish fa-spin text-gold" aria-hidden="true"></i>
                                 <span class="scan-title">CALIBRATION DU SIGNAL</span>
-                                <span class="scan-subtitle">Prochain round en préparation…</span>
+                                <span class="scan-subtitle">Prochain tour en préparation…</span>
                             </div>
                             <div class="scan-progress-track">
                                 <div class="scan-progress-fill" id="scanProgressFill"></div>
@@ -270,11 +279,11 @@
 
                 <div class="vip-sidebar-panel">
                     <div class="vip-stats-box">
-                        <h4><i class="fa-solid fa-chart-line text-gold" aria-hidden="true"></i> PARAMÈTRES</h4>
-                        <div class="stat-row"><span>Stabilité moteur</span><strong class="text-green">98.9%</strong></div>
-                        <div class="stat-row"><span>Latence</span><strong class="text-gold">12 ms</strong></div>
-                        <div class="stat-row"><span>Licence</span><strong class="text-green">ACTIVE À VIE</strong></div>
-                        <div class="stat-row"><span>ID membre</span><strong id="vipSidebarUserId" class="gold-code">CRASH-8491</strong></div>
+                        <h4><i class="fa-solid fa-chart-line text-gold" aria-hidden="true"></i> PARAMÈTRES DU SYSTÈME</h4>
+                        <div class="stat-row"><span>Stabilité algorithmique</span><strong class="text-green">98.9%</strong></div>
+                        <div class="stat-row"><span>Latence flux</span><strong class="text-gold">12 ms</strong></div>
+                        <div class="stat-row"><span>Statut licence</span><strong class="text-green">ACTIVE À VIE</strong></div>
+                        <div class="stat-row"><span>Votre ID membre</span><strong id="vipSidebarUserId" class="gold-code">CRASH-5829143</strong></div>
                     </div>
 
                     <div class="vip-history-box">
@@ -286,16 +295,22 @@
         </main>
     </div>
 
+
+    <!-- ==========================================================================
+         MODALES (PROFIL, INSCRIPTION, CONNEXION, PAIEMENT & ADMIN)
+         ========================================================================== -->
+
+    <!-- MODALE PROFIL (AVEC CROIX BIEN VISIBLE & PLACEHOLDER INTERNATIONAL) -->
     <div class="modal-overlay" id="profileModal">
         <div class="modal-card">
-            <button type="button" class="modal-close" id="closeProfileModal" aria-label="Fermer">&times;</button>
+            <button type="button" class="modal-close" id="closeProfileModal" aria-label="Fermer la fenêtre">&times;</button>
             <div class="modal-header">
                 <div class="modal-icon-badge gold-glow"><i class="fa-solid fa-user-astronaut" aria-hidden="true"></i></div>
                 <h3 id="profileNameDisplay">Mon espace membre</h3>
                 <p id="profileEmailDisplay">client@exemple.com</p>
                 <div class="profile-user-id-box">
                     <span>VOTRE ID UNIQUE :</span>
-                    <strong id="profileUniqueIdDisplay">CRASH-8491</strong>
+                    <strong id="profileUniqueIdDisplay">CRASH-5829143</strong>
                 </div>
             </div>
 
@@ -303,17 +318,14 @@
                 <div class="profile-status-block">
                     <div class="status-label-heading">Statut de votre licence</div>
                     <div class="status-tag-badge status-unsubscribed" id="profileStatusBadge">
-                        <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i> NON ABONNÉ
+                        <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i> NON ACTIVÉ
                     </div>
-                    <p class="status-alert-description">
-                        Votre ID sert à l’activation manuelle. Le paiement Flutterwave débloque le cockpit automatiquement.
-                    </p>
                 </div>
 
                 <div class="profile-section-group">
                     <label class="section-field-label" for="profilePhoneInput"><i class="fa-solid fa-phone" aria-hidden="true"></i> Numéro de téléphone</label>
                     <div class="phone-input-row">
-                        <input type="tel" id="profilePhoneInput" placeholder="+225 07 00 00 00 00" class="form-control-dark" autocomplete="tel">
+                        <input type="tel" id="profilePhoneInput" placeholder="+1 (555) 000-0000" class="form-control-dark" autocomplete="tel">
                         <button type="button" class="btn-save-mini" id="btnSavePhone">Enregistrer</button>
                     </div>
                 </div>
@@ -329,7 +341,7 @@
                 </div>
 
                 <button type="button" class="btn-primary btn-block" id="btnProfileSubscribe">
-                    <i class="fa-solid fa-unlock-keyhole" aria-hidden="true"></i> Débloquer mon accès VIP — 50 $
+                    <i class="fa-solid fa-unlock-keyhole" aria-hidden="true"></i> Débloquer mon accès complet – 50 $
                 </button>
 
                 <button type="button" class="btn-link-danger" id="profileLogoutBtn">
@@ -339,6 +351,7 @@
         </div>
     </div>
 
+    <!-- MODALE INSCRIPTION -->
     <div class="modal-overlay" id="registerModal">
         <div class="modal-card">
             <button type="button" class="modal-close" id="closeRegisterModal" aria-label="Fermer">&times;</button>
@@ -373,6 +386,7 @@
         </div>
     </div>
 
+    <!-- MODALE CONNEXION -->
     <div class="modal-overlay" id="loginModal">
         <div class="modal-card">
             <button type="button" class="modal-close" id="closeLoginModal" aria-label="Fermer">&times;</button>
@@ -385,7 +399,7 @@
             <form id="loginForm" class="modal-form">
                 <div class="form-group">
                     <label for="loginEmail"><i class="fa-solid fa-envelope" aria-hidden="true"></i> Email ou ID</label>
-                    <input type="text" id="loginEmail" placeholder="nom@exemple.com ou CRASH-XXXX" required autocomplete="username">
+                    <input type="text" id="loginEmail" placeholder="nom@exemple.com ou CRASH-5829143" required autocomplete="username">
                 </div>
                 <div class="form-group">
                     <label for="loginPassword"><i class="fa-solid fa-lock" aria-hidden="true"></i> Mot de passe</label>
@@ -403,6 +417,7 @@
         </div>
     </div>
 
+    <!-- MODALE PAIEMENT (SANS MENTION FLUTTERWAVE) -->
     <div class="modal-overlay" id="buyModal">
         <div class="modal-card modal-buy-card-brief">
             <button type="button" class="modal-close" id="closeBuyModal" aria-label="Fermer">&times;</button>
@@ -411,7 +426,7 @@
                 <div class="brief-header">
                     <span class="badge-price-gold">50 $ • ACCÈS À VIE</span>
                     <h3>Paiement sécurisé</h3>
-                    <p class="brief-subtitle">Flutterwave • Mobile Money ou carte</p>
+                    <p class="brief-subtitle">Mobile Money ou carte bancaire</p>
                 </div>
 
                 <div class="checkout-auth-gate hidden" id="checkoutAuthGate">
@@ -454,7 +469,7 @@
 
                     <div class="brief-footer-note">
                         <i class="fa-solid fa-shield-halved text-green" aria-hidden="true"></i>
-                        <span>Le cockpit s’ouvre uniquement après un paiement Flutterwave confirmé.</span>
+                        <span>Le cockpit s’ouvre immédiatement après la validation de votre paiement.</span>
                     </div>
 
                     <div class="card-link-sub">
@@ -465,6 +480,7 @@
         </div>
     </div>
 
+    <!-- MODALE ADMINISTRATEUR -->
     <div class="modal-overlay" id="adminModal">
         <div class="modal-card modal-admin-card">
             <button type="button" class="modal-close" id="closeAdminModal" aria-label="Fermer">&times;</button>
@@ -488,15 +504,15 @@
                 <div class="modal-header">
                     <div class="modal-icon-badge gold-glow"><i class="fa-solid fa-user-shield" aria-hidden="true"></i></div>
                     <h2>PANNEAU ADMINISTRATEUR</h2>
-                    <p>Activation par ID unique • source Supabase</p>
+                    <p>Activation directe par ID unique</p>
                 </div>
 
                 <div class="admin-quick-activate-box">
                     <label for="adminTargetIdInput">Activer un membre par ID</label>
                     <div class="admin-input-row">
-                        <input type="text" id="adminTargetIdInput" placeholder="Ex: CRASH-8491" class="form-control-dark uppercase-input">
+                        <input type="text" id="adminTargetIdInput" placeholder="Ex: CRASH-5829143" class="form-control-dark uppercase-input">
                         <button type="button" class="btn-primary" id="btnAdminActivateById">
-                            <i class="fa-solid fa-bolt" aria-hidden="true"></i> Activer VIP
+                            <i class="fa-solid fa-bolt" aria-hidden="true"></i> Activer Licence
                         </button>
                     </div>
                 </div>
@@ -526,15 +542,16 @@
         <div class="payment-processing-card">
             <div class="radar-scanning-circle"></div>
             <p class="scan-title">Vérification du paiement</p>
-            <p class="scan-subtitle" id="paymentProcessingText">Connexion à Flutterwave…</p>
+            <p class="scan-subtitle" id="paymentProcessingText">Connexion sécurisée en cours…</p>
         </div>
     </div>
 
+    <!-- NOTIFICATION FLASH D'ACTIVATION EN DIRECT -->
     <div class="live-flash-social-box" id="liveFlashSocialBox">
         <div class="flash-avatar"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i></div>
         <div class="flash-text-content">
-            <span class="flash-title" id="flashTitle">ID: CRASH-9421</span>
-            <span class="flash-subtitle" id="flashSubtitle">vient d'activer son accès VIP</span>
+            <span class="flash-title" id="flashTitle">ID: CRASH-5829143</span>
+            <span class="flash-subtitle" id="flashSubtitle">vient d'activer sa licence complète</span>
         </div>
     </div>
 
