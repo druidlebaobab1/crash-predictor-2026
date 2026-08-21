@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#080512">
-    <title>CRASH PREDICTOR 2026 | Cockpit d'Analyse et Prédictions Officielles</title>
+    <title data-i18n="doc_title">CRASH PREDICTOR 2026 | Cockpit d'Analyse et Prédictions Officielles</title>
     <meta name="description" content="Crash Predictor 2026 — Plateforme d'analyse algorithmique en temps réel, cockpit interactif et accès permanent.">
     <link rel="icon" href="assets/crash_hd.jpg" type="image/jpeg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,12 +27,12 @@
             <div class="ticker-content">
                 <div class="live-pulse-badge flash-effect">
                     <span class="live-dot-pulse"></span>
-                    <span class="live-tag-text">EN DIRECT</span>
+                    <span class="live-tag-text" data-i18n="ticker_live">EN DIRECT</span>
                 </div>
                 <div class="live-counter-box">
                     <i class="fa-solid fa-users text-gold" aria-hidden="true"></i>
                     <span id="liveOnlineUsersCount" class="live-counter-highlight">1 438 920</span>
-                    <span class="live-sub-label">sessions actives • moteur d'analyse</span>
+                    <span class="live-sub-label" data-i18n="ticker_sub">sessions actives • moteur d'analyse</span>
                 </div>
             </div>
         </div>
@@ -48,15 +48,15 @@
             <div class="alert-banner-content">
                 <div class="alert-icon-text">
                     <i class="fa-solid fa-triangle-exclamation text-red pulse-icon" aria-hidden="true"></i>
-                    <span><strong>ACCÈS NON ACTIVÉ :</strong> activez votre licence pour ouvrir le cockpit.</span>
+                    <span data-i18n="alert_unsubscribed"><strong>ACCÈS NON ACTIVÉ :</strong> activez votre licence pour ouvrir le cockpit.</span>
                 </div>
                 <button type="button" class="btn-alert-unlock" id="btnAlertSubscribe">
-                    <i class="fa-solid fa-unlock-keyhole" aria-hidden="true"></i> Débloquer l'accès – 50 $
+                    <i class="fa-solid fa-unlock-keyhole" aria-hidden="true"></i> <span data-i18n="btn_alert_unlock">Débloquer l'accès – 50 $</span>
                 </button>
             </div>
         </div>
 
-        <!-- BARRE DE NAVIGATION (MOBILE 100% VISIBLE ET CADRÉ) -->
+        <!-- BARRE DE NAVIGATION -->
         <header class="main-navbar">
             <div class="nav-container">
                 <a href="#" class="brand-logo">
@@ -65,17 +65,43 @@
                     </div>
                     <div class="brand-text">
                         <span class="logo-title">CRASH<span class="highlight">PREDICTOR</span></span>
-                        <span class="logo-badge">ÉDITION 2026</span>
+                        <span class="logo-badge" data-i18n="badge_edition">ÉDITION 2026</span>
                     </div>
                 </a>
 
                 <div class="nav-auth-actions">
+                    <!-- SÉLECTEUR DE LANGUE DISCRET & INTUITIF -->
+                    <div class="lang-selector-dropdown" id="langSelectorWrap">
+                        <button type="button" class="lang-toggle-btn" id="langToggleBtn" aria-label="Changer de langue">
+                            <span class="lang-flag" id="currentLangFlag">🇫🇷</span>
+                            <span class="lang-code" id="currentLangCode">FR</span>
+                            <i class="fa-solid fa-chevron-down lang-chevron"></i>
+                        </button>
+                        <div class="lang-dropdown-menu hidden" id="langDropdownMenu">
+                            <button type="button" class="lang-option-btn active" data-lang="fr">
+                                <span class="opt-flag">🇫🇷</span> <span class="opt-label">Français</span>
+                            </button>
+                            <button type="button" class="lang-option-btn" data-lang="en">
+                                <span class="opt-flag">🇬🇧</span> <span class="opt-label">English</span>
+                            </button>
+                            <button type="button" class="lang-option-btn" data-lang="es">
+                                <span class="opt-flag">🇪🇸</span> <span class="opt-label">Español</span>
+                            </button>
+                            <button type="button" class="lang-option-btn" data-lang="pt">
+                                <span class="opt-flag">🇵🇹</span> <span class="opt-label">Português</span>
+                            </button>
+                            <button type="button" class="lang-option-btn" data-lang="de">
+                                <span class="opt-flag">🇩🇪</span> <span class="opt-label">Deutsch</span>
+                            </button>
+                        </div>
+                    </div>
+
                     <div class="guest-buttons" id="guestButtons">
                         <button type="button" class="btn-ghost-compact" id="openLoginBtn">
-                            <i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i> Connexion
+                            <i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i> <span data-i18n="nav_login">Connexion</span>
                         </button>
                         <button type="button" class="btn-primary-compact" id="openRegisterBtn">
-                            <i class="fa-solid fa-user-plus" aria-hidden="true"></i> Inscription
+                            <i class="fa-solid fa-user-plus" aria-hidden="true"></i> <span data-i18n="nav_register">Inscription</span>
                         </button>
                     </div>
 
@@ -100,10 +126,10 @@
                     <div class="hero-header-text text-center">
                         <div class="countdown-promo-badge">
                             <i class="fa-solid fa-stopwatch text-gold pulse-icon" aria-hidden="true"></i>
-                            <span>Offre 50 $ : <strong class="countdown-timer-text">47h 59m 50s</strong> restante(s)</span>
+                            <span><span data-i18n="promo_offer">Offre 50 $ :</span> <strong class="countdown-timer-text">47h 59m 50s</strong> <span data-i18n="promo_remaining">restante(s)</span></span>
                         </div>
                         <h1 class="hero-main-title">CRASH <span class="gradient-gold">PREDICTOR 2026</span></h1>
-                        <p class="hero-subtitle-desc">Plateforme d'analyse haute fréquence et anticipation des trajectoires en direct.</p>
+                        <p class="hero-subtitle-desc" data-i18n="hero_subtitle">Plateforme d'analyse haute fréquence et anticipation des trajectoires en direct.</p>
                     </div>
 
                     <div class="master-product-display luxury-alive-box">
@@ -113,77 +139,77 @@
                                 <div class="radiant-light-beam" aria-hidden="true"></div>
                             </div>
                             <div class="image-caption-bar">
-                                <span class="badge-algo"><i class="fa-solid fa-microchip" aria-hidden="true"></i> MOTEUR 2026</span>
-                                <span class="badge-status-live"><i class="fa-solid fa-bolt" aria-hidden="true"></i> SESSION TEMPS RÉEL</span>
+                                <span class="badge-algo"><i class="fa-solid fa-microchip" aria-hidden="true"></i> <span data-i18n="badge_algo">MOTEUR 2026</span></span>
+                                <span class="badge-status-live"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="badge_live_session">SESSION TEMPS RÉEL</span></span>
                             </div>
 
-                            <!-- 2. BANDEAU D'ACTIVITÉ PRO ET ÉLÉGANT (SOUS LE VISUEL, SANS GÊNER LE TEXTE) -->
+                            <!-- BANDEAU D'ACTIVITÉ PRO ET ÉLÉGANT -->
                             <div class="live-activity-luxury-card" id="liveFlashSocialBox">
                                 <div class="luxury-card-left">
                                     <span class="active-radar-dot"></span>
                                     <div class="luxury-id-group">
                                         <span class="luxury-id-title" id="flashTitle">ID: CRASH-5829143</span>
-                                        <span class="luxury-id-subtitle" id="flashSubtitle">vient d'activer sa licence complète</span>
+                                        <span class="luxury-id-subtitle" id="flashSubtitle" data-i18n="flash_default">vient d'activer sa licence complète</span>
                                     </div>
                                 </div>
-                                <span class="luxury-verified-badge"><i class="fa-solid fa-circle-check"></i> VÉRIFIÉ</span>
+                                <span class="luxury-verified-badge"><i class="fa-solid fa-circle-check"></i> <span data-i18n="badge_verified">VÉRIFIÉ</span></span>
                             </div>
                         </div>
 
                         <div class="product-order-box">
-                            <h2 class="access-title">Licence Officielle & Accès Illimité</h2>
-                            <p class="access-desc">Débloquez l'accès complet au cockpit d'analyse, aux prédictions en direct et à l'historique complet.</p>
+                            <h2 class="access-title" data-i18n="offer_title">Licence Officielle & Accès Illimité</h2>
+                            <p class="access-desc" data-i18n="offer_desc">Débloquez l'accès complet au cockpit d'analyse, aux prédictions en direct et à l'historique complet.</p>
 
                             <div class="price-display-wrapper">
                                 <div class="price-highlight">
                                     <div class="price-main-row">
                                         <span class="price-amount">50 $</span>
-                                        <span class="price-type">/ Accès à vie</span>
+                                        <span class="price-type" data-i18n="price_lifetime">/ Accès à vie</span>
                                     </div>
-                                    <div class="price-cfa-conversion">≈ 30 000 francs CFA</div>
+                                    <div class="price-cfa-conversion" id="priceCfaConversion" data-i18n="price_cfa">≈ 30 000 francs CFA</div>
                                 </div>
                             </div>
 
-                            <!-- 1. STRUCTURE AVANTAGES : CARTES VERTICALES ULTRA-PROPRES & PARFAITEMENT ALIGNÉES -->
+                            <!-- CARTES VERTICALES D'AVANTAGES -->
                             <div class="benefits-vertical-list">
                                 <div class="benefit-card">
                                     <div class="benefit-head">
                                         <i class="fa-solid fa-circle-check text-green" aria-hidden="true"></i>
-                                        <span class="benefit-name">Précision Algorithmique Optimale</span>
+                                        <span class="benefit-name" data-i18n="benefit_1_title">Précision Algorithmique Optimale</span>
                                     </div>
-                                    <p class="benefit-text">Analyse en temps réel et anticipation précise des trajectoires.</p>
+                                    <p class="benefit-text" data-i18n="benefit_1_desc">Analyse en temps réel et anticipation précise des trajectoires.</p>
                                 </div>
                                 <div class="benefit-card">
                                     <div class="benefit-head">
                                         <i class="fa-solid fa-circle-check text-green" aria-hidden="true"></i>
-                                        <span class="benefit-name">Activation Immédiate</span>
+                                        <span class="benefit-name" data-i18n="benefit_2_title">Activation Immédiate</span>
                                     </div>
-                                    <p class="benefit-text">Accès instantané à l'ensemble des prédictions et au cockpit dès la validation de votre paiement.</p>
+                                    <p class="benefit-text" data-i18n="benefit_2_desc">Accès instantané à l'ensemble des prédictions et au cockpit dès la validation de votre paiement.</p>
                                 </div>
                                 <div class="benefit-card">
                                     <div class="benefit-head">
                                         <i class="fa-solid fa-circle-check text-green" aria-hidden="true"></i>
-                                        <span class="benefit-name">Accès à Vie Sans Frais</span>
+                                        <span class="benefit-name" data-i18n="benefit_3_title">Accès à Vie Sans Frais</span>
                                     </div>
-                                    <p class="benefit-text">Licence permanente à paiement unique, garantie sans aucun abonnement mensuel ni prélèvement futur.</p>
+                                    <p class="benefit-text" data-i18n="benefit_3_desc">Licence permanente à paiement unique, garantie sans aucun abonnement mensuel ni prélèvement futur.</p>
                                 </div>
                                 <div class="benefit-card">
                                     <div class="benefit-head">
                                         <i class="fa-solid fa-circle-check text-green" aria-hidden="true"></i>
-                                        <span class="benefit-name">Multi-supports</span>
+                                        <span class="benefit-name" data-i18n="benefit_4_title">Multi-supports</span>
                                     </div>
-                                    <p class="benefit-text">Interface optimisée pour un usage fluide sur smartphone, tablette et ordinateur.</p>
+                                    <p class="benefit-text" data-i18n="benefit_4_desc">Interface optimisée pour un usage fluide sur smartphone, tablette et ordinateur.</p>
                                 </div>
                             </div>
 
                             <button type="button" class="btn-buy-instant" id="directBuyButton">
                                 <i class="fa-solid fa-bolt" aria-hidden="true"></i>
-                                <span>Débloquer mon accès complet – 50 $</span>
+                                <span data-i18n="btn_buy_instant">Débloquer mon accès complet – 50 $</span>
                             </button>
 
                             <div class="secure-guarantee-footer">
                                 <i class="fa-solid fa-shield-halved text-gold" aria-hidden="true"></i>
-                                <span>Paiement sécurisé et chiffré • Activation automatique du cockpit</span>
+                                <span data-i18n="secure_guarantee">Paiement sécurisé et chiffré • Activation automatique du cockpit</span>
                             </div>
                         </div>
                     </div>
@@ -194,26 +220,26 @@
             <section class="testimonials-section">
                 <div class="section-container">
                     <div class="section-header text-center">
-                        <span class="badge-sub"><i class="fa-solid fa-star" aria-hidden="true"></i> RETOURS MEMBRES VÉRIFIÉS (113 AVIS)</span>
-                        <h2 class="section-title">Retours d'Expérience & Témoignages</h2>
-                        <p class="section-subtitle">Commentaires authentiques associés à des identifiants membres anonymes.</p>
+                        <span class="badge-sub"><i class="fa-solid fa-star" aria-hidden="true"></i> <span data-i18n="reviews_badge">RETOURS MEMBRES VÉRIFIÉS (113 AVIS)</span></span>
+                        <h2 class="section-title" data-i18n="reviews_title">Retours d'Expérience & Témoignages</h2>
+                        <p class="section-subtitle" data-i18n="reviews_subtitle">Commentaires authentiques associés à des identifiants membres anonymes.</p>
                     </div>
 
                     <div class="testimonials-stats-bar">
                         <div class="t-stat-item">
                             <span class="t-stat-num">155 643</span>
-                            <span class="t-stat-sub">Membres inscrits</span>
+                            <span class="t-stat-sub" data-i18n="stat_registered">Membres inscrits</span>
                         </div>
                         <div class="t-stat-item">
                             <span class="t-stat-num">4.9 / 5</span>
                             <div class="t-stat-stars" aria-label="Note 4.9 sur 5">
                                 <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
                             </div>
-                            <span class="t-stat-sub">Indice de satisfaction</span>
+                            <span class="t-stat-sub" data-i18n="stat_satisfaction">Indice de satisfaction</span>
                         </div>
                         <div class="t-stat-item">
                             <span class="t-stat-num text-green">50 $</span>
-                            <span class="t-stat-sub">Licence unique à vie</span>
+                            <span class="t-stat-sub" data-i18n="stat_license">Licence unique à vie</span>
                         </div>
                     </div>
 
@@ -221,7 +247,7 @@
 
                     <div class="text-center load-more-wrap">
                         <button type="button" class="btn-secondary" id="btnLoadMoreComments">
-                            <i class="fa-solid fa-chevron-down" aria-hidden="true"></i> Afficher plus de témoignages (<span id="commentsRemainingCount">107</span> restants)
+                            <i class="fa-solid fa-chevron-down" aria-hidden="true"></i> <span data-i18n="btn_load_more">Afficher plus de témoignages</span> (<span id="commentsRemainingCount">107</span> <span data-i18n="remaining_txt">restants</span>)
                         </button>
                     </div>
                 </div>
@@ -231,9 +257,9 @@
         <footer class="main-footer">
             <div class="footer-container">
                 <div class="logo-title">CRASH <span class="highlight">PREDICTOR 2026</span></div>
-                <div class="footer-copy">&copy; 2026 CRASH PREDICTOR TECHNOLOGIES. Tous droits réservés.</div>
+                <div class="footer-copy" data-i18n="footer_copy">&copy; 2026 CRASH PREDICTOR TECHNOLOGIES. Tous droits réservés.</div>
                 <a href="#admin" id="linkOpenAdminLogin" class="admin-discrete-link">
-                    <i class="fa-solid fa-lock" aria-hidden="true"></i> Espace administrateur
+                    <i class="fa-solid fa-lock" aria-hidden="true"></i> <span data-i18n="footer_admin">Espace administrateur</span>
                 </a>
             </div>
         </footer>
@@ -249,15 +275,15 @@
                 <div class="vip-brand">
                     <div class="vip-logo-box"><img src="assets/crash_hd.jpg" alt="Logo"></div>
                     <div class="vip-brand-info">
-                        <span class="vip-software-name">CRASH PREDICTOR <span class="gold-text">OFFICIEL</span></span>
-                        <span class="vip-live-indicator"><span class="pulse-dot-green"></span> FLUX RADAR EN DIRECT</span>
+                        <span class="vip-software-name">CRASH PREDICTOR <span class="gold-text" data-i18n="vip_official">OFFICIEL</span></span>
+                        <span class="vip-live-indicator"><span class="pulse-dot-green"></span> <span data-i18n="vip_radar_live">FLUX RADAR EN DIRECT</span></span>
                     </div>
                 </div>
 
                 <div class="vip-user-meta">
                     <div class="vip-member-tag">
                         <i class="fa-solid fa-crown text-gold" aria-hidden="true"></i>
-                        <span id="vipUsernameDisplay">Membre Actif</span>
+                        <span id="vipUsernameDisplay" data-i18n="vip_member_active">Membre Actif</span>
                         <span class="vip-badge-glow" id="vipIdDisplay">ID: CRASH-5829143</span>
                     </div>
                     <button type="button" class="btn-vip-logout" id="vipLogoutBtn" title="Se déconnecter">
@@ -273,17 +299,17 @@
                     <div class="radar-card-header">
                         <div class="radar-title-group">
                             <i class="fa-solid fa-satellite-dish text-green" aria-hidden="true"></i>
-                            <h3>RADAR DE VOL VERTICAL HAUTE PRÉCISION</h3>
+                            <h3 data-i18n="radar_heading">RADAR DE VOL VERTICAL HAUTE PRÉCISION</h3>
                         </div>
-                        <div class="radar-session-badge">SESSION ACTIVE</div>
+                        <div class="radar-session-badge" data-i18n="radar_session_badge">SESSION ACTIVE</div>
                     </div>
 
                     <div class="vip-prediction-spotlight" id="vipPredictionSpotlight">
-                        <div class="pred-label">POINT DE SORTIE CALCULÉ</div>
+                        <div class="pred-label" data-i18n="pred_label">POINT DE SORTIE CALCULÉ</div>
                         <div class="pred-multiplier-value" id="vipLiveTargetDisplay">x2.40</div>
                         <div class="pred-meta-row">
-                            <span class="pred-confidence"><i class="fa-solid fa-shield-halved text-green" aria-hidden="true"></i> Stabilité : <strong id="vipLiveConfidence">99.4%</strong></span>
-                            <span class="pred-advice" id="vipLiveAdvice">Encaissement programmé avant rupture</span>
+                            <span class="pred-confidence"><i class="fa-solid fa-shield-halved text-green" aria-hidden="true"></i> <span data-i18n="pred_stability">Stabilité :</span> <strong id="vipLiveConfidence">99.4%</strong></span>
+                            <span class="pred-advice" id="vipLiveAdvice" data-i18n="pred_advice">Encaissement programmé avant rupture</span>
                         </div>
                     </div>
 
@@ -291,7 +317,7 @@
                         <canvas id="vipFlightCanvas" class="vip-flight-canvas grand-canvas-height" aria-label="Radar de vol"></canvas>
 
                         <div class="vip-live-hud" id="vipLiveHud">
-                            <span class="hud-label">COTE EN DIRECT</span>
+                            <span class="hud-label" data-i18n="hud_label">COTE EN DIRECT</span>
                             <span class="hud-number" id="vipHudNumber">x1.00</span>
                         </div>
 
@@ -299,8 +325,8 @@
                             <div class="radar-scanning-circle"></div>
                             <div class="scanner-text-group">
                                 <i class="fa-solid fa-satellite-dish fa-spin text-gold" aria-hidden="true"></i>
-                                <span class="scan-title">CALIBRATION DU SIGNAL</span>
-                                <span class="scan-subtitle">Prochain tour en préparation…</span>
+                                <span class="scan-title" data-i18n="scan_title">CALIBRATION DU SIGNAL</span>
+                                <span class="scan-subtitle" data-i18n="scan_subtitle">Prochain tour en préparation…</span>
                             </div>
                             <div class="scan-progress-track">
                                 <div class="scan-progress-fill" id="scanProgressFill"></div>
@@ -310,21 +336,21 @@
 
                     <div class="vip-flight-status-bar" id="vipFlightStatusBar">
                         <span class="status-indicator-dot"></span>
-                        <span class="status-message-text" id="vipFlightMessage">Analyse des flux… Décollage imminent</span>
+                        <span class="status-message-text" id="vipFlightMessage" data-i18n="vip_flight_init">Analyse des flux… Décollage imminent</span>
                     </div>
                 </div>
 
                 <div class="vip-sidebar-panel">
                     <div class="vip-stats-box">
-                        <h4><i class="fa-solid fa-chart-line text-gold" aria-hidden="true"></i> PARAMÈTRES DU SYSTÈME</h4>
-                        <div class="stat-row"><span>Stabilité algorithmique</span><strong class="text-green">98.9%</strong></div>
-                        <div class="stat-row"><span>Latence flux</span><strong class="text-gold">12 ms</strong></div>
-                        <div class="stat-row"><span>Statut licence</span><strong class="text-green">ACTIVE À VIE</strong></div>
-                        <div class="stat-row"><span>Votre ID membre</span><strong id="vipSidebarUserId" class="gold-code">CRASH-5829143</strong></div>
+                        <h4><i class="fa-solid fa-chart-line text-gold" aria-hidden="true"></i> <span data-i18n="sys_params">PARAMÈTRES DU SYSTÈME</span></h4>
+                        <div class="stat-row"><span data-i18n="sys_algo_stab">Stabilité algorithmique</span><strong class="text-green">98.9%</strong></div>
+                        <div class="stat-row"><span data-i18n="sys_latency">Latence flux</span><strong class="text-gold">12 ms</strong></div>
+                        <div class="stat-row"><span data-i18n="sys_license_status">Statut licence</span><strong class="text-green" data-i18n="sys_active_lifetime">ACTIVE À VIE</strong></div>
+                        <div class="stat-row"><span data-i18n="sys_your_id">Votre ID membre</span><strong id="vipSidebarUserId" class="gold-code">CRASH-5829143</strong></div>
                     </div>
 
                     <div class="vip-history-box">
-                        <h4><i class="fa-solid fa-clock-rotate-left text-gold" aria-hidden="true"></i> DERNIERS ROUNDS</h4>
+                        <h4><i class="fa-solid fa-clock-rotate-left text-gold" aria-hidden="true"></i> <span data-i18n="recent_rounds">DERNIERS ROUNDS</span></h4>
                         <div class="history-list" id="vipHistoryList"></div>
                     </div>
                 </div>
@@ -343,46 +369,46 @@
             <button type="button" class="modal-close" id="closeProfileModal" aria-label="Fermer la fenêtre">&times;</button>
             <div class="modal-header">
                 <div class="modal-icon-badge gold-glow"><i class="fa-solid fa-user-astronaut" aria-hidden="true"></i></div>
-                <h3 id="profileNameDisplay">Mon espace membre</h3>
+                <h3 id="profileNameDisplay" data-i18n="profile_space">Mon espace membre</h3>
                 <p id="profileEmailDisplay">client@exemple.com</p>
                 <div class="profile-user-id-box">
-                    <span>VOTRE ID UNIQUE :</span>
+                    <span data-i18n="profile_your_id">VOTRE ID UNIQUE :</span>
                     <strong id="profileUniqueIdDisplay">CRASH-5829143</strong>
                 </div>
             </div>
 
             <div class="profile-modal-body">
                 <div class="profile-status-block">
-                    <div class="status-label-heading">Statut de votre licence</div>
+                    <div class="status-label-heading" data-i18n="profile_license_status">Statut de votre licence</div>
                     <div class="status-tag-badge status-unsubscribed" id="profileStatusBadge">
-                        <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i> NON ACTIVÉ
+                        <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i> <span data-i18n="status_unsubscribed">NON ACTIVÉ</span>
                     </div>
                 </div>
 
                 <div class="profile-section-group">
-                    <label class="section-field-label" for="profilePhoneInput"><i class="fa-solid fa-phone" aria-hidden="true"></i> Numéro de téléphone</label>
+                    <label class="section-field-label" for="profilePhoneInput"><i class="fa-solid fa-phone" aria-hidden="true"></i> <span data-i18n="lbl_phone">Numéro de téléphone</span></label>
                     <div class="phone-input-row">
                         <input type="tel" id="profilePhoneInput" placeholder="+1 (555) 000-0000" class="form-control-dark" autocomplete="tel">
-                        <button type="button" class="btn-save-mini" id="btnSavePhone">Enregistrer</button>
+                        <button type="button" class="btn-save-mini" id="btnSavePhone" data-i18n="btn_save">Enregistrer</button>
                     </div>
                 </div>
 
                 <div class="profile-section-group">
-                    <label class="section-field-label"><i class="fa-solid fa-lock" aria-hidden="true"></i> Modifier mon mot de passe</label>
+                    <label class="section-field-label"><i class="fa-solid fa-lock" aria-hidden="true"></i> <span data-i18n="lbl_update_pass">Modifier mon mot de passe</span></label>
                     <form id="formUpdatePassword" class="password-update-form">
-                        <input type="password" id="profileOldPassword" placeholder="Mot de passe actuel" required class="form-control-dark" autocomplete="current-password">
-                        <input type="password" id="profileNewPassword" placeholder="Nouveau mot de passe (6+ caractères)" required class="form-control-dark" autocomplete="new-password">
-                        <input type="password" id="profileConfirmNewPassword" placeholder="Confirmer le nouveau mot de passe" required class="form-control-dark" autocomplete="new-password">
-                        <button type="submit" class="btn-save-mini btn-full">Mettre à jour</button>
+                        <input type="password" id="profileOldPassword" placeholder="Mot de passe actuel" data-i18n-placeholder="ph_old_pass" required class="form-control-dark" autocomplete="current-password">
+                        <input type="password" id="profileNewPassword" placeholder="Nouveau mot de passe (6+ caractères)" data-i18n-placeholder="ph_new_pass" required class="form-control-dark" autocomplete="new-password">
+                        <input type="password" id="profileConfirmNewPassword" placeholder="Confirmer le nouveau mot de passe" data-i18n-placeholder="ph_confirm_pass" required class="form-control-dark" autocomplete="new-password">
+                        <button type="submit" class="btn-save-mini btn-full" data-i18n="btn_update">Mettre à jour</button>
                     </form>
                 </div>
 
                 <button type="button" class="btn-primary btn-block" id="btnProfileSubscribe">
-                    <i class="fa-solid fa-unlock-keyhole" aria-hidden="true"></i> Débloquer mon accès complet – 50 $
+                    <i class="fa-solid fa-unlock-keyhole" aria-hidden="true"></i> <span data-i18n="btn_profile_unlock">Débloquer mon accès complet – 50 $</span>
                 </button>
 
                 <button type="button" class="btn-link-danger" id="profileLogoutBtn">
-                    <i class="fa-solid fa-power-off" aria-hidden="true"></i> Se déconnecter
+                    <i class="fa-solid fa-power-off" aria-hidden="true"></i> <span data-i18n="btn_logout">Se déconnecter</span>
                 </button>
             </div>
         </div>
@@ -394,31 +420,31 @@
             <button type="button" class="modal-close" id="closeRegisterModal" aria-label="Fermer">&times;</button>
             <div class="modal-header">
                 <div class="modal-icon-badge"><i class="fa-solid fa-user-plus" aria-hidden="true"></i></div>
-                <h2 class="modal-title-big">Créer un compte</h2>
-                <p>Un identifiant unique vous sera attribué</p>
+                <h2 class="modal-title-big" data-i18n="reg_title">Créer un compte</h2>
+                <p data-i18n="reg_sub">Un identifiant unique vous sera attribué</p>
             </div>
 
             <form id="registerForm" class="modal-form">
                 <div class="form-group">
-                    <label for="regName"><i class="fa-solid fa-user" aria-hidden="true"></i> Nom ou pseudonyme</label>
-                    <input type="text" id="regName" placeholder="Ex: Alex_Trader" required autocomplete="username" minlength="3">
+                    <label for="regName"><i class="fa-solid fa-user" aria-hidden="true"></i> <span data-i18n="reg_name_lbl">Nom ou pseudonyme</span></label>
+                    <input type="text" id="regName" placeholder="Ex: Alex_Trader" data-i18n-placeholder="ph_name" required autocomplete="username" minlength="3">
                 </div>
                 <div class="form-group">
-                    <label for="regEmail"><i class="fa-solid fa-envelope" aria-hidden="true"></i> Adresse email</label>
-                    <input type="email" id="regEmail" placeholder="nom@exemple.com" required autocomplete="email">
+                    <label for="regEmail"><i class="fa-solid fa-envelope" aria-hidden="true"></i> <span data-i18n="reg_email_lbl">Adresse email</span></label>
+                    <input type="email" id="regEmail" placeholder="nom@exemple.com" data-i18n-placeholder="ph_email" required autocomplete="email">
                 </div>
                 <div class="form-group">
-                    <label for="regPassword"><i class="fa-solid fa-lock" aria-hidden="true"></i> Mot de passe</label>
-                    <input type="password" id="regPassword" placeholder="Au moins 6 caractères" required autocomplete="new-password" minlength="6">
+                    <label for="regPassword"><i class="fa-solid fa-lock" aria-hidden="true"></i> <span data-i18n="reg_pass_lbl">Mot de passe</span></label>
+                    <input type="password" id="regPassword" placeholder="Au moins 6 caractères" data-i18n-placeholder="ph_pass_min" required autocomplete="new-password" minlength="6">
                 </div>
                 <button type="submit" class="btn-primary btn-block" id="registerSubmitBtn">
-                    <i class="fa-solid fa-check" aria-hidden="true"></i> Valider mon inscription
+                    <i class="fa-solid fa-check" aria-hidden="true"></i> <span data-i18n="reg_submit">Valider mon inscription</span>
                 </button>
             </form>
 
             <div class="modal-footer-switch">
-                <span>Déjà inscrit ?</span>
-                <button type="button" class="btn-link" id="switchToLogin">Se connecter</button>
+                <span data-i18n="already_registered">Déjà inscrit ?</span>
+                <button type="button" class="btn-link" id="switchToLogin" data-i18n="switch_login">Se connecter</button>
             </div>
         </div>
     </div>
@@ -429,27 +455,27 @@
             <button type="button" class="modal-close" id="closeLoginModal" aria-label="Fermer">&times;</button>
             <div class="modal-header">
                 <div class="modal-icon-badge"><i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i></div>
-                <h2 class="modal-title-big">Connexion membre</h2>
-                <p>Accédez à votre espace</p>
+                <h2 class="modal-title-big" data-i18n="login_title">Connexion membre</h2>
+                <p data-i18n="login_sub">Accédez à votre espace</p>
             </div>
 
             <form id="loginForm" class="modal-form">
                 <div class="form-group">
-                    <label for="loginEmail"><i class="fa-solid fa-envelope" aria-hidden="true"></i> Email ou ID</label>
-                    <input type="text" id="loginEmail" placeholder="nom@exemple.com ou CRASH-5829143" required autocomplete="username">
+                    <label for="loginEmail"><i class="fa-solid fa-envelope" aria-hidden="true"></i> <span data-i18n="login_id_lbl">Email ou ID</span></label>
+                    <input type="text" id="loginEmail" placeholder="nom@exemple.com ou CRASH-5829143" data-i18n-placeholder="ph_login_id" required autocomplete="username">
                 </div>
                 <div class="form-group">
-                    <label for="loginPassword"><i class="fa-solid fa-lock" aria-hidden="true"></i> Mot de passe</label>
-                    <input type="password" id="loginPassword" placeholder="Votre mot de passe" required autocomplete="current-password">
+                    <label for="loginPassword"><i class="fa-solid fa-lock" aria-hidden="true"></i> <span data-i18n="login_pass_lbl">Mot de passe</span></label>
+                    <input type="password" id="loginPassword" placeholder="Votre mot de passe" data-i18n-placeholder="ph_pass" required autocomplete="current-password">
                 </div>
                 <button type="submit" class="btn-primary btn-block" id="loginSubmitBtn">
-                    <i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i> Se connecter
+                    <i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i> <span data-i18n="login_submit">Se connecter</span>
                 </button>
             </form>
 
             <div class="modal-footer-switch">
-                <span>Pas encore de compte ?</span>
-                <button type="button" class="btn-link" id="switchToRegister">Créer un compte</button>
+                <span data-i18n="not_registered_yet">Pas encore de compte ?</span>
+                <button type="button" class="btn-link" id="switchToRegister" data-i18n="switch_register">Créer un compte</button>
             </div>
         </div>
     </div>
@@ -461,22 +487,22 @@
 
             <div class="brief-checkout-box">
                 <div class="brief-header">
-                    <span class="badge-price-gold">50 $ • ACCÈS À VIE</span>
-                    <h3>Paiement sécurisé</h3>
-                    <p class="brief-subtitle">Mobile Money ou carte bancaire</p>
+                    <span class="badge-price-gold" data-i18n="checkout_badge">50 $ • ACCÈS À VIE</span>
+                    <h3 data-i18n="checkout_title">Paiement sécurisé</h3>
+                    <p class="brief-subtitle" data-i18n="checkout_sub">Mobile Money ou carte bancaire</p>
                 </div>
 
                 <div class="checkout-auth-gate hidden" id="checkoutAuthGate">
-                    <p>Connectez-vous ou créez un compte pour lier la licence à votre ID.</p>
+                    <p data-i18n="checkout_gate_msg">Connectez-vous ou créez un compte pour lier la licence à votre ID.</p>
                     <div class="checkout-auth-actions">
-                        <button type="button" class="btn-primary" id="checkoutGoLogin">Connexion</button>
-                        <button type="button" class="btn-ghost-compact" id="checkoutGoRegister">Inscription</button>
+                        <button type="button" class="btn-primary" id="checkoutGoLogin" data-i18n="nav_login">Connexion</button>
+                        <button type="button" class="btn-ghost-compact" id="checkoutGoRegister" data-i18n="nav_register">Inscription</button>
                     </div>
                 </div>
 
                 <div id="checkoutPaymentPanel">
                     <div class="form-group checkout-phone-group">
-                        <label for="checkoutPhoneInput"><i class="fa-solid fa-phone" aria-hidden="true"></i> Numéro Mobile Money</label>
+                        <label for="checkoutPhoneInput"><i class="fa-solid fa-phone" aria-hidden="true"></i> <span data-i18n="checkout_momo_num">Numéro Mobile Money</span></label>
                         <input type="tel" id="checkoutPhoneInput" class="form-control-dark" placeholder="07 00 00 00 00" autocomplete="tel">
                     </div>
 
@@ -501,16 +527,16 @@
 
                     <button type="button" class="btn-direct-pay-now" id="btnExecuteMomoPayment">
                         <i class="fa-solid fa-bolt" aria-hidden="true"></i>
-                        <span>Payer par Mobile Money — 30 000 F</span>
+                        <span data-i18n="btn_pay_momo">Payer par Mobile Money — 30 000 F</span>
                     </button>
 
                     <div class="brief-footer-note">
                         <i class="fa-solid fa-shield-halved text-green" aria-hidden="true"></i>
-                        <span>Le cockpit s’ouvre immédiatement après la validation de votre paiement.</span>
+                        <span data-i18n="checkout_guarantee_note">Le cockpit s’ouvre immédiatement après la validation de votre paiement.</span>
                     </div>
 
                     <div class="card-link-sub">
-                        <button type="button" class="btn-link-card-mini" id="btnExecuteCardPayment">Payer par carte bancaire — 50 $</button>
+                        <button type="button" class="btn-link-card-mini" id="btnExecuteCardPayment" data-i18n="btn_pay_card">Payer par carte bancaire — 50 $</button>
                     </div>
                 </div>
             </div>
@@ -578,8 +604,8 @@
     <div class="payment-processing-overlay hidden" id="paymentProcessingOverlay" aria-live="assertive">
         <div class="payment-processing-card">
             <div class="radar-scanning-circle"></div>
-            <p class="scan-title">Vérification du paiement</p>
-            <p class="scan-subtitle" id="paymentProcessingText">Connexion sécurisée en cours…</p>
+            <p class="scan-title" data-i18n="pay_verif_title">Vérification du paiement</p>
+            <p class="scan-subtitle" id="paymentProcessingText" data-i18n="pay_verif_sub">Connexion sécurisée en cours…</p>
         </div>
     </div>
 

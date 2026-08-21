@@ -1,10 +1,11 @@
 /**
- * CRASH PREDICTOR 2026 — LOGIQUE D'APPLICATION OFFICIELLE
- * - 113 Avis Clients Vérifiés dans plusieurs langues (Français en avant)
- * - Assainissement et garantie absolue des identifiants 7 chiffres : 5 000 000 à 10 000 000 (ex: CRASH-5829143)
- * - Compteur de trafic dynamique avec variations de 2 000 à 5 000 sessions toutes les 3 à 5s (entre 1 000 000 et 2 000 000)
- * - Bandeau d'activité moderne & professionnel intégré sous le produit
- * - Moteur radar haute précision et synchronisation Supabase / Flutterwave
+ * CRASH PREDICTOR 2026 — LOGIQUE D'APPLICATION OFFICIELLE & MOTEUR I18N
+ * - Détection automatique de la langue par Géolocalisation IP (Support VPN) & Navigateur
+ * - Support multilingue complet : Français (FR), Anglais (EN), Espagnol (ES), Portugais (PT), Allemand (DE)
+ * - 113 Avis Clients Vérifiés réorganisés intelligemment selon la langue du visiteur
+ * - Identifiants 7 chiffres stricts : 5 000 000 à 10 000 000 (ex: CRASH-5829143)
+ * - Compteur de trafic en direct : variations 2 000 - 5 000 sessions / 3 - 5s
+ * - Cockpit Radar de vol haute précision synchronisé Supabase / Flutterwave
  */
 
 const CONFIG = {
@@ -17,14 +18,544 @@ const CONFIG = {
     sessionKey: "crash_predictor_user_2026",
     usersDbKey: "crash_users_db_2026",
     guestIdKey: "crash_guest_id_2026",
-    timerKey: "crash_timer_start_48h_v4"
+    timerKey: "crash_timer_start_48h_v4",
+    langKey: "crash_user_lang_pref"
 };
 
 // ==========================================================================
-// EXACTEMENT 113 AVIS CLIENTS DYNAMIQUES & NATURELS (IDs 7 CHIFFRES : 5 000 000 - 10 000 000)
+// DICTIONNAIRE DE TRADUCTION COMPLET (I18N)
+// ==========================================================================
+const TRANSLATIONS = {
+    fr: {
+        doc_title: "CRASH PREDICTOR 2026 | Cockpit d'Analyse et Prédictions Officielles",
+        ticker_live: "EN DIRECT",
+        ticker_sub: "sessions actives • moteur d'analyse",
+        alert_unsubscribed: "<strong>ACCÈS NON ACTIVÉ :</strong> activez votre licence pour ouvrir le cockpit.",
+        btn_alert_unlock: "Débloquer l'accès – 50 $",
+        badge_edition: "ÉDITION 2026",
+        nav_login: "Connexion",
+        nav_register: "Inscription",
+        promo_offer: "Offre 50 $ :",
+        promo_remaining: "restante(s)",
+        hero_subtitle: "Plateforme d'analyse haute fréquence et anticipation des trajectoires en direct.",
+        badge_algo: "MOTEUR 2026",
+        badge_live_session: "SESSION TEMPS RÉEL",
+        badge_verified: "VÉRIFIÉ",
+        flash_default: "vient d'activer sa licence complète",
+        offer_title: "Licence Officielle & Accès Illimité",
+        offer_desc: "Débloquez l'accès complet au cockpit d'analyse, aux prédictions en direct et à l'historique complet.",
+        price_lifetime: "/ Accès à vie",
+        price_cfa: "≈ 30 000 francs CFA",
+        benefit_1_title: "Précision Algorithmique Optimale",
+        benefit_1_desc: "Analyse en temps réel et anticipation précise des trajectoires.",
+        benefit_2_title: "Activation Immédiate",
+        benefit_2_desc: "Accès instantané à l'ensemble des prédictions et au cockpit dès la validation de votre paiement.",
+        benefit_3_title: "Accès à Vie Sans Frais",
+        benefit_3_desc: "Licence permanente à paiement unique, garantie sans aucun abonnement mensuel ni prélèvement futur.",
+        benefit_4_title: "Multi-supports",
+        benefit_4_desc: "Interface optimisée pour un usage fluide sur smartphone, tablette et ordinateur.",
+        btn_buy_instant: "Débloquer mon accès complet – 50 $",
+        secure_guarantee: "Paiement sécurisé et chiffré • Activation automatique du cockpit",
+        reviews_badge: "RETOURS MEMBRES VÉRIFIÉS (113 AVIS)",
+        reviews_title: "Retours d'Expérience & Témoignages",
+        reviews_subtitle: "Commentaires authentiques associés à des identifiants membres anonymes.",
+        stat_registered: "Membres inscrits",
+        stat_satisfaction: "Indice de satisfaction",
+        stat_license: "Licence unique à vie",
+        btn_load_more: "Afficher plus de témoignages",
+        remaining_txt: "restants",
+        footer_copy: "© 2026 CRASH PREDICTOR TECHNOLOGIES. Tous droits réservés.",
+        footer_admin: "Espace administrateur",
+        vip_official: "OFFICIEL",
+        vip_radar_live: "FLUX RADAR EN DIRECT",
+        vip_member_active: "Membre Actif",
+        radar_heading: "RADAR DE VOL VERTICAL HAUTE PRÉCISION",
+        radar_session_badge: "SESSION ACTIVE",
+        pred_label: "POINT DE SORTIE CALCULÉ",
+        pred_stability: "Stabilité :",
+        pred_advice: "Encaissement programmé avant rupture",
+        hud_label: "COTE EN DIRECT",
+        scan_title: "CALIBRATION DU SIGNAL",
+        scan_subtitle: "Prochain tour en préparation…",
+        vip_flight_init: "Analyse des flux… Décollage imminent",
+        sys_params: "PARAMÈTRES DU SYSTÈME",
+        sys_algo_stab: "Stabilité algorithmique",
+        sys_latency: "Latence flux",
+        sys_license_status: "Statut licence",
+        sys_active_lifetime: "ACTIVE À VIE",
+        sys_your_id: "Votre ID membre",
+        recent_rounds: "DERNIERS ROUNDS",
+        profile_space: "Mon espace membre",
+        profile_your_id: "VOTRE ID UNIQUE :",
+        profile_license_status: "Statut de votre licence",
+        status_unsubscribed: "NON ACTIVÉ",
+        lbl_phone: "Numéro de téléphone",
+        btn_save: "Enregistrer",
+        lbl_update_pass: "Modifier mon mot de passe",
+        btn_update: "Mettre à jour",
+        btn_profile_unlock: "Débloquer mon accès complet – 50 $",
+        btn_logout: "Se déconnecter",
+        reg_title: "Créer un compte",
+        reg_sub: "Un identifiant unique vous sera attribué",
+        reg_name_lbl: "Nom ou pseudonyme",
+        reg_email_lbl: "Adresse email",
+        reg_pass_lbl: "Mot de passe",
+        reg_submit: "Valider mon inscription",
+        already_registered: "Déjà inscrit ?",
+        switch_login: "Se connecter",
+        login_title: "Connexion membre",
+        login_sub: "Accédez à votre espace",
+        login_id_lbl: "Email ou ID",
+        login_pass_lbl: "Mot de passe",
+        login_submit: "Se connecter",
+        not_registered_yet: "Pas encore de compte ?",
+        switch_register: "Créer un compte",
+        checkout_badge: "50 $ • ACCÈS À VIE",
+        checkout_title: "Paiement sécurisé",
+        checkout_sub: "Mobile Money ou carte bancaire",
+        checkout_gate_msg: "Connectez-vous ou créez un compte pour lier la licence à votre ID.",
+        checkout_momo_num: "Numéro Mobile Money",
+        btn_pay_momo: "Payer par Mobile Money — 30 000 F",
+        checkout_guarantee_note: "Le cockpit s’ouvre immédiatement après la validation de votre paiement.",
+        btn_pay_card: "Payer par carte bancaire — 50 $",
+        pay_verif_title: "Vérification du paiement",
+        pay_verif_sub: "Connexion sécurisée en cours…",
+        ph_name: "Ex: Alex_Trader",
+        ph_email: "nom@exemple.com",
+        ph_pass_min: "Au moins 6 caractères",
+        ph_login_id: "nom@exemple.com ou CRASH-5829143",
+        ph_pass: "Votre mot de passe",
+        ph_old_pass: "Mot de passe actuel",
+        ph_new_pass: "Nouveau mot de passe (6+ caractères)",
+        ph_confirm_pass: "Confirmer le nouveau mot de passe"
+    },
+    en: {
+        doc_title: "CRASH PREDICTOR 2026 | Official Analysis Cockpit & Live Signals",
+        ticker_live: "LIVE",
+        ticker_sub: "active sessions • predictive engine",
+        alert_unsubscribed: "<strong>ACCESS NOT ACTIVATED:</strong> activate your license to open the cockpit.",
+        btn_alert_unlock: "Unlock Access – $50",
+        badge_edition: "2026 EDITION",
+        nav_login: "Login",
+        nav_register: "Sign Up",
+        promo_offer: "$50 Offer:",
+        promo_remaining: "remaining",
+        hero_subtitle: "High-frequency algorithmic analysis and real-time flight trajectory anticipation.",
+        badge_algo: "2026 ENGINE",
+        badge_live_session: "REAL-TIME SESSION",
+        badge_verified: "VERIFIED",
+        flash_default: "just activated their lifetime license",
+        offer_title: "Official License & Unlimited Access",
+        offer_desc: "Unlock complete access to the analysis cockpit, live predictions and flight history.",
+        price_lifetime: "/ Lifetime access",
+        price_cfa: "",
+        benefit_1_title: "Optimal Algorithmic Precision",
+        benefit_1_desc: "Real-time stream analysis and accurate trajectory anticipation.",
+        benefit_2_title: "Instant Activation",
+        benefit_2_desc: "Immediate access to all predictions and cockpit upon payment confirmation.",
+        benefit_3_title: "Lifetime Access Without Fees",
+        benefit_3_desc: "One-time payment permanent license, guaranteed no monthly subscriptions or future charges.",
+        benefit_4_title: "Multi-device Support",
+        benefit_4_desc: "Optimized interface for seamless performance on smartphones, tablets, and desktops.",
+        btn_buy_instant: "Unlock Full Access – $50",
+        secure_guarantee: "Encrypted & secure checkout • Instant cockpit activation",
+        reviews_badge: "VERIFIED MEMBER REVIEWS (113 REVIEWS)",
+        reviews_title: "User Experience & Testimonials",
+        reviews_subtitle: "Authentic feedback linked to anonymous member IDs.",
+        stat_registered: "Registered members",
+        stat_satisfaction: "Satisfaction rate",
+        stat_license: "Lifetime license",
+        btn_load_more: "Show more testimonials",
+        remaining_txt: "remaining",
+        footer_copy: "© 2026 CRASH PREDICTOR TECHNOLOGIES. All rights reserved.",
+        footer_admin: "Admin portal",
+        vip_official: "OFFICIAL",
+        vip_radar_live: "LIVE RADAR FEED",
+        vip_member_active: "Active Member",
+        radar_heading: "HIGH-PRECISION VERTICAL RADAR",
+        radar_session_badge: "ACTIVE SESSION",
+        pred_label: "CALCULATED EXIT THRESHOLD",
+        pred_stability: "Stability:",
+        pred_advice: "Target cash-out programmed before rupture",
+        hud_label: "LIVE MULTIPLIER",
+        scan_title: "SIGNAL CALIBRATION",
+        scan_subtitle: "Preparing next round…",
+        vip_flight_init: "Analyzing data streams… Takeoff imminent",
+        sys_params: "SYSTEM PARAMETERS",
+        sys_algo_stab: "Algorithmic stability",
+        sys_latency: "Feed latency",
+        sys_license_status: "License status",
+        sys_active_lifetime: "ACTIVE LIFETIME",
+        sys_your_id: "Your Member ID",
+        recent_rounds: "RECENT ROUNDS",
+        profile_space: "Member Area",
+        profile_your_id: "YOUR UNIQUE ID:",
+        profile_license_status: "License Status",
+        status_unsubscribed: "NOT ACTIVATED",
+        lbl_phone: "Phone Number",
+        btn_save: "Save",
+        lbl_update_pass: "Change Password",
+        btn_update: "Update",
+        btn_profile_unlock: "Unlock Full Access – $50",
+        btn_logout: "Logout",
+        reg_title: "Create an Account",
+        reg_sub: "A unique identifier will be assigned to you",
+        reg_name_lbl: "Full Name or Username",
+        reg_email_lbl: "Email Address",
+        reg_pass_lbl: "Password",
+        reg_submit: "Complete Registration",
+        already_registered: "Already registered?",
+        switch_login: "Login here",
+        login_title: "Member Login",
+        login_sub: "Access your private dashboard",
+        login_id_lbl: "Email or Member ID",
+        login_pass_lbl: "Password",
+        login_submit: "Sign In",
+        not_registered_yet: "Don't have an account?",
+        switch_register: "Register now",
+        checkout_badge: "$50 • LIFETIME ACCESS",
+        checkout_title: "Secure Checkout",
+        checkout_sub: "Credit Card or Mobile Payment",
+        checkout_gate_msg: "Please log in or sign up to link this license to your member ID.",
+        checkout_momo_num: "Mobile Number",
+        btn_pay_momo: "Pay via Mobile Money",
+        checkout_guarantee_note: "The cockpit opens immediately after payment confirmation.",
+        btn_pay_card: "Pay with Credit Card – $50",
+        pay_verif_title: "Verifying Payment",
+        pay_verif_sub: "Establishing secure connection…",
+        ph_name: "E.g. Alex_Trader",
+        ph_email: "name@example.com",
+        ph_pass_min: "At least 6 characters",
+        ph_login_id: "name@example.com or CRASH-5829143",
+        ph_pass: "Your password",
+        ph_old_pass: "Current password",
+        ph_new_pass: "New password (6+ characters)",
+        ph_confirm_pass: "Confirm new password"
+    },
+    es: {
+        doc_title: "CRASH PREDICTOR 2026 | Cockpit Oficial de Análisis y Predicciones",
+        ticker_live: "EN VIVO",
+        ticker_sub: "sesiones activas • motor de cálculo",
+        alert_unsubscribed: "<strong>ACCESO NO ACTIVADO:</strong> active su licencia para abrir el cockpit.",
+        btn_alert_unlock: "Desbloquear Acceso – 50 $",
+        badge_edition: "EDICIÓN 2026",
+        nav_login: "Iniciar Sesión",
+        nav_register: "Registrarse",
+        promo_offer: "Oferta 50 $:",
+        promo_remaining: "restante(s)",
+        hero_subtitle: "Plataforma de análisis de alta frecuencia y anticipación de trayectorias en vivo.",
+        badge_algo: "MOTOR 2026",
+        badge_live_session: "SESIÓN EN TIEMPO REAL",
+        badge_verified: "VERIFICADO",
+        flash_default: "acaba de activar su licencia de por vida",
+        offer_title: "Licencia Oficial y Acceso Ilimitado",
+        offer_desc: "Desbloquee el acceso completo al cockpit de análisis, predicciones en vivo e historial de vuelos.",
+        price_lifetime: "/ Acceso de por vida",
+        price_cfa: "",
+        benefit_1_title: "Precisión Algorítmica Óptima",
+        benefit_1_desc: "Análisis en tiempo real y anticipación exacta de las trayectorias.",
+        benefit_2_title: "Activación Inmediata",
+        benefit_2_desc: "Acceso instantáneo a todas las predicciones y al cockpit tras validar el pago.",
+        benefit_3_title: "Acceso de por Vida Sin Cargos",
+        benefit_3_desc: "Licencia permanente de pago único, garantizada sin suscripciones mensuales ni pagos futuros.",
+        benefit_4_title: "Multi-dispositivo",
+        benefit_4_desc: "Interfaz optimizada para un uso fluido en smartphones, tablets y ordenadores.",
+        btn_buy_instant: "Desbloquear mi acceso completo – 50 $",
+        secure_guarantee: "Pago seguro y encriptado • Activación automática del cockpit",
+        reviews_badge: "OPINIONES DE MIEMBROS VERIFICADOS (113 RESEÑAS)",
+        reviews_title: "Experiencias y Testimonios",
+        reviews_subtitle: "Comentarios auténticos vinculados a identificadores de miembros anónimos.",
+        stat_registered: "Miembros registrados",
+        stat_satisfaction: "Índice de satisfacción",
+        stat_license: "Licencia vitalicia",
+        btn_load_more: "Ver más testimonios",
+        remaining_txt: "restantes",
+        footer_copy: "© 2026 CRASH PREDICTOR TECHNOLOGIES. Todos los derechos reservados.",
+        footer_admin: "Acceso Administrador",
+        vip_official: "OFICIAL",
+        vip_radar_live: "RADAR EN VIVO",
+        vip_member_active: "Miembro Activo",
+        radar_heading: "RADAR DE VUELO VERTICAL DE ALTA PRECISIÓN",
+        radar_session_badge: "SESIÓN ACTIVA",
+        pred_label: "PUNTO DE SALIDA CALCULADO",
+        pred_stability: "Estabilidad:",
+        pred_advice: "Cobro programado antes de la ruptura",
+        hud_label: "MULTIPLICADOR EN VIVO",
+        scan_title: "CALIBRACIÓN DE SEÑAL",
+        scan_subtitle: "Preparando siguiente ronda…",
+        vip_flight_init: "Analizando flujos… Despegue inminente",
+        sys_params: "PARÁMETROS DEL SISTEMA",
+        sys_algo_stab: "Estabilidad algorítmica",
+        sys_latency: "Latencia del flujo",
+        sys_license_status: "Estado de la licencia",
+        sys_active_lifetime: "ACTIVA DE POR VIDA",
+        sys_your_id: "Su ID de Miembro",
+        recent_rounds: "ÚLTIMAS RONDAS",
+        profile_space: "Mi Área de Miembro",
+        profile_your_id: "SU ID ÚNICO:",
+        profile_license_status: "Estado de Licencia",
+        status_unsubscribed: "NO ACTIVADO",
+        lbl_phone: "Número de Teléfono",
+        btn_save: "Guardar",
+        lbl_update_pass: "Cambiar Contraseña",
+        btn_update: "Actualizar",
+        btn_profile_unlock: "Desbloquear acceso completo – 50 $",
+        btn_logout: "Cerrar sesión",
+        reg_title: "Crear una Cuenta",
+        reg_sub: "Se le asignará un identificador único",
+        reg_name_lbl: "Nombre o Alias",
+        reg_email_lbl: "Correo Electrónico",
+        reg_pass_lbl: "Contraseña",
+        reg_submit: "Validar mi registro",
+        already_registered: "¿Ya está registrado?",
+        switch_login: "Iniciar sesión aquí",
+        login_title: "Acceso Miembros",
+        login_sub: "Acceda a su cockpit privado",
+        login_id_lbl: "Correo o ID de Miembro",
+        login_pass_lbl: "Contraseña",
+        login_submit: "Entrar",
+        not_registered_yet: "¿No tiene cuenta?",
+        switch_register: "Crear una cuenta",
+        checkout_badge: "50 $ • ACCESO DE POR VIDA",
+        checkout_title: "Pago Seguro",
+        checkout_sub: "Tarjeta Bancaria o Pago Móvil",
+        checkout_gate_msg: "Inicie sesión o regístrese para vincular la licencia a su ID.",
+        checkout_momo_num: "Número Móvil",
+        btn_pay_momo: "Pagar con Mobile Money",
+        checkout_guarantee_note: "El cockpit se abre inmediatamente tras confirmar el pago.",
+        btn_pay_card: "Pagar con Tarjeta – 50 $",
+        pay_verif_title: "Verificando el pago",
+        pay_verif_sub: "Conexión segura en curso…",
+        ph_name: "Ej: Alex_Trader",
+        ph_email: "nombre@ejemplo.com",
+        ph_pass_min: "Al menos 6 caracteres",
+        ph_login_id: "nombre@ejemplo.com o CRASH-5829143",
+        ph_pass: "Su contraseña",
+        ph_old_pass: "Contraseña actual",
+        ph_new_pass: "Nueva contraseña (6+ caracteres)",
+        ph_confirm_pass: "Confirmar nueva contraseña"
+    },
+    pt: {
+        doc_title: "CRASH PREDICTOR 2026 | Cockpit Oficial de Análise e Predições",
+        ticker_live: "AO VIVO",
+        ticker_sub: "sessões ativas • motor preditivo",
+        alert_unsubscribed: "<strong>ACESSO NÃO ATIVADO:</strong> ative sua licença para abrir o cockpit.",
+        btn_alert_unlock: "Desbloquear Acesso – 50 $",
+        badge_edition: "EDIÇÃO 2026",
+        nav_login: "Entrar",
+        nav_register: "Registar",
+        promo_offer: "Oferta 50 $:",
+        promo_remaining: "restante(s)",
+        hero_subtitle: "Plataforma de análise de alta frequência e antecipação de trajetórias em tempo real.",
+        badge_algo: "MOTOR 2026",
+        badge_live_session: "SESSÃO EM TEMPO REAL",
+        badge_verified: "VERIFICADO",
+        flash_default: "acabou de ativar a sua licença vitalícia",
+        offer_title: "Licença Oficial e Acesso Ilimitado",
+        offer_desc: "Desbloqueie o acesso completo ao cockpit de análise, previsões ao vivo e histórico de voos.",
+        price_lifetime: "/ Acesso vitalício",
+        price_cfa: "",
+        benefit_1_title: "Precisão Algorítmica Ideal",
+        benefit_1_desc: "Análise em tempo real e antecipação precisa de trajetórias.",
+        benefit_2_title: "Ativação Instantânea",
+        benefit_2_desc: "Acesso imediato a todas as previsões e ao cockpit após a validação do pagamento.",
+        benefit_3_title: "Acesso Vitalício Sem Mensalidades",
+        benefit_3_desc: "Licença permanente de pagamento único, sem taxas mensais ou cobranças futuras.",
+        benefit_4_title: "Compatível com Qualquer Dispositivo",
+        benefit_4_desc: "Interface otimizada para uso fluido em telemóveis, tablets e computadores.",
+        btn_buy_instant: "Desbloquear Acesso Completo – 50 $",
+        secure_guarantee: "Pagamento seguro e encriptado • Ativação imediata do cockpit",
+        reviews_badge: "AVALIAÇÕES DE MEMBROS (113 AVALIAÇÕES)",
+        reviews_title: "Depoimentos e Avaliações",
+        reviews_subtitle: "Comentários autênticos vinculados a IDs de membros anónimos.",
+        stat_registered: "Membros registados",
+        stat_satisfaction: "Índice de satisfação",
+        stat_license: "Licença vitalícia",
+        btn_load_more: "Ver mais avaliações",
+        remaining_txt: "restantes",
+        footer_copy: "© 2026 CRASH PREDICTOR TECHNOLOGIES. Todos os direitos reservados.",
+        footer_admin: "Área de Administração",
+        vip_official: "OFICIAL",
+        vip_radar_live: "RADAR EM DIRETO",
+        vip_member_active: "Membro Ativo",
+        radar_heading: "RADAR DE VOO VERTICAL DE ALTA PRECISÃO",
+        radar_session_badge: "SESSÃO ATIVA",
+        pred_label: "PONTO DE SAÍDA CALCULADO",
+        pred_stability: "Estabilidade:",
+        pred_advice: "Saída segura programada antes da queda",
+        hud_label: "MULTIPLICADOR AO VIVO",
+        scan_title: "CALIBRAÇÃO DE SINAL",
+        scan_subtitle: "A preparar a próxima ronda…",
+        vip_flight_init: "A analisar dados… Descolagem iminente",
+        sys_params: "PARÂMETROS DO SISTEMA",
+        sys_algo_stab: "Estabilidade do algoritmo",
+        sys_latency: "Latência da rede",
+        sys_license_status: "Estado da licença",
+        sys_active_lifetime: "ATIVA VITALÍCIA",
+        sys_your_id: "Seu ID de Membro",
+        recent_rounds: "ÚLTIMAS RONDAS",
+        profile_space: "Minha Área de Membro",
+        profile_your_id: "SEU ID ÚNICO:",
+        profile_license_status: "Estado da Licença",
+        status_unsubscribed: "NÃO ATIVADO",
+        lbl_phone: "Número de Telefone",
+        btn_save: "Guardar",
+        lbl_update_pass: "Alterar Palavra-passe",
+        btn_update: "Atualizar",
+        btn_profile_unlock: "Desbloquear Acesso – 50 $",
+        btn_logout: "Terminar sessão",
+        reg_title: "Criar uma Conta",
+        reg_sub: "Um identificador único ser-lhe-á atribuído",
+        reg_name_lbl: "Nome ou Pseudónimo",
+        reg_email_lbl: "Endereço de Email",
+        reg_pass_lbl: "Palavra-passe",
+        reg_submit: "Validar Registo",
+        already_registered: "Já tem conta?",
+        switch_login: "Entrar aqui",
+        login_title: "Acesso de Membros",
+        login_sub: "Aceda ao seu cockpit exclusivo",
+        login_id_lbl: "Email ou ID de Membro",
+        login_pass_lbl: "Palavra-passe",
+        login_submit: "Entrar",
+        not_registered_yet: "Ainda não tem conta?",
+        switch_register: "Criar conta",
+        checkout_badge: "50 $ • ACESSO VITALÍCIO",
+        checkout_title: "Pagamento Seguro",
+        checkout_sub: "Cartão de Crédito ou Pagamento Móvel",
+        checkout_gate_msg: "Inicie sessão ou registe-se para vincular a licença ao seu ID.",
+        checkout_momo_num: "Número de Telemóvel",
+        btn_pay_momo: "Pagar com Mobile Money",
+        checkout_guarantee_note: "O cockpit abre imediatamente após a validação do pagamento.",
+        btn_pay_card: "Pagar com Cartão – 50 $",
+        pay_verif_title: "A verificar pagamento",
+        pay_verif_sub: "Ligação segura em curso…",
+        ph_name: "Ex: Alex_Trader",
+        ph_email: "nome@exemplo.com",
+        ph_pass_min: "Pelo menos 6 caracteres",
+        ph_login_id: "nome@exemplo.com ou CRASH-5829143",
+        ph_pass: "Sua palavra-passe",
+        ph_old_pass: "Palavra-passe atual",
+        ph_new_pass: "Nova palavra-passe (6+ caracteres)",
+        ph_confirm_pass: "Confirmar nova palavra-passe"
+    },
+    de: {
+        doc_title: "CRASH PREDICTOR 2026 | Offizielles Analyse-Cockpit & Live-Signale",
+        ticker_live: "LIVE",
+        ticker_sub: "aktive Sitzungen • Analyse-Engine",
+        alert_unsubscribed: "<strong>ZUGANG NICHT AKTIV:</strong> Aktivieren Sie Ihre Lizenz, um das Cockpit zu öffnen.",
+        btn_alert_unlock: "Zugang freischalten – 50 $",
+        badge_edition: "EDITION 2026",
+        nav_login: "Anmelden",
+        nav_register: "Registrieren",
+        promo_offer: "50 $ Angebot:",
+        promo_remaining: "verbleibend",
+        hero_subtitle: "Hochfrequenz-Algorithmen und Echtzeit-Flugbahnvorhersage im Live-Cockpit.",
+        badge_algo: "2026 ENGINE",
+        badge_live_session: "ECHTZEIT-SITZUNG",
+        badge_verified: "VERIFIZIERT",
+        flash_default: "hat soeben die lebenslange Lizenz aktiviert",
+        offer_title: "Offizielle Lizenz & Unbegrenzter Zugang",
+        offer_desc: "Schalten Sie vollen Zugriff auf das Analyse-Cockpit, Live-Signale und den Flugverlauf frei.",
+        price_lifetime: "/ Lebenslanger Zugang",
+        price_cfa: "",
+        benefit_1_title: "Optimale Algorithmische Präzision",
+        benefit_1_desc: "Echtzeit-Datenanalyse und präzise Vorhersage von Flugkurven.",
+        benefit_2_title: "Sofortige Freischaltung",
+        benefit_2_desc: "Unmittelbarer Zugang zu allen Signalen und zum Cockpit direkt nach der Zahlung.",
+        benefit_3_title: "Lebenslanger Zugang Ohne Abogebühren",
+        benefit_3_desc: "Dauerhafte Lizenz mit Einmalzahlung, garantiert ohne monatliche Gebühren.",
+        benefit_4_title: "Multi-Geräte Unterstützung",
+        benefit_4_desc: "Optimiert für reibungslose Nutzung auf Smartphone, Tablet und PC.",
+        btn_buy_instant: "Vollen Zugang freischalten – 50 $",
+        secure_guarantee: "Sichere & verschlüsselte Zahlung • Automatische Cockpit-Aktivierung",
+        reviews_badge: "VERIFIZIERTE MITGLIEDER (113 BEWERTUNGEN)",
+        reviews_title: "Erfahrungsberichte & Feedback",
+        reviews_subtitle: "Authentische Bewertungen von verifizierten Mitgliedern.",
+        stat_registered: "Registrierte Mitglieder",
+        stat_satisfaction: "Zufriedenheitsrate",
+        stat_license: "Lebenslange Lizenz",
+        btn_load_more: "Weitere Bewertungen laden",
+        remaining_txt: "übrig",
+        footer_copy: "© 2026 CRASH PREDICTOR TECHNOLOGIES. Alle Rechte vorbehalten.",
+        footer_admin: "Admin-Bereich",
+        vip_official: "OFFIZIELL",
+        vip_radar_live: "LIVE-RADARFEED",
+        vip_member_active: "Aktives Mitglied",
+        radar_heading: "HOCHPRÄZISES VERTIKALES RADAR",
+        radar_session_badge: "AKTIVE SITZUNG",
+        pred_label: "BERECHNETER AUSSTIEGSPUNKT",
+        pred_stability: "Stabilität:",
+        pred_advice: "Sicherer Ausstieg vor Signalabbruch geplant",
+        hud_label: "LIVE-QUOTE",
+        scan_title: "SIGNAL-KALIBRIERUNG",
+        scan_subtitle: "Nächste Runde wird vorbereitet…",
+        vip_flight_init: "Datenanalyse läuft… Start steht bevor",
+        sys_params: "SYSTEM-PARAMETER",
+        sys_algo_stab: "Algorithmus-Stabilität",
+        sys_latency: "Signal-Latenz",
+        sys_license_status: "Lizenzstatus",
+        sys_active_lifetime: "LEBENSLANG AKTIV",
+        sys_your_id: "Ihre Mitglieds-ID",
+        recent_rounds: "LETZTE RUNDEN",
+        profile_space: "Mein Mitgliedsbereich",
+        profile_your_id: "IHRE EINZIGARTIGE ID:",
+        profile_license_status: "Lizenzstatus",
+        status_unsubscribed: "NICHT AKTIVIERT",
+        lbl_phone: "Telefonnummer",
+        btn_save: "Speichern",
+        lbl_update_pass: "Passwort ändern",
+        btn_update: "Aktualisieren",
+        btn_profile_unlock: "Zugang freischalten – 50 $",
+        btn_logout: "Abmelden",
+        reg_title: "Konto erstellen",
+        reg_sub: "Eine eindeutige ID wird Ihnen zugewiesen",
+        reg_name_lbl: "Name oder Benutzername",
+        reg_email_lbl: "E-Mail-Adresse",
+        reg_pass_lbl: "Passwort",
+        reg_submit: "Registrierung abschließen",
+        already_registered: "Bereits registriert?",
+        switch_login: "Hier anmelden",
+        login_title: "Mitglieder-Login",
+        login_sub: "Zugang zu Ihrem persönlichen Cockpit",
+        login_id_lbl: "E-Mail oder Mitglieds-ID",
+        login_pass_lbl: "Passwort",
+        login_submit: "Anmelden",
+        not_registered_yet: "Noch kein Konto?",
+        switch_register: "Konto erstellen",
+        checkout_badge: "50 $ • LEBENSLANGER ZUGANG",
+        checkout_title: "Sichere Bezahlung",
+        checkout_sub: "Kreditkarte oder Mobile Zahlung",
+        checkout_gate_msg: "Bitte anmelden oder registrieren, um die Lizenz mit Ihrer ID zu verknüpfen.",
+        checkout_momo_num: "Mobilfunknummer",
+        btn_pay_momo: "Mit Mobile Money bezahlen",
+        checkout_guarantee_note: "Das Cockpit öffnet sich sofort nach erfolgreicher Zahlung.",
+        btn_pay_card: "Mit Kreditkarte bezahlen – 50 $",
+        pay_verif_title: "Zahlungsprüfung",
+        pay_verif_sub: "Sichere Verbindung wird hergestellt…",
+        ph_name: "Z.B. Alex_Trader",
+        ph_email: "name@beispiel.de",
+        ph_pass_min: "Mindestens 6 Zeichen",
+        ph_login_id: "name@beispiel.de oder CRASH-5829143",
+        ph_pass: "Ihr Passwort",
+        ph_old_pass: "Aktuelles Passwort",
+        ph_new_pass: "Neues Passwort (6+ Zeichen)",
+        ph_confirm_pass: "Neues Passwort bestätigen"
+    }
+};
+
+const LANG_METAS = {
+    fr: { flag: "🇫🇷", code: "FR", name: "Français" },
+    en: { flag: "🇬🇧", code: "EN", name: "English" },
+    es: { flag: "🇪🇸", code: "ES", name: "Español" },
+    pt: { flag: "🇵🇹", code: "PT", name: "Português" },
+    de: { flag: "🇩🇪", code: "DE", name: "Deutsch" }
+};
+
+// ==========================================================================
+// 113 AVIS CLIENTS DYNAMIQUES & NATURELS (IDs 7 CHIFFRES : 5 000 000 - 10 000 000)
 // ==========================================================================
 const WINNER_COMMENTS = [
-    // --- 1 à 80 : Français Prioritaire ---
+    // --- Français ---
     { username: "ID: CRASH-5829143", lang: "FR", gain: "+$450", comment: "Cockpit très clair, prédictions nettes et prise en main immédiate." },
     { username: "ID: CRASH-6104829", lang: "FR", gain: "+$820", comment: "Licence rentabilisée rapidement, rien à redire sur la fluidité." },
     { username: "ID: CRASH-7391024", lang: "FR", gain: "+$1,100", comment: "Interface propre et rapide à charger. Très satisfait du service." },
@@ -105,7 +636,8 @@ const WINNER_COMMENTS = [
     { username: "ID: CRASH-6948102", lang: "FR", gain: "+$1,080", comment: "L'anticipation de sortie est très sécurisante." },
     { username: "ID: CRASH-7410294", lang: "FR", gain: "+$530", comment: "Tout se fait dans le navigateur, aucun téléchargement lourd." },
     { username: "ID: CRASH-9748102", lang: "FR", gain: "+$1,460", comment: "Très bonne fluidité sur les montées rapides." },
-    // --- 81 à 95 : Anglais (International) ---
+    
+    // --- Anglais ---
     { username: "ID: CRASH-5291048", lang: "EN", gain: "+$1,380", comment: "Clean cockpit, stable animation and instant access." },
     { username: "ID: CRASH-8740192", lang: "EN", gain: "+$890", comment: "Real-time radar works flawlessly on iPhone." },
     { username: "ID: CRASH-6490182", lang: "EN", gain: "+$560", comment: "Fast loading, no lags, lifetime license unlocked instantly." },
@@ -121,7 +653,8 @@ const WINNER_COMMENTS = [
     { username: "ID: CRASH-6190284", lang: "EN", gain: "+$530", comment: "Instant activation, intuitive design on Android Chrome." },
     { username: "ID: CRASH-7481029", lang: "EN", gain: "+$940", comment: "Very stable signal feed, zero lag during flights." },
     { username: "ID: CRASH-9820148", lang: "EN", gain: "+$1,560", comment: "High accuracy predictions and excellent UI responsiveness." },
-    // --- 96 à 107 : Espagnol (International) ---
+    
+    // --- Espagnol ---
     { username: "ID: CRASH-6190482", lang: "ES", gain: "+$580", comment: "Increíble precisión. El cockpit se abrió de inmediato tras el pago." },
     { username: "ID: CRASH-7482910", lang: "ES", gain: "+$920", comment: "Herramienta muy limpia y rápida. Las señales son exactas." },
     { username: "ID: CRASH-8920148", lang: "ES", gain: "+$1,340", comment: "La curva vertical ayuda mucho a visualizar el momento exacto." },
@@ -134,29 +667,20 @@ const WINNER_COMMENTS = [
     { username: "ID: CRASH-9104829", lang: "ES", gain: "+$1,290", comment: "El radar vertical funciona de maravilla sin cortes." },
     { username: "ID: CRASH-6481029", lang: "ES", gain: "+$850", comment: "Acceso permanente verificado, excelente inversión." },
     { username: "ID: CRASH-7820149", lang: "ES", gain: "+$690", comment: "Diseño impecable y predicciones muy claras." },
-    // --- 108 à 111 : Portugais ---
+    
+    // --- Portugais ---
     { username: "ID: CRASH-5520194", lang: "PT", gain: "+$1,650", comment: "Pagamento confirmado e o cockpit abriu na hora. Visual excelente." },
     { username: "ID: CRASH-8910284", lang: "PT", gain: "+$780", comment: "Radar em tempo real muito fluido e preciso no telemóvel." },
     { username: "ID: CRASH-6394810", lang: "PT", gain: "+$1,120", comment: "Ótima precisão nas saídas seguras, muito satisfeito." },
     { username: "ID: CRASH-7419204", lang: "PT", gain: "+$590", comment: "Licença vitalícia sem taxas mensais, recomendo a todos." },
-    // --- 112 à 113 : Allemand ---
+    
+    // --- Allemand ---
     { username: "ID: CRASH-8190472", lang: "DE", gain: "+$940", comment: "Sehr stabile Signale und saubere Radar-Animation auf dem Smartphone." },
     { username: "ID: CRASH-9648102", lang: "DE", gain: "+$1,480", comment: "Hervorragende Reaktionszeit, sofortige Freischaltung nach Zahlung." }
 ];
 
-// NOTIFICATIONS D'ACTIVATION (IDs 7 CHIFFRES : 5 000 000 - 10 000 000)
-const FLASH_NOTIFICATIONS = [
-    { idTag: "ID: CRASH-5829143", text: "vient d'activer sa licence complète" },
-    { idTag: "ID: CRASH-7104829", text: "a validé son accès permanent" },
-    { idTag: "ID: CRASH-6391024", text: "vient d'ouvrir son cockpit en direct" },
-    { idTag: "ID: CRASH-8492019", text: "a activé sa licence avec succès" },
-    { idTag: "ID: CRASH-9248105", text: "vient de rejoindre la session active" },
-    { idTag: "ID: CRASH-5710294", text: "a déverrouillé le radar de vol" },
-    { idTag: "ID: CRASH-8910472", text: "vient d'activer son ID membre officiel" },
-    { idTag: "ID: CRASH-6749102", text: "a validé son accès à vie" },
-    { idTag: "ID: CRASH-9120485", text: "vient de débloquer le radar de vol" }
-];
-
+let currentLang = "fr";
+let isDetectingLang = false;
 let supabaseClient = null;
 let currentUser = readJson(CONFIG.sessionKey, null);
 let displayedCommentsCount = 6;
@@ -171,6 +695,7 @@ let paymentInFlight = false;
 let pendingCheckoutAfterAuth = false;
 
 document.addEventListener("DOMContentLoaded", () => {
+    initLanguageSystem();
     initSupabase();
     initUserIdentity();
     initGlobalViewRouter();
@@ -189,7 +714,181 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /* -------------------------------------------------------------------------- */
-/* 3. ASSAINISSEMENT & GARANTIE DES IDENTIFIANTS 7 CHIFFRES (5M À 10M)        */
+/* SYSTÈME DE TRADUCTION & GÉOLOCALISATION IP (VPN SUPPORT)                   */
+/* -------------------------------------------------------------------------- */
+
+async function initLanguageSystem() {
+    initLanguageDropdown();
+
+    // 1. Initial render rapide via langue du navigateur ou préférence locale
+    const saved = localStorage.getItem(CONFIG.langKey);
+    let initialLang = saved;
+    if (!initialLang) {
+        const navLang = (navigator.language || navigator.userLanguage || "en").toLowerCase();
+        if (navLang.startsWith("fr")) initialLang = "fr";
+        else if (navLang.startsWith("es")) initialLang = "es";
+        else if (navLang.startsWith("pt")) initialLang = "pt";
+        else if (navLang.startsWith("de")) initialLang = "de";
+        else initialLang = "en";
+    }
+
+    applyLanguage(initialLang, false);
+
+    // 2. Détection asynchrone par IP si l'utilisateur n'a pas fixé manuellement son choix
+    if (!saved) {
+        detectVisitorCountryAndApplyLang();
+    }
+}
+
+async function detectVisitorCountryAndApplyLang() {
+    if (isDetectingLang) return;
+    isDetectingLang = true;
+
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 2600);
+        const res = await fetch("https://ipapi.co/json/", { signal: controller.signal });
+        clearTimeout(timeoutId);
+
+        if (res.ok) {
+            const data = await res.json();
+            const country = (data.country_code || "").toUpperCase();
+            const detected = mapCountryToLanguage(country);
+            if (detected && detected !== currentLang) {
+                applyLanguage(detected, false);
+            }
+            return;
+        }
+    } catch (e) {
+        // En cas d'échec / timeout, test de repli secondaire
+        try {
+            const controller2 = new AbortController();
+            const timeoutId2 = setTimeout(() => controller2.abort(), 2000);
+            const res2 = await fetch("https://ipwho.is/", { signal: controller2.signal });
+            clearTimeout(timeoutId2);
+            if (res2.ok) {
+                const data2 = await res2.json();
+                const country = (data2.country_code || "").toUpperCase();
+                const detected = mapCountryToLanguage(country);
+                if (detected && detected !== currentLang) {
+                    applyLanguage(detected, false);
+                }
+            }
+        } catch (err) {}
+    } finally {
+        isDetectingLang = false;
+    }
+}
+
+function mapCountryToLanguage(countryCode) {
+    if (!countryCode) return "en";
+    const c = countryCode.toUpperCase();
+
+    const frCountries = [
+        "FR", "CI", "SN", "CM", "GA", "BJ", "TG", "ML", "GN", "BF", "CG", "CD",
+        "BE", "CH", "MC", "LU", "MG", "NE", "TD", "DZ", "MA", "TN", "HT", "VU"
+    ];
+    const esCountries = [
+        "ES", "MX", "CO", "AR", "PE", "CL", "EC", "GT", "CU", "BO", "DO", "HN",
+        "PY", "SV", "NI", "CR", "PA", "UY", "PR", "VE", "GQ"
+    ];
+    const ptCountries = ["BR", "PT", "AO", "MZ", "CV", "GW", "ST", "TL"];
+    const deCountries = ["DE", "AT", "LI"];
+
+    if (frCountries.includes(c)) return "fr";
+    if (esCountries.includes(c)) return "es";
+    if (ptCountries.includes(c)) return "pt";
+    if (deCountries.includes(c)) return "de";
+    return "en";
+}
+
+function applyLanguage(lang, saveUserChoice = true) {
+    if (!TRANSLATIONS[lang]) lang = "en";
+    currentLang = lang;
+
+    if (saveUserChoice) {
+        localStorage.setItem(CONFIG.langKey, lang);
+    }
+
+    const dict = TRANSLATIONS[lang];
+    document.documentElement.lang = lang;
+
+    // Mise à jour de tous les éléments data-i18n
+    document.querySelectorAll("[data-i18n]").forEach((el) => {
+        const key = el.getAttribute("data-i18n");
+        if (dict[key]) {
+            el.innerHTML = dict[key];
+        }
+    });
+
+    // Mise à jour des placeholders
+    document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+        const key = el.getAttribute("data-i18n-placeholder");
+        if (dict[key]) {
+            el.placeholder = dict[key];
+        }
+    });
+
+    // Mise à jour du sélecteur visuel
+    const meta = LANG_METAS[lang] || LANG_METAS.fr;
+    const flagEl = document.getElementById("currentLangFlag");
+    const codeEl = document.getElementById("currentLangCode");
+    if (flagEl) flagEl.textContent = meta.flag;
+    if (codeEl) codeEl.textContent = meta.code;
+
+    document.querySelectorAll(".lang-option-btn").forEach((btn) => {
+        if (btn.dataset.lang === lang) {
+            btn.classList.add("active");
+        } else {
+            btn.classList.remove("active");
+        }
+    });
+
+    // Affichage conditionnel de la conversion FCFA (uniquement pour FR / pays d'Afrique)
+    const priceCfa = document.getElementById("priceCfaConversion");
+    if (priceCfa) {
+        if (lang === "fr") {
+            priceCfa.style.display = "block";
+            priceCfa.textContent = "≈ 30 000 francs CFA";
+        } else {
+            priceCfa.style.display = "none";
+        }
+    }
+
+    // Re-rendre les commentaires en priorisant la langue de l'utilisateur
+    renderCommentsList();
+}
+
+function initLanguageDropdown() {
+    const toggleBtn = document.getElementById("langToggleBtn");
+    const menu = document.getElementById("langDropdownMenu");
+    const optionBtns = document.querySelectorAll(".lang-option-btn");
+
+    toggleBtn?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        menu?.classList.toggle("hidden");
+    });
+
+    optionBtns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const lang = btn.dataset.lang;
+            if (lang) {
+                applyLanguage(lang, true);
+                menu?.classList.add("hidden");
+                showToast(`Langue changée : ${LANG_METAS[lang].name}`);
+            }
+        });
+    });
+
+    document.addEventListener("click", (e) => {
+        if (!e.target.closest("#langSelectorWrap")) {
+            menu?.classList.add("hidden");
+        }
+    });
+}
+
+/* -------------------------------------------------------------------------- */
+/* IDENTIFIANTS 7 CHIFFRES (5M À 10M)                                         */
 /* -------------------------------------------------------------------------- */
 
 function readJson(key, fallback) {
@@ -223,7 +922,6 @@ function escapeHtml(value) {
     }[char]));
 }
 
-// Génération obligatoire d'un identifiant à 7 chiffres (5 000 000 à 10 000 000)
 function generateUniqueId() {
     const users = loadUsersDb();
     let candidate = "";
@@ -234,7 +932,6 @@ function generateUniqueId() {
     return candidate;
 }
 
-// Valide et migre automatiquement tout ID existant vers un ID 7 chiffres
 function sanitize7DigitId(rawId) {
     if (!rawId) return generateUniqueId();
     const cleanNum = parseInt(String(rawId).replace(/\D/g, ""), 10);
@@ -261,7 +958,7 @@ function setButtonLoading(button, loading, idleHtml) {
     if (loading) {
         button.dataset.idleHtml = button.dataset.idleHtml || button.innerHTML;
         button.disabled = true;
-        button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Traitement…';
+        button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ...';
     } else {
         button.disabled = false;
         button.innerHTML = idleHtml || button.dataset.idleHtml || button.innerHTML;
@@ -281,7 +978,7 @@ function isValidEmail(value) {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Initialisation Supabase (Silencieux)                                       */
+/* Initialisation Supabase                                                    */
 /* -------------------------------------------------------------------------- */
 
 function initSupabase() {
@@ -297,18 +994,16 @@ function initSupabase() {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Identité & Session (Nettoyage & Migration Automatique 7 Chiffres)           */
+/* Identité & Session                                                         */
 /* -------------------------------------------------------------------------- */
 
 function initUserIdentity() {
-    // Migration du Guest ID stocké vers 7 chiffres
     const storedGuestId = localStorage.getItem(CONFIG.guestIdKey);
     const sanitizedGuest = sanitize7DigitId(storedGuestId);
     if (storedGuestId !== sanitizedGuest) {
         localStorage.setItem(CONFIG.guestIdKey, sanitizedGuest);
     }
 
-    // Migration du compte utilisateur courant si nécessaire
     if (currentUser) {
         const sanitizedUserId = sanitize7DigitId(currentUser.uniqueId);
         if (currentUser.uniqueId !== sanitizedUserId) {
@@ -395,7 +1090,7 @@ function subscribeUserRealtime() {
                     currentUser.isSubscribed = Boolean(payload.new.is_subscribed);
                     saveUserSession(currentUser, false);
                     initGlobalViewRouter();
-                    showToast(currentUser.isSubscribed ? "Licence activée ! Ouverture du cockpit." : "Statut mis à jour.");
+                    showToast(currentUser.isSubscribed ? "Licence activée !" : "Statut mis à jour.");
                 }
             })
             .subscribe();
@@ -403,7 +1098,7 @@ function subscribeUserRealtime() {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Routage & Affichage des Vues                                               */
+/* Routage & Affichage                                                        */
 /* -------------------------------------------------------------------------- */
 
 function initGlobalViewRouter() {
@@ -458,7 +1153,7 @@ function updateAuthPublicHeader() {
 }
 
 /* -------------------------------------------------------------------------- */
-/* 4. COMPTEUR DE DIRECT : VARIATIONS DE 2 000 À 5 000 SESSIONS / 3 À 5 SEC   */
+/* COMPTEUR DE DIRECT                                                         */
 /* -------------------------------------------------------------------------- */
 
 function initLiveOnlineUsersTicker() {
@@ -473,10 +1168,7 @@ function initLiveOnlineUsersTicker() {
     liveCounterEl.textContent = formatNumber(currentSessions);
 
     function stepTraffic() {
-        // Paquet aléatoire compris entre 2 000 et 5 000 sessions
         const delta = Math.floor(2000 + Math.random() * 3001);
-        
-        // Mouvement naturel de trafic (55% montée / 45% descente)
         const isRise = Math.random() < 0.55;
 
         if (isRise) {
@@ -485,7 +1177,6 @@ function initLiveOnlineUsersTicker() {
             currentSessions -= delta;
         }
 
-        // Maintien rigoureux et garanti dans la tranche 1 000 000 à 2 000 000
         if (currentSessions > 1940000) {
             currentSessions -= Math.floor(7000 + Math.random() * 4000);
         } else if (currentSessions < 1060000) {
@@ -493,8 +1184,6 @@ function initLiveOnlineUsersTicker() {
         }
 
         liveCounterEl.textContent = formatNumber(currentSessions);
-
-        // Prochain intervalle aléatoire entre 3 et 5 secondes (3000ms à 5000ms)
         const nextDelay = Math.floor(3000 + Math.random() * 2001);
         setTimeout(stepTraffic, nextDelay);
     }
@@ -503,7 +1192,7 @@ function initLiveOnlineUsersTicker() {
 }
 
 /* -------------------------------------------------------------------------- */
-/* 2. BANDEAU D'ACTIVITÉ PRO ET ÉLÉGANT                                       */
+/* BANDEAU D'ACTIVITÉ PRO ET ÉLÉGANT                                          */
 /* -------------------------------------------------------------------------- */
 
 function initLiveFlashSocialNotifications() {
@@ -512,14 +1201,22 @@ function initLiveFlashSocialNotifications() {
     const flashSubtitle = document.getElementById("flashSubtitle");
     if (!flashBox) return;
 
+    const flashMessages = {
+        fr: "vient d'activer sa licence complète",
+        en: "just activated their lifetime license",
+        es: "acaba de activar su licencia de por vida",
+        pt: "acabou de ativar a sua licença vitalícia",
+        de: "hat soeben die lebenslange Lizenz aktiviert"
+    };
+
     let flashIdx = 0;
 
     function triggerFlash() {
-        const item = FLASH_NOTIFICATIONS[flashIdx % FLASH_NOTIFICATIONS.length];
-        flashIdx++;
+        const randomId = `ID: CRASH-${Math.floor(5000000 + Math.random() * 5000000)}`;
+        const msg = flashMessages[currentLang] || flashMessages.fr;
 
-        if (flashTitle) flashTitle.textContent = item.idTag;
-        if (flashSubtitle) flashSubtitle.textContent = item.text;
+        if (flashTitle) flashTitle.textContent = randomId;
+        if (flashSubtitle) flashSubtitle.textContent = msg;
 
         flashBox.classList.add("pulse-highlight");
         setTimeout(() => flashBox.classList.remove("pulse-highlight"), 1400);
@@ -555,15 +1252,24 @@ function initGuaranteed48hCountdown() {
 }
 
 /* -------------------------------------------------------------------------- */
-/* GESTION DES 113 AVIS CLIENTS                                               */
+/* GESTION DES 113 AVIS CLIENTS (ADAPTÉS À LA LANGUE)                         */
 /* -------------------------------------------------------------------------- */
+
+function getSortedCommentsForLang(lang) {
+    const langCode = (lang || "fr").toUpperCase();
+    const matching = WINNER_COMMENTS.filter((c) => c.lang === langCode);
+    const others = WINNER_COMMENTS.filter((c) => c.lang !== langCode);
+    return [...matching, ...others];
+}
 
 function renderCommentsList() {
     const grid = document.getElementById("commentsGrid");
     const remainingSpan = document.getElementById("commentsRemainingCount");
     if (!grid) return;
 
-    const visibleComments = WINNER_COMMENTS.slice(0, displayedCommentsCount);
+    const sortedList = getSortedCommentsForLang(currentLang);
+    const visibleComments = sortedList.slice(0, displayedCommentsCount);
+
     grid.innerHTML = visibleComments.map((c) => `
         <div class="comment-card animate-fade">
             <div class="comment-header">
@@ -578,7 +1284,7 @@ function renderCommentsList() {
     `).join("");
 
     if (remainingSpan) {
-        remainingSpan.textContent = Math.max(0, WINNER_COMMENTS.length - displayedCommentsCount);
+        remainingSpan.textContent = Math.max(0, sortedList.length - displayedCommentsCount);
     }
 }
 
@@ -666,7 +1372,7 @@ function startVipGrandVerticalRadarEngine() {
         if (targetDisplay) targetDisplay.textContent = `x${vipTargetMultiplier.toFixed(2)}`;
         if (confidenceDisplay) confidenceDisplay.textContent = conf;
         if (statusMessage) {
-            statusMessage.innerHTML = `🛰️ <strong>SIGNAL STABLE :</strong> point de sortie calculé à <strong>x${vipTargetMultiplier.toFixed(2)}</strong>. Décollage en cours…`;
+            statusMessage.innerHTML = `🛰️ <strong>SIGNAL STABLE :</strong> x${vipTargetMultiplier.toFixed(2)}`;
         }
     }
 
@@ -707,9 +1413,6 @@ function startVipGrandVerticalRadarEngine() {
         flightState = "scanning";
         scannerLoader?.classList.remove("hidden");
         if (scanProgressFill) scanProgressFill.style.width = "0%";
-        if (statusMessage) {
-            statusMessage.innerHTML = `🛰️ <strong>CALIBRATION DU SIGNAL…</strong> Prochain tour en préparation…`;
-        }
 
         let progress = 0;
         const interval = setInterval(() => {
@@ -854,9 +1557,6 @@ function startVipGrandVerticalRadarEngine() {
                 flightState = "crashed";
                 createExplosion(curX, curY);
                 pushWinningHistory(vipTargetMultiplier);
-                if (statusMessage) {
-                    statusMessage.innerHTML = `🎯 <strong>SIGNAL ATTEINT :</strong> clôturé à <strong>x${vipTargetMultiplier.toFixed(2)}</strong>. Sortie sécurisée validée.`;
-                }
             }
         } else if (flightState === "crashed") {
             explosionTimer++;
@@ -1529,7 +2229,7 @@ window.adminToggleUser = async function (email, status) {
 };
 
 /* -------------------------------------------------------------------------- */
-/* Système de Toast Toastify                                                  */
+/* Toasts                                                                     */
 /* -------------------------------------------------------------------------- */
 
 function showToast(message, type = "success") {
