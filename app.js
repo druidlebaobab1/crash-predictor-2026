@@ -926,22 +926,25 @@ function randomMemberNumber() {
     return 5000000 + Math.floor(Math.random() * 5000000);
 }
 
+function formatMemberId(num) {
+    const n = parseInt(String(num ?? "").replace(/\D/g, ""), 10);
+    if (!n || n < 5000000 || n > 9999999) {
+        return `CRASH-${randomMemberNumber()}`;
+    }
+    return `CRASH-${n}`;
+}
+
 function generateUniqueId() {
     const users = loadUsersDb();
     let candidate = "";
     do {
-        candidate = `CRASH-${randomMemberNumber()}`;
+        candidate = formatMemberId(randomMemberNumber());
     } while (users.some((user) => user.uniqueId === candidate));
     return candidate;
 }
 
 function sanitize7DigitId(rawId) {
-    if (!rawId) return generateUniqueId();
-    const cleanNum = parseInt(String(rawId).replace(/\D/g, ""), 10);
-    if (isNaN(cleanNum) || cleanNum < 5000000 || cleanNum > 9999999) {
-        return generateUniqueId();
-    }
-    return `CRASH-${cleanNum}`;
+    return formatMemberId(rawId);
 }
 
 async function hashPassword(password) {
@@ -1006,6 +1009,18 @@ function initUserIdentity() {
     if (storedGuestId !== sanitizedGuest) {
         localStorage.setItem(CONFIG.guestIdKey, sanitizedGuest);
     }
+
+    const usersDb = loadUsersDb();
+    let dbChanged = false;
+    const migratedDb = usersDb.map((user) => {
+        const nextId = sanitize7DigitId(user.uniqueId);
+        if (nextId !== user.uniqueId) {
+            dbChanged = true;
+            return { ...user, uniqueId: nextId };
+        }
+        return user;
+    });
+    if (dbChanged) saveUsersDb(migratedDb);
 
     if (currentUser) {
         const sanitizedUserId = sanitize7DigitId(currentUser.uniqueId);
@@ -1211,7 +1226,7 @@ function initLiveFlashSocialNotifications() {
     };
 
     function triggerFlash() {
-        const randomId = `ID: CRASH-${randomMemberNumber()}`;
+        const randomId = `ID: ${formatMemberId(randomMemberNumber())}`;
         const msg = flashMessages[currentLang] || flashMessages.fr;
 
         document.querySelectorAll(".js-live-activity-id, #flashTitle").forEach((el) => {
