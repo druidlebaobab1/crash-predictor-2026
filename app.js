@@ -105,7 +105,7 @@ const TRANSLATIONS = {
         switch_login: "Se connecter",
         login_title: "Connexion membre",
         login_sub: "Accédez à votre espace",
-        login_id_lbl: "Email ou ID",
+        login_id_lbl: "Email",
         login_pass_lbl: "Mot de passe",
         login_submit: "Se connecter",
         not_registered_yet: "Pas encore de compte ?",
@@ -123,7 +123,7 @@ const TRANSLATIONS = {
         ph_name: "Ex: Alex_Trader",
         ph_email: "nom@exemple.com",
         ph_pass_min: "Au moins 6 caractères",
-        ph_login_id: "nom@exemple.com ou CRASH-5829143",
+        ph_login_id: "nom@exemple.com",
         ph_pass: "Votre mot de passe",
         ph_old_pass: "Mot de passe actuel",
         ph_new_pass: "Nouveau mot de passe (6+ caractères)",
@@ -208,7 +208,7 @@ const TRANSLATIONS = {
         switch_login: "Login here",
         login_title: "Member Login",
         login_sub: "Access your private dashboard",
-        login_id_lbl: "Email or Member ID",
+        login_id_lbl: "Email",
         login_pass_lbl: "Password",
         login_submit: "Sign In",
         not_registered_yet: "Don't have an account?",
@@ -226,7 +226,7 @@ const TRANSLATIONS = {
         ph_name: "E.g. Alex_Trader",
         ph_email: "name@example.com",
         ph_pass_min: "At least 6 characters",
-        ph_login_id: "name@example.com or CRASH-5829143",
+        ph_login_id: "name@example.com",
         ph_pass: "Your password",
         ph_old_pass: "Current password",
         ph_new_pass: "New password (6+ characters)",
@@ -311,7 +311,7 @@ const TRANSLATIONS = {
         switch_login: "Iniciar sesión aquí",
         login_title: "Acceso Miembros",
         login_sub: "Acceda a su cockpit privado",
-        login_id_lbl: "Correo o ID de Miembro",
+        login_id_lbl: "Email",
         login_pass_lbl: "Contraseña",
         login_submit: "Entrar",
         not_registered_yet: "¿No tiene cuenta?",
@@ -329,7 +329,7 @@ const TRANSLATIONS = {
         ph_name: "Ej: Alex_Trader",
         ph_email: "nombre@ejemplo.com",
         ph_pass_min: "Al menos 6 caracteres",
-        ph_login_id: "nombre@ejemplo.com o CRASH-5829143",
+        ph_login_id: "nombre@ejemplo.com",
         ph_pass: "Su contraseña",
         ph_old_pass: "Contraseña actual",
         ph_new_pass: "Nueva contraseña (6+ caracteres)",
@@ -414,7 +414,7 @@ const TRANSLATIONS = {
         switch_login: "Entrar aqui",
         login_title: "Acesso de Membros",
         login_sub: "Aceda ao seu cockpit exclusivo",
-        login_id_lbl: "Email ou ID de Membro",
+        login_id_lbl: "Email",
         login_pass_lbl: "Palavra-passe",
         login_submit: "Entrar",
         not_registered_yet: "Ainda não tem conta?",
@@ -432,7 +432,7 @@ const TRANSLATIONS = {
         ph_name: "Ex: Alex_Trader",
         ph_email: "nome@exemplo.com",
         ph_pass_min: "Pelo menos 6 caracteres",
-        ph_login_id: "nome@exemplo.com ou CRASH-5829143",
+        ph_login_id: "nome@exemplo.com",
         ph_pass: "Sua palavra-passe",
         ph_old_pass: "Palavra-passe atual",
         ph_new_pass: "Nova palavra-passe (6+ caracteres)",
@@ -517,7 +517,7 @@ const TRANSLATIONS = {
         switch_login: "Hier anmelden",
         login_title: "Mitglieder-Login",
         login_sub: "Zugang zu Ihrem persönlichen Cockpit",
-        login_id_lbl: "E-Mail oder Mitglieds-ID",
+        login_id_lbl: "E-Mail",
         login_pass_lbl: "Passwort",
         login_submit: "Anmelden",
         not_registered_yet: "Noch kein Konto?",
@@ -535,7 +535,7 @@ const TRANSLATIONS = {
         ph_name: "Z.B. Alex_Trader",
         ph_email: "name@beispiel.de",
         ph_pass_min: "Mindestens 6 Zeichen",
-        ph_login_id: "name@beispiel.de oder CRASH-5829143",
+        ph_login_id: "name@beispiel.de",
         ph_pass: "Ihr Passwort",
         ph_old_pass: "Aktuelles Passwort",
         ph_new_pass: "Neues Passwort (6+ Zeichen)",
@@ -549,15 +549,6 @@ const LANG_METAS = {
     es: { flag: "🇪🇸", code: "ES", name: "Español" },
     pt: { flag: "🇵🇹", code: "PT", name: "Português" },
     de: { flag: "🇩🇪", code: "DE", name: "Deutsch" }
-};
-
-const COMMENT_LANG_FLAGS = {
-    FR: { flag: "🇫🇷", code: "FR" },
-    EN: { flag: "🇬🇧", code: "EN" },
-    ES: { flag: "🇪🇸", code: "ES" },
-    PT: { flag: "🇵🇹", code: "PT" },
-    DE: { flag: "🇩🇪", code: "DE" },
-    IT: { flag: "🇮🇹", code: "IT" }
 };
 
 // ==========================================================================
@@ -802,23 +793,30 @@ function raceFirstCountry(promises, timeoutMs) {
 }
 
 async function fetchLiveVisitorCountry() {
-    const hostingCountry = getHostingHeaderCountry();
-    if (hostingCountry) return hostingCountry;
+    try {
+        const hostingCountry = getHostingHeaderCountry();
+        if (hostingCountry) return hostingCountry;
 
-    return raceFirstCountry([
-        fetch("https://www.cloudflare.com/cdn-cgi/trace", { cache: "no-store" })
-            .then((res) => res.text())
-            .then((text) => {
-                const match = String(text).match(/loc=([A-Z]{2})/i);
-                return match ? match[1] : "";
-            }),
-        fetch("https://ipapi.co/country/", { cache: "no-store" })
-            .then((res) => res.text())
-            .then((text) => String(text || "").trim()),
-        fetch("https://ipwho.is/", { cache: "no-store" })
-            .then((res) => res.json())
-            .then((data) => data && data.country_code)
-    ], 2800);
+        return await raceFirstCountry([
+            fetch("https://www.cloudflare.com/cdn-cgi/trace", { cache: "no-store" })
+                .then((res) => res.ok ? res.text() : "")
+                .then((text) => {
+                    const match = String(text || "").match(/loc=([A-Z]{2})/i);
+                    return match ? match[1] : "";
+                })
+                .catch(() => ""),
+            fetch("https://ipapi.co/country/", { cache: "no-store" })
+                .then((res) => res.ok ? res.text() : "")
+                .then((text) => String(text || "").trim())
+                .catch(() => ""),
+            fetch("https://ipwho.is/", { cache: "no-store" })
+                .then((res) => res.ok ? res.json() : null)
+                .then((data) => data && data.country_code)
+                .catch(() => "")
+        ], 2800);
+    } catch (e) {
+        return "";
+    }
 }
 
 async function initLanguageSystem() {
@@ -842,13 +840,15 @@ async function detectVisitorCountryAndApplyLang() {
 
     try {
         const country = await fetchLiveVisitorCountry();
-        if (!country) return;
-        const detected = mapCountryToLanguage(country);
+        const detected = country ? mapCountryToLanguage(country) : detectBrowserLanguage();
         if (detected && detected !== currentLang) {
             applyLanguage(detected, false);
         }
     } catch (e) {
-        // Repli silencieux : navigator.language déjà appliqué
+        const fallback = detectBrowserLanguage();
+        if (fallback && fallback !== currentLang) {
+            applyLanguage(fallback, false);
+        }
     } finally {
         isDetectingLang = false;
     }
@@ -1401,7 +1401,6 @@ function renderCommentsList() {
         <div class="comment-card animate-fade">
             <div class="comment-header">
                 <div class="comment-user-box">
-                    <div class="comment-lang-badge" title="${escapeHtml((COMMENT_LANG_FLAGS[c.lang] || { code: c.lang }).code)}">${(COMMENT_LANG_FLAGS[c.lang] || { flag: c.lang }).flag}</div>
                     <div class="comment-username">${escapeHtml(c.username)} <i class="fa-solid fa-circle-check text-green"></i></div>
                 </div>
             </div>
@@ -1755,6 +1754,21 @@ function initAuthSecurity() {
                 return;
             }
 
+            if (supabaseClient) {
+                try {
+                    const { data: existingRemote } = await supabaseClient
+                        .from("users")
+                        .select("email")
+                        .eq("email", email)
+                        .maybeSingle();
+                    if (existingRemote) {
+                        setButtonLoading(regSubmitBtn, false);
+                        showToast("Cet email est déjà enregistré. Connectez-vous.", "error");
+                        return;
+                    }
+                } catch {}
+            }
+
             const passwordHash = await hashPassword(password);
             const newUser = {
                 id: Date.now(),
@@ -1768,6 +1782,16 @@ function initAuthSecurity() {
             };
 
             await saveUserSession(newUser, true);
+            if (supabaseClient) {
+                try {
+                    const { data: stored } = await supabaseClient
+                        .from("users")
+                        .select("email")
+                        .eq("email", email)
+                        .maybeSingle();
+                    if (!stored) await upsertUserToSupabase(newUser);
+                } catch {}
+            }
             setButtonLoading(regSubmitBtn, false);
 
             initGlobalViewRouter();
@@ -1785,51 +1809,36 @@ function initAuthSecurity() {
     if (logForm) {
         logForm.addEventListener("submit", async (e) => {
             e.preventDefault();
-            const identifier = document.getElementById("loginEmail").value.trim();
+            const emailKey = String(document.getElementById("loginEmail").value || "").trim().toLowerCase();
             const password = String(document.getElementById("loginPassword")?.value || "").trim();
 
-            if (!identifier) {
-                showToast("Email ou ID requis.", "error");
+            if (!isValidEmail(emailKey)) {
+                showToast("Adresse email requise.", "error");
                 return;
             }
 
             setButtonLoading(loginSubmitBtn, true);
             const usersDb = loadUsersDb();
-            const emailKey = identifier.toLowerCase();
-            const memberId = normalizeMemberIdInput(identifier);
-            const idDigits = identifier.replace(/\D/g, "");
-            let found = usersDb.find((u) => {
-                const email = String(u.email || "").toLowerCase();
-                const uid = String(u.uniqueId || "").toUpperCase();
-                const uidDigits = uid.replace(/\D/g, "");
-                return email === emailKey
-                    || uid === memberId
-                    || uid === identifier.toUpperCase().replace(/^ID:\s*/i, "").replace(/\s+/g, "")
-                    || (idDigits.length >= 7 && uidDigits === idDigits);
-            });
+            let found = usersDb.find((u) => String(u.email || "").toLowerCase() === emailKey);
 
-            if (!found && supabaseClient) {
+            if (supabaseClient) {
                 try {
-                    const safeEmail = emailKey.replace(/"/g, "");
-                    const safeId = memberId.replace(/"/g, "");
-                    let query = supabaseClient.from("users").select("*");
-                    if (safeEmail.includes("@")) {
-                        query = query.or(`email.eq."${safeEmail}",unique_id.eq."${safeId}"`);
-                    } else {
-                        query = query.eq("unique_id", safeId);
-                    }
-                    const { data } = await query.maybeSingle();
+                    const { data } = await supabaseClient
+                        .from("users")
+                        .select("*")
+                        .eq("email", emailKey)
+                        .maybeSingle();
 
                     if (data) {
                         found = {
-                            id: data.id || Date.now(),
-                            uniqueId: sanitize7DigitId(data.unique_id),
-                            name: data.name || "Client",
+                            id: data.id || (found && found.id) || Date.now(),
+                            uniqueId: sanitize7DigitId(data.unique_id || (found && found.uniqueId)),
+                            name: data.name || (found && found.name) || "Client",
                             email: data.email,
-                            phone: data.phone || "",
-                            passwordHash: data.password_hash || "",
-                            isSubscribed: Boolean(data.is_subscribed),
-                            registeredAt: new Date().toLocaleDateString("fr-FR")
+                            phone: data.phone || (found && found.phone) || "",
+                            passwordHash: data.password_hash || (found && found.passwordHash) || "",
+                            isSubscribed: Boolean(data.is_subscribed) || Boolean(found && found.isSubscribed),
+                            registeredAt: (found && found.registeredAt) || new Date().toLocaleDateString("fr-FR")
                         };
                     }
                 } catch {}
@@ -1841,7 +1850,7 @@ function initAuthSecurity() {
                     if (found.passwordHash === btoa(password)) {
                         found.passwordHash = await hashPassword(password);
                     }
-                    await saveUserSession(found, false);
+                    await saveUserSession(found, true);
                     setButtonLoading(loginSubmitBtn, false);
                     initGlobalViewRouter();
                     closeAllModals();
