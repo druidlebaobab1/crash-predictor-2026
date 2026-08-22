@@ -21,6 +21,7 @@ alter table public.users add column if not exists phone text default '';
 alter table public.users add column if not exists is_subscribed boolean default false;
 alter table public.users add column if not exists created_at timestamptz default now();
 alter table public.users add column if not exists updated_at timestamptz default now();
+alter table public.users add column if not exists password_hash text default '';
 
 create table if not exists public.payments (
     id uuid primary key default gen_random_uuid(),

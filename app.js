@@ -990,12 +990,27 @@ function writeJson(key, value) {
     localStorage.setItem(key, JSON.stringify(value));
 }
 
+function normalizeEmail(value) {
+    return String(value || "").trim().toLowerCase();
+}
+
 function loadUsersDb() {
-    return readJson(CONFIG.usersDbKey, []);
+    const users = readJson(CONFIG.usersDbKey, []);
+    if (!Array.isArray(users)) return [];
+    return users.map((user) => ({
+        ...user,
+        email: normalizeEmail(user.email)
+    }));
 }
 
 function saveUsersDb(users) {
-    writeJson(CONFIG.usersDbKey, users);
+    if (!Array.isArray(users)) return;
+    const current = readJson(CONFIG.usersDbKey, []);
+    if (users.length === 0 && Array.isArray(current) && current.length > 0) return;
+    writeJson(CONFIG.usersDbKey, users.map((user) => ({
+        ...user,
+        email: normalizeEmail(user.email)
+    })));
 }
 
 function escapeHtml(value) {
@@ -1109,7 +1124,7 @@ function normalizeMemberIdInput(raw) {
 }
 
 function isValidEmail(value) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizeEmail(value));
 }
 
 /* -------------------------------------------------------------------------- */
@@ -1158,12 +1173,13 @@ function initUserIdentity() {
 
 async function saveUserSession(user, syncRemote = true) {
     if (!user) return;
+    user.email = normalizeEmail(user.email);
     user.uniqueId = persistMemberId(user.uniqueId) || sanitize7DigitId(user.uniqueId);
     currentUser = user;
     writeJson(CONFIG.sessionKey, user);
 
     const usersDb = loadUsersDb();
-    const idx = usersDb.findIndex((u) => u.email === user.email);
+    const idx = usersDb.findIndex((u) => normalizeEmail(u.email) === user.email);
     if (idx !== -1) {
         usersDb[idx] = { ...usersDb[idx], ...user };
     } else {
@@ -1178,17 +1194,51 @@ async function saveUserSession(user, syncRemote = true) {
 
 async function upsertUserToSupabase(user) {
     if (!supabaseClient || !user?.email) return;
+    const email = normalizeEmail(user.email);
     try {
+        const { data: existing } = await supabaseClient
+            .from("users")
+            .select("is_subscribed, unique_id, password_hash, email")
+            .ilike("email", email)
+            .maybeSingle();
+        const uniqueId = formatMemberId(existing && existing.unique_id) || persistMemberId(user.uniqueId);
         await supabaseClient.from("users").upsert({
-            unique_id: user.uniqueId,
+            unique_id: uniqueId,
             name: user.name,
-            email: user.email,
+            email,
             phone: user.phone || "",
-            is_subscribed: Boolean(user.isSubscribed),
-            password_hash: user.passwordHash || "",
+            is_subscribed: Boolean(user.isSubscribed) || Boolean(existing && existing.is_subscribed),
+            password_hash: user.passwordHash || (existing && existing.password_hash) || "",
             updated_at: new Date().toISOString()
         }, { onConflict: "email" });
     } catch {}
+}
+
+async function findAccountByEmail(email) {
+    const emailKey = normalizeEmail(email);
+    if (!emailKey) return null;
+    const local = loadUsersDb().find((u) => normalizeEmail(u.email) === emailKey) || null;
+    if (!supabaseClient) return local;
+    try {
+        let { data } = await supabaseClient.from("users").select("*").eq("email", emailKey).maybeSingle();
+        if (!data) {
+            const fallback = await supabaseClient.from("users").select("*").ilike("email", emailKey).maybeSingle();
+            data = fallback.data;
+        }
+        if (!data) return local;
+        return {
+            id: data.id || (local && local.id) || Date.now(),
+            uniqueId: formatMemberId(data.unique_id) || (local && local.uniqueId) || "",
+            name: data.name || (local && local.name) || "Client",
+            email: emailKey,
+            phone: data.phone || (local && local.phone) || "",
+            passwordHash: data.password_hash || (local && local.passwordHash) || "",
+            isSubscribed: Boolean(data.is_subscribed) || Boolean(local && local.isSubscribed),
+            registeredAt: (local && local.registeredAt) || new Date().toLocaleDateString("fr-FR")
+        };
+    } catch {
+        return local;
+    }
 }
 
 async function syncUserFromSupabase() {
@@ -1197,7 +1247,7 @@ async function syncUserFromSupabase() {
         const { data, error } = await supabaseClient
             .from("users")
             .select("unique_id, name, email, phone, is_subscribed, password_hash")
-            .eq("email", currentUser.email)
+            .ilike("email", normalizeEmail(currentUser.email))
             .maybeSingle();
 
         if (data && !error) {
@@ -1627,19 +1677,27 @@ function startVipGrandVerticalRadarEngine() {
     const scannerLoader = document.getElementById("vipScannerLoader");
     const scanProgressFill = document.getElementById("scanProgressFill");
 
-    if (!canvas) return;
+    if (!canvas) {
+        vipEngineRunning = false;
+        return;
+    }
     const ctx = canvas.getContext("2d");
+    let viewW = 800;
+    let viewH = 520;
 
     function resizeCanvas() {
         const parent = canvas.parentElement;
-        if (parent) {
-            const width = parent.clientWidth || 800;
-            const height = Math.max(parent.clientHeight || 520, 360);
-            if (canvas.width !== width || canvas.height !== height) {
-                canvas.width = width;
-                canvas.height = height;
-            }
-        }
+        if (!parent) return;
+        const cssW = Math.max(parent.clientWidth || 320, 260);
+        const cssH = Math.max(parent.clientHeight || 320, 240);
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        viewW = cssW;
+        viewH = cssH;
+        canvas.style.width = `${cssW}px`;
+        canvas.style.height = `${cssH}px`;
+        canvas.width = Math.round(cssW * dpr);
+        canvas.height = Math.round(cssH * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
     resizeCanvas();
     vipResizeHandler = resizeCanvas;
@@ -1796,8 +1854,8 @@ function startVipGrandVerticalRadarEngine() {
     function renderVIPCockpit() {
         if (!vipEngineRunning) return;
 
-        const W = canvas.width;
-        const H = canvas.height;
+        const W = viewW;
+        const H = viewH;
 
         ctx.clearRect(0, 0, W, H);
         ctx.fillStyle = "#060a18";
@@ -1833,12 +1891,12 @@ function startVipGrandVerticalRadarEngine() {
         ctx.lineTo(25, H - 25);
         ctx.stroke();
 
-        const startX = 56;
-        const startY = H - 56;
+        const startX = 74;
+        const startY = H - 58;
 
         const multiplierRatio = Math.min(Math.max((vipTargetMultiplier - 1.0) / 8.5, 0.12), 0.95);
-        const targetX = startX + (W - startX - 40) * (0.28 + multiplierRatio * 0.72);
-        const targetY = startY - (startY - 40) * (0.22 + multiplierRatio * 0.78);
+        const targetX = startX + (W - startX - 28) * (0.52 + multiplierRatio * 0.38);
+        const targetY = 42 + (startY - 42) * (0.42 - multiplierRatio * 0.28);
 
         const cpX = startX + (targetX - startX) * 0.25;
         const cpY = startY;
@@ -1938,6 +1996,7 @@ function handleLogout() {
     stopVipRadarEngine();
     closeAllModals();
     initGlobalViewRouter();
+    document.getElementById("loginModal")?.classList.add("active");
     showToast("Vous avez été déconnecté.");
 }
 
@@ -1953,7 +2012,7 @@ function initAuthSecurity() {
         regForm.addEventListener("submit", async (e) => {
             e.preventDefault();
             const name = document.getElementById("regName").value.trim();
-            const email = document.getElementById("regEmail").value.trim().toLowerCase();
+            const email = normalizeEmail(document.getElementById("regEmail").value);
             const password = document.getElementById("regPassword").value;
 
             if (!name || name.length < 3) {
@@ -1971,26 +2030,11 @@ function initAuthSecurity() {
 
             setButtonLoading(regSubmitBtn, true);
 
-            const usersDb = loadUsersDb();
-            if (usersDb.some((u) => u.email === email)) {
+            const existingAccount = await findAccountByEmail(email);
+            if (existingAccount) {
                 setButtonLoading(regSubmitBtn, false);
                 showToast("Cet email est déjà enregistré. Connectez-vous.", "error");
                 return;
-            }
-
-            if (supabaseClient) {
-                try {
-                    const { data: existingRemote } = await supabaseClient
-                        .from("users")
-                        .select("email")
-                        .eq("email", email)
-                        .maybeSingle();
-                    if (existingRemote) {
-                        setButtonLoading(regSubmitBtn, false);
-                        showToast("Cet email est déjà enregistré. Connectez-vous.", "error");
-                        return;
-                    }
-                } catch {}
             }
 
             const passwordHash = await hashPassword(password);
@@ -2033,7 +2077,7 @@ function initAuthSecurity() {
     if (logForm) {
         logForm.addEventListener("submit", async (e) => {
             e.preventDefault();
-            const emailKey = String(document.getElementById("loginEmail").value || "").trim().toLowerCase();
+            const emailKey = normalizeEmail(document.getElementById("loginEmail").value);
             const password = String(document.getElementById("loginPassword")?.value || "").trim();
 
             if (!isValidEmail(emailKey)) {
@@ -2042,31 +2086,7 @@ function initAuthSecurity() {
             }
 
             setButtonLoading(loginSubmitBtn, true);
-            const usersDb = loadUsersDb();
-            let found = usersDb.find((u) => String(u.email || "").toLowerCase() === emailKey);
-
-            if (supabaseClient) {
-                try {
-                    const { data } = await supabaseClient
-                        .from("users")
-                        .select("*")
-                        .eq("email", emailKey)
-                        .maybeSingle();
-
-                    if (data) {
-                        found = {
-                            id: data.id || (found && found.id) || Date.now(),
-                            uniqueId: sanitize7DigitId(data.unique_id || (found && found.uniqueId)),
-                            name: data.name || (found && found.name) || "Client",
-                            email: data.email,
-                            phone: data.phone || (found && found.phone) || "",
-                            passwordHash: data.password_hash || (found && found.passwordHash) || "",
-                            isSubscribed: Boolean(data.is_subscribed),
-                            registeredAt: (found && found.registeredAt) || new Date().toLocaleDateString("fr-FR")
-                        };
-                    }
-                } catch {}
-            }
+            const found = await findAccountByEmail(emailKey);
 
             if (found) {
                 const match = await passwordMatches(found, password);
