@@ -28,7 +28,9 @@ const CONFIG = {
     maketouSuccessUrl: "https://crashpredictor.fr/?payment=success&status=approved",
     accessUnlockedKey: "crash_access_unlocked",
     userPremiumKey: "user_premium",
-    accessTokenKey: "crash_access_token"
+    accessTokenKey: "crash_access_token",
+    memberIdKey: "user_member_id",
+    accessVerifiedKey: "crash_access_v2_verified"
 };
 
 // ==========================================================================
@@ -697,8 +699,10 @@ let selectedMomoNetwork = "WAVE";
 let vipAnimationId = null;
 let vipEngineRunning = false;
 let vipResizeHandler = null;
+let vipCalibrationTimer = null;
 let vipTargetMultiplier = 2.40;
 let vipCurrentFlightNumber = 8492;
+let vipLastHistoryMultiplier = null;
 let realtimeChannel = null;
 let paymentInFlight = false;
 let pendingCheckoutAfterAuth = false;
@@ -1008,25 +1012,52 @@ function randomMemberNumber() {
     return 5000000 + Math.floor(Math.random() * 5000000);
 }
 
+function parseMemberNumber(raw) {
+    const n = parseInt(String(raw ?? "").replace(/\D/g, ""), 10);
+    if (n >= 5000000 && n <= 9999999) return n;
+    return null;
+}
+
 function formatMemberId(num) {
-    const n = parseInt(String(num ?? "").replace(/\D/g, ""), 10);
-    if (!n || n < 5000000 || n > 9999999) {
-        return `CRASH-${randomMemberNumber()}`;
-    }
-    return `CRASH-${n}`;
+    const n = parseMemberNumber(num);
+    return n ? `CRASH-${n}` : "";
+}
+
+function readPersistedMemberId() {
+    try {
+        const stored = formatMemberId(localStorage.getItem(CONFIG.memberIdKey) || localStorage.getItem(CONFIG.guestIdKey) || "");
+        if (stored) return stored;
+    } catch {}
+    return formatMemberId(currentUser && currentUser.uniqueId);
+}
+
+function persistMemberId(id) {
+    const formatted = formatMemberId(id) || readPersistedMemberId();
+    if (!formatted) return "";
+    try {
+        localStorage.setItem(CONFIG.memberIdKey, formatted);
+        localStorage.setItem(CONFIG.guestIdKey, formatted);
+    } catch {}
+    return formatted;
 }
 
 function generateUniqueId() {
+    const existing = readPersistedMemberId();
+    if (existing) return existing;
     const users = loadUsersDb();
     let candidate = "";
     do {
-        candidate = formatMemberId(randomMemberNumber());
+        candidate = `CRASH-${randomMemberNumber()}`;
     } while (users.some((user) => user.uniqueId === candidate));
-    return candidate;
+    return persistMemberId(candidate);
 }
 
 function sanitize7DigitId(rawId) {
-    return formatMemberId(rawId);
+    return formatMemberId(rawId) || readPersistedMemberId();
+}
+
+function displayMemberId() {
+    return sanitize7DigitId(currentUser && currentUser.uniqueId) || readPersistedMemberId();
 }
 
 async function hashPassword(password) {
@@ -1102,17 +1133,16 @@ function initSupabase() {
 /* -------------------------------------------------------------------------- */
 
 function initUserIdentity() {
-    const storedGuestId = localStorage.getItem(CONFIG.guestIdKey);
-    const sanitizedGuest = sanitize7DigitId(storedGuestId);
-    if (storedGuestId !== sanitizedGuest) {
-        localStorage.setItem(CONFIG.guestIdKey, sanitizedGuest);
-    }
+    const sessionId = formatMemberId(currentUser && currentUser.uniqueId);
+    const persisted = readPersistedMemberId();
+    const stable = sessionId || persisted;
+    if (stable) persistMemberId(stable);
 
     const usersDb = loadUsersDb();
     let dbChanged = false;
     const migratedDb = usersDb.map((user) => {
-        const nextId = sanitize7DigitId(user.uniqueId);
-        if (nextId !== user.uniqueId) {
+        const nextId = formatMemberId(user.uniqueId);
+        if (nextId && nextId !== user.uniqueId) {
             dbChanged = true;
             return { ...user, uniqueId: nextId };
         }
@@ -1120,18 +1150,15 @@ function initUserIdentity() {
     });
     if (dbChanged) saveUsersDb(migratedDb);
 
-    if (currentUser) {
-        const sanitizedUserId = sanitize7DigitId(currentUser.uniqueId);
-        if (currentUser.uniqueId !== sanitizedUserId) {
-            currentUser.uniqueId = sanitizedUserId;
-            saveUserSession(currentUser, false);
-        }
+    if (currentUser && stable && currentUser.uniqueId !== stable) {
+        currentUser.uniqueId = stable;
+        saveUserSession(currentUser, false);
     }
 }
 
 async function saveUserSession(user, syncRemote = true) {
     if (!user) return;
-    user.uniqueId = sanitize7DigitId(user.uniqueId);
+    user.uniqueId = persistMemberId(user.uniqueId) || sanitize7DigitId(user.uniqueId);
     currentUser = user;
     writeJson(CONFIG.sessionKey, user);
 
@@ -1181,8 +1208,15 @@ async function syncUserFromSupabase() {
                 changed = true;
             }
             if (subscribed) grantVerifiedAccess();
-            if (data.unique_id && data.unique_id !== currentUser.uniqueId) {
-                currentUser.uniqueId = sanitize7DigitId(data.unique_id);
+            const localId = formatMemberId(currentUser.uniqueId) || readPersistedMemberId();
+            const remoteId = formatMemberId(data.unique_id);
+            if (localId) {
+                if (currentUser.uniqueId !== localId) {
+                    currentUser.uniqueId = persistMemberId(localId);
+                    changed = true;
+                }
+            } else if (remoteId) {
+                currentUser.uniqueId = persistMemberId(remoteId);
                 changed = true;
             }
             if (changed) {
@@ -1240,6 +1274,7 @@ function grantVerifiedAccess(token) {
     try {
         localStorage.setItem(CONFIG.accessUnlockedKey, "true");
         localStorage.setItem(CONFIG.userPremiumKey, "true");
+        localStorage.setItem(CONFIG.accessVerifiedKey, "true");
     } catch {}
     if (currentUser) currentUser.isSubscribed = true;
 }
@@ -1250,6 +1285,7 @@ function revokeVerifiedAccess() {
         localStorage.removeItem(CONFIG.accessTokenKey);
         localStorage.removeItem(CONFIG.accessUnlockedKey);
         localStorage.removeItem(CONFIG.userPremiumKey);
+        localStorage.removeItem(CONFIG.accessVerifiedKey);
     } catch {}
 }
 
@@ -1337,10 +1373,10 @@ function initGlobalViewRouter() {
         const vipIdDisplay = document.getElementById("vipIdDisplay");
         const vipSidebarUserId = document.getElementById("vipSidebarUserId");
 
-        const user7Id = sanitize7DigitId(currentUser && currentUser.uniqueId);
+        const user7Id = displayMemberId();
         if (vipUserDisplay) vipUserDisplay.textContent = (currentUser && currentUser.name) || "Membre Actif";
-        if (vipIdDisplay) vipIdDisplay.textContent = `ID: ${user7Id}`;
-        if (vipSidebarUserId) vipSidebarUserId.textContent = user7Id;
+        if (user7Id && vipIdDisplay) vipIdDisplay.textContent = `ID: ${user7Id}`;
+        if (user7Id && vipSidebarUserId) vipSidebarUserId.textContent = user7Id;
 
         startVipGrandVerticalRadarEngine();
     } else {
@@ -1362,7 +1398,10 @@ function updateAuthPublicHeader() {
         guestButtons?.classList.add("hidden");
         userProfileBadge?.classList.remove("hidden");
         if (navUserName) navUserName.textContent = currentUser.name || "Client";
-        if (navUserIdTag) navUserIdTag.textContent = `ID: ${sanitize7DigitId(currentUser.uniqueId)}`;
+        if (navUserIdTag) {
+            const navId = displayMemberId();
+            if (navId) navUserIdTag.textContent = `ID: ${navId}`;
+        }
 
         if (!currentUser.isSubscribed) {
             siteAlertBanner?.classList.remove("hidden");
@@ -1563,6 +1602,11 @@ function stopVipRadarEngine() {
         cancelAnimationFrame(vipAnimationId);
         vipAnimationId = null;
     }
+    if (vipCalibrationTimer) {
+        cancelAnimationFrame(vipCalibrationTimer);
+        clearInterval(vipCalibrationTimer);
+        vipCalibrationTimer = null;
+    }
     if (vipResizeHandler) {
         window.removeEventListener("resize", vipResizeHandler);
         vipResizeHandler = null;
@@ -1608,17 +1652,24 @@ function startVipGrandVerticalRadarEngine() {
     let explosionTimer = 0;
     let particles = [];
 
-    function generateNextTarget() {
-        const isBig = Math.random() < 0.25;
-        if (isBig) {
-            const bigs = [5.20, 5.85, 6.40, 7.15, 7.90];
-            vipTargetMultiplier = bigs[Math.floor(Math.random() * bigs.length)];
-            flightSpeed = 0.0011;
-        } else {
-            const regulars = [1.65, 1.85, 2.10, 2.35, 2.65, 2.95, 3.25];
-            vipTargetMultiplier = regulars[Math.floor(Math.random() * regulars.length)];
-            flightSpeed = 0.0015;
+    function pickVariedMultiplier() {
+        let value = 1.47;
+        for (let attempt = 0; attempt < 12; attempt++) {
+            const roll = Math.random();
+            if (roll < 0.55) value = 1.40 + Math.random() * 0.80;
+            else if (roll < 0.90) value = 2.21 + Math.random() * 2.59;
+            else value = 4.81 + Math.random() * 4.69;
+            value = Math.round(value * 100) / 100;
+            if (vipLastHistoryMultiplier == null || Math.abs(value - vipLastHistoryMultiplier) >= 0.08) {
+                break;
+            }
         }
+        return value;
+    }
+
+    function generateNextTarget() {
+        vipTargetMultiplier = pickVariedMultiplier();
+        flightSpeed = vipTargetMultiplier >= 4.81 ? 0.00105 : (vipTargetMultiplier >= 2.21 ? 0.00128 : 0.00148);
 
         const conf = (98.6 + Math.random() * 1.2).toFixed(1) + "%";
 
@@ -1660,32 +1711,86 @@ function startVipGrandVerticalRadarEngine() {
         if (historyList.children.length > 8) {
             historyList.removeChild(historyList.lastChild);
         }
+        vipLastHistoryMultiplier = mult;
+    }
+
+    function beginTakeoff() {
+        scannerLoader?.classList.add("hidden");
+        flightState = "flying";
+        currentMultiplier = 1.00;
+        flightProgress = 0;
+        explosionTimer = 0;
+        particles = [];
+        if (hudNumber) hudNumber.textContent = "x1.00";
+        generateNextTarget();
     }
 
     function startCalibrationPhase() {
         flightState = "scanning";
         scannerLoader?.classList.remove("hidden");
         if (scanProgressFill) scanProgressFill.style.width = "0%";
+        if (vipCalibrationTimer) {
+            cancelAnimationFrame(vipCalibrationTimer);
+            clearInterval(vipCalibrationTimer);
+            vipCalibrationTimer = null;
+        }
 
-        let progress = 0;
-        const interval = setInterval(() => {
-            if (!vipEngineRunning) {
-                clearInterval(interval);
-                return;
-            }
-            progress += 2;
+        const startedAt = performance.now();
+        const durationMs = 30000;
+
+        function tickCalibration(now) {
+            if (!vipEngineRunning) return;
+            const progress = Math.min(100, ((now - startedAt) / durationMs) * 100);
             if (scanProgressFill) scanProgressFill.style.width = `${progress}%`;
             if (progress >= 100) {
-                clearInterval(interval);
-                scannerLoader?.classList.add("hidden");
-                flightState = "flying";
-                currentMultiplier = 1.00;
-                flightProgress = 0;
-                explosionTimer = 0;
-                particles = [];
-                generateNextTarget();
+                vipCalibrationTimer = null;
+                beginTakeoff();
+                return;
             }
-        }, 120);
+            vipCalibrationTimer = requestAnimationFrame(tickCalibration);
+        }
+        vipCalibrationTimer = requestAnimationFrame(tickCalibration);
+    }
+
+    function drawPlane(x, y, angle) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(angle);
+
+        ctx.fillStyle = "#ffc837";
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 24, 11, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#1e1b4b";
+        ctx.beginPath();
+        ctx.arc(7, -2, 4, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#f59e0b";
+        ctx.beginPath();
+        ctx.moveTo(-3, 0);
+        ctx.lineTo(-14, -20);
+        ctx.lineTo(5, -3);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(-3, 0);
+        ctx.lineTo(-14, 20);
+        ctx.lineTo(5, 3);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = "#ef4444";
+        ctx.beginPath();
+        ctx.moveTo(-24, -4);
+        ctx.lineTo(-42 - Math.random() * 14, 0);
+        ctx.lineTo(-24, 4);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.restore();
     }
 
     function renderVIPCockpit() {
@@ -1728,12 +1833,12 @@ function startVipGrandVerticalRadarEngine() {
         ctx.lineTo(25, H - 25);
         ctx.stroke();
 
-        const startX = 25;
-        const startY = H - 25;
+        const startX = 56;
+        const startY = H - 56;
 
-        const multiplierRatio = Math.min(Math.max((vipTargetMultiplier - 1.2) / 6.8, 0.15), 0.95);
-        const targetX = startX + (W - startX - 35) * (0.3 + multiplierRatio * 0.7);
-        const targetY = startY - (startY - 35) * (0.25 + multiplierRatio * 0.75);
+        const multiplierRatio = Math.min(Math.max((vipTargetMultiplier - 1.0) / 8.5, 0.12), 0.95);
+        const targetX = startX + (W - startX - 40) * (0.28 + multiplierRatio * 0.72);
+        const targetY = startY - (startY - 40) * (0.22 + multiplierRatio * 0.78);
 
         const cpX = startX + (targetX - startX) * 0.25;
         const cpY = startY;
@@ -1765,46 +1870,14 @@ function startVipGrandVerticalRadarEngine() {
 
             const dx = 2 * (1 - p) * (cpX - startX) + 2 * p * (targetX - cpX);
             const dy = 2 * (1 - p) * (cpY - startY) + 2 * p * (targetY - cpY);
-            const angle = Math.atan2(dy, dx);
-
-            ctx.save();
-            ctx.translate(curX, curY);
-            ctx.rotate(angle);
-
-            ctx.fillStyle = "#ffc837";
-            ctx.beginPath();
-            ctx.ellipse(0, 0, 24, 11, 0, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.fillStyle = "#1e1b4b";
-            ctx.beginPath();
-            ctx.arc(7, -2, 4, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.fillStyle = "#f59e0b";
-            ctx.beginPath();
-            ctx.moveTo(-3, 0);
-            ctx.lineTo(-14, -20);
-            ctx.lineTo(5, -3);
-            ctx.closePath();
-            ctx.fill();
+            const angle = Math.atan2(dy, dx) || -0.55;
 
             ctx.beginPath();
-            ctx.moveTo(-3, 0);
-            ctx.lineTo(-14, 20);
-            ctx.lineTo(5, 3);
-            ctx.closePath();
+            ctx.arc(startX, startY, 7, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(255, 200, 55, 0.35)";
             ctx.fill();
 
-            ctx.fillStyle = "#ef4444";
-            ctx.beginPath();
-            ctx.moveTo(-24, -4);
-            ctx.lineTo(-42 - Math.random() * 14, 0);
-            ctx.lineTo(-24, 4);
-            ctx.closePath();
-            ctx.fill();
-
-            ctx.restore();
+            drawPlane(curX, curY, angle);
 
             if (p >= 1) {
                 flightState = "crashed";
@@ -1837,13 +1910,36 @@ function startVipGrandVerticalRadarEngine() {
         vipAnimationId = requestAnimationFrame(renderVIPCockpit);
     }
 
-    startCalibrationPhase();
+    beginTakeoff();
     renderVIPCockpit();
 }
 
 /* -------------------------------------------------------------------------- */
 /* Authentification & Modales                                                 */
 /* -------------------------------------------------------------------------- */
+
+function handleLogout() {
+    currentUser = null;
+    verifiedAccessGranted = false;
+    try {
+        localStorage.removeItem(CONFIG.sessionKey);
+        localStorage.removeItem(CONFIG.accessTokenKey);
+        localStorage.removeItem(CONFIG.accessUnlockedKey);
+        localStorage.removeItem(CONFIG.userPremiumKey);
+        localStorage.removeItem(CONFIG.accessVerifiedKey);
+        localStorage.removeItem("crash_access_v2_verified");
+        localStorage.removeItem(CONFIG.maketouCartKey);
+        localStorage.removeItem(CONFIG.maketouPendingKey);
+    } catch {}
+    if (realtimeChannel && supabaseClient) {
+        supabaseClient.removeChannel(realtimeChannel);
+        realtimeChannel = null;
+    }
+    stopVipRadarEngine();
+    closeAllModals();
+    initGlobalViewRouter();
+    showToast("Vous avez été déconnecté.");
+}
 
 function initAuthSecurity() {
     const regForm = document.getElementById("registerForm");
@@ -1999,20 +2095,9 @@ function initAuthSecurity() {
         });
     }
 
-    const handleLogout = () => {
-        currentUser = null;
-        localStorage.removeItem(CONFIG.sessionKey);
-        if (realtimeChannel && supabaseClient) {
-            supabaseClient.removeChannel(realtimeChannel);
-            realtimeChannel = null;
-        }
-        initGlobalViewRouter();
-        closeAllModals();
-        showToast("Vous avez été déconnecté.");
-    };
-
     profileLogoutBtn?.addEventListener("click", handleLogout);
     vipLogoutBtn?.addEventListener("click", handleLogout);
+    if (vipLogoutBtn) vipLogoutBtn.dataset.boundLogout = "1";
 }
 
 function initProfileModal() {
@@ -2031,7 +2116,7 @@ function initProfileModal() {
     userProfileBadge?.addEventListener("click", () => {
         if (!currentUser) return;
 
-        const user7Id = sanitize7DigitId(currentUser.uniqueId);
+        const user7Id = displayMemberId();
         if (profileNameDisplay) profileNameDisplay.textContent = currentUser.name;
         if (profileEmailDisplay) profileEmailDisplay.textContent = currentUser.email;
         if (profileUniqueIdDisplay) profileUniqueIdDisplay.textContent = user7Id;
