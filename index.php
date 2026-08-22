@@ -36,7 +36,11 @@ ob_start();
 include_once(__DIR__ . "/index.html");
 $html = ob_get_clean();
 $geoScript = "<script>window.__GEO_COUNTRY=" . json_encode($geoCountry) . ";</script>";
-$html = preg_replace("/<head>/i", "<head>" . $geoScript, $html, 1);
+if (strpos($html, "<!-- End Meta Pixel Code -->") !== false) {
+    $html = str_replace("<!-- End Meta Pixel Code -->", "<!-- End Meta Pixel Code -->" . $geoScript, $html);
+} else {
+    $html = preg_replace("/<head>/i", "<head>" . $geoScript, $html, 1);
+}
 echo $html;
 exit();
 ?>
