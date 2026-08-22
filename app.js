@@ -2230,7 +2230,13 @@ function openProfileModal() {
     }
     if (profileUniqueIdDisplay) profileUniqueIdDisplay.textContent = user7Id || "—";
     if (profilePhoneInput) {
-        profilePhoneInput.value = (currentUser && currentUser.phone) || "";
+        const localSaved = currentUser && currentUser.email
+            ? loadUsersDb().find((u) => normalizeEmail(u.email) === normalizeEmail(currentUser.email))
+            : null;
+        const checkoutPhone = String(document.getElementById("checkoutPhoneInput")?.value || "").trim();
+        const savedPhone = String((currentUser && currentUser.phone) || (localSaved && localSaved.phone) || checkoutPhone || "").trim();
+        if (currentUser && savedPhone && !String(currentUser.phone || "").trim()) currentUser.phone = savedPhone;
+        profilePhoneInput.value = savedPhone;
         profilePhoneInput.disabled = false;
         profilePhoneInput.readOnly = false;
     }
@@ -2280,7 +2286,6 @@ function bindProfileOpenTrigger(el) {
 
 function initProfileModal() {
     const userProfileBadge = document.getElementById("userProfileBadge");
-    const vipProfileBadge = document.getElementById("vipProfileBadge");
     const vipProfileBtn = document.getElementById("vipProfileBtn");
     const closeProfile = document.getElementById("closeProfileModal");
     const profilePhoneInput = document.getElementById("profilePhoneInput");
@@ -2289,7 +2294,6 @@ function initProfileModal() {
     const btnProfileSubscribe = document.getElementById("btnProfileSubscribe");
 
     bindProfileOpenTrigger(userProfileBadge);
-    bindProfileOpenTrigger(vipProfileBadge);
     bindProfileOpenTrigger(vipProfileBtn);
     closeProfile?.addEventListener("click", (e) => {
         e.preventDefault();
@@ -2309,8 +2313,9 @@ function initProfileModal() {
             }
             preservePaidSessionOnProfileSave();
             currentUser.phone = phone;
-            await saveUserSession(currentUser, true);
+            await saveUserSession(currentUser, false);
             showToast("Numéro de téléphone enregistré !");
+            saveUserSession(currentUser, true);
         } catch (err) {
             showToast("Enregistrement impossible. Réessayez.", "error");
         }
@@ -2325,8 +2330,15 @@ function initProfileModal() {
             const newPass = String(document.getElementById("profileNewPassword")?.value || "").trim();
             const confirmPass = String(document.getElementById("profileConfirmNewPassword")?.value || "").trim();
 
-            if (currentUser.passwordHash) {
-                const match = await passwordMatches(currentUser, oldPass);
+            const localSaved = loadUsersDb().find((u) => normalizeEmail(u.email) === normalizeEmail(currentUser.email));
+            const checkUser = {
+                passwordHash: currentUser.passwordHash || (localSaved && localSaved.passwordHash) || ""
+            };
+            if (checkUser.passwordHash) {
+                let match = await passwordMatches(checkUser, oldPass);
+                if (!match && localSaved && localSaved.passwordHash) {
+                    match = await passwordMatches(localSaved, oldPass);
+                }
                 if (!match) {
                     showToast("Mot de passe actuel incorrect.", "error");
                     return;
@@ -2343,9 +2355,10 @@ function initProfileModal() {
 
             preservePaidSessionOnProfileSave();
             currentUser.passwordHash = await hashPassword(newPass);
-            await saveUserSession(currentUser, true);
+            await saveUserSession(currentUser, false);
             formUpdatePassword.reset();
             showToast("Mot de passe mis à jour !");
+            saveUserSession(currentUser, true);
         } catch (err) {
             showToast("Mise à jour impossible. Réessayez.", "error");
         }
