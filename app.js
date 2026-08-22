@@ -780,39 +780,59 @@ function initPwaInstall() {
     const iosModal = document.getElementById("pwaIosInstallModal");
     const closeIos = document.getElementById("closePwaIosModal");
     let deferredPrompt = null;
+    let showTimer = null;
+    let waitTimer = null;
+    let stoppedForever = false;
+    const PWA_SHOW_MS = 15000;
+    const PWA_WAIT_MS = 150000;
 
     if ("serviceWorker" in navigator) {
         navigator.serviceWorker.register("sw.js").catch(() => {});
     }
 
     if (!banner || isPwaStandalone()) return;
-    try {
-        if (localStorage.getItem("pwa_install_dismissed") === "1") return;
-    } catch (err) {}
+
+    function clearPwaTimers() {
+        if (showTimer) clearTimeout(showTimer);
+        if (waitTimer) clearTimeout(waitTimer);
+        showTimer = null;
+        waitTimer = null;
+    }
+
+    function stopPwaBannerForever() {
+        stoppedForever = true;
+        clearPwaTimers();
+        banner.classList.remove("is-visible");
+    }
 
     function showPwaBanner() {
-        if (isPwaStandalone()) return;
-        banner.classList.remove("hidden");
-    }
-
-    function hidePwaBanner(persist) {
-        banner.classList.add("hidden");
-        if (persist) {
-            try { localStorage.setItem("pwa_install_dismissed", "1"); } catch (err) {}
+        if (stoppedForever || isPwaStandalone()) {
+            stopPwaBannerForever();
+            return;
         }
+        clearPwaTimers();
+        banner.classList.add("is-visible");
+        showTimer = setTimeout(hidePwaBannerThenWait, PWA_SHOW_MS);
     }
 
-    if (isIosSafari()) showPwaBanner();
+    function hidePwaBannerThenWait() {
+        if (stoppedForever || isPwaStandalone()) {
+            stopPwaBannerForever();
+            return;
+        }
+        banner.classList.remove("is-visible");
+        clearPwaTimers();
+        waitTimer = setTimeout(showPwaBanner, PWA_WAIT_MS);
+    }
 
     window.addEventListener("beforeinstallprompt", (event) => {
         event.preventDefault();
         deferredPrompt = event;
-        showPwaBanner();
     });
 
     window.addEventListener("appinstalled", () => {
         deferredPrompt = null;
-        hidePwaBanner(true);
+        stopPwaBannerForever();
     });
 
     installBtn?.addEventListener("click", async () => {
@@ -824,11 +844,12 @@ function initPwaInstall() {
         deferredPrompt.prompt();
         try { await deferredPrompt.userChoice; } catch (err) {}
         deferredPrompt = null;
-        hidePwaBanner(true);
+        hidePwaBannerThenWait();
     });
 
-    dismissBtn?.addEventListener("click", () => hidePwaBanner(true));
+    dismissBtn?.addEventListener("click", () => hidePwaBannerThenWait());
     closeIos?.addEventListener("click", () => iosModal?.classList.remove("active"));
+    showPwaBanner();
 }
 
 /* -------------------------------------------------------------------------- */
