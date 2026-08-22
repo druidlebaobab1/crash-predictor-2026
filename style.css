@@ -864,13 +864,21 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 .vip-member-tag {
     background: rgba(255, 200, 55, 0.12);
     border: 1px solid var(--gold-primary);
-    padding: 6px 14px;
+    padding: 4px 10px;
     border-radius: 20px;
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 0.82rem;
+    gap: 6px;
+    font-size: 0.78rem;
     font-weight: 700;
+    max-width: min(42vw, 220px);
+    min-width: 0;
+    white-space: nowrap;
+}
+.vip-member-tag #vipUsernameDisplay {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 .vip-badge-glow {
     background: var(--gold-gradient);
@@ -1009,7 +1017,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 .scan-subtitle { font-size: 0.82rem; color: #34d399; font-weight: 600; }
 
 .scan-progress-track { width: 220px; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 10px; overflow: hidden; }
-.scan-progress-fill { height: 100%; width: 0%; background: var(--gold-gradient); transition: width 0.1s linear; }
+.scan-progress-fill { height: 100%; width: 0%; background: var(--gold-gradient); transition: width 0.35s linear; }
 
 .vip-flight-status-bar {
     background: rgba(0, 0, 0, 0.4);
@@ -1392,17 +1400,10 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     .vip-member-tag {
         padding: 3px 8px;
         gap: 5px;
-        font-size: 0.68rem;
-        max-width: min(56vw, 220px);
+        font-size: 0.7rem;
+        max-width: min(46vw, 180px);
         min-width: 0;
     }
-    .vip-member-tag #vipUsernameDisplay {
-        max-width: 70px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-    .vip-badge-glow { padding: 1px 6px; font-size: 0.6rem; }
     .btn-vip-logout {
         padding: 6px 8px;
         font-size: 0.78rem;

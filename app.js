@@ -84,7 +84,7 @@ const TRANSLATIONS = {
         radar_session_badge: "SESSION ACTIVE",
         pred_label: "POINT DE SORTIE CALCULÉ",
         pred_stability: "Stabilité :",
-        pred_advice: "Encaissement programmé avant rupture",
+        pred_advice: "Retirez vos gains avant cette cote de sécurité",
         hud_label: "COTE EN DIRECT",
         scan_title: "CALIBRATION DU SIGNAL",
         scan_subtitle: "Prochain tour en préparation…",
@@ -187,7 +187,7 @@ const TRANSLATIONS = {
         radar_session_badge: "ACTIVE SESSION",
         pred_label: "CALCULATED EXIT THRESHOLD",
         pred_stability: "Stability:",
-        pred_advice: "Target cash-out programmed before rupture",
+        pred_advice: "Cash-out your profits before this safety threshold",
         hud_label: "LIVE MULTIPLIER",
         scan_title: "SIGNAL CALIBRATION",
         scan_subtitle: "Preparing next round…",
@@ -290,7 +290,7 @@ const TRANSLATIONS = {
         radar_session_badge: "SESIÓN ACTIVA",
         pred_label: "PUNTO DE SALIDA CALCULADO",
         pred_stability: "Estabilidad:",
-        pred_advice: "Cobro programado antes de la ruptura",
+        pred_advice: "Retire sus ganancias antes de este umbral de seguridad",
         hud_label: "MULTIPLICADOR EN VIVO",
         scan_title: "CALIBRACIÓN DE SEÑAL",
         scan_subtitle: "Preparando siguiente ronda…",
@@ -393,7 +393,7 @@ const TRANSLATIONS = {
         radar_session_badge: "SESSÃO ATIVA",
         pred_label: "PONTO DE SAÍDA CALCULADO",
         pred_stability: "Estabilidade:",
-        pred_advice: "Saída segura programada antes da queda",
+        pred_advice: "Retire os seus ganhos antes deste limiar de segurança",
         hud_label: "MULTIPLICADOR AO VIVO",
         scan_title: "CALIBRAÇÃO DE SINAL",
         scan_subtitle: "A preparar a próxima ronda…",
@@ -496,7 +496,7 @@ const TRANSLATIONS = {
         radar_session_badge: "AKTIVE SITZUNG",
         pred_label: "BERECHNETER AUSSTIEGSPUNKT",
         pred_stability: "Stabilität:",
-        pred_advice: "Sicherer Ausstieg vor Signalabbruch geplant",
+        pred_advice: "Realisieren Sie Ihre Gewinne vor dieser Sicherheitsschwelle",
         hud_label: "LIVE-QUOTE",
         scan_title: "SIGNAL-KALIBRIERUNG",
         scan_subtitle: "Nächste Runde wird vorbereitet…",
@@ -943,6 +943,7 @@ function applyLanguage(lang, saveUserChoice = true) {
     });
 
     renderCommentsList();
+    refreshVipMemberBadge();
 }
 
 function initLanguageDropdown() {
@@ -1410,6 +1411,13 @@ async function restoreVerifiedAccess() {
 /* Routage & Affichage                                                        */
 /* -------------------------------------------------------------------------- */
 
+function refreshVipMemberBadge() {
+    const vipUserDisplay = document.getElementById("vipUsernameDisplay");
+    if (!vipUserDisplay) return;
+    const fallback = (TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang].vip_member_active) || "Membre Actif";
+    vipUserDisplay.textContent = (currentUser && currentUser.name) || fallback;
+}
+
 function initGlobalViewRouter() {
     const publicSite = document.getElementById("publicSiteWrapper");
     const vipSoftware = document.getElementById("vipSoftwareWrapper");
@@ -1419,13 +1427,9 @@ function initGlobalViewRouter() {
         publicSite?.classList.add("hidden");
         vipSoftware?.classList.remove("hidden");
 
-        const vipUserDisplay = document.getElementById("vipUsernameDisplay");
-        const vipIdDisplay = document.getElementById("vipIdDisplay");
         const vipSidebarUserId = document.getElementById("vipSidebarUserId");
-
         const user7Id = displayMemberId();
-        if (vipUserDisplay) vipUserDisplay.textContent = (currentUser && currentUser.name) || "Membre Actif";
-        if (user7Id && vipIdDisplay) vipIdDisplay.textContent = `ID: ${user7Id}`;
+        refreshVipMemberBadge();
         if (user7Id && vipSidebarUserId) vipSidebarUserId.textContent = user7Id;
 
         startVipGrandVerticalRadarEngine();
@@ -1793,21 +1797,27 @@ function startVipGrandVerticalRadarEngine() {
             vipCalibrationTimer = null;
         }
 
-        const startedAt = performance.now();
-        const durationMs = 30000;
+        const startedAt = Date.now();
+        const durationMs = 30 * 60 * 1000;
 
-        function tickCalibration(now) {
-            if (!vipEngineRunning) return;
-            const progress = Math.min(100, ((now - startedAt) / durationMs) * 100);
-            if (scanProgressFill) scanProgressFill.style.width = `${progress}%`;
-            if (progress >= 100) {
-                vipCalibrationTimer = null;
-                beginTakeoff();
+        function tickCalibration() {
+            if (!vipEngineRunning) {
+                if (vipCalibrationTimer) {
+                    clearInterval(vipCalibrationTimer);
+                    vipCalibrationTimer = null;
+                }
                 return;
             }
-            vipCalibrationTimer = requestAnimationFrame(tickCalibration);
+            const progress = Math.min(100, ((Date.now() - startedAt) / durationMs) * 100);
+            if (scanProgressFill) scanProgressFill.style.width = `${progress}%`;
+            if (progress >= 100) {
+                clearInterval(vipCalibrationTimer);
+                vipCalibrationTimer = null;
+                beginTakeoff();
+            }
         }
-        vipCalibrationTimer = requestAnimationFrame(tickCalibration);
+        vipCalibrationTimer = setInterval(tickCalibration, 250);
+        tickCalibration();
     }
 
     function drawPlane(x, y, angle) {
