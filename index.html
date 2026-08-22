@@ -24,6 +24,12 @@
     src="https://www.facebook.com/tr?id=2575698122882923&ev=PageView&noscript=1"
     /></noscript>
     <!-- End Meta Pixel Code -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="CrashApp">
+    <link rel="apple-touch-icon" href="assets/pwa-icon-192.png">
     <script>
     (function () {
         try {
@@ -60,7 +66,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=u36">
+    <link rel="stylesheet" href="style.css?v=u41">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 </head>
 <body class="dark-theme">
@@ -665,6 +671,25 @@
 
     <div class="toast-container" id="toastContainer"></div>
 
-    <script src="app.js?v=u38" defer></script>
+    <div id="pwaInstallBanner" class="pwa-install-banner hidden" role="region" aria-label="Installer l'application">
+        <button type="button" class="pwa-install-btn" id="pwaInstallBtn">📲 Installer l'application</button>
+        <button type="button" class="pwa-install-close" id="pwaInstallDismiss" aria-label="Fermer">&times;</button>
+    </div>
+
+    <div class="modal-overlay" id="pwaIosInstallModal">
+        <div class="modal-card">
+            <button type="button" class="modal-close" id="closePwaIosModal" aria-label="Fermer">&times;</button>
+            <div class="modal-header">
+                <div class="modal-icon-badge gold-glow"><i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i></div>
+                <h3>📲 Installer l'application</h3>
+            </div>
+            <ol class="pwa-ios-steps">
+                <li>Appuyer sur l'icône Partager en bas de Safari (carré avec flèche vers le haut ⎋)</li>
+                <li>Sélectionner "Sur l'écran d'accueil" ➕</li>
+            </ol>
+        </div>
+    </div>
+
+    <script src="app.js?v=u41" defer></script>
 </body>
 </html>

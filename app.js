@@ -754,6 +754,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     subscribeUserRealtime();
     await verifyMaketouReturn();
     startMaketouPaymentWatch();
+    initPwaInstall();
     document.addEventListener("visibilitychange", () => {
         if (document.visibilityState === "visible") {
             syncUserFromSupabase();
@@ -761,6 +762,74 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 });
+
+function isPwaStandalone() {
+    return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+}
+
+function isIosSafari() {
+    const ua = String(navigator.userAgent || "");
+    const iOS = /iphone|ipad|ipod/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    return iOS && !window.MSStream;
+}
+
+function initPwaInstall() {
+    const banner = document.getElementById("pwaInstallBanner");
+    const installBtn = document.getElementById("pwaInstallBtn");
+    const dismissBtn = document.getElementById("pwaInstallDismiss");
+    const iosModal = document.getElementById("pwaIosInstallModal");
+    const closeIos = document.getElementById("closePwaIosModal");
+    let deferredPrompt = null;
+
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("sw.js").catch(() => {});
+    }
+
+    if (!banner || isPwaStandalone()) return;
+    try {
+        if (localStorage.getItem("pwa_install_dismissed") === "1") return;
+    } catch (err) {}
+
+    function showPwaBanner() {
+        if (isPwaStandalone()) return;
+        banner.classList.remove("hidden");
+    }
+
+    function hidePwaBanner(persist) {
+        banner.classList.add("hidden");
+        if (persist) {
+            try { localStorage.setItem("pwa_install_dismissed", "1"); } catch (err) {}
+        }
+    }
+
+    if (isIosSafari()) showPwaBanner();
+
+    window.addEventListener("beforeinstallprompt", (event) => {
+        event.preventDefault();
+        deferredPrompt = event;
+        showPwaBanner();
+    });
+
+    window.addEventListener("appinstalled", () => {
+        deferredPrompt = null;
+        hidePwaBanner(true);
+    });
+
+    installBtn?.addEventListener("click", async () => {
+        if (isIosSafari()) {
+            iosModal?.classList.add("active");
+            return;
+        }
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        try { await deferredPrompt.userChoice; } catch (err) {}
+        deferredPrompt = null;
+        hidePwaBanner(true);
+    });
+
+    dismissBtn?.addEventListener("click", () => hidePwaBanner(true));
+    closeIos?.addEventListener("click", () => iosModal?.classList.remove("active"));
+}
 
 /* -------------------------------------------------------------------------- */
 /* SYSTÈME DE TRADUCTION & GÉOLOCALISATION IP (VPN SUPPORT)                   */
