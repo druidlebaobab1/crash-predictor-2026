@@ -32,7 +32,10 @@ if ($email === "" || $firstName === "" || $lastName === "") {
 $https = (!empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off")
     || ((string) ($_SERVER["HTTP_X_FORWARDED_PROTO"] ?? "")) === "https";
 $host = (string) ($_SERVER["HTTP_HOST"] ?? "");
-$redirectURL = ($https ? "https" : "http") . "://" . $host . "/";
+$redirectURL = trim((string) ($body["redirectURL"] ?? ""));
+if ($redirectURL === "" || !preg_match("/^https?:\\/\\//i", $redirectURL)) {
+    $redirectURL = ($https ? "https" : "http") . "://" . $host . "/?maketou=success";
+}
 
 $payload = [
     "productDocumentId" => MAKETOU_PRODUCT_ID,
