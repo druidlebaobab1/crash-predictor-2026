@@ -9,6 +9,10 @@ if ($maketouAction === "maketou_status") {
     require __DIR__ . "/maketou-status.php";
     exit();
 }
+if ($maketouAction === "maketou_webhook") {
+    require __DIR__ . "/maketou-webhook.php";
+    exit();
+}
 
 header("Cache-Control: no-cache, must-revalidate");
 

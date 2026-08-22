@@ -20,7 +20,9 @@ const CONFIG = {
     guestIdKey: "crash_guest_id_2026",
     timerKey: "crash_timer_start_48h_v4",
     langKey: "crash_user_lang_pref",
-    maketouCartKey: "crash_maketou_cart"
+    maketouCartKey: "crash_maketou_cart",
+    maketouPendingKey: "crash_maketou_pending",
+    maketouCheckoutUrl: "https://50.mymaketou.shop/products/50/checkout"
 };
 
 // ==========================================================================
@@ -713,6 +715,12 @@ document.addEventListener("DOMContentLoaded", () => {
     syncUserFromSupabase();
     subscribeUserRealtime();
     verifyMaketouReturn();
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") {
+            syncUserFromSupabase();
+            verifyMaketouReturn();
+        }
+    });
 });
 
 /* -------------------------------------------------------------------------- */
@@ -2154,38 +2162,36 @@ function splitCustomerName(fullName) {
     };
 }
 
-function maketouEndpoint(fileName, query) {
-    const origin = window.location.origin;
-    const folder = window.location.pathname.replace(/[^/]+$/, "");
-    const q = query ? `?${query}` : "";
-    return [
-        `${origin}${folder}index.php?action=${fileName === "maketou-status.php" ? "maketou_status" : "maketou_checkout"}${query ? `&${query}` : ""}`,
-        `${origin}${folder}${fileName}${q}`,
-        `${origin}/${fileName}${q}`,
-        `/api/${fileName === "maketou-status.php" ? "maketou-status" : "maketou-checkout"}${q}`
-    ];
-}
-
-function extractMaketouRedirect(data) {
-    if (!data || typeof data !== "object") return "";
-    return data.redirectUrl || data.redirect_url || data.checkoutUrl || data.checkout_url
-        || (data.data && (data.data.redirectUrl || data.data.redirect_url))
-        || "";
-}
-
-async function requestMaketouJson(paths, options) {
-    for (let i = 0; i < paths.length; i++) {
-        try {
-            const response = await fetch(paths[i], options);
-            const text = await response.text();
-            let data = null;
-            try { data = JSON.parse(text); } catch { continue; }
-            if (data && (extractMaketouRedirect(data) || data.status || data.completed === true || data.cartId)) {
-                return data;
-            }
-        } catch {}
+function readMaketouPending() {
+    try {
+        return JSON.parse(localStorage.getItem(CONFIG.maketouPendingKey) || "null");
+    } catch {
+        return null;
     }
-    return null;
+}
+
+function writeMaketouPending(value) {
+    try {
+        if (value) localStorage.setItem(CONFIG.maketouPendingKey, JSON.stringify(value));
+        else localStorage.removeItem(CONFIG.maketouPendingKey);
+    } catch {}
+}
+
+function buildMaketouReturnUrl(user) {
+    const url = new URL(window.location.href);
+    url.search = "";
+    url.hash = "";
+    url.searchParams.set("maketou", "success");
+    url.searchParams.set("uid", user.uniqueId || "");
+    return url.toString();
+}
+
+function hasMaketouSuccessFlag() {
+    const params = new URLSearchParams(window.location.search);
+    const hints = ["success", "completed", "paid", "successful", "1", "true"];
+    return ["maketou", "status", "payment", "paid", "state"].some((key) => {
+        return hints.includes(String(params.get(key) || "").toLowerCase());
+    });
 }
 
 async function startMaketouCheckout() {
@@ -2196,73 +2202,54 @@ async function startMaketouCheckout() {
         return;
     }
 
-    if (paymentInFlight) return;
-    paymentInFlight = true;
+    const names = splitCustomerName(currentUser.name);
+    writeMaketouPending({
+        email: currentUser.email,
+        uniqueId: currentUser.uniqueId,
+        startedAt: Date.now()
+    });
+
+    const checkout = new URL(CONFIG.maketouCheckoutUrl);
+    checkout.searchParams.set("email", currentUser.email || "");
+    checkout.searchParams.set("firstName", names.firstName);
+    checkout.searchParams.set("lastName", names.lastName);
+    if (currentUser.phone) checkout.searchParams.set("phone", currentUser.phone);
+    const returnUrl = buildMaketouReturnUrl(currentUser);
+    checkout.searchParams.set("redirectURL", returnUrl);
+    checkout.searchParams.set("redirect_url", returnUrl);
+
     closeAllModals();
-    showPaymentOverlay();
-
-    try {
-        const names = splitCustomerName(currentUser.name);
-        const data = await requestMaketouJson(
-            maketouEndpoint("maketou-checkout.php"),
-            {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "Accept": "application/json" },
-                body: JSON.stringify({
-                    email: currentUser.email,
-                    firstName: names.firstName,
-                    lastName: names.lastName,
-                    phone: currentUser.phone || "",
-                    uniqueId: currentUser.uniqueId || ""
-                })
-            }
-        );
-
-        const redirectUrl = extractMaketouRedirect(data);
-        if (redirectUrl) {
-            if (data.cartId) {
-                try { localStorage.setItem(CONFIG.maketouCartKey, data.cartId); } catch {}
-            }
-            window.location.href = redirectUrl;
-            return;
-        }
-
-        showToast("Impossible d'ouvrir le paiement.", "error");
-    } catch {
-        showToast("Impossible d'ouvrir le paiement.", "error");
-    } finally {
-        paymentInFlight = false;
-        hidePaymentOverlay();
-    }
+    window.location.href = checkout.toString();
 }
 
 async function verifyMaketouReturn() {
-    const params = new URLSearchParams(window.location.search);
-    let cartId = params.get("maketou_cart") || "";
-    if (!cartId) {
-        try { cartId = localStorage.getItem(CONFIG.maketouCartKey) || ""; } catch {}
-    }
-    if (!cartId || !currentUser) return;
+    if (!currentUser) return;
 
-    try {
-        const data = await requestMaketouJson(
-            maketouEndpoint("maketou-status.php", `cartId=${encodeURIComponent(cartId)}`),
-            { method: "GET", cache: "no-store" }
-        );
-        if (data && data.completed) {
-            try { localStorage.removeItem(CONFIG.maketouCartKey); } catch {}
-            if (params.get("maketou_cart")) {
-                const cleanUrl = window.location.origin + window.location.pathname;
-                window.history.replaceState({}, document.title, cleanUrl);
-            }
-            await handlePaymentSuccess({
-                transaction_id: cartId,
-                tx_ref: cartId,
-                status: "successful",
-                payment_type: "maketou"
-            }, "USD", CONFIG.licenseUsd);
-        }
-    } catch {}
+    await syncUserFromSupabase();
+    if (currentUser.isSubscribed) {
+        writeMaketouPending(null);
+        initGlobalViewRouter();
+        return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const pending = readMaketouPending();
+    const pendingFresh = pending
+        && pending.email === currentUser.email
+        && (Date.now() - Number(pending.startedAt || 0)) < 86400000;
+    const uidOk = !params.get("uid") || params.get("uid") === currentUser.uniqueId;
+
+    if (hasMaketouSuccessFlag() && pendingFresh && uidOk) {
+        writeMaketouPending(null);
+        const cleanUrl = window.location.origin + window.location.pathname + window.location.hash;
+        window.history.replaceState({}, document.title, cleanUrl);
+        await handlePaymentSuccess({
+            transaction_id: `maketou-${currentUser.uniqueId}-${Date.now()}`,
+            tx_ref: currentUser.uniqueId,
+            status: "successful",
+            payment_type: "maketou"
+        }, "USD", CONFIG.licenseUsd);
+    }
 }
 
 /* -------------------------------------------------------------------------- */
