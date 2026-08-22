@@ -157,6 +157,28 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 
 .live-sub-label { color: #cbd5e1; font-size: 0.78rem; }
 
+@media (max-width: 600px) {
+    .live-traders-ticker-bar.prominent-live-bar { padding: 8px 10px; }
+    .ticker-content {
+        justify-content: center;
+        text-align: center;
+        gap: 8px;
+    }
+    .live-counter-box {
+        justify-content: center;
+        flex-wrap: wrap;
+        text-align: center;
+        gap: 6px;
+    }
+    .live-counter-highlight { font-size: 0.95rem; }
+    .live-sub-label {
+        font-size: 0.68rem;
+        line-height: 1.25;
+        width: 100%;
+        text-align: center;
+    }
+}
+
 /* ================= BACKGROUND ================= */
 .sky-effects-container {
     position: fixed;
@@ -1415,17 +1437,39 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     }
     .vip-software-body { padding: 14px 10px; }
     .main-navbar { padding: 8px 0; }
-    .nav-container { padding: 0 12px; gap: 6px; justify-content: space-between; }
-    
-    .brand-logo { gap: 6px; min-width: 0; flex-shrink: 1; }
+    .nav-container {
+        padding: 0 10px;
+        gap: 8px;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+        align-items: center;
+    }
+    .brand-logo {
+        gap: 6px;
+        flex: 0 0 auto;
+        min-width: 0;
+        max-width: 46%;
+    }
     .logo-image-wrap { width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0; }
-    .logo-title { font-size: 0.82rem; letter-spacing: -0.2px; }
+    .logo-title { font-size: 0.72rem; letter-spacing: -0.2px; }
     .logo-badge { display: none; }
-    
-    .nav-auth-actions { gap: 4px; }
-    .lang-toggle-btn { padding: 4px 6px; font-size: 0.72rem; gap: 4px; }
+    .nav-auth-actions {
+        gap: 6px;
+        flex: 1 1 auto;
+        justify-content: flex-end;
+        min-width: 0;
+        flex-wrap: nowrap;
+    }
+    .lang-selector-dropdown { flex-shrink: 0; }
+    .lang-toggle-btn { padding: 5px 7px; font-size: 0.7rem; gap: 4px; }
+    .lang-code, .lang-chevron { display: none; }
     .lang-dropdown-menu { min-width: 130px; }
-    .guest-buttons { gap: 4px; }
+    .guest-buttons {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 4px;
+        flex-shrink: 0;
+    }
     
     .btn-ghost-compact {
         padding: 5px 8px;
@@ -1458,9 +1502,9 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 }
 
 @media (max-width: 375px) {
-    .nav-container { padding: 0 8px; gap: 4px; }
-    .logo-title { font-size: 0.75rem; }
-    .lang-toggle-btn { padding: 3px 5px; font-size: 0.68rem; }
+    .nav-container { padding: 0 8px; gap: 6px; flex-wrap: nowrap; }
+    .logo-title { font-size: 0.66rem; }
+    .lang-toggle-btn { padding: 4px 6px; font-size: 0.68rem; }
     .btn-ghost-compact { padding: 4px 6px; font-size: 0.68rem; }
     .btn-primary-compact { padding: 4px 8px; font-size: 0.70rem; }
 }

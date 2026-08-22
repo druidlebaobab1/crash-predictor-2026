@@ -40,7 +40,7 @@ const TRANSLATIONS = {
     fr: {
         doc_title: "CRASH PREDICTOR 2026 | Cockpit d'Analyse et Prédictions Officielles",
         ticker_live: "EN DIRECT",
-        ticker_sub: "sessions actives • moteur d'analyse",
+        ticker_sub: "utilisateurs connectées sur le site crashpredictor.fr",
         alert_unsubscribed: "<strong>ACCÈS NON ACTIVÉ :</strong> activez votre licence pour ouvrir le cockpit.",
         btn_alert_unlock: "Débloquer l'accès – 50 $",
         badge_edition: "ÉDITION 2026",
@@ -143,7 +143,7 @@ const TRANSLATIONS = {
     en: {
         doc_title: "CRASH PREDICTOR 2026 | Official Analysis Cockpit & Live Signals",
         ticker_live: "LIVE",
-        ticker_sub: "active sessions • predictive engine",
+        ticker_sub: "users connected on crashpredictor.fr",
         alert_unsubscribed: "<strong>ACCESS NOT ACTIVATED:</strong> activate your license to open the cockpit.",
         btn_alert_unlock: "Unlock Access – $50",
         badge_edition: "2026 EDITION",
@@ -246,7 +246,7 @@ const TRANSLATIONS = {
     es: {
         doc_title: "CRASH PREDICTOR 2026 | Cockpit Oficial de Análisis y Predicciones",
         ticker_live: "EN VIVO",
-        ticker_sub: "sesiones activas • motor de cálculo",
+        ticker_sub: "usuarios conectados en crashpredictor.fr",
         alert_unsubscribed: "<strong>ACCESO NO ACTIVADO:</strong> active su licencia para abrir el cockpit.",
         btn_alert_unlock: "Desbloquear Acceso – 50 $",
         badge_edition: "EDICIÓN 2026",
@@ -349,7 +349,7 @@ const TRANSLATIONS = {
     pt: {
         doc_title: "CRASH PREDICTOR 2026 | Cockpit Oficial de Análise e Predições",
         ticker_live: "AO VIVO",
-        ticker_sub: "sessões ativas • motor preditivo",
+        ticker_sub: "utilizadores ligados em crashpredictor.fr",
         alert_unsubscribed: "<strong>ACESSO NÃO ATIVADO:</strong> ative sua licença para abrir o cockpit.",
         btn_alert_unlock: "Desbloquear Acesso – 50 $",
         badge_edition: "EDIÇÃO 2026",
@@ -452,7 +452,7 @@ const TRANSLATIONS = {
     de: {
         doc_title: "CRASH PREDICTOR 2026 | Offizielles Analyse-Cockpit & Live-Signale",
         ticker_live: "LIVE",
-        ticker_sub: "aktive Sitzungen • Analyse-Engine",
+        ticker_sub: "Nutzer verbunden auf crashpredictor.fr",
         alert_unsubscribed: "<strong>ZUGANG NICHT AKTIV:</strong> Aktivieren Sie Ihre Lizenz, um das Cockpit zu öffnen.",
         btn_alert_unlock: "Zugang freischalten – 50 $",
         badge_edition: "EDITION 2026",
@@ -566,128 +566,118 @@ const LANG_METAS = {
 // 113 AVIS CLIENTS DYNAMIQUES & NATURELS (IDs 7 CHIFFRES : 5 000 000 - 10 000 000)
 // ==========================================================================
 const WINNER_COMMENTS = [
-    // --- Français ---
-    { username: "ID: CRASH-5829143", lang: "FR", gain: "+$450", comment: "Cockpit très clair, prédictions nettes et prise en main immédiate." },
-    { username: "ID: CRASH-6104829", lang: "FR", gain: "+$820", comment: "Licence rentabilisée rapidement, rien à redire sur la fluidité." },
-    { username: "ID: CRASH-7391024", lang: "FR", gain: "+$1,100", comment: "Interface propre et rapide à charger. Très satisfait du service." },
-    { username: "ID: CRASH-5248190", lang: "FR", gain: "+$390", comment: "Compte activé sans attente, lecture des courbes très intuitive sur mobile." },
-    { username: "ID: CRASH-8910472", lang: "FR", gain: "+$640", comment: "Accès mensuel validé au premier essai. Décollage fluide et sans coupure." },
-    { username: "ID: CRASH-9482105", lang: "FR", gain: "+$950", comment: "L'anticipation des trajectoires est remarquablement stable et régulière." },
-    { username: "ID: CRASH-6739201", lang: "FR", gain: "+$520", comment: "Très bon suivi en temps réel, navigation sans latence sur Android." },
-    { username: "ID: CRASH-8149203", lang: "FR", gain: "+$1,280", comment: "Simple, direct et efficace. Les rounds s'enchaînent parfaitement." },
-    { username: "ID: CRASH-5390184", lang: "FR", gain: "+$410", comment: "Paiement Mobile Money validé en 10 secondes, cockpit ouvert de suite." },
-    { username: "ID: CRASH-7820194", lang: "FR", gain: "+$730", comment: "Radar vertical très agréable visuellement, les points de sortie sont précis." },
-    { username: "ID: CRASH-6491028", lang: "FR", gain: "+$890", comment: "Rien à installer, fonctionne parfaitement dans le navigateur." },
-    { username: "ID: CRASH-9120485", lang: "FR", gain: "+$1,450", comment: "Excellente plateforme. Les données sont bien calculées en continu." },
-    { username: "ID: CRASH-5682910", lang: "FR", gain: "+$340", comment: "Interface sobre et professionnelle, très bonne expérience utilisateur." },
-    { username: "ID: CRASH-7401928", lang: "FR", gain: "+$670", comment: "Débloqué hier soir, déjà trois sessions rentables ce matin." },
-    { username: "ID: CRASH-8392014", lang: "FR", gain: "+$1,150", comment: "La calibration entre les vols permet de bien anticiper le coup suivant." },
-    { username: "ID: CRASH-5920184", lang: "FR", gain: "+$480", comment: "Accès immédiat par mois, aucun frais caché." },
-    { username: "ID: CRASH-6819204", lang: "FR", gain: "+$920", comment: "Super fluide sur iPhone. Le signal est toujours prêt au bon moment." },
-    { username: "ID: CRASH-7582910", lang: "FR", gain: "+$560", comment: "Très bon investissement pour ceux qui cherchent la précision." },
-    { username: "ID: CRASH-8920174", lang: "FR", gain: "+$1,320", comment: "Historique des rounds très utile pour vérifier la cohérence des courbes." },
-    { username: "ID: CRASH-6204918", lang: "FR", gain: "+$780", comment: "Service impeccable, support rapide et compte activé sans accroc." },
-    { username: "ID: CRASH-5491028", lang: "FR", gain: "+$430", comment: "Le radar vertical change tout par rapport aux anciens outils." },
-    { username: "ID: CRASH-7182904", lang: "FR", gain: "+$860", comment: "Prédictions nettes, aucun ralentissement même en 4G." },
-    { username: "ID: CRASH-9382019", lang: "FR", gain: "+$1,540", comment: "Grande régularité sur les sorties entre x2.00 et x3.50." },
-    { username: "ID: CRASH-5710294", lang: "FR", gain: "+$370", comment: "Validation instantanée par carte, outil opérationnel direct." },
-    { username: "ID: CRASH-8491027", lang: "FR", gain: "+$690", comment: "Plateforme fiable et sérieuse, je recommande sans hésiter." },
-    { username: "ID: CRASH-6391028", lang: "FR", gain: "+$980", comment: "Les montées sont bien cadrées, visuel agréable et lisible." },
-    { username: "ID: CRASH-7910284", lang: "FR", gain: "+$1,210", comment: "Rendu parfait sur grand écran comme sur mobile." },
-    { username: "ID: CRASH-5102948", lang: "FR", gain: "+$460", comment: "Interface légère qui charge très vite, aucun bug constaté." },
-    { username: "ID: CRASH-8692014", lang: "FR", gain: "+$740", comment: "Très pratique d'avoir un ID unique pour sécuriser son compte." },
-    { username: "ID: CRASH-6920184", lang: "FR", gain: "+$1,050", comment: "Signaux stables et régularité exemplaire au quotidien." },
-    { username: "ID: CRASH-7394810", lang: "FR", gain: "+$590", comment: "Cockpit moderne avec des informations claires et directes." },
-    { username: "ID: CRASH-9582014", lang: "FR", gain: "+$1,420", comment: "Une référence en matière de calcul prédictif en direct." },
-    { username: "ID: CRASH-5820491", lang: "FR", gain: "+$380", comment: "Simple à prendre en main, même sans être un expert." },
-    { username: "ID: CRASH-8104928", lang: "FR", gain: "+$830", comment: "Déclenchement précis des seuils d'encaissement." },
-    { username: "ID: CRASH-6492018", lang: "FR", gain: "+$620", comment: "Tarif très honnête pour un accès par mois." },
-    { username: "ID: CRASH-7720194", lang: "FR", gain: "+$1,180", comment: "La fluidité de l'animation d'avion aide beaucoup à anticiper." },
-    { username: "ID: CRASH-9182049", lang: "FR", gain: "+$910", comment: "Excellente gestion de la session, reconnexion automatique propre." },
-    { username: "ID: CRASH-5394810", lang: "FR", gain: "+$490", comment: "Paiement Wave passé sans encombre, déblocage direct." },
-    { username: "ID: CRASH-8291048", lang: "FR", gain: "+$770", comment: "L'affichage en temps réel est parfaitement synchronisé." },
-    { username: "ID: CRASH-6710294", lang: "FR", gain: "+$1,340", comment: "Très bon outil pour sécuriser ses sessions pas à pas." },
-    { username: "ID: CRASH-7491028", lang: "FR", gain: "+$540", comment: "Sobre, rapide et efficace. Exactement ce que je cherchais." },
-    { username: "ID: CRASH-8819204", lang: "FR", gain: "+$990", comment: "La stabilité du serveur est remarquable, zéro déconnexion." },
-    { username: "ID: CRASH-5620194", lang: "FR", gain: "+$420", comment: "Bonne prise en charge sur tablette et téléphone." },
-    { username: "ID: CRASH-7920184", lang: "FR", gain: "+$850", comment: "Signal propre, pas de latence parasite." },
-    { username: "ID: CRASH-9401928", lang: "FR", gain: "+$1,600", comment: "Très satisfait de la qualité d'analyse globale." },
-    { username: "ID: CRASH-6182904", lang: "FR", gain: "+$680", comment: "Le compteur et les alertes sont bien proportionnés." },
-    { username: "ID: CRASH-8501928", lang: "FR", gain: "+$1,120", comment: "Facile d'utilisation, activation en quelques secondes." },
-    { username: "ID: CRASH-5294810", lang: "FR", gain: "+$350", comment: "Interface ergonomique et bien pensée pour mobile." },
-    { username: "ID: CRASH-7682910", lang: "FR", gain: "+$790", comment: "Licence rentabilisée sur mes premières parties." },
-    { username: "ID: CRASH-9248102", lang: "FR", gain: "+$1,270", comment: "Cockpit intuitif et historique toujours à jour." },
-    { username: "ID: CRASH-5948102", lang: "FR", gain: "+$470", comment: "Bonne réactivité, aucun temps mort entre les calculs." },
-    { username: "ID: CRASH-8310294", lang: "FR", gain: "+$930", comment: "La courbe parabolique donne une excellente lisibilité." },
-    { username: "ID: CRASH-6582910", lang: "FR", gain: "+$610", comment: "Paiement validé instantanément, outil très propre." },
-    { username: "ID: CRASH-7891024", lang: "FR", gain: "+$1,390", comment: "Outil sérieux et robuste sur toutes mes sessions." },
-    { username: "ID: CRASH-9102948", lang: "FR", gain: "+$720", comment: "Très bon retour d'expérience après deux semaines d'utilisation." },
-    { username: "ID: CRASH-5420194", lang: "FR", gain: "+$390", comment: "Compte créé facilement et accès accordé directement." },
-    { username: "ID: CRASH-8749102", lang: "FR", gain: "+$880", comment: "Navigation ultra fluide sur navigateur Safari mobile." },
-    { username: "ID: CRASH-6891028", lang: "FR", gain: "+$1,040", comment: "Analyse en temps réel de grande qualité." },
-    { username: "ID: CRASH-7201948", lang: "FR", gain: "+$510", comment: "Très satisfait du suivi des trajectoires." },
-    { username: "ID: CRASH-9682014", lang: "FR", gain: "+$1,480", comment: "Moteur algorithmique puissant et constant." },
-    { username: "ID: CRASH-5782910", lang: "FR", gain: "+$440", comment: "Rapport qualité prix imbattable avec l'abonnement mensuel." },
-    { username: "ID: CRASH-8192048", lang: "FR", gain: "+$760", comment: "Très bonne synchronisation des données de vol." },
-    { username: "ID: CRASH-6349102", lang: "FR", gain: "+$970", comment: "Session stable sans déconnexion intempestive." },
-    { username: "ID: CRASH-7501928", lang: "FR", gain: "+$1,230", comment: "Précision chirurgicale sur les cotes de sécurité." },
-    { username: "ID: CRASH-9820194", lang: "FR", gain: "+$690", comment: "Le design sombre et moderne est très agréable." },
-    { username: "ID: CRASH-5192048", lang: "FR", gain: "+$360", comment: "Prise en main en 2 minutes chrono." },
-    { username: "ID: CRASH-8401928", lang: "FR", gain: "+$810", comment: "Système de prédiction fiable et constant." },
-    { username: "ID: CRASH-6691024", lang: "FR", gain: "+$1,160", comment: "Visualisation claire du point de sortie conseillé." },
-    { username: "ID: CRASH-7948102", lang: "FR", gain: "+$580", comment: "Excellent travail sur l'ergonomie mobile." },
-    { username: "ID: CRASH-9281049", lang: "FR", gain: "+$1,510", comment: "Très bon outil pour sécuriser ses objectifs." },
-    { username: "ID: CRASH-5592014", lang: "FR", gain: "+$430", comment: "Activation automatique sans aucune intervention manuelle." },
-    { username: "ID: CRASH-8891024", lang: "IT", gain: "+$870", comment: "Piattaforma solida, nessun rallentamento riscontrato." },
-    { username: "ID: CRASH-6248102", lang: "IT", gain: "+$650", comment: "La barra di stato informa bene su ogni fase." },
-    { username: "ID: CRASH-7601928", lang: "IT", gain: "+$1,310", comment: "Ottimo comfort visivo durante le sessioni lunghe." },
-    { username: "ID: CRASH-9048102", lang: "IT", gain: "+$750", comment: "Ottimo strumento di anticipazione matematica." },
-    { username: "ID: CRASH-5849102", lang: "FR", gain: "+$400", comment: "Accès mensuel respecté, compte toujours actif." },
-    { username: "ID: CRASH-8201948", lang: "FR", gain: "+$940", comment: "Régularité et précision au rendez-vous." },
-    { username: "ID: CRASH-6948102", lang: "FR", gain: "+$1,080", comment: "L'anticipation de sortie est très sécurisante." },
-    { username: "ID: CRASH-7410294", lang: "FR", gain: "+$530", comment: "Tout se fait dans le navigateur, aucun téléchargement lourd." },
-    { username: "ID: CRASH-9748102", lang: "FR", gain: "+$1,460", comment: "Très bonne fluidité sur les montées rapides." },
-    
-    // --- Anglais ---
-    { username: "ID: CRASH-5291048", lang: "EN", gain: "+$1,380", comment: "Clean cockpit, stable animation and instant access." },
-    { username: "ID: CRASH-8740192", lang: "EN", gain: "+$890", comment: "Real-time radar works flawlessly on iPhone." },
-    { username: "ID: CRASH-6490182", lang: "EN", gain: "+$560", comment: "Fast loading, no lags, monthly access unlocked instantly." },
-    { username: "ID: CRASH-9381024", lang: "EN", gain: "+$1,620", comment: "The exit threshold algorithm is remarkably consistent." },
-    { username: "ID: CRASH-7102948", lang: "EN", gain: "+$740", comment: "Great UI, easy checkout and straightforward signals." },
-    { username: "ID: CRASH-5840192", lang: "EN", gain: "+$430", comment: "Very satisfied with the flight curve responsiveness." },
-    { username: "ID: CRASH-8290148", lang: "EN", gain: "+$1,190", comment: "Simple monthly plan that works as soon as it is activated." },
-    { username: "ID: CRASH-6910284", lang: "EN", gain: "+$980", comment: "Solid predictive stream with accurate tracking." },
-    { username: "ID: CRASH-7581029", lang: "EN", gain: "+$670", comment: "Excellent performance on both tablet and laptop." },
-    { username: "ID: CRASH-9481029", lang: "EN", gain: "+$1,440", comment: "Super smooth vertical canvas and instant target updates." },
-    { username: "ID: CRASH-5310298", lang: "EN", gain: "+$820", comment: "Great radar clarity, very easy to follow each round." },
-    { username: "ID: CRASH-8649107", lang: "EN", gain: "+$1,110", comment: "Seamless experience. The calculated cash-out points are great." },
-    { username: "ID: CRASH-6190284", lang: "EN", gain: "+$530", comment: "Instant activation, intuitive design on Android Chrome." },
-    { username: "ID: CRASH-7481029", lang: "EN", gain: "+$940", comment: "Very stable signal feed, zero lag during flights." },
-    { username: "ID: CRASH-9820148", lang: "EN", gain: "+$1,560", comment: "High accuracy predictions and excellent UI responsiveness." },
-    
-    // --- Espagnol ---
-    { username: "ID: CRASH-6190482", lang: "ES", gain: "+$580", comment: "Increíble precisión. El cockpit se abrió de inmediato tras el pago." },
-    { username: "ID: CRASH-7482910", lang: "ES", gain: "+$920", comment: "Herramienta muy limpia y rápida. Las señales son exactas." },
-    { username: "ID: CRASH-8920148", lang: "ES", gain: "+$1,340", comment: "La curva vertical ayuda mucho a visualizar el momento exacto." },
-    { username: "ID: CRASH-5648102", lang: "ES", gain: "+$410", comment: "Activación inmediata y soporte sin problemas en móvil." },
-    { username: "ID: CRASH-9102847", lang: "ES", gain: "+$760", comment: "Excelente estabilidad en cada ronda calculada." },
-    { username: "ID: CRASH-6820194", lang: "ES", gain: "+$1,120", comment: "Muy satisfecho con la suscripción mensual, vale totalmente la pena." },
-    { username: "ID: CRASH-8391028", lang: "ES", gain: "+$640", comment: "Interfaz profesional, sin anuncios y muy rápida." },
-    { username: "ID: CRASH-7910482", lang: "ES", gain: "+$1,050", comment: "Gran precisión en las salidas seguras x2.00 a x3.00." },
-    { username: "ID: CRASH-5829104", lang: "ES", gain: "+$470", comment: "Muy buena herramienta para seguir los vuelos en directo." },
-    { username: "ID: CRASH-9104829", lang: "ES", gain: "+$1,290", comment: "El radar vertical funciona de maravilla sin cortes." },
-    { username: "ID: CRASH-6481029", lang: "ES", gain: "+$850", comment: "Acceso mensual verificado, excelente inversión." },
-    { username: "ID: CRASH-7820149", lang: "ES", gain: "+$690", comment: "Diseño impecable y predicciones muy claras." },
-    
-    // --- Portugais ---
-    { username: "ID: CRASH-5520194", lang: "PT", gain: "+$1,650", comment: "Pagamento confirmado e o cockpit abriu na hora. Visual excelente." },
-    { username: "ID: CRASH-8910284", lang: "PT", gain: "+$780", comment: "Radar em tempo real muito fluido e preciso no telemóvel." },
-    { username: "ID: CRASH-6394810", lang: "PT", gain: "+$1,120", comment: "Ótima precisão nas saídas seguras, muito satisfeito." },
-    { username: "ID: CRASH-7419204", lang: "PT", gain: "+$590", comment: "Assinatura mensal, recomendo a todos." },
-    
-    // --- Allemand ---
-    { username: "ID: CRASH-8190472", lang: "DE", gain: "+$940", comment: "Sehr stabile Signale und saubere Radar-Animation auf dem Smartphone." },
-    { username: "ID: CRASH-9648102", lang: "DE", gain: "+$1,480", comment: "Hervorragende Reaktionszeit, sofortige Freischaltung nach Zahlung." }
+    { username: "Koffi_CI", lang: "FR", gain: "+$450", comment: "Cockpit très clair, prédictions nettes et prise en main immédiate." },
+    { username: "James_UK", lang: "EN", gain: "+$1,380", comment: "Clean cockpit, stable animation and instant access after payment." },
+    { username: "Lucia_ES", lang: "ES", gain: "+$580", comment: "Increíble precisión. El cockpit se abrió de inmediato tras el pago." },
+    { username: "Omar_AR", lang: "AR", gain: "+$720", comment: "المنصة سريعة ودقيقة، والوصول فُتح مباشرة بعد الدفع." },
+    { username: "Bruno_BR", lang: "PT", gain: "+$1,650", comment: "Pagamento confirmado e o cockpit abriu na hora. Visual excelente." },
+    { username: "Arjun_IN", lang: "HI", gain: "+$810", comment: "बहुत साफ़ इंटरफ़ेस और लाइव भविष्यवाणियाँ एकदम स्थिर हैं।" },
+    { username: "Dmitri_RU", lang: "RU", gain: "+$940", comment: "Стабильный сигнал и понятный радар. Доступ открылся сразу." },
+    { username: "Lukas_DE", lang: "DE", gain: "+$940", comment: "Sehr stabile Signale und saubere Radar-Animation auf dem Smartphone." },
+    { username: "Marco_IT", lang: "IT", gain: "+$870", comment: "Piattaforma solida, nessun rallentamento durante le sessioni." },
+    { username: "Emre_TR", lang: "TR", gain: "+$690", comment: "Ödeme sonrası anında açıldı. Radar akıcı ve okunması kolay." },
+    { username: "Rina_ID", lang: "ID", gain: "+$560", comment: "Tampilan rapi, prediksi jelas, dan akses langsung setelah bayar." },
+    { username: "Sanne_NL", lang: "NL", gain: "+$730", comment: "Strak dashboard, snelle activatie en stabiele live signalen." },
+    { username: "Yuki_JP", lang: "JA", gain: "+$1,020", comment: "操作が分かりやすく、支払い後すぐにコクピットが開きました。" },
+    { username: "Noah_US", lang: "EN", gain: "+$890", comment: "Real-time radar works flawlessly on iPhone. Worth the monthly plan." },
+    { username: "Awa_SN", lang: "FR", gain: "+$820", comment: "Licence rentabilisée rapidement, rien à redire sur la fluidité." },
+    { username: "Sofia_MX", lang: "ES", gain: "+$920", comment: "Herramienta muy limpia y rápida. Las señales son exactas." },
+    { username: "Layla_EG", lang: "AR", gain: "+$640", comment: "تجربة ممتازة على الجوال، بدون تأخير في التحليل." },
+    { username: "Camila_BR", lang: "PT", gain: "+$780", comment: "Radar em tempo real muito fluido e preciso no telemóvel." },
+    { username: "Priya_IN", lang: "HI", gain: "+$540", comment: "मोबाइल पर बहुत स्मूद चलता है, कोई लैग नहीं।" },
+    { username: "Elena_RU", lang: "RU", gain: "+$1,180", comment: "Отличная точность по точкам выхода. Рекомендую." },
+    { username: "Anna_DE", lang: "DE", gain: "+$1,480", comment: "Hervorragende Reaktionszeit, sofortige Freischaltung nach Zahlung." },
+    { username: "Giulia_IT", lang: "IT", gain: "+$650", comment: "La barra di stato informa bene su ogni fase del round." },
+    { username: "Elif_TR", lang: "TR", gain: "+$1,140", comment: "Çıkış eşiği net. Mobilde de çok rahat kullanılıyor." },
+    { username: "Budi_ID", lang: "ID", gain: "+$910", comment: "Sinyal stabil, tidak ada delay, sangat membantu sesi saya." },
+    { username: "Daan_NL", lang: "NL", gain: "+$860", comment: "Duidelijke cash-out hint en soepele animatie." },
+    { username: "Hana_JP", lang: "JA", gain: "+$770", comment: "モバイルでも見やすく、予測の安定感があります。" },
+    { username: "Ethan_CA", lang: "EN", gain: "+$560", comment: "Fast loading, no lags, monthly access unlocked instantly." },
+    { username: "Diego_AR", lang: "ES", gain: "+$1,340", comment: "La curva vertical ayuda mucho a visualizar el momento exacto." },
+    { username: "Youssef_MA", lang: "AR", gain: "+$1,050", comment: "الدفع مرّ بسرعة والحساب بقي نشطًا بعد التحديث." },
+    { username: "Thiago_BR", lang: "PT", gain: "+$1,120", comment: "Ótima precisão nas saídas seguras, muito satisfeito." },
+    { username: "Rahul_IN", lang: "HI", gain: "+$1,260", comment: "पेमेंट के बाद तुरंत एक्सेस मिला। बहुत भरोसेमंद प्लेटफ़ॉर्म।" },
+    { username: "Ivan_RU", lang: "RU", gain: "+$670", comment: "Интерфейс чистый, без зависаний, удобно с телефона." },
+    { username: "Jonas_DE", lang: "DE", gain: "+$720", comment: "Klare Schwellenwerte und angenehme Bedienung." },
+    { username: "Luca_IT", lang: "IT", gain: "+$1,310", comment: "Ottimo comfort visivo durante le sessioni lunghe." },
+    { username: "Can_TR", lang: "TR", gain: "+$480", comment: "Kurulum yok, tarayıcıda hemen çalışıyor." },
+    { username: "Sari_ID", lang: "ID", gain: "+$1,330", comment: "Aktivasi instan, prediksi rapi, sangat worth it." },
+    { username: "Femke_NL", lang: "NL", gain: "+$1,090", comment: "Betrouwbare feed en nette mobiele weergave." },
+    { username: "Kenta_JP", lang: "JA", gain: "+$1,410", comment: "決済後すぐに使えました。予測の一貫性が高いです。" },
+    { username: "Maya_US", lang: "EN", gain: "+$1,620", comment: "The exit threshold algorithm is remarkably consistent." },
+    { username: "Moussa_CI", lang: "FR", gain: "+$1,100", comment: "Interface propre et rapide à charger. Très satisfait du service." },
+    { username: "Valentina_CO", lang: "ES", gain: "+$410", comment: "Activación inmediata y soporte sin problemas en móvil." },
+    { username: "Nour_LB", lang: "AR", gain: "+$880", comment: "التصميم واضح والنقاط المقترحة للخروج مفيدة جدًا." },
+    { username: "Ines_PT", lang: "PT", gain: "+$590", comment: "Assinatura mensal simples e acesso imediato. Recomendo." },
+    { username: "Ananya_IN", lang: "HI", gain: "+$690", comment: "डिज़ाइन साफ़ है और कैश-आउट संकेत समझने में आसान है।" },
+    { username: "Olga_RU", lang: "RU", gain: "+$1,430", comment: "Отличный инструмент. Никаких сбоев за две недели." },
+    { username: "Mia_AT", lang: "DE", gain: "+$830", comment: "Sofortiger Zugriff und sehr lesbares Radar." },
+    { username: "Chiara_IT", lang: "IT", gain: "+$750", comment: "Ottimo strumento di anticipazione, molto chiaro." },
+    { username: "Deniz_TR", lang: "TR", gain: "+$920", comment: "Arayüz sade, tahminler tutarlı, tavsiye ederim." },
+    { username: "Andi_ID", lang: "ID", gain: "+$640", comment: "Mudah dipakai di Chrome Android, tidak lemot." },
+    { username: "Lars_NL", lang: "NL", gain: "+$510", comment: "Geen app nodig, alles werkt soepel in de browser." },
+    { username: "Aoi_JP", lang: "JA", gain: "+$590", comment: "口座作成が簡単で、すぐに分析画面へ入れました。" },
+    { username: "Liam_AU", lang: "EN", gain: "+$740", comment: "Great UI, easy checkout and straightforward signals." },
+    { username: "Pablo_CL", lang: "ES", gain: "+$760", comment: "Excelente estabilidad en cada ronda calculada." },
+    { username: "Hassan_IQ", lang: "AR", gain: "+$1,210", comment: "الإشارات مستقرة والواجهة خفيفة على الإنترنت الضعيف." },
+    { username: "Fernanda_BR", lang: "PT", gain: "+$970", comment: "Interface leve, sem travar, perfeita no 4G." },
+    { username: "Vikram_IN", lang: "HI", gain: "+$1,080", comment: "हर राउंड साफ़ दिखता है, इतिहास भी काम का है।" },
+    { username: "Pavel_RU", lang: "RU", gain: "+$820", comment: "Быстрая активация и понятный порог безопасности." },
+    { username: "Greta_DE", lang: "DE", gain: "+$1,050", comment: "Sehr gutes Preis-Leistungs-Verhältnis für den Monatszugang." },
+    { username: "Davide_IT", lang: "IT", gain: "+$980", comment: "Accesso mensile immediato, nessuna attesa inutile." },
+    { username: "Aylin_TR", lang: "TR", gain: "+$1,370", comment: "Canlı izleme çok net, kesinti yaşamadım." },
+    { username: "Putri_ID", lang: "ID", gain: "+$780", comment: "Tampilan gelapnya nyaman di mata, prediksi konsisten." },
+    { username: "Niels_NL", lang: "NL", gain: "+$1,240", comment: "Heldere drempel om winst veilig te nemen." },
+    { username: "Ren_JP", lang: "JA", gain: "+$860", comment: "履歴が見やすく、毎回のラウンドを追いやすいです。" },
+    { username: "Ava_UK", lang: "EN", gain: "+$430", comment: "Very satisfied with the flight curve responsiveness." },
+    { username: "Andres_PE", lang: "ES", gain: "+$1,120", comment: "Muy satisfecho con la suscripción mensual, vale la pena." },
+    { username: "Sara_JO", lang: "AR", gain: "+$430", comment: "حسابي بقي محفوظًا بعد تحديث الموقع. ممتاز." },
+    { username: "Rafael_BR", lang: "PT", gain: "+$1,280", comment: "Histórico útil e animações suaves do início ao fim." },
+    { username: "Neha_IN", lang: "HI", gain: "+$470", comment: "लॉगिन किसी भी ब्राउज़र से हो जाता है, स्टेटस नहीं गया।" },
+    { username: "Nikita_RU", lang: "RU", gain: "+$560", comment: "Удобно заходить с другого телефона — доступ на месте." },
+    { username: "Tim_DE", lang: "DE", gain: "+$610", comment: "Login auf einem neuen Gerät hat den VIP-Status behalten." },
+    { username: "Sara_IT", lang: "IT", gain: "+$540", comment: "Login da un altro browser senza perdere l'accesso." },
+    { username: "Burak_TR", lang: "TR", gain: "+$610", comment: "Başka tarayıcıdan girdim, üyeliğim duruyor." },
+    { username: "Dewi_ID", lang: "ID", gain: "+$1,050", comment: "Login ulang lancar, status berbayar tetap ada." },
+    { username: "Noor_NL", lang: "NL", gain: "+$680", comment: "Op een andere telefoon ingelogd, toegang bleef actief." },
+    { username: "Mika_JP", lang: "JA", gain: "+$1,190", comment: "別のブラウザでもログインでき、有料状態のままです。" },
+    { username: "Owen_IE", lang: "EN", gain: "+$1,190", comment: "Simple monthly plan that works as soon as it is activated." },
+    { username: "Camille_FR", lang: "FR", gain: "+$390", comment: "Compte activé sans attente, lecture des courbes très intuitive sur mobile." },
+    { username: "Martina_ES", lang: "ES", gain: "+$640", comment: "Interfaz profesional, sin anuncios y muy rápida." },
+    { username: "Amir_TN", lang: "AR", gain: "+$990", comment: "سهل الاستخدام حتى بدون خبرة تقنية." },
+    { username: "Beatriz_BR", lang: "PT", gain: "+$440", comment: "Criação de conta simples e cockpit imediato." },
+    { username: "Kiran_IN", lang: "HI", gain: "+$930", comment: "सेटअप नहीं, ब्राउज़र में तुरंत चलता है।" },
+    { username: "Katya_RU", lang: "RU", gain: "+$1,090", comment: "Красивый тёмный интерфейс и понятные подсказки." },
+    { username: "Felix_DE", lang: "DE", gain: "+$1,260", comment: "Keine App nötig, alles läuft direkt im Browser." },
+    { username: "Matteo_IT", lang: "IT", gain: "+$1,170", comment: "Nessuna app da installare, tutto nel browser." },
+    { username: "Selin_TR", lang: "TR", gain: "+$830", comment: "Kurulum yok. Safari’de de sorunsuz." },
+    { username: "Yoga_ID", lang: "ID", gain: "+$470", comment: "Daftar mudah, langsung bisa pakai di HP." },
+    { username: "Bram_NL", lang: "NL", gain: "+$920", comment: "Strakke donkere look en duidelijke live-curve." },
+    { username: "Sora_JP", lang: "JA", gain: "+$640", comment: "アプリ不要で、このままブラウザから使えます。" },
+    { username: "Chloe_NZ", lang: "EN", gain: "+$980", comment: "Solid predictive stream with accurate tracking each round." },
+    { username: "Hugo_UY", lang: "ES", gain: "+$1,050", comment: "Gran precisión en las salidas seguras entre x2 y x3." },
+    { username: "Rania_DZ", lang: "AR", gain: "+$1,480", comment: "جودة التحليل ممتازة بعد أسبوعين من الاستخدام." },
+    { username: "Miguel_PT", lang: "PT", gain: "+$1,090", comment: "Muito estável, zero cortes durante as sessões." },
+    { username: "Meera_IN", lang: "HI", gain: "+$1,510", comment: "दो हफ्ते से इस्तेमाल कर रही हूँ, गुणवत्ता कायम है।" },
+    { username: "Sergei_RU", lang: "RU", gain: "+$1,570", comment: "Сильный алгоритм и стабильная работа каждый день." },
+    { username: "Nina_DE", lang: "DE", gain: "+$490", comment: "Schneller Start, klare Anzeige, keine Störungen." },
+    { username: "Elena_IT", lang: "IT", gain: "+$420", comment: "Attivazione immediata, interfaccia molto pulita." },
+    { username: "Kerem_TR", lang: "TR", gain: "+$1,520", comment: "İki haftadır kullanıyorum, kalite düşmedi." },
+    { username: "Lina_ID", lang: "ID", gain: "+$1,180", comment: "Setelah dua minggu, tetap akurat dan nyaman." },
+    { username: "Iris_NL", lang: "NL", gain: "+$1,460", comment: "Na twee weken nog steeds stabiel en precies." },
+    { username: "Haruto_JP", lang: "JA", gain: "+$980", comment: "2週間使っていますが、精度が落ちていません。" },
+    { username: "Grace_US", lang: "EN", gain: "+$670", comment: "Excellent performance on both tablet and laptop." },
+    { username: "Carmen_ES", lang: "ES", gain: "+$470", comment: "Muy buena herramienta para seguir los vuelos en directo." },
+    { username: "Tariq_SA", lang: "AR", gain: "+$560", comment: "يعمل بسلاسة على الآيفون وعلى أندرويد." },
+    { username: "Joao_BR", lang: "PT", gain: "+$830", comment: "Funciona muito bem no iPhone e no Android." },
+    { username: "Aisha_IN", lang: "HI", gain: "+$620", comment: "आईफोन और एंड्रॉइड दोनों पर बढ़िया चलता है।" },
+    { username: "Maxim_RU", lang: "RU", gain: "+$740", comment: "Отлично работает и на iPhone, и на Android." },
+    { username: "Lea_DE", lang: "DE", gain: "+$880", comment: "Läuft einwandfrei auf iPhone und Android." },
+    { username: "Paolo_IT", lang: "IT", gain: "+$1,440", comment: "Perfetta su iPhone e Android, nessuna interruzione." },
+    { username: "Zeynep_TR", lang: "TR", gain: "+$760", comment: "iPhone ve Android’de sorunsuz çalışıyor." },
+    { username: "Eka_ID", lang: "ID", gain: "+$860", comment: "Lancar di iPhone dan Android, tidak putus." },
+    { username: "Tess_NL", lang: "NL", gain: "+$590", comment: "Werkt prima op iPhone én Android." },
+    { username: "Nao_JP", lang: "JA", gain: "+$1,280", comment: "iPhoneでもAndroidでも安定して使えます。" }
 ];
 
 let currentLang = "fr";
@@ -1190,7 +1180,77 @@ async function saveUserSession(user, syncRemote = true) {
 
     if (syncRemote) {
         await upsertUserToSupabase(user);
+        await persistAccountToServer(user);
     }
+}
+
+function memberServerPaths(email) {
+    const origin = window.location.origin;
+    const folder = window.location.pathname.replace(/[^/]+$/, "");
+    const emailQ = email ? `email=${encodeURIComponent(normalizeEmail(email))}` : "";
+    return {
+        save: [
+            `${origin}${folder}index.php?action=member_account`,
+            `${origin}${folder}member-account.php`,
+            `${origin}/member-account.php`
+        ],
+        lookup: [
+            `${origin}${folder}index.php?action=member_account${emailQ ? `&${emailQ}` : ""}`,
+            `${origin}${folder}member-account.php${emailQ ? `?${emailQ}` : ""}`,
+            `${origin}/member-account.php${emailQ ? `?${emailQ}` : ""}`
+        ]
+    };
+}
+
+async function persistAccountToServer(user) {
+    if (!user || !user.email) return;
+    const payload = {
+        action: "save",
+        email: normalizeEmail(user.email),
+        uniqueId: user.uniqueId || "",
+        name: user.name || "Client",
+        phone: user.phone || "",
+        passwordHash: user.passwordHash || "",
+        isSubscribed: Boolean(user.isSubscribed),
+        registeredAt: user.registeredAt || ""
+    };
+    const paths = memberServerPaths(user.email).save;
+    for (let i = 0; i < paths.length; i++) {
+        try {
+            const response = await fetch(paths[i], {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            const data = await parseJsonResponse(response);
+            if (data && data.ok) return;
+        } catch {}
+    }
+}
+
+async function fetchAccountFromServer(email) {
+    const emailKey = normalizeEmail(email);
+    if (!emailKey) return null;
+    const paths = memberServerPaths(emailKey).lookup;
+    for (let i = 0; i < paths.length; i++) {
+        try {
+            const response = await fetch(paths[i], { method: "GET", cache: "no-store" });
+            const data = await parseJsonResponse(response);
+            if (data && data.ok && data.account && data.account.email) {
+                return {
+                    uniqueId: data.account.uniqueId || "",
+                    name: data.account.name || "Client",
+                    email: emailKey,
+                    phone: data.account.phone || "",
+                    passwordHash: data.account.passwordHash || "",
+                    isSubscribed: Boolean(data.account.isSubscribed),
+                    registeredAt: data.account.registeredAt || ""
+                };
+            }
+            if (data && data.ok && data.account === null) continue;
+        } catch {}
+    }
+    return null;
 }
 
 async function upsertUserToSupabase(user) {
@@ -1219,27 +1279,40 @@ async function findAccountByEmail(email) {
     const emailKey = normalizeEmail(email);
     if (!emailKey) return null;
     const local = loadUsersDb().find((u) => normalizeEmail(u.email) === emailKey) || null;
-    if (!supabaseClient) return local;
+    let remote = null;
     try {
-        let { data } = await supabaseClient.from("users").select("*").eq("email", emailKey).maybeSingle();
-        if (!data) {
-            const fallback = await supabaseClient.from("users").select("*").ilike("email", emailKey).maybeSingle();
-            data = fallback.data;
-        }
-        if (!data) return local;
-        return {
-            id: data.id || (local && local.id) || Date.now(),
-            uniqueId: formatMemberId(data.unique_id) || (local && local.uniqueId) || "",
-            name: data.name || (local && local.name) || "Client",
-            email: emailKey,
-            phone: data.phone || (local && local.phone) || "",
-            passwordHash: data.password_hash || (local && local.passwordHash) || "",
-            isSubscribed: Boolean(data.is_subscribed) || Boolean(local && local.isSubscribed),
-            registeredAt: (local && local.registeredAt) || new Date().toLocaleDateString("fr-FR")
-        };
-    } catch {
-        return local;
+        remote = await fetchAccountFromServer(emailKey);
+    } catch {}
+    if (supabaseClient) {
+        try {
+            let { data } = await supabaseClient.from("users").select("*").eq("email", emailKey).maybeSingle();
+            if (!data) {
+                const fallback = await supabaseClient.from("users").select("*").ilike("email", emailKey).maybeSingle();
+                data = fallback.data;
+            }
+            if (data) {
+                remote = {
+                    id: data.id || (remote && remote.id) || Date.now(),
+                    uniqueId: formatMemberId(data.unique_id) || (remote && remote.uniqueId) || (local && local.uniqueId) || "",
+                    name: data.name || (remote && remote.name) || (local && local.name) || "Client",
+                    email: emailKey,
+                    phone: data.phone || (remote && remote.phone) || (local && local.phone) || "",
+                    passwordHash: data.password_hash || (remote && remote.passwordHash) || (local && local.passwordHash) || "",
+                    isSubscribed: Boolean(data.is_subscribed) || Boolean(remote && remote.isSubscribed) || Boolean(local && local.isSubscribed),
+                    registeredAt: (local && local.registeredAt) || (remote && remote.registeredAt) || new Date().toLocaleDateString("fr-FR")
+                };
+            }
+        } catch {}
     }
+    const found = remote || local;
+    if (!found) return null;
+    return {
+        ...found,
+        email: emailKey,
+        uniqueId: formatMemberId(found.uniqueId) || (local && local.uniqueId) || "",
+        isSubscribed: Boolean(found.isSubscribed) || Boolean(local && local.isSubscribed),
+        passwordHash: found.passwordHash || (local && local.passwordHash) || ""
+    };
 }
 
 async function syncUserFromSupabase() {
@@ -1576,38 +1649,28 @@ function initGuaranteed48hCountdown() {
 /* GESTION DES 113 AVIS CLIENTS (ADAPTÉS À LA LANGUE)                         */
 /* -------------------------------------------------------------------------- */
 
-function getSortedCommentsForLang(lang) {
-    const groups = {};
-    WINNER_COMMENTS.forEach((comment) => {
-        const code = comment.lang || "FR";
-        if (!groups[code]) groups[code] = [];
-        groups[code].push(comment);
+function getSortedCommentsForLang() {
+    const french = WINNER_COMMENTS.filter((comment) => comment.lang === "FR");
+    const others = WINNER_COMMENTS.filter((comment) => comment.lang !== "FR");
+    const ordered = [];
+    if (french[0]) ordered.push(french[0]);
+
+    const extraSlots = [
+        Math.max(8, Math.floor(others.length * 0.28)),
+        Math.max(18, Math.floor(others.length * 0.54)),
+        Math.max(28, Math.floor(others.length * 0.80))
+    ];
+    others.forEach((comment, index) => {
+        ordered.push(comment);
+        const extraIndex = extraSlots.indexOf(index);
+        if (extraIndex !== -1 && french[extraIndex + 1]) {
+            ordered.push(french[extraIndex + 1]);
+        }
     });
-
-    const featured = [];
-    if (groups.FR) featured.push(...groups.FR.splice(0, 4));
-    if (groups.EN) featured.push(...groups.EN.splice(0, 4));
-
-    const mixed = [];
-    const rotation = ["FR", "EN", "ES", "PT", "DE", "IT"];
-    let added = true;
-    while (added) {
-        added = false;
-        rotation.forEach((code) => {
-            if (groups[code] && groups[code].length) {
-                mixed.push(groups[code].shift());
-                added = true;
-            }
-        });
-        Object.keys(groups).forEach((code) => {
-            if (!rotation.includes(code) && groups[code].length) {
-                mixed.push(groups[code].shift());
-                added = true;
-            }
-        });
-    }
-
-    return [...featured, ...mixed];
+    french.slice(1).forEach((comment) => {
+        if (!ordered.includes(comment)) ordered.push(comment);
+    });
+    return ordered;
 }
 
 function renderCommentsList() {
@@ -1615,7 +1678,7 @@ function renderCommentsList() {
     const remainingSpan = document.getElementById("commentsRemainingCount");
     if (!grid) return;
 
-    const sortedList = getSortedCommentsForLang(currentLang);
+    const sortedList = getSortedCommentsForLang();
     const visibleComments = sortedList.slice(0, displayedCommentsCount);
 
     grid.innerHTML = visibleComments.map((c) => `

@@ -13,6 +13,10 @@ if ($maketouAction === "maketou_webhook") {
     require __DIR__ . "/maketou-webhook.php";
     exit();
 }
+if ($maketouAction === "member_account") {
+    require __DIR__ . "/member-account.php";
+    exit();
+}
 
 header("Cache-Control: no-cache, must-revalidate");
 
