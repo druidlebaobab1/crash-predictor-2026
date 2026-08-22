@@ -24,7 +24,10 @@ const CONFIG = {
     maketouPendingKey: "crash_maketou_pending",
     maketouCheckoutUrl: "https://50.mymaketou.shop/products/50/checkout",
     maketouProductId: "d307c251-4302-4adf-acce-e69a8dd9951a",
-    maketouApiBase: "https://api.maketou.net"
+    maketouApiBase: "https://api.maketou.net",
+    maketouSuccessUrl: "https://crashpredictor.fr/?payment=success&status=approved",
+    accessUnlockedKey: "crash_access_unlocked",
+    userPremiumKey: "user_premium"
 };
 
 // ==========================================================================
@@ -701,9 +704,12 @@ let pendingCheckoutAfterAuth = false;
 let maketouPollTimer = null;
 
 document.addEventListener("DOMContentLoaded", () => {
+    applyMaketouSuccessFromUrl();
+    restoreUnlockedAccess();
     initLanguageSystem();
     initSupabase();
     initUserIdentity();
+    restoreUnlockedAccess();
     initGlobalViewRouter();
     initLiveOnlineUsersTicker();
     initLiveFlashSocialNotifications();
@@ -1207,6 +1213,43 @@ function subscribeUserRealtime() {
     } catch {}
 }
 
+function isAccessUnlocked() {
+    try {
+        if (localStorage.getItem(CONFIG.accessUnlockedKey) === "true") return true;
+        if (localStorage.getItem(CONFIG.userPremiumKey) === "true") return true;
+    } catch {}
+    return Boolean(currentUser && currentUser.isSubscribed);
+}
+
+function markAccessUnlocked() {
+    try {
+        localStorage.setItem(CONFIG.accessUnlockedKey, "true");
+        localStorage.setItem(CONFIG.userPremiumKey, "true");
+    } catch {}
+    if (currentUser) currentUser.isSubscribed = true;
+}
+
+function restoreUnlockedAccess() {
+    if (!isAccessUnlocked()) return;
+    if (currentUser) currentUser.isSubscribed = true;
+}
+
+function applyMaketouSuccessFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const payment = String(params.get("payment") || "").toLowerCase();
+    const status = String(params.get("status") || "").toLowerCase();
+    const maketou = String(params.get("maketou") || "").toLowerCase();
+    const approved = payment === "success"
+        || status === "approved"
+        || status === "success"
+        || status === "completed"
+        || maketou === "success";
+    if (!approved) return false;
+    markAccessUnlocked();
+    window.history.replaceState({}, document.title, window.location.pathname);
+    return true;
+}
+
 /* -------------------------------------------------------------------------- */
 /* Routage & Affichage                                                        */
 /* -------------------------------------------------------------------------- */
@@ -1215,7 +1258,8 @@ function initGlobalViewRouter() {
     const publicSite = document.getElementById("publicSiteWrapper");
     const vipSoftware = document.getElementById("vipSoftwareWrapper");
 
-    if (currentUser && currentUser.isSubscribed) {
+    if (isAccessUnlocked()) {
+        if (currentUser) currentUser.isSubscribed = true;
         publicSite?.classList.add("hidden");
         vipSoftware?.classList.remove("hidden");
 
@@ -1223,8 +1267,8 @@ function initGlobalViewRouter() {
         const vipIdDisplay = document.getElementById("vipIdDisplay");
         const vipSidebarUserId = document.getElementById("vipSidebarUserId");
 
-        const user7Id = sanitize7DigitId(currentUser.uniqueId);
-        if (vipUserDisplay) vipUserDisplay.textContent = currentUser.name || "Membre Actif";
+        const user7Id = sanitize7DigitId(currentUser && currentUser.uniqueId);
+        if (vipUserDisplay) vipUserDisplay.textContent = (currentUser && currentUser.name) || "Membre Actif";
         if (vipIdDisplay) vipIdDisplay.textContent = `ID: ${user7Id}`;
         if (vipSidebarUserId) vipSidebarUserId.textContent = user7Id;
 
@@ -2159,6 +2203,7 @@ async function handlePaymentSuccess(response, currency, amount) {
         maketouPollTimer = null;
     }
 
+    markAccessUnlocked();
     hidePaymentOverlay();
     closeAllModals();
     initGlobalViewRouter();
@@ -2189,11 +2234,8 @@ function writeMaketouPending(value) {
 }
 
 function buildMaketouReturnUrl(user, cartId) {
-    const url = new URL(window.location.href);
-    url.search = "";
-    url.hash = "";
-    url.searchParams.set("maketou", "success");
-    url.searchParams.set("uid", user.uniqueId || "");
+    const url = new URL(CONFIG.maketouSuccessUrl);
+    if (user && user.uniqueId) url.searchParams.set("uid", user.uniqueId);
     if (cartId) url.searchParams.set("maketou_cart", cartId);
     return url.toString();
 }
@@ -2267,14 +2309,18 @@ async function fetchMaketouCartStatus(cartId) {
         try {
             const response = await fetch(paths[i], { method: "GET", cache: "no-store" });
             const data = await parseJsonResponse(response);
-            if (data && (data.completed === true || data.status)) return data;
+            if (data && (data.access === true || data.completed === true || data.status === "paid" || data.status)) return data;
         } catch {}
     }
     return null;
 }
 
 async function activateMaketouLicense(cartId) {
-    if (!currentUser || currentUser.isSubscribed) return;
+    markAccessUnlocked();
+    if (!currentUser) {
+        initGlobalViewRouter();
+        return;
+    }
     await handlePaymentSuccess({
         transaction_id: cartId || `maketou-${currentUser.uniqueId}-${Date.now()}`,
         tx_ref: cartId || currentUser.uniqueId,
@@ -2331,44 +2377,53 @@ async function startMaketouCheckout() {
 }
 
 async function verifyMaketouReturn() {
-    if (!currentUser) return;
-
-    await syncUserFromSupabase();
-    if (currentUser.isSubscribed) {
-        writeMaketouPending(null);
-        try { localStorage.removeItem(CONFIG.maketouCartKey); } catch {}
+    if (applyMaketouSuccessFromUrl()) {
+        restoreUnlockedAccess();
+        if (currentUser) {
+            currentUser.isSubscribed = true;
+            await saveUserSession(currentUser, true);
+        }
         initGlobalViewRouter();
         return;
     }
 
+    restoreUnlockedAccess();
+    if (isAccessUnlocked()) {
+        if (currentUser) {
+            currentUser.isSubscribed = true;
+            await saveUserSession(currentUser, false);
+        }
+        initGlobalViewRouter();
+        return;
+    }
+
+    if (currentUser) {
+        await syncUserFromSupabase();
+        if (currentUser.isSubscribed) {
+            markAccessUnlocked();
+            initGlobalViewRouter();
+            return;
+        }
+    }
+
     const params = new URLSearchParams(window.location.search);
-    let cartId = params.get("maketou_cart") || "";
+    let cartId = params.get("maketou_cart") || params.get("cartId") || params.get("token") || "";
     if (!cartId) {
         try { cartId = localStorage.getItem(CONFIG.maketouCartKey) || ""; } catch {}
     }
 
     if (cartId) {
         const status = await fetchMaketouCartStatus(cartId);
-        if (status && (status.completed === true || String(status.status || "").toLowerCase() === "completed")) {
-            if (params.get("maketou") || params.get("maketou_cart")) {
-                window.history.replaceState({}, document.title, window.location.origin + window.location.pathname);
-            }
+        const paid = status && (
+            status.access === true
+            || status.completed === true
+            || String(status.status || "").toLowerCase() === "paid"
+            || String(status.status || "").toLowerCase() === "completed"
+        );
+        if (paid) {
+            window.history.replaceState({}, document.title, window.location.pathname);
             await activateMaketouLicense(cartId);
-            return;
         }
-    }
-
-    const pending = readMaketouPending();
-    const pendingFresh = pending
-        && pending.email === currentUser.email
-        && (Date.now() - Number(pending.startedAt || 0)) < 86400000;
-    const successHints = ["success", "completed", "paid", "successful"];
-    const flagged = ["maketou", "status", "payment", "paid", "state"].some((key) => {
-        return successHints.includes(String(params.get(key) || "").toLowerCase());
-    });
-    if (flagged && pendingFresh) {
-        window.history.replaceState({}, document.title, window.location.origin + window.location.pathname);
-        await activateMaketouLicense(cartId);
     }
 }
 

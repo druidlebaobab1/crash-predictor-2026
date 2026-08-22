@@ -63,9 +63,11 @@ $data = json_decode($body, true);
 $cartStatus = is_array($data) ? (string) ($data["status"] ?? "") : "";
 
 if ($status >= 200 && $status < 300) {
+    $paid = in_array(strtolower($cartStatus), ["completed", "paid", "success", "successful", "approved"], true);
     echo json_encode([
-        "status" => $cartStatus,
-        "completed" => $cartStatus === "completed",
+        "status" => $paid ? "paid" : $cartStatus,
+        "access" => $paid,
+        "completed" => $paid,
         "cartId" => $cartId
     ]);
     exit;
