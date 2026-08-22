@@ -896,6 +896,12 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     max-width: min(42vw, 220px);
     min-width: 0;
     white-space: nowrap;
+    font-family: inherit;
+    color: inherit;
+    cursor: pointer;
+}
+button.vip-member-tag:hover {
+    background: rgba(255, 200, 55, 0.22);
 }
 .vip-member-tag #vipUsernameDisplay {
     overflow: hidden;
@@ -912,14 +918,23 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     font-size: 0.72rem;
 }
 
+.btn-vip-profile,
 .btn-vip-logout {
-    background: rgba(239, 68, 68, 0.15);
-    border: 1px solid #ef4444;
-    color: #fca5a5;
     padding: 6px 10px;
     border-radius: 10px;
     cursor: pointer;
     font-size: 0.85rem;
+}
+.btn-vip-profile {
+    background: rgba(255, 200, 55, 0.15);
+    border: 1px solid var(--gold-primary);
+    color: var(--gold-primary);
+}
+.btn-vip-profile:hover { background: var(--gold-primary); color: #0d0614; }
+.btn-vip-logout {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid #ef4444;
+    color: #fca5a5;
 }
 .btn-vip-logout:hover { background: #dc2626; color: #fff; }
 
@@ -1161,6 +1176,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 
 .modal-header { text-align: center; margin-bottom: 16px; }
 .modal-header p { color: var(--text-muted); font-size: 0.84rem; }
+.profile-display-name { color: #fff !important; font-weight: 800; font-size: 1rem !important; margin: 2px 0 0; }
 .modal-title-big { font-family: var(--font-heading); font-size: 1.3rem; font-weight: 900; }
 
 .modal-icon-badge {
@@ -1234,6 +1250,10 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     padding: 12px;
     margin-bottom: 12px;
     text-align: center;
+}
+.profile-status-block.is-licensed {
+    background: rgba(16, 185, 129, 0.12);
+    border-color: rgba(16, 185, 129, 0.45);
 }
 .status-label-heading { font-size: 0.76rem; color: var(--text-muted); margin-bottom: 6px; }
 .status-tag-badge.status-unsubscribed { background: #dc2626; color: #fff; font-weight: 800; font-size: 0.78rem; padding: 4px 10px; border-radius: 14px; display: inline-block; }
@@ -1426,6 +1446,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
         max-width: min(46vw, 180px);
         min-width: 0;
     }
+    .btn-vip-profile,
     .btn-vip-logout {
         padding: 6px 8px;
         font-size: 0.78rem;

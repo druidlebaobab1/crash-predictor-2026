@@ -43,7 +43,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=u34">
+    <link rel="stylesheet" href="style.css?v=u36">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 </head>
 <body class="dark-theme">
@@ -308,10 +308,13 @@
                 </div>
 
                 <div class="vip-user-meta">
-                    <div class="vip-member-tag">
+                    <button type="button" class="vip-member-tag" id="vipProfileBadge" title="Mon Profil / Paramètres">
                         <i class="fa-solid fa-crown text-gold" aria-hidden="true"></i>
                         <span id="vipUsernameDisplay">Membre Actif</span>
-                    </div>
+                    </button>
+                    <button type="button" class="btn-vip-profile" id="vipProfileBtn" title="Mon Profil / Paramètres" aria-label="Mon Profil / Paramètres">
+                        <i class="fa-solid fa-user" aria-hidden="true"></i>
+                    </button>
                     <button type="button" class="btn-vip-logout" id="vipLogoutBtn" title="Se déconnecter">
                         <i class="fa-solid fa-power-off" aria-hidden="true"></i>
                     </button>
@@ -406,7 +409,8 @@
             <button type="button" class="modal-close" id="closeProfileModal" aria-label="Fermer la fenêtre">&times;</button>
             <div class="modal-header">
                 <div class="modal-icon-badge gold-glow"><i class="fa-solid fa-user-astronaut" aria-hidden="true"></i></div>
-                <h3 id="profileNameDisplay" data-i18n="profile_space">Mon espace membre</h3>
+                <h3 data-i18n="profile_space">Mon Profil / Paramètres</h3>
+                <p class="profile-display-name" id="profileNameDisplay">Membre</p>
                 <p id="profileEmailDisplay">client@exemple.com</p>
                 <div class="profile-user-id-box">
                     <span data-i18n="profile_your_id">VOTRE ID UNIQUE :</span>
@@ -423,7 +427,7 @@
                 </div>
 
                 <div class="profile-section-group">
-                    <label class="section-field-label" for="profilePhoneInput"><i class="fa-solid fa-phone" aria-hidden="true"></i> <span data-i18n="lbl_phone">Numéro de téléphone</span></label>
+                    <label class="section-field-label" for="profilePhoneInput"><i class="fa-solid fa-phone" aria-hidden="true"></i> <span data-i18n="lbl_phone">Numéro de téléphone / WhatsApp</span></label>
                     <div class="phone-input-row">
                         <input type="tel" id="profilePhoneInput" placeholder="+1 (555) 000-0000" class="form-control-dark" autocomplete="tel">
                         <button type="button" class="btn-save-mini" id="btnSavePhone" data-i18n="btn_save">Enregistrer</button>
@@ -648,6 +652,6 @@
 
     <div class="toast-container" id="toastContainer"></div>
 
-    <script src="app.js?v=u35" defer></script>
+    <script src="app.js?v=u36" defer></script>
 </body>
 </html>

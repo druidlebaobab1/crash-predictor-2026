@@ -96,11 +96,12 @@ const TRANSLATIONS = {
         sys_active_lifetime: "ACTIVE / MOIS",
         sys_your_id: "Votre ID membre",
         recent_rounds: "DERNIERS ROUNDS",
-        profile_space: "Mon espace membre",
+        profile_space: "Mon Profil / Paramètres",
         profile_your_id: "VOTRE ID UNIQUE :",
         profile_license_status: "Statut de votre licence",
         status_unsubscribed: "NON ACTIVÉ",
-        lbl_phone: "Numéro de téléphone",
+        status_activated_vip: "ACTIVÉ / VIP",
+        lbl_phone: "Numéro de téléphone / WhatsApp",
         btn_save: "Enregistrer",
         lbl_update_pass: "Modifier mon mot de passe",
         btn_update: "Mettre à jour",
@@ -199,11 +200,12 @@ const TRANSLATIONS = {
         sys_active_lifetime: "ACTIVE / MONTH",
         sys_your_id: "Your Member ID",
         recent_rounds: "RECENT ROUNDS",
-        profile_space: "Member Area",
+        profile_space: "My Profile / Settings",
         profile_your_id: "YOUR UNIQUE ID:",
         profile_license_status: "License Status",
         status_unsubscribed: "NOT ACTIVATED",
-        lbl_phone: "Phone Number",
+        status_activated_vip: "ACTIVATED / VIP",
+        lbl_phone: "Phone / WhatsApp number",
         btn_save: "Save",
         lbl_update_pass: "Change Password",
         btn_update: "Update",
@@ -302,11 +304,12 @@ const TRANSLATIONS = {
         sys_active_lifetime: "ACTIVA / MES",
         sys_your_id: "Su ID de Miembro",
         recent_rounds: "ÚLTIMAS RONDAS",
-        profile_space: "Mi Área de Miembro",
+        profile_space: "Mi Perfil / Ajustes",
         profile_your_id: "SU ID ÚNICO:",
         profile_license_status: "Estado de Licencia",
         status_unsubscribed: "NO ACTIVADO",
-        lbl_phone: "Número de Teléfono",
+        status_activated_vip: "ACTIVADO / VIP",
+        lbl_phone: "Teléfono / WhatsApp",
         btn_save: "Guardar",
         lbl_update_pass: "Cambiar Contraseña",
         btn_update: "Actualizar",
@@ -405,11 +408,12 @@ const TRANSLATIONS = {
         sys_active_lifetime: "ATIVA / MÊS",
         sys_your_id: "Seu ID de Membro",
         recent_rounds: "ÚLTIMAS RONDAS",
-        profile_space: "Minha Área de Membro",
+        profile_space: "Meu Perfil / Definições",
         profile_your_id: "SEU ID ÚNICO:",
         profile_license_status: "Estado da Licença",
         status_unsubscribed: "NÃO ATIVADO",
-        lbl_phone: "Número de Telefone",
+        status_activated_vip: "ATIVADO / VIP",
+        lbl_phone: "Telefone / WhatsApp",
         btn_save: "Guardar",
         lbl_update_pass: "Alterar Palavra-passe",
         btn_update: "Atualizar",
@@ -508,11 +512,12 @@ const TRANSLATIONS = {
         sys_active_lifetime: "AKTIV / MONAT",
         sys_your_id: "Ihre Mitglieds-ID",
         recent_rounds: "LETZTE RUNDEN",
-        profile_space: "Mein Mitgliedsbereich",
+        profile_space: "Mein Profil / Einstellungen",
         profile_your_id: "IHRE EINZIGARTIGE ID:",
         profile_license_status: "Lizenzstatus",
         status_unsubscribed: "NICHT AKTIVIERT",
-        lbl_phone: "Telefonnummer",
+        status_activated_vip: "AKTIVIERT / VIP",
+        lbl_phone: "Telefon / WhatsApp",
         btn_save: "Speichern",
         lbl_update_pass: "Passwort ändern",
         btn_update: "Aktualisieren",
@@ -2193,72 +2198,118 @@ function initAuthSecurity() {
     if (vipLogoutBtn) vipLogoutBtn.dataset.boundLogout = "1";
 }
 
-function initProfileModal() {
-    const userProfileBadge = document.getElementById("userProfileBadge");
+function i18nText(key, fallback) {
+    const dict = TRANSLATIONS[currentLang] || TRANSLATIONS.fr || {};
+    return dict[key] || fallback || key;
+}
+
+function preservePaidSessionOnProfileSave() {
+    if (!currentUser) return;
+    if (isAccessUnlocked()) currentUser.isSubscribed = true;
+}
+
+function openProfileModal() {
     const profileModal = document.getElementById("profileModal");
-    const closeProfile = document.getElementById("closeProfileModal");
+    if (!profileModal) return;
+
     const profileNameDisplay = document.getElementById("profileNameDisplay");
     const profileEmailDisplay = document.getElementById("profileEmailDisplay");
     const profileUniqueIdDisplay = document.getElementById("profileUniqueIdDisplay");
     const profilePhoneInput = document.getElementById("profilePhoneInput");
     const btnSavePhone = document.getElementById("btnSavePhone");
-    const formUpdatePassword = document.getElementById("formUpdatePassword");
     const profileStatusBadge = document.getElementById("profileStatusBadge");
     const btnProfileSubscribe = document.getElementById("btnProfileSubscribe");
+    const profileStatusBlock = profileModal.querySelector(".profile-status-block");
 
-    userProfileBadge?.addEventListener("click", () => {
-        if (!currentUser) return;
+    const user7Id = displayMemberId();
+    if (profileNameDisplay) {
+        profileNameDisplay.textContent = (currentUser && currentUser.name) || i18nText("vip_member_active", "Membre Actif");
+    }
+    if (profileEmailDisplay) {
+        profileEmailDisplay.textContent = (currentUser && currentUser.email) || "—";
+    }
+    if (profileUniqueIdDisplay) profileUniqueIdDisplay.textContent = user7Id || "—";
+    if (profilePhoneInput) {
+        profilePhoneInput.value = (currentUser && currentUser.phone) || "";
+        profilePhoneInput.disabled = false;
+        profilePhoneInput.readOnly = false;
+    }
+    if (btnSavePhone) {
+        btnSavePhone.disabled = false;
+        btnSavePhone.style.opacity = "";
+        btnSavePhone.style.pointerEvents = "";
+    }
 
-        const user7Id = displayMemberId();
-        if (profileNameDisplay) profileNameDisplay.textContent = currentUser.name;
-        if (profileEmailDisplay) profileEmailDisplay.textContent = currentUser.email;
-        if (profileUniqueIdDisplay) profileUniqueIdDisplay.textContent = user7Id;
-        if (profilePhoneInput) profilePhoneInput.value = currentUser.phone || "";
-        if (profilePhoneInput) {
-            const locked = Boolean(String(currentUser.phone || "").trim());
-            profilePhoneInput.disabled = locked;
-            profilePhoneInput.readOnly = locked;
-            if (btnSavePhone) {
-                btnSavePhone.disabled = locked;
-                btnSavePhone.style.opacity = locked ? "0.5" : "";
-                btnSavePhone.style.pointerEvents = locked ? "none" : "";
-            }
+    const licensed = Boolean((currentUser && currentUser.isSubscribed) || isAccessUnlocked());
+    if (profileStatusBadge) {
+        if (!licensed) {
+            profileStatusBadge.className = "status-tag-badge status-unsubscribed";
+            profileStatusBadge.innerHTML = '<i class="fa-solid fa-circle-xmark" aria-hidden="true"></i> ' + i18nText("status_unsubscribed", "NON ACTIVÉ");
+            if (btnProfileSubscribe) btnProfileSubscribe.style.display = "block";
+            profileStatusBlock?.classList.remove("is-licensed");
+        } else {
+            profileStatusBadge.className = "status-tag-badge status-active";
+            profileStatusBadge.innerHTML = '<i class="fa-solid fa-circle" aria-hidden="true"></i> ' + i18nText("status_activated_vip", "ACTIVÉ / VIP");
+            if (btnProfileSubscribe) btnProfileSubscribe.style.display = "none";
+            profileStatusBlock?.classList.add("is-licensed");
         }
+    }
 
-        if (profileStatusBadge) {
-            if (!currentUser.isSubscribed) {
-                profileStatusBadge.className = "status-tag-badge status-unsubscribed";
-                profileStatusBadge.innerHTML = '<i class="fa-solid fa-circle-xmark" aria-hidden="true"></i> NON ACTIVÉ';
-                if (btnProfileSubscribe) btnProfileSubscribe.style.display = "block";
-            } else {
-                profileStatusBadge.className = "status-tag-badge status-active";
-                profileStatusBadge.innerHTML = '<i class="fa-solid fa-crown" aria-hidden="true"></i> LICENCE ACTIVE / MOIS';
-                if (btnProfileSubscribe) btnProfileSubscribe.style.display = "none";
-            }
-        }
+    profileModal.classList.add("active");
+}
 
-        profileModal?.classList.add("active");
+function closeProfileModal() {
+    document.getElementById("profileModal")?.classList.remove("active");
+}
+
+function bindProfileOpenTrigger(el) {
+    if (!el || el.dataset.boundProfileOpen === "1") return;
+    el.dataset.boundProfileOpen = "1";
+    el.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        openProfileModal();
     });
+    el.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            openProfileModal();
+        }
+    });
+}
 
-    closeProfile?.addEventListener("click", () => profileModal?.classList.remove("active"));
+function initProfileModal() {
+    const userProfileBadge = document.getElementById("userProfileBadge");
+    const vipProfileBadge = document.getElementById("vipProfileBadge");
+    const vipProfileBtn = document.getElementById("vipProfileBtn");
+    const closeProfile = document.getElementById("closeProfileModal");
+    const profilePhoneInput = document.getElementById("profilePhoneInput");
+    const btnSavePhone = document.getElementById("btnSavePhone");
+    const formUpdatePassword = document.getElementById("formUpdatePassword");
+    const btnProfileSubscribe = document.getElementById("btnProfileSubscribe");
+
+    bindProfileOpenTrigger(userProfileBadge);
+    bindProfileOpenTrigger(vipProfileBadge);
+    bindProfileOpenTrigger(vipProfileBtn);
+    closeProfile?.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        closeProfileModal();
+    });
 
     btnSavePhone?.addEventListener("click", async () => {
         try {
             if (!currentUser) return;
-            if (String(currentUser.phone || "").trim()) return;
             if (!profilePhoneInput) return;
             const phone = String(profilePhoneInput.value || "").trim();
-            if (!phone || !isValidPhone(phone)) {
+            if (!phone) return;
+            if (!isValidPhone(phone)) {
                 showToast("Numéro de téléphone invalide.", "error");
                 return;
             }
+            preservePaidSessionOnProfileSave();
             currentUser.phone = phone;
             await saveUserSession(currentUser, true);
-            profilePhoneInput.disabled = true;
-            profilePhoneInput.readOnly = true;
-            btnSavePhone.disabled = true;
-            btnSavePhone.style.opacity = "0.5";
-            btnSavePhone.style.pointerEvents = "none";
             showToast("Numéro de téléphone enregistré !");
         } catch (err) {
             showToast("Enregistrement impossible. Réessayez.", "error");
@@ -2290,6 +2341,7 @@ function initProfileModal() {
                 return;
             }
 
+            preservePaidSessionOnProfileSave();
             currentUser.passwordHash = await hashPassword(newPass);
             await saveUserSession(currentUser, true);
             formUpdatePassword.reset();
@@ -2300,7 +2352,7 @@ function initProfileModal() {
     });
 
     btnProfileSubscribe?.addEventListener("click", () => {
-        profileModal?.classList.remove("active");
+        closeProfileModal();
         if (!currentUser) {
             pendingCheckoutAfterAuth = true;
             document.getElementById("loginModal")?.classList.add("active");
