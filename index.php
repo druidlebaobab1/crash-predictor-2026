@@ -1,7 +1,7 @@
 <?php
 // CRASH PREDICTOR 2026 - CHARGEMENT DIRECT DU SITE
 $maketouAction = (string) ($_GET["action"] ?? "");
-if ($maketouAction === "maketou_checkout") {
+if (in_array($maketouAction, ["maketou_checkout", "maketou_verify", "maketou_session"], true)) {
     require __DIR__ . "/maketou-checkout.php";
     exit();
 }

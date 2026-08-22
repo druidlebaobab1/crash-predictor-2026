@@ -27,7 +27,8 @@ const CONFIG = {
     maketouApiBase: "https://api.maketou.net",
     maketouSuccessUrl: "https://crashpredictor.fr/?payment=success&status=approved",
     accessUnlockedKey: "crash_access_unlocked",
-    userPremiumKey: "user_premium"
+    userPremiumKey: "user_premium",
+    accessTokenKey: "crash_access_token"
 };
 
 // ==========================================================================
@@ -702,14 +703,14 @@ let realtimeChannel = null;
 let paymentInFlight = false;
 let pendingCheckoutAfterAuth = false;
 let maketouPollTimer = null;
+let verifiedAccessGranted = false;
+let maketouVerifyInFlight = false;
 
-document.addEventListener("DOMContentLoaded", () => {
-    applyMaketouSuccessFromUrl();
-    restoreUnlockedAccess();
+document.addEventListener("DOMContentLoaded", async () => {
     initLanguageSystem();
     initSupabase();
     initUserIdentity();
-    restoreUnlockedAccess();
+    await restoreVerifiedAccess();
     initGlobalViewRouter();
     initLiveOnlineUsersTicker();
     initLiveFlashSocialNotifications();
@@ -721,9 +722,8 @@ document.addEventListener("DOMContentLoaded", () => {
     initModals();
     initCheckout();
     initMasterAdminDashboard();
-    syncUserFromSupabase();
     subscribeUserRealtime();
-    verifyMaketouReturn();
+    await verifyMaketouReturn();
     startMaketouPaymentWatch();
     document.addEventListener("visibilitychange", () => {
         if (document.visibilityState === "visible") {
@@ -1175,10 +1175,12 @@ async function syncUserFromSupabase() {
 
         if (data && !error) {
             let changed = false;
-            if (Boolean(data.is_subscribed) !== Boolean(currentUser.isSubscribed)) {
-                currentUser.isSubscribed = Boolean(data.is_subscribed);
+            const subscribed = Boolean(data.is_subscribed);
+            if (subscribed !== Boolean(currentUser.isSubscribed)) {
+                currentUser.isSubscribed = subscribed;
                 changed = true;
             }
+            if (subscribed) grantVerifiedAccess();
             if (data.unique_id && data.unique_id !== currentUser.uniqueId) {
                 currentUser.uniqueId = sanitize7DigitId(data.unique_id);
                 changed = true;
@@ -1204,6 +1206,8 @@ function subscribeUserRealtime() {
             }, (payload) => {
                 if (payload?.new && typeof payload.new.is_subscribed !== "undefined") {
                     currentUser.isSubscribed = Boolean(payload.new.is_subscribed);
+                    if (currentUser.isSubscribed) grantVerifiedAccess();
+                    else if (!readAccessToken()) revokeVerifiedAccess();
                     saveUserSession(currentUser, false);
                     initGlobalViewRouter();
                     showToast(currentUser.isSubscribed ? "Licence activée !" : "Statut mis à jour.");
@@ -1214,14 +1218,25 @@ function subscribeUserRealtime() {
 }
 
 function isAccessUnlocked() {
-    try {
-        if (localStorage.getItem(CONFIG.accessUnlockedKey) === "true") return true;
-        if (localStorage.getItem(CONFIG.userPremiumKey) === "true") return true;
-    } catch {}
-    return Boolean(currentUser && currentUser.isSubscribed);
+    return verifiedAccessGranted === true;
 }
 
-function markAccessUnlocked() {
+function readAccessToken() {
+    try {
+        return localStorage.getItem(CONFIG.accessTokenKey) || "";
+    } catch {
+        return "";
+    }
+}
+
+function storeAccessToken(token) {
+    if (!token) return;
+    try { localStorage.setItem(CONFIG.accessTokenKey, token); } catch {}
+}
+
+function grantVerifiedAccess(token) {
+    verifiedAccessGranted = true;
+    if (token) storeAccessToken(token);
     try {
         localStorage.setItem(CONFIG.accessUnlockedKey, "true");
         localStorage.setItem(CONFIG.userPremiumKey, "true");
@@ -1229,25 +1244,80 @@ function markAccessUnlocked() {
     if (currentUser) currentUser.isSubscribed = true;
 }
 
-function restoreUnlockedAccess() {
-    if (!isAccessUnlocked()) return;
-    if (currentUser) currentUser.isSubscribed = true;
+function revokeVerifiedAccess() {
+    verifiedAccessGranted = false;
+    try {
+        localStorage.removeItem(CONFIG.accessTokenKey);
+        localStorage.removeItem(CONFIG.accessUnlockedKey);
+        localStorage.removeItem(CONFIG.userPremiumKey);
+    } catch {}
 }
 
-function applyMaketouSuccessFromUrl() {
-    const params = new URLSearchParams(window.location.search);
+function markAccessUnlocked() {
+    grantVerifiedAccess();
+}
+
+function hasMaketouReturnHint(params) {
     const payment = String(params.get("payment") || "").toLowerCase();
     const status = String(params.get("status") || "").toLowerCase();
     const maketou = String(params.get("maketou") || "").toLowerCase();
-    const approved = payment === "success"
+    return payment === "success"
         || status === "approved"
         || status === "success"
         || status === "completed"
         || maketou === "success";
-    if (!approved) return false;
-    markAccessUnlocked();
+}
+
+function extractPaymentRef(params) {
+    const keys = [
+        "ref", "cartId", "cart_id", "maketou_cart", "transaction_id",
+        "transactionId", "reference", "order_id", "orderId", "payment_id", "paymentId"
+    ];
+    for (let i = 0; i < keys.length; i++) {
+        const value = String(params.get(keys[i]) || "").trim();
+        if (/^[A-Za-z0-9_-]{8,80}$/.test(value)) return value;
+    }
+    try {
+        const stored = String(localStorage.getItem(CONFIG.maketouCartKey) || "").trim();
+        if (/^[A-Za-z0-9_-]{8,80}$/.test(stored)) return stored;
+    } catch {}
+    return "";
+}
+
+function clearMaketouReturnUrl() {
     window.history.replaceState({}, document.title, window.location.pathname);
-    return true;
+}
+
+function denyPaymentAccess(message) {
+    if (verifiedAccessGranted) {
+        clearMaketouReturnUrl();
+        return;
+    }
+    verifiedAccessGranted = false;
+    clearMaketouReturnUrl();
+    initGlobalViewRouter();
+    showToast(message || "Paiement non confirmé. L'accès reste bloqué.", "error");
+}
+
+async function restoreVerifiedAccess() {
+    const token = readAccessToken();
+    if (token) {
+        const session = await fetchMaketouSession(token);
+        if (session && session.access === true) {
+            grantVerifiedAccess(token);
+            return true;
+        }
+        try { localStorage.removeItem(CONFIG.accessTokenKey); } catch {}
+    }
+    if (currentUser) {
+        await syncUserFromSupabase();
+        if (currentUser.isSubscribed) {
+            grantVerifiedAccess();
+            return true;
+        }
+    }
+    verifiedAccessGranted = false;
+    return false;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -1895,7 +1965,7 @@ function initAuthSecurity() {
                             email: data.email,
                             phone: data.phone || (found && found.phone) || "",
                             passwordHash: data.password_hash || (found && found.passwordHash) || "",
-                            isSubscribed: Boolean(data.is_subscribed) || Boolean(found && found.isSubscribed),
+                            isSubscribed: Boolean(data.is_subscribed),
                             registeredAt: (found && found.registeredAt) || new Date().toLocaleDateString("fr-FR")
                         };
                     }
@@ -1909,6 +1979,7 @@ function initAuthSecurity() {
                         found.passwordHash = await hashPassword(password);
                     }
                     await saveUserSession(found, true);
+                    if (found.isSubscribed) grantVerifiedAccess();
                     setButtonLoading(loginSubmitBtn, false);
                     initGlobalViewRouter();
                     closeAllModals();
@@ -2203,7 +2274,6 @@ async function handlePaymentSuccess(response, currency, amount) {
         maketouPollTimer = null;
     }
 
-    markAccessUnlocked();
     hidePaymentOverlay();
     closeAllModals();
     initGlobalViewRouter();
@@ -2244,8 +2314,29 @@ function maketouServerPaths(kind, query) {
     const origin = window.location.origin;
     const folder = window.location.pathname.replace(/[^/]+$/, "");
     const q = query ? `?${query}` : "";
+    if (kind === "verify") {
+        return [
+            `${origin}${folder}maketou-checkout.php${q}`,
+            `${origin}/maketou-checkout.php${q}`,
+            `/maketou-checkout.php${q}`,
+            `${origin}${folder}index.php?action=maketou_verify${query ? `&${query}` : ""}`,
+            `${origin}${folder}index.php?action=maketou_status${query ? `&${query}` : ""}`,
+            `${origin}${folder}maketou-status.php${q}`,
+            `/api/maketou-status${q}`
+        ];
+    }
+    if (kind === "session") {
+        return [
+            `${origin}${folder}maketou-checkout.php${q}`,
+            `${origin}/maketou-checkout.php${q}`,
+            `/maketou-checkout.php${q}`,
+            `${origin}${folder}index.php?action=maketou_session${query ? `&${query}` : ""}`
+        ];
+    }
     if (kind === "status") {
         return [
+            `${origin}${folder}maketou-checkout.php${q}`,
+            `${origin}${folder}index.php?action=maketou_verify${query ? `&${query}` : ""}`,
             `${origin}${folder}index.php?action=maketou_status${query ? `&${query}` : ""}`,
             `${origin}${folder}maketou-status.php${q}`,
             `${origin}/maketou-status.php${q}`,
@@ -2301,24 +2392,50 @@ async function createMaketouCart(user) {
     return null;
 }
 
-async function fetchMaketouCartStatus(cartId) {
-    if (!cartId) return null;
-    const query = `cartId=${encodeURIComponent(cartId)}`;
-    const paths = maketouServerPaths("status", query);
+function currentPaymentEmail() {
+    if (currentUser && currentUser.email) return String(currentUser.email).trim();
+    const pending = readMaketouPending();
+    return pending && pending.email ? String(pending.email).trim() : "";
+}
+
+async function fetchMaketouVerification(ref) {
+    if (!ref) return null;
+    const email = currentPaymentEmail();
+    const query = `action=verify&ref=${encodeURIComponent(ref)}${email ? `&email=${encodeURIComponent(email)}` : ""}`;
+    const paths = maketouServerPaths("verify", query);
     for (let i = 0; i < paths.length; i++) {
         try {
             const response = await fetch(paths[i], { method: "GET", cache: "no-store" });
             const data = await parseJsonResponse(response);
-            if (data && (data.access === true || data.completed === true || data.status === "paid" || data.status)) return data;
+            if (data && typeof data.access === "boolean") return data;
         } catch {}
     }
     return null;
 }
 
-async function activateMaketouLicense(cartId) {
-    markAccessUnlocked();
+async function fetchMaketouSession(token) {
+    if (!token) return null;
+    const query = `action=session&token=${encodeURIComponent(token)}`;
+    const paths = maketouServerPaths("session", query);
+    for (let i = 0; i < paths.length; i++) {
+        try {
+            const response = await fetch(paths[i], { method: "GET", cache: "no-store" });
+            const data = await parseJsonResponse(response);
+            if (data && typeof data.access === "boolean") return data;
+        } catch {}
+    }
+    return null;
+}
+
+async function fetchMaketouCartStatus(cartId) {
+    return fetchMaketouVerification(cartId);
+}
+
+async function activateMaketouLicense(cartId, token) {
+    grantVerifiedAccess(token);
     if (!currentUser) {
         initGlobalViewRouter();
+        showToast("🎉 Félicitations ! Votre cockpit d'analyse est débloqué pour le mois !");
         return;
     }
     await handlePaymentSuccess({
@@ -2332,7 +2449,16 @@ async function activateMaketouLicense(cartId) {
 function startMaketouPaymentWatch() {
     if (maketouPollTimer) clearInterval(maketouPollTimer);
     maketouPollTimer = setInterval(() => {
-        verifyMaketouReturn();
+        if (verifiedAccessGranted) {
+            clearInterval(maketouPollTimer);
+            maketouPollTimer = null;
+            return;
+        }
+        let pendingCart = "";
+        try { pendingCart = localStorage.getItem(CONFIG.maketouCartKey) || ""; } catch {}
+        if (pendingCart || readMaketouPending()) {
+            verifyMaketouReturn();
+        }
     }, 4000);
 }
 
@@ -2377,53 +2503,66 @@ async function startMaketouCheckout() {
 }
 
 async function verifyMaketouReturn() {
-    if (applyMaketouSuccessFromUrl()) {
-        restoreUnlockedAccess();
-        if (currentUser) {
-            currentUser.isSubscribed = true;
-            await saveUserSession(currentUser, true);
-        }
-        initGlobalViewRouter();
-        return;
-    }
+    if (maketouVerifyInFlight) return;
+    const params = new URLSearchParams(window.location.search);
+    const returnHint = hasMaketouReturnHint(params);
+    const ref = extractPaymentRef(params);
 
-    restoreUnlockedAccess();
-    if (isAccessUnlocked()) {
-        if (currentUser) {
-            currentUser.isSubscribed = true;
-            await saveUserSession(currentUser, false);
-        }
-        initGlobalViewRouter();
-        return;
-    }
-
-    if (currentUser) {
-        await syncUserFromSupabase();
-        if (currentUser.isSubscribed) {
-            markAccessUnlocked();
-            initGlobalViewRouter();
+    if (returnHint && !ref) {
+        if (verifiedAccessGranted) {
+            clearMaketouReturnUrl();
             return;
         }
-    }
-
-    const params = new URLSearchParams(window.location.search);
-    let cartId = params.get("maketou_cart") || params.get("cartId") || params.get("token") || "";
-    if (!cartId) {
-        try { cartId = localStorage.getItem(CONFIG.maketouCartKey) || ""; } catch {}
-    }
-
-    if (cartId) {
-        const status = await fetchMaketouCartStatus(cartId);
-        const paid = status && (
-            status.access === true
-            || status.completed === true
-            || String(status.status || "").toLowerCase() === "paid"
-            || String(status.status || "").toLowerCase() === "completed"
-        );
-        if (paid) {
-            window.history.replaceState({}, document.title, window.location.pathname);
-            await activateMaketouLicense(cartId);
+        showPaymentOverlay("Validation de la licence…");
+        if (currentUser) {
+            for (let i = 0; i < 3; i++) {
+                await syncUserFromSupabase();
+                if (currentUser.isSubscribed) {
+                    hidePaymentOverlay();
+                    grantVerifiedAccess();
+                    clearMaketouReturnUrl();
+                    initGlobalViewRouter();
+                    showToast("🎉 Félicitations ! Votre cockpit d'analyse est débloqué pour le mois !");
+                    return;
+                }
+                if (i < 2) await new Promise((resolve) => setTimeout(resolve, 1200));
+            }
         }
+        hidePaymentOverlay();
+        denyPaymentAccess("Paiement non confirmé. L'accès reste bloqué.");
+        return;
+    }
+
+    if (!ref) {
+        if (verifiedAccessGranted) return;
+        if (currentUser) {
+            await syncUserFromSupabase();
+            if (currentUser.isSubscribed) {
+                grantVerifiedAccess();
+                initGlobalViewRouter();
+            }
+        }
+        return;
+    }
+
+    maketouVerifyInFlight = true;
+    try {
+        const result = await fetchMaketouVerification(ref);
+        const paid = Boolean(result && result.access === true && result.token);
+        if (paid) {
+            clearMaketouReturnUrl();
+            await activateMaketouLicense(result.cartId || ref, result.token);
+            return;
+        }
+        if (returnHint) {
+            if (verifiedAccessGranted) {
+                clearMaketouReturnUrl();
+                return;
+            }
+            denyPaymentAccess("Paiement non confirmé. L'accès reste bloqué.");
+        }
+    } finally {
+        maketouVerifyInFlight = false;
     }
 }
 
@@ -2492,6 +2631,7 @@ function initMasterAdminDashboard() {
             saveUsersDb(usersDb);
             if (currentUser && (currentUser.uniqueId === targetId || currentUser.email?.toUpperCase() === targetId)) {
                 currentUser.isSubscribed = true;
+                grantVerifiedAccess();
                 writeJson(CONFIG.sessionKey, currentUser);
                 initGlobalViewRouter();
             }
@@ -2520,6 +2660,7 @@ function initMasterAdminDashboard() {
             if (currentUser) {
                 currentUser.isSubscribed = true;
                 currentUser.uniqueId = targetId;
+                grantVerifiedAccess();
                 writeJson(CONFIG.sessionKey, currentUser);
                 initGlobalViewRouter();
             }
@@ -2606,6 +2747,8 @@ window.adminToggleUser = async function (email, status) {
 
         if (currentUser && currentUser.email === email) {
             currentUser.isSubscribed = status;
+            if (status) grantVerifiedAccess();
+            else revokeVerifiedAccess();
             writeJson(CONFIG.sessionKey, currentUser);
             initGlobalViewRouter();
         }

@@ -1,69 +1,47 @@
 <?php
 error_reporting(0);
 ini_set("display_errors", "0");
+require_once __DIR__ . "/maketou-config.php";
 
 header("Content-Type: application/json; charset=utf-8");
 header("Cache-Control: no-store");
 
-if (($_SERVER["REQUEST_METHOD"] ?? "") !== "POST") {
+if (strtoupper((string) ($_SERVER["REQUEST_METHOD"] ?? "")) !== "POST") {
     http_response_code(405);
-    echo json_encode(["error" => "method_not_allowed"]);
+    echo json_encode(["error" => "method_not_allowed", "access" => false]);
     exit;
 }
 
 $body = json_decode((string) file_get_contents("php://input"), true);
 if (!is_array($body)) {
-    $body = $_POST;
-}
-if (!is_array($body)) {
-    $body = [];
+    $body = is_array($_POST) ? $_POST : [];
 }
 
-$email = trim((string) (
-    $body["email"]
-    ?? ($body["customerInfo"]["email"] ?? "")
-    ?? ($body["customer"]["email"] ?? "")
-    ?? ($body["data"]["email"] ?? "")
-    ?? ($body["data"]["customerInfo"]["email"] ?? "")
-    ?? ""
-));
-$status = strtolower((string) (
-    $body["status"]
-    ?? ($body["data"]["status"] ?? "")
-    ?? ($body["event"] ?? "")
-    ?? ""
-));
-$email = strtolower($email);
-
-$paid = in_array($status, ["completed", "success", "successful", "paid", "payment.completed", ""], true);
-if ($email === "" || !$paid) {
+$ref = maketou_extract_ref($body);
+$email = maketou_extract_email($body);
+if ($ref === "") {
     http_response_code(400);
-    echo json_encode(["error" => "ignored"]);
+    echo json_encode(["error" => "missing_ref", "access" => false]);
     exit;
 }
 
-$supabaseUrl = "https://tnxyrvjrxxrsqnpviknz.supabase.co";
-$supabaseKey = "sb_publishable_Hl6nmMnRAM1mfdDdudH2_w_kYIJAXdF";
-$payload = json_encode(["is_subscribed" => true]);
-$url = $supabaseUrl . "/rest/v1/users?email=eq." . rawurlencode($email);
-$headers = [
-    "apikey: " . $supabaseKey,
-    "Authorization: Bearer " . $supabaseKey,
-    "Content-Type: application/json",
-    "Prefer: return=minimal"
-];
+[$paid, $cartStatus, $data] = maketou_verify_ref_with_api($ref);
+$cartEmail = maketou_extract_email($data);
+$useEmail = $cartEmail !== "" ? $cartEmail : $email;
 
-if (function_exists("curl_init")) {
-    $ch = curl_init($url);
-    curl_setopt_array($ch, [
-        CURLOPT_CUSTOMREQUEST => "PATCH",
-        CURLOPT_POSTFIELDS => $payload,
-        CURLOPT_HTTPHEADER => $headers,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT => 20
+if (!$paid) {
+    echo json_encode([
+        "ok" => false,
+        "status" => $cartStatus !== "" ? $cartStatus : "unpaid",
+        "access" => false
     ]);
-    curl_exec($ch);
-    curl_close($ch);
+    exit;
 }
 
-echo json_encode(["ok" => true]);
+maketou_mark_supabase_paid($useEmail);
+echo json_encode([
+    "ok" => true,
+    "status" => "paid",
+    "access" => true,
+    "cartId" => $ref
+]);

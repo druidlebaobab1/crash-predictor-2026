@@ -1,5 +1,9 @@
+import base64
+import hashlib
+import hmac
 import json
 import os
+import time
 import urllib.error
 import urllib.request
 import webbrowser
@@ -110,10 +114,25 @@ class Handler(SimpleHTTPRequestHandler):
         if path == "/api/health":
             json_response(self, 200, {"ok": True, "service": "crash-predictor-2026"})
             return
-        if path == "/api/maketou-status":
+        if path in ("/api/maketou-status", "/api/maketou-checkout"):
             params = parse_qs(query)
-            cart_id = unquote((params.get("cartId") or [""])[0])
-            status, payload = read_maketou_status(cart_id)
+            action = unquote((params.get("action") or [""])[0]).lower()
+            if action == "session" or (params.get("token") and action != "verify"):
+                token = unquote((params.get("token") or params.get("access_token") or [""])[0])
+                session = read_maketou_token(token)
+                if not session:
+                    json_response(self, 401, {"status": "invalid_token", "access": False, "completed": False})
+                    return
+                json_response(self, 200, {
+                    "status": "paid",
+                    "access": True,
+                    "completed": True,
+                    "cartId": str(session.get("r") or ""),
+                })
+                return
+            cart_id = unquote((params.get("ref") or params.get("cartId") or [""])[0])
+            email = unquote((params.get("email") or [""])[0])
+            status, payload = read_maketou_status(cart_id, email)
             json_response(self, status, payload)
             return
         super().do_GET()
@@ -207,7 +226,7 @@ def create_maketou_checkout(body, host_url):
         "email": email,
         "firstName": first_name,
         "lastName": last_name,
-        "redirectURL": host_url,
+        "redirectURL": "https://crashpredictor.fr/?payment=success&status=approved",
         "meta": {
             "userId": unique_id,
             "source": "website",
@@ -237,25 +256,119 @@ def create_maketou_checkout(body, host_url):
     return int(status or 502), {"error": "checkout_failed"}
 
 
-def read_maketou_status(cart_id):
+def b64url_encode(raw):
+    return base64.urlsafe_b64encode(raw).decode("ascii").rstrip("=")
+
+
+def b64url_decode(value):
+    padding = "=" * (-len(value) % 4)
+    return base64.urlsafe_b64decode(value + padding)
+
+
+def issue_maketou_token(ref, email=""):
+    payload = json.dumps(
+        {
+            "r": ref,
+            "e": str(email or "").lower(),
+            "iat": int(time.time()),
+            "exp": int(time.time()) + 45 * 24 * 3600,
+            "v": 1,
+        },
+        separators=(",", ":"),
+    )
+    body = b64url_encode(payload.encode("utf-8"))
+    signature = hmac.new(
+        maketou_api_key().encode("utf-8"),
+        body.encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest()
+    return f"{body}.{signature}"
+
+
+def read_maketou_token(token):
+    token = str(token or "").strip()
+    parts = token.split(".")
+    if len(parts) != 2 or not parts[0] or not parts[1]:
+        return None
+    expected = hmac.new(
+        maketou_api_key().encode("utf-8"),
+        parts[0].encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest()
+    if not hmac.compare_digest(expected, parts[1]):
+        return None
+    try:
+        data = json.loads(b64url_decode(parts[0]).decode("utf-8"))
+    except (ValueError, json.JSONDecodeError, UnicodeDecodeError):
+        return None
+    if not isinstance(data, dict) or int(data.get("exp") or 0) < int(time.time()):
+        return None
+    return data
+
+
+def extract_maketou_status(data):
+    if not isinstance(data, dict):
+        return ""
+    cart = data.get("cart") if isinstance(data.get("cart"), dict) else {}
+    nested = data.get("data") if isinstance(data.get("data"), dict) else {}
+    for value in (
+        data.get("status"),
+        cart.get("status"),
+        nested.get("status"),
+        data.get("paymentStatus"),
+        data.get("payment_status"),
+    ):
+        if value:
+            return str(value)
+    return ""
+
+
+def extract_maketou_email(data):
+    if not isinstance(data, dict):
+        return ""
+    cart = data.get("cart") if isinstance(data.get("cart"), dict) else {}
+    customer = cart.get("customerInfo") if isinstance(cart.get("customerInfo"), dict) else {}
+    for value in (data.get("email"), customer.get("email"), cart.get("email")):
+        email = str(value or "").strip().lower()
+        if "@" in email:
+            return email
+    return ""
+
+
+def read_maketou_status(cart_id, email=""):
     if not cart_id:
-        return 400, {"error": "missing_cart"}
+        return 400, {"status": "missing_ref", "access": False, "completed": False}
     status, data = maketou_request(
         "GET",
         f"{MAKETOU_API_BASE}/api/v1/stores/cart/{cart_id}",
     )
     if status is None:
-        return 503, data
-    cart_status = ""
-    if isinstance(data, dict):
-        cart_status = str(data.get("status") or "")
+        return 502, {"status": "network_error", "access": False, "completed": False}
+    cart_status = extract_maketou_status(data) if isinstance(data, dict) else ""
+    paid = 200 <= int(status or 0) < 300 and cart_status.lower() in {
+        "completed", "paid", "success", "successful", "approved", "succeeded"
+    }
+    cart_email = extract_maketou_email(data) if isinstance(data, dict) else ""
+    request_email = str(email or "").strip().lower()
+    if paid and cart_email and request_email and cart_email != request_email:
+        return 403, {"status": "email_mismatch", "access": False, "completed": False}
+    if paid:
+        use_email = request_email or cart_email
+        return 200, {
+            "status": "paid",
+            "access": True,
+            "completed": True,
+            "cartId": cart_id,
+            "token": issue_maketou_token(cart_id, use_email),
+        }
     if 200 <= int(status or 0) < 300:
         return 200, {
-            "status": cart_status,
-            "completed": cart_status == "completed",
+            "status": cart_status or "unpaid",
+            "access": False,
+            "completed": False,
             "cartId": cart_id,
         }
-    return int(status or 502), {"error": "status_failed"}
+    return int(status or 502), {"status": "status_failed", "access": False, "completed": False}
 
 
 if __name__ == "__main__":
