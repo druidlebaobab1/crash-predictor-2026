@@ -2154,12 +2154,35 @@ function splitCustomerName(fullName) {
     };
 }
 
+function maketouEndpoint(fileName, query) {
+    const origin = window.location.origin;
+    const folder = window.location.pathname.replace(/[^/]+$/, "");
+    const q = query ? `?${query}` : "";
+    return [
+        `${origin}${folder}index.php?action=${fileName === "maketou-status.php" ? "maketou_status" : "maketou_checkout"}${query ? `&${query}` : ""}`,
+        `${origin}${folder}${fileName}${q}`,
+        `${origin}/${fileName}${q}`,
+        `/api/${fileName === "maketou-status.php" ? "maketou-status" : "maketou-checkout"}${q}`
+    ];
+}
+
+function extractMaketouRedirect(data) {
+    if (!data || typeof data !== "object") return "";
+    return data.redirectUrl || data.redirect_url || data.checkoutUrl || data.checkout_url
+        || (data.data && (data.data.redirectUrl || data.data.redirect_url))
+        || "";
+}
+
 async function requestMaketouJson(paths, options) {
     for (let i = 0; i < paths.length; i++) {
         try {
             const response = await fetch(paths[i], options);
-            if (!response.ok) continue;
-            return await response.json();
+            const text = await response.text();
+            let data = null;
+            try { data = JSON.parse(text); } catch { continue; }
+            if (data && (extractMaketouRedirect(data) || data.status || data.completed === true || data.cartId)) {
+                return data;
+            }
         } catch {}
     }
     return null;
@@ -2181,10 +2204,10 @@ async function startMaketouCheckout() {
     try {
         const names = splitCustomerName(currentUser.name);
         const data = await requestMaketouJson(
-            ["maketou-checkout.php", "/api/maketou-checkout"],
+            maketouEndpoint("maketou-checkout.php"),
             {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json", "Accept": "application/json" },
                 body: JSON.stringify({
                     email: currentUser.email,
                     firstName: names.firstName,
@@ -2195,11 +2218,12 @@ async function startMaketouCheckout() {
             }
         );
 
-        if (data && data.redirectUrl) {
+        const redirectUrl = extractMaketouRedirect(data);
+        if (redirectUrl) {
             if (data.cartId) {
                 try { localStorage.setItem(CONFIG.maketouCartKey, data.cartId); } catch {}
             }
-            window.location.href = data.redirectUrl;
+            window.location.href = redirectUrl;
             return;
         }
 
@@ -2222,7 +2246,7 @@ async function verifyMaketouReturn() {
 
     try {
         const data = await requestMaketouJson(
-            [`maketou-status.php?cartId=${encodeURIComponent(cartId)}`, `/api/maketou-status?cartId=${encodeURIComponent(cartId)}`],
+            maketouEndpoint("maketou-status.php", `cartId=${encodeURIComponent(cartId)}`),
             { method: "GET", cache: "no-store" }
         );
         if (data && data.completed) {

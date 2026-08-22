@@ -1,5 +1,15 @@
 <?php
 // CRASH PREDICTOR 2026 - CHARGEMENT DIRECT DU SITE
+$maketouAction = (string) ($_GET["action"] ?? "");
+if ($maketouAction === "maketou_checkout") {
+    require __DIR__ . "/maketou-checkout.php";
+    exit();
+}
+if ($maketouAction === "maketou_status") {
+    require __DIR__ . "/maketou-status.php";
+    exit();
+}
+
 header("Cache-Control: no-cache, must-revalidate");
 
 $geoCountry = strtoupper((string) (
