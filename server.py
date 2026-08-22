@@ -4,10 +4,13 @@ import urllib.error
 import urllib.request
 import webbrowser
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+from urllib.parse import parse_qs, unquote
 
 PORT = int(os.environ.get("PORT", "8080"))
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 FLUTTERWAVE_VERIFY_URL = "https://api.flutterwave.com/v3/transactions/{transaction_id}/verify"
+MAKETOU_API_BASE = "https://api.maketou.net"
+MAKETOU_PRODUCT_ID = os.environ.get("MAKETOU_PRODUCT_ID", "d307c251-4302-4adf-acce-e69a8dd9951a")
 ALLOWED_AMOUNTS = {
     ("XOF", 30000),
     ("USD", 50),
@@ -103,13 +106,31 @@ class Handler(SimpleHTTPRequestHandler):
         print("[%s] %s" % (self.log_date_time_string(), format % args))
 
     def do_GET(self):
-        if self.path.split("?", 1)[0] == "/api/health":
+        path, _, query = self.path.partition("?")
+        if path == "/api/health":
             json_response(self, 200, {"ok": True, "service": "crash-predictor-2026"})
+            return
+        if path == "/api/maketou-status":
+            params = parse_qs(query)
+            cart_id = unquote((params.get("cartId") or [""])[0])
+            status, payload = read_maketou_status(cart_id)
+            json_response(self, status, payload)
             return
         super().do_GET()
 
     def do_POST(self):
-        if self.path.split("?", 1)[0] != "/api/verify-payment":
+        path = self.path.split("?", 1)[0]
+        if path == "/api/maketou-checkout":
+            body = read_json_body(self)
+            if body is None:
+                json_response(self, 400, {"error": "invalid_json"})
+                return
+            host = self.headers.get("Host", "localhost")
+            proto = "https" if self.headers.get("X-Forwarded-Proto") == "https" else "http"
+            status, payload = create_maketou_checkout(body, f"{proto}://{host}/")
+            json_response(self, status, payload)
+            return
+        if path != "/api/verify-payment":
             json_response(self, 404, {"error": "not_found"})
             return
 
@@ -130,6 +151,111 @@ class Handler(SimpleHTTPRequestHandler):
             return
 
         json_response(self, 200 if result.get("verified") else 200, result)
+
+
+def maketou_api_key():
+    return os.environ.get(
+        "MAKETOU_API_KEY",
+        "msk_11042c8d69a3df9e0ec7bffa592097e18cf6a3c9ef0d4166874d25e0d091073f",
+    ).strip()
+
+
+def maketou_request(method, url, payload=None):
+    secret = maketou_api_key()
+    if not secret:
+        return None, {"error": "secret_key_missing"}
+
+    body = None if payload is None else json.dumps(payload).encode("utf-8")
+    request = urllib.request.Request(
+        url,
+        data=body,
+        headers={
+            "Authorization": f"Bearer {secret}",
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        },
+        method=method,
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=25) as response:
+            raw = response.read().decode("utf-8")
+            status = response.getcode()
+    except urllib.error.HTTPError as error:
+        raw = error.read().decode("utf-8", errors="ignore")
+        status = error.code
+    except urllib.error.URLError:
+        return 502, {"error": "network_error"}
+
+    try:
+        data = json.loads(raw) if raw else {}
+    except json.JSONDecodeError:
+        data = {"error": "invalid_upstream"}
+    return status, data
+
+
+def create_maketou_checkout(body, host_url):
+    email = str(body.get("email") or "").strip()
+    first_name = str(body.get("firstName") or "").strip()
+    last_name = str(body.get("lastName") or "").strip()
+    phone = str(body.get("phone") or "").strip()
+    unique_id = str(body.get("uniqueId") or "").strip()
+    if not email or not first_name or not last_name:
+        return 400, {"error": "missing_fields"}
+
+    payload = {
+        "productDocumentId": MAKETOU_PRODUCT_ID,
+        "email": email,
+        "firstName": first_name,
+        "lastName": last_name,
+        "redirectURL": host_url,
+        "meta": {
+            "userId": unique_id,
+            "source": "website",
+        },
+    }
+    if phone:
+        payload["phone"] = phone
+
+    status, data = maketou_request(
+        "POST",
+        f"{MAKETOU_API_BASE}/api/v1/stores/cart/checkout",
+        payload,
+    )
+    if status is None:
+        return 503, data
+
+    redirect_url = ""
+    cart_id = ""
+    if isinstance(data, dict):
+        redirect_url = str(data.get("redirectUrl") or data.get("redirect_url") or "")
+        cart = data.get("cart") or {}
+        if isinstance(cart, dict):
+            cart_id = str(cart.get("id") or "")
+
+    if 200 <= int(status or 0) < 300 and redirect_url:
+        return 200, {"redirectUrl": redirect_url, "cartId": cart_id}
+    return int(status or 502), {"error": "checkout_failed"}
+
+
+def read_maketou_status(cart_id):
+    if not cart_id:
+        return 400, {"error": "missing_cart"}
+    status, data = maketou_request(
+        "GET",
+        f"{MAKETOU_API_BASE}/api/v1/stores/cart/{cart_id}",
+    )
+    if status is None:
+        return 503, data
+    cart_status = ""
+    if isinstance(data, dict):
+        cart_status = str(data.get("status") or "")
+    if 200 <= int(status or 0) < 300:
+        return 200, {
+            "status": cart_status,
+            "completed": cart_status == "completed",
+            "cartId": cart_id,
+        }
+    return int(status or 502), {"error": "status_failed"}
 
 
 if __name__ == "__main__":

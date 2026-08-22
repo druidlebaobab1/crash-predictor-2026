@@ -19,7 +19,8 @@ const CONFIG = {
     usersDbKey: "crash_users_db_2026",
     guestIdKey: "crash_guest_id_2026",
     timerKey: "crash_timer_start_48h_v4",
-    langKey: "crash_user_lang_pref"
+    langKey: "crash_user_lang_pref",
+    maketouCartKey: "crash_maketou_cart"
 };
 
 // ==========================================================================
@@ -711,6 +712,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initMasterAdminDashboard();
     syncUserFromSupabase();
     subscribeUserRealtime();
+    verifyMaketouReturn();
 });
 
 /* -------------------------------------------------------------------------- */
@@ -1801,7 +1803,7 @@ function initAuthSecurity() {
 
             if (pendingCheckoutAfterAuth) {
                 pendingCheckoutAfterAuth = false;
-                document.getElementById("buyModal")?.classList.add("active");
+                startMaketouCheckout();
             }
         });
     }
@@ -1859,7 +1861,7 @@ function initAuthSecurity() {
 
                     if (pendingCheckoutAfterAuth) {
                         pendingCheckoutAfterAuth = false;
-                        document.getElementById("buyModal")?.classList.add("active");
+                        startMaketouCheckout();
                     }
                     return;
                 }
@@ -1999,7 +2001,7 @@ function initProfileModal() {
             document.getElementById("loginModal")?.classList.add("active");
             return;
         }
-        document.getElementById("buyModal")?.classList.add("active");
+        startMaketouCheckout();
     });
 }
 
@@ -2076,19 +2078,7 @@ function initCheckout() {
     });
 
     function openCheckoutModal() {
-        if (!currentUser) {
-            pendingCheckoutAfterAuth = true;
-            closeAllModals();
-            document.getElementById("loginModal")?.classList.add("active");
-            return;
-        }
-
-        checkoutAuthGate?.classList.add("hidden");
-        checkoutPaymentPanel?.classList.remove("hidden");
-        if (phoneInput && currentUser.phone) {
-            phoneInput.value = currentUser.phone;
-        }
-        buyModal?.classList.add("active");
+        startMaketouCheckout();
     }
 
     directBuyButtons.forEach((btn) => {
@@ -2110,8 +2100,8 @@ function initCheckout() {
         document.getElementById("registerModal")?.classList.add("active");
     });
 
-    btnExecuteMomoPayment?.addEventListener("click", () => launchPayment("mobilemoneyfrancophone"));
-    btnExecuteCardPayment?.addEventListener("click", () => launchPayment("card"));
+    btnExecuteMomoPayment?.addEventListener("click", () => startMaketouCheckout());
+    btnExecuteCardPayment?.addEventListener("click", () => startMaketouCheckout());
 }
 
 function showPaymentOverlay(text = "Connexion sécurisée en cours…") {
@@ -2156,75 +2146,99 @@ async function handlePaymentSuccess(response, currency, amount) {
     showToast("🎉 Félicitations ! Votre cockpit d'analyse est débloqué pour le mois !");
 }
 
-function launchPayment(paymentOption) {
-    if (paymentInFlight) return;
+function splitCustomerName(fullName) {
+    const parts = String(fullName || "Client").trim().split(/\s+/).filter(Boolean);
+    return {
+        firstName: parts[0] || "Client",
+        lastName: parts.slice(1).join(" ") || "Membre"
+    };
+}
 
+async function requestMaketouJson(paths, options) {
+    for (let i = 0; i < paths.length; i++) {
+        try {
+            const response = await fetch(paths[i], options);
+            if (!response.ok) continue;
+            return await response.json();
+        } catch {}
+    }
+    return null;
+}
+
+async function startMaketouCheckout() {
     if (!currentUser) {
-        showToast("Veuillez vous inscrire ou vous connecter pour lier votre licence.", "error");
         pendingCheckoutAfterAuth = true;
-        document.getElementById("buyModal")?.classList.remove("active");
-        document.getElementById("registerModal")?.classList.add("active");
+        closeAllModals();
+        document.getElementById("loginModal")?.classList.add("active");
         return;
     }
 
-    const phoneInput = document.getElementById("checkoutPhoneInput");
-    const rawPhone = phoneInput?.value.trim() || currentUser.phone || "";
-    if (paymentOption === "mobilemoneyfrancophone" && !isValidPhone(rawPhone)) {
-        showToast("Veuillez saisir un numéro Mobile Money valide (8+ chiffres).", "error");
-        phoneInput?.focus();
-        return;
-    }
-
-    if (typeof window.FlutterwaveCheckout !== "function") {
-        showToast("Passerelle de paiement en cours de chargement…", "error");
-        return;
-    }
-
+    if (paymentInFlight) return;
     paymentInFlight = true;
-    showPaymentOverlay("Ouverture de la passerelle sécurisée…");
-
-    const isMomo = paymentOption === "mobilemoneyfrancophone";
-    const amount = isMomo ? CONFIG.licenseXof : CONFIG.licenseUsd;
-    const currency = isMomo ? "XOF" : "USD";
-    const txRef = `CRASH-${currentUser.uniqueId || "USER"}-${Date.now()}`;
+    closeAllModals();
+    showPaymentOverlay();
 
     try {
-        window.FlutterwaveCheckout({
-            public_key: CONFIG.flutterwavePublicKey,
-            tx_ref: txRef,
-            amount,
-            currency,
-            payment_options: paymentOption,
-            customer: {
-                email: currentUser.email,
-                phone_number: digitsOnly(rawPhone) || "0700000000",
-                name: currentUser.name || "Membre Actif"
-            },
-            customizations: {
-                title: "CRASH PREDICTOR 2026",
-                description: isMomo ? `Paiement ${selectedMomoNetwork} — 30 000 FCFA` : "Licence officielle — 50 $",
-                logo: `${window.location.origin}/assets/crash_hd.jpg`
-            },
-            callback: async function (response) {
-                paymentInFlight = false;
-                const status = (response?.status || "").toLowerCase();
-                if (status === "successful" || status === "completed" || response?.transaction_id) {
-                    await handlePaymentSuccess(response, currency, amount);
-                } else {
-                    hidePaymentOverlay();
-                    showToast("Paiement non finalisé.", "error");
-                }
-            },
-            onclose: function () {
-                paymentInFlight = false;
-                hidePaymentOverlay();
+        const names = splitCustomerName(currentUser.name);
+        const data = await requestMaketouJson(
+            ["maketou-checkout.php", "/api/maketou-checkout"],
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    email: currentUser.email,
+                    firstName: names.firstName,
+                    lastName: names.lastName,
+                    phone: currentUser.phone || "",
+                    uniqueId: currentUser.uniqueId || ""
+                })
             }
-        });
+        );
+
+        if (data && data.redirectUrl) {
+            if (data.cartId) {
+                try { localStorage.setItem(CONFIG.maketouCartKey, data.cartId); } catch {}
+            }
+            window.location.href = data.redirectUrl;
+            return;
+        }
+
+        showToast("Impossible d'ouvrir le paiement.", "error");
     } catch {
+        showToast("Impossible d'ouvrir le paiement.", "error");
+    } finally {
         paymentInFlight = false;
         hidePaymentOverlay();
-        showToast("Impossible d'initialiser le paiement.", "error");
     }
+}
+
+async function verifyMaketouReturn() {
+    const params = new URLSearchParams(window.location.search);
+    let cartId = params.get("maketou_cart") || "";
+    if (!cartId) {
+        try { cartId = localStorage.getItem(CONFIG.maketouCartKey) || ""; } catch {}
+    }
+    if (!cartId || !currentUser) return;
+
+    try {
+        const data = await requestMaketouJson(
+            [`maketou-status.php?cartId=${encodeURIComponent(cartId)}`, `/api/maketou-status?cartId=${encodeURIComponent(cartId)}`],
+            { method: "GET", cache: "no-store" }
+        );
+        if (data && data.completed) {
+            try { localStorage.removeItem(CONFIG.maketouCartKey); } catch {}
+            if (params.get("maketou_cart")) {
+                const cleanUrl = window.location.origin + window.location.pathname;
+                window.history.replaceState({}, document.title, cleanUrl);
+            }
+            await handlePaymentSuccess({
+                transaction_id: cartId,
+                tx_ref: cartId,
+                status: "successful",
+                payment_type: "maketou"
+            }, "USD", CONFIG.licenseUsd);
+        }
+    } catch {}
 }
 
 /* -------------------------------------------------------------------------- */
