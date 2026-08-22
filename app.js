@@ -33,6 +33,28 @@ const CONFIG = {
     accessVerifiedKey: "crash_access_v2_verified"
 };
 
+function trackMetaPixel(eventName, params) {
+    try {
+        if (typeof window.fbq === "function") {
+            window.fbq("track", eventName, params || {});
+        }
+    } catch (err) {}
+}
+
+function trackMetaPurchase(orderId) {
+    try {
+        const stamp = String(orderId || "paid");
+        const key = "meta_pixel_purchase_" + stamp;
+        if (sessionStorage.getItem(key) === "1") return;
+        sessionStorage.setItem(key, "1");
+    } catch (err) {}
+    trackMetaPixel("Purchase", {
+        content_name: "Crash Predictor VIP License",
+        value: 50.00,
+        currency: "USD"
+    });
+}
+
 // ==========================================================================
 // DICTIONNAIRE DE TRADUCTION COMPLET (I18N)
 // ==========================================================================
@@ -711,6 +733,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     initUserIdentity();
     await restoreVerifiedAccess();
     initGlobalViewRouter();
+    if (!document.getElementById("publicSiteWrapper")?.classList.contains("hidden")) {
+        trackMetaPixel("ViewContent", {
+            content_name: "Crash Predictor VIP License",
+            content_category: "Software/SaaS",
+            value: 50.00,
+            currency: "USD"
+        });
+    }
     initLiveOnlineUsersTicker();
     initLiveFlashSocialNotifications();
     initGuaranteed48hCountdown();
@@ -2144,6 +2174,7 @@ function initAuthSecurity() {
             closeAllModals();
             regForm.reset();
             showToast(`Compte créé ! Votre ID : ${newUser.uniqueId}`);
+            trackMetaPixel("CompleteRegistration", { status: "success" });
 
             if (pendingCheckoutAfterAuth) {
                 pendingCheckoutAfterAuth = false;
@@ -2675,6 +2706,7 @@ async function fetchMaketouCartStatus(cartId) {
 }
 
 async function activateMaketouLicense(cartId, token) {
+    trackMetaPurchase(cartId || token || "maketou");
     grantVerifiedAccess(token);
     if (!currentUser) {
         initGlobalViewRouter();
@@ -2706,6 +2738,11 @@ function startMaketouPaymentWatch() {
 }
 
 async function startMaketouCheckout() {
+    trackMetaPixel("InitiateCheckout", {
+        content_name: "Crash Predictor VIP License",
+        value: 50.00,
+        currency: "USD"
+    });
     if (!currentUser) {
         pendingCheckoutAfterAuth = true;
         closeAllModals();
@@ -2766,6 +2803,7 @@ async function verifyMaketouReturn() {
                     clearMaketouReturnUrl();
                     initGlobalViewRouter();
                     showToast("🎉 Félicitations ! Votre cockpit d'analyse est débloqué pour le mois !");
+                    trackMetaPurchase("maketou-return");
                     return;
                 }
                 if (i < 2) await new Promise((resolve) => setTimeout(resolve, 1200));
