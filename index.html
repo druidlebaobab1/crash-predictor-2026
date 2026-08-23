@@ -257,6 +257,11 @@
                                 <span data-i18n="btn_buy_instant">Débloquer mon accès complet – 17 $</span>
                             </button>
 
+                            <button type="button" class="btn-referral-free" id="openReferralModalBtn">
+                                <i class="fa-solid fa-gift" aria-hidden="true"></i>
+                                <span>ACTIVER MON ACCÈS GRATUITEMENT</span>
+                            </button>
+
                             <div class="secure-guarantee-footer">
                                 <i class="fa-solid fa-shield-halved text-gold" aria-hidden="true"></i>
                                 <span data-i18n="secure_guarantee">Paiement sécurisé et chiffré • Activation automatique du cockpit</span>
@@ -690,6 +695,42 @@
         </div>
     </div>
 
-    <script src="app.js?v=u45" defer></script>
+    <div class="modal-overlay" id="referralModal">
+        <div class="modal-card referral-modal-card">
+            <button type="button" class="modal-close" id="closeReferralModal" aria-label="Fermer">&times;</button>
+            <div class="modal-header">
+                <div class="modal-icon-badge gold-glow"><i class="fa-solid fa-gift" aria-hidden="true"></i></div>
+                <h3 class="modal-title-big">Accès gratuit</h3>
+            </div>
+            <p class="referral-modal-copy">Partagez votre lien exclusif à vos proches. Dès que 2 amis débloquent leur accès VIP via votre lien, votre propre accès VIP s'active automatiquement et gratuitement pour 30 jours !</p>
+            <div class="referral-progress-box" id="referralProgressBox">
+                <div class="referral-progress-label" id="referralProgressLabel">0 / 2 amis ont activé leur accès</div>
+                <div class="referral-progress-track" aria-hidden="true">
+                    <div class="referral-progress-fill" id="referralProgressFill" style="width: 0%"></div>
+                </div>
+            </div>
+            <div class="referral-link-row">
+                <input type="text" class="form-control-dark" id="referralLinkInput" readonly value="" aria-label="Lien de parrainage">
+                <button type="button" class="btn-referral-copy" id="referralCopyBtn">Copier le lien</button>
+            </div>
+            <p class="referral-login-hint hidden" id="referralLoginHint">Connectez-vous ou créez un compte pour obtenir votre lien exclusif.</p>
+            <div class="referral-share-grid">
+                <a class="referral-share-btn whatsapp" id="referralShareWhatsapp" href="#" target="_blank" rel="noopener noreferrer">
+                    <i class="fa-brands fa-whatsapp" aria-hidden="true"></i> WhatsApp
+                </a>
+                <a class="referral-share-btn telegram" id="referralShareTelegram" href="#" target="_blank" rel="noopener noreferrer">
+                    <i class="fa-brands fa-telegram" aria-hidden="true"></i> Telegram
+                </a>
+                <a class="referral-share-btn facebook" id="referralShareFacebook" href="#" target="_blank" rel="noopener noreferrer">
+                    <i class="fa-brands fa-facebook-f" aria-hidden="true"></i> Facebook
+                </a>
+                <button type="button" class="referral-share-btn native hidden" id="referralShareNative">
+                    <i class="fa-solid fa-share-nodes" aria-hidden="true"></i> Partager
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js?v=u46" defer></script>
 </body>
 </html>

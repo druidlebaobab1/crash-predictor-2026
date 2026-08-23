@@ -83,7 +83,9 @@ function members_public_record($record) {
         "paymentDate" => (string) ($record["paymentDate"] ?? ""),
         "subscriptionExpiresAt" => $expiresAt,
         "vipUntil" => $expiresAt,
-        "lastPaymentRef" => (string) ($record["lastPaymentRef"] ?? "")
+        "lastPaymentRef" => (string) ($record["lastPaymentRef"] ?? ""),
+        "referredBy" => (string) ($record["referredBy"] ?? ""),
+        "paidReferralCount" => (int) ($record["paidReferralCount"] ?? 0)
     ];
 }
 
@@ -144,7 +146,10 @@ if ($method === "POST" && ($action === "save" || $action === "" || $action === "
         "paymentDate" => $paymentDate,
         "subscriptionExpiresAt" => $expiresAt,
         "vipUntil" => $expiresAt,
-        "lastPaymentRef" => $lastPaymentRef
+        "lastPaymentRef" => $lastPaymentRef,
+        "referredBy" => (string) (($existing["referredBy"] ?? "") !== "" ? $existing["referredBy"] : ($body["referredBy"] ?? "")),
+        "paidReferralCount" => (int) ($existing["paidReferralCount"] ?? 0),
+        "creditedFilleuls" => is_array($existing["creditedFilleuls"] ?? null) ? $existing["creditedFilleuls"] : []
     ];
     if (!empty($existing["uniqueId"]) && $incoming["uniqueId"] === "") {
         $incoming["uniqueId"] = $existing["uniqueId"];

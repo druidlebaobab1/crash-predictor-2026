@@ -31,7 +31,8 @@ const CONFIG = {
     userPremiumKey: "user_premium",
     accessTokenKey: "crash_access_token",
     memberIdKey: "user_member_id",
-    accessVerifiedKey: "crash_access_v2_verified"
+    accessVerifiedKey: "crash_access_v2_verified",
+    referralKey: "crash_referral_ref"
 };
 
 function trackMetaPixel(eventName, params) {
@@ -771,6 +772,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     startSubscriptionGuard();
     await verifyMaketouReturn();
     startMaketouPaymentWatch();
+    initReferralSystem();
     initPwaInstall();
     document.addEventListener("visibilitychange", () => {
         if (document.visibilityState === "visible") {
@@ -1359,7 +1361,9 @@ async function persistAccountToServer(user) {
         paymentDate: user.paymentDate || "",
         subscriptionExpiresAt: user.subscriptionExpiresAt || user.vipUntil || "",
         vipUntil: user.subscriptionExpiresAt || user.vipUntil || "",
-        lastPaymentRef: user.lastPaymentRef || ""
+        lastPaymentRef: user.lastPaymentRef || "",
+        referredBy: user.referredBy || "",
+        paidReferralCount: Number(user.paidReferralCount || 0)
     };
     const paths = memberServerPaths(user.email).save;
     for (let i = 0; i < paths.length; i++) {
@@ -1395,7 +1399,9 @@ async function fetchAccountFromServer(email) {
                     paymentDate: data.account.paymentDate || "",
                     subscriptionExpiresAt: data.account.subscriptionExpiresAt || data.account.vipUntil || "",
                     vipUntil: data.account.subscriptionExpiresAt || data.account.vipUntil || "",
-                    lastPaymentRef: data.account.lastPaymentRef || ""
+                    lastPaymentRef: data.account.lastPaymentRef || "",
+                    referredBy: data.account.referredBy || "",
+                    paidReferralCount: Number(data.account.paidReferralCount || 0)
                 };
             }
             if (data && data.ok && data.account === null) continue;
@@ -1452,12 +1458,23 @@ async function upsertUserToSupabase(user) {
         if (user.lastPaymentRef || (existing && existing.last_payment_ref)) {
             row.last_payment_ref = user.lastPaymentRef || existing.last_payment_ref || "";
         }
+        if (user.referredBy || (existing && existing.referred_by)) {
+            row.referred_by = user.referredBy || existing.referred_by || "";
+        }
+        if (typeof user.paidReferralCount !== "undefined" || (existing && typeof existing.paid_referral_count !== "undefined")) {
+            row.paid_referral_count = Math.max(
+                Number(user.paidReferralCount || 0),
+                Number((existing && existing.paid_referral_count) || 0)
+            );
+        }
         const { error } = await supabaseClient.from("users").upsert(row, { onConflict: "email" });
         if (error) {
             delete row.payment_date;
             delete row.subscription_expires_at;
             delete row.vip_until;
             delete row.last_payment_ref;
+            delete row.referred_by;
+            delete row.paid_referral_count;
             await supabaseClient.from("users").upsert(row, { onConflict: "email" });
         }
     } catch {}
@@ -1493,7 +1510,9 @@ async function findAccountByEmail(email) {
                         data.subscription_expires_at || data.vip_until || "",
                         (remote && (remote.subscriptionExpiresAt || remote.vipUntil)) || (local && (local.subscriptionExpiresAt || local.vipUntil)) || ""
                     ),
-                    lastPaymentRef: data.last_payment_ref || (remote && remote.lastPaymentRef) || (local && local.lastPaymentRef) || ""
+                    lastPaymentRef: data.last_payment_ref || (remote && remote.lastPaymentRef) || (local && local.lastPaymentRef) || "",
+                    referredBy: data.referred_by || (remote && remote.referredBy) || (local && local.referredBy) || "",
+                    paidReferralCount: Number(data.paid_referral_count || (remote && remote.paidReferralCount) || (local && local.paidReferralCount) || 0)
                 };
                 remote.vipUntil = remote.subscriptionExpiresAt;
             }
@@ -2508,8 +2527,13 @@ function initAuthSecurity() {
                 phone: "",
                 passwordHash,
                 isSubscribed: false,
-                registeredAt: new Date().toLocaleDateString("fr-FR")
+                registeredAt: new Date().toLocaleDateString("fr-FR"),
+                referredBy: readStoredReferralCode(),
+                paidReferralCount: 0
             };
+            if (newUser.referredBy && newUser.referredBy === newUser.uniqueId) {
+                newUser.referredBy = "";
+            }
 
             await saveUserSession(newUser, true);
             if (supabaseClient) {
@@ -3468,4 +3492,147 @@ function showToast(message, type = "success") {
         toast.style.transition = "all 0.3s ease";
         setTimeout(() => toast.remove(), 300);
     }, 4200);
+}
+
+function normalizeReferralCode(value) {
+    return formatMemberId(value);
+}
+
+function captureReferralCode() {
+    try {
+        const params = new URLSearchParams(window.location.search);
+        const incoming = normalizeReferralCode(params.get("ref") || "");
+        if (!incoming) return;
+        const ownId = formatMemberId((currentUser && currentUser.uniqueId) || readPersistedMemberId());
+        if (ownId && incoming === ownId) return;
+        if (!localStorage.getItem(CONFIG.referralKey)) {
+            localStorage.setItem(CONFIG.referralKey, incoming);
+        }
+        document.cookie = `crash_ref=${encodeURIComponent(incoming)};path=/;max-age=${60 * 24 * 3600};SameSite=Lax`;
+    } catch {}
+}
+
+function readStoredReferralCode() {
+    try {
+        const stored = normalizeReferralCode(localStorage.getItem(CONFIG.referralKey) || "");
+        if (stored) return stored;
+    } catch {}
+    try {
+        const match = document.cookie.match(/(?:^|; )crash_ref=([^;]*)/);
+        if (match && match[1]) return normalizeReferralCode(decodeURIComponent(match[1]));
+    } catch {}
+    return "";
+}
+
+function buildReferralLink(memberId) {
+    const id = normalizeReferralCode(memberId);
+    const url = new URL(window.location.origin + window.location.pathname);
+    if (id) url.searchParams.set("ref", id);
+    return url.toString();
+}
+
+function referralShareMessage(link) {
+    return `Crash Predictor 2026 — débloque ton accès VIP ici : ${link}`;
+}
+
+function updateReferralProgress(count) {
+    const safeCount = Math.max(0, Number(count) || 0);
+    const current = safeCount % 2;
+    const label = document.getElementById("referralProgressLabel");
+    const fill = document.getElementById("referralProgressFill");
+    if (label) label.textContent = `${current} / 2 amis ont activé leur accès`;
+    if (fill) fill.style.width = `${(current / 2) * 100}%`;
+}
+
+function bindReferralShareLinks(link) {
+    const message = referralShareMessage(link);
+    const whatsapp = document.getElementById("referralShareWhatsapp");
+    const telegram = document.getElementById("referralShareTelegram");
+    const facebook = document.getElementById("referralShareFacebook");
+    if (whatsapp) whatsapp.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+    if (telegram) telegram.href = `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(message)}`;
+    if (facebook) facebook.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`;
+}
+
+async function refreshReferralModal() {
+    const memberId = displayMemberId();
+    const linkInput = document.getElementById("referralLinkInput");
+    const loginHint = document.getElementById("referralLoginHint");
+    const copyBtn = document.getElementById("referralCopyBtn");
+    let count = Number((currentUser && currentUser.paidReferralCount) || 0);
+    if (currentUser && currentUser.email) {
+        try {
+            const remote = await fetchAccountFromServer(currentUser.email);
+            if (remote) {
+                count = Number(remote.paidReferralCount || 0);
+                currentUser.paidReferralCount = count;
+                if (remote.referredBy && !currentUser.referredBy) currentUser.referredBy = remote.referredBy;
+            }
+        } catch {}
+    }
+    updateReferralProgress(count);
+    if (memberId) {
+        const link = buildReferralLink(memberId);
+        if (linkInput) linkInput.value = link;
+        if (copyBtn) copyBtn.disabled = false;
+        loginHint?.classList.add("hidden");
+        bindReferralShareLinks(link);
+    } else {
+        if (linkInput) linkInput.value = "";
+        if (copyBtn) copyBtn.disabled = true;
+        loginHint?.classList.remove("hidden");
+        bindReferralShareLinks(window.location.origin + window.location.pathname);
+    }
+}
+
+function initReferralSystem() {
+    captureReferralCode();
+    const openBtn = document.getElementById("openReferralModalBtn");
+    const modal = document.getElementById("referralModal");
+    const closeBtn = document.getElementById("closeReferralModal");
+    const copyBtn = document.getElementById("referralCopyBtn");
+    const nativeBtn = document.getElementById("referralShareNative");
+
+    openBtn?.addEventListener("click", async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        modal?.classList.add("active");
+        await refreshReferralModal();
+    });
+    closeBtn?.addEventListener("click", () => modal?.classList.remove("active"));
+
+    copyBtn?.addEventListener("click", async () => {
+        const link = document.getElementById("referralLinkInput")?.value || "";
+        if (!link) {
+            document.getElementById("loginModal")?.classList.add("active");
+            return;
+        }
+        try {
+            await navigator.clipboard.writeText(link);
+        } catch {
+            const input = document.getElementById("referralLinkInput");
+            input?.select();
+            document.execCommand("copy");
+        }
+        copyBtn.textContent = "Copié !";
+        copyBtn.classList.add("is-copied");
+        setTimeout(() => {
+            copyBtn.textContent = "Copier le lien";
+            copyBtn.classList.remove("is-copied");
+        }, 1800);
+    });
+
+    if (nativeBtn && typeof navigator.share === "function") {
+        nativeBtn.classList.remove("hidden");
+        nativeBtn.addEventListener("click", async () => {
+            const link = document.getElementById("referralLinkInput")?.value || buildReferralLink(displayMemberId());
+            try {
+                await navigator.share({
+                    title: "Crash Predictor 2026",
+                    text: referralShareMessage(link),
+                    url: link
+                });
+            } catch {}
+        });
+    }
 }

@@ -367,10 +367,10 @@ function maketou_supabase_fetch_user($email = "", $uniqueId = "") {
     $uniqueId = trim((string) $uniqueId);
     $queries = [];
     if ($email !== "" && strpos($email, "@") !== false) {
-        $queries[] = "/rest/v1/users?select=email,unique_id,is_subscribed,payment_date,subscription_expires_at,vip_until,last_payment_ref&email=eq." . rawurlencode($email);
+        $queries[] = "/rest/v1/users?select=email,unique_id,is_subscribed,payment_date,subscription_expires_at,vip_until,last_payment_ref,referred_by,paid_referral_count&email=eq." . rawurlencode($email);
     }
     if ($uniqueId !== "") {
-        $queries[] = "/rest/v1/users?select=email,unique_id,is_subscribed,payment_date,subscription_expires_at,vip_until,last_payment_ref&unique_id=eq." . rawurlencode($uniqueId);
+        $queries[] = "/rest/v1/users?select=email,unique_id,is_subscribed,payment_date,subscription_expires_at,vip_until,last_payment_ref,referred_by,paid_referral_count&unique_id=eq." . rawurlencode($uniqueId);
     }
     foreach ($queries as $path) {
         [$status, $body] = maketou_supabase_http("GET", $path);
@@ -675,9 +675,110 @@ function maketou_activate_paid_account($ref, $requestEmail, $data = []) {
     } elseif ($uniqueId !== "") {
         maketou_apply_supabase_subscription("", $uniqueId, $ref, $expiresAt, $paymentDate);
     }
+    maketou_credit_referral_on_payment($email, $uniqueId);
     return [
         "email" => $email,
         "expiresAt" => $expiresAt,
         "paymentDate" => $paymentDate
     ];
+}
+
+function maketou_normalize_member_id($value) {
+    $value = strtoupper(trim((string) $value));
+    if (preg_match("/CRASH-(\d{7})/", $value, $match)) {
+        $n = (int) $match[1];
+        if ($n >= 5000000 && $n <= 9999999) {
+            return "CRASH-" . $match[1];
+        }
+    }
+    if (preg_match("/^(\d{7})$/", $value, $match)) {
+        $n = (int) $match[1];
+        if ($n >= 5000000 && $n <= 9999999) {
+            return "CRASH-" . $match[1];
+        }
+    }
+    return "";
+}
+
+function maketou_find_member_record_by_unique_id($uniqueId) {
+    $uniqueId = maketou_normalize_member_id($uniqueId);
+    if ($uniqueId === "") {
+        return [null, null];
+    }
+    $file = maketou_members_file();
+    if (!is_file($file)) {
+        return [null, null];
+    }
+    $members = json_decode((string) @file_get_contents($file), true);
+    if (!is_array($members)) {
+        return [null, null];
+    }
+    foreach ($members as $email => $record) {
+        if (!is_array($record)) {
+            continue;
+        }
+        if (maketou_normalize_member_id($record["uniqueId"] ?? "") === $uniqueId) {
+            return [strtolower(trim((string) ($record["email"] ?? $email))), $record];
+        }
+    }
+    return [null, null];
+}
+
+function maketou_credit_referral_on_payment($filleulEmail, $filleulUniqueId) {
+    $filleulEmail = strtolower(trim((string) $filleulEmail));
+    $filleulId = maketou_normalize_member_id($filleulUniqueId);
+    $filleul = $filleulEmail !== "" ? maketou_read_local_member($filleulEmail) : null;
+    $sponsorId = "";
+    if (is_array($filleul)) {
+        $sponsorId = maketou_normalize_member_id($filleul["referredBy"] ?? "");
+    }
+    if ($sponsorId === "") {
+        $cloud = maketou_supabase_fetch_user($filleulEmail, $filleulId);
+        if (is_array($cloud)) {
+            $sponsorId = maketou_normalize_member_id($cloud["referred_by"] ?? "");
+        }
+    }
+    if ($sponsorId === "" || ($filleulId !== "" && $sponsorId === $filleulId)) {
+        return;
+    }
+
+    [$sponsorEmail, $sponsor] = maketou_find_member_record_by_unique_id($sponsorId);
+    if ($sponsorEmail === null || !is_array($sponsor)) {
+        return;
+    }
+    if ($filleulEmail !== "" && strcasecmp($sponsorEmail, $filleulEmail) === 0) {
+        return;
+    }
+
+    $credited = $sponsor["creditedFilleuls"] ?? [];
+    if (!is_array($credited)) {
+        $credited = [];
+    }
+    foreach ([$filleulEmail, $filleulId] as $key) {
+        if ($key !== "" && in_array($key, $credited, true)) {
+            return;
+        }
+    }
+    if ($filleulEmail !== "") {
+        $credited[] = $filleulEmail;
+    } elseif ($filleulId !== "") {
+        $credited[] = $filleulId;
+    }
+
+    $count = (int) ($sponsor["paidReferralCount"] ?? 0) + 1;
+    $sponsor["paidReferralCount"] = $count;
+    $sponsor["creditedFilleuls"] = $credited;
+    maketou_write_local_member($sponsorEmail, $sponsor);
+
+    if ($count > 0 && $count % 2 === 0) {
+        $state = maketou_collect_subscription_state($sponsorEmail, $sponsorId);
+        [, $expiresAt] = maketou_next_expiry_iso($state["expiresAt"], "", "referral-" . $count);
+        $paymentDate = maketou_now_iso();
+        maketou_apply_local_subscription($sponsorEmail, "referral-" . $count, $expiresAt, $paymentDate);
+        maketou_apply_supabase_subscription($sponsorEmail, $sponsorId, "referral-" . $count, $expiresAt, $paymentDate);
+    }
+
+    maketou_supabase_http("PATCH", "/rest/v1/users?email=eq." . rawurlencode($sponsorEmail), [
+        "paid_referral_count" => $count
+    ]);
 }

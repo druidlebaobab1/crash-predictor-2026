@@ -26,6 +26,8 @@ alter table public.users add column if not exists payment_date timestamptz;
 alter table public.users add column if not exists subscription_expires_at timestamptz;
 alter table public.users add column if not exists vip_until timestamptz;
 alter table public.users add column if not exists last_payment_ref text default '';
+alter table public.users add column if not exists referred_by text default '';
+alter table public.users add column if not exists paid_referral_count integer default 0;
 
 create index if not exists users_subscription_expires_idx on public.users (subscription_expires_at);
 
