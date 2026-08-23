@@ -4,8 +4,8 @@ if (basename((string) ($_SERVER["SCRIPT_FILENAME"] ?? "")) === "maketou-config.p
     exit;
 }
 
-define("MAKETOU_API_KEY", "msk_11042c8d69a3df9e0ec7bffa592097e18cf6a3c9ef0d4166874d25e0d091073f");
-define("MAKETOU_PRODUCT_ID", "d307c251-4302-4adf-acce-e69a8dd9951a");
+define("MAKETOU_API_KEY", "msk_34a43139cb75fcfd894088d0e618f14fda606ab398769436fb31c342842a8f37");
+define("MAKETOU_PRODUCT_ID", "9f5842bc-8ece-4012-8f24-81761d32a4b8");
 define("MAKETOU_API_BASE", "https://api.maketou.net");
 define("MAKETOU_SUCCESS_URL", "https://crashpredictor.fr/?payment=success&status=approved");
 define("MAKETOU_TOKEN_TTL", 45 * 24 * 3600);

@@ -14,10 +14,10 @@ PORT = int(os.environ.get("PORT", "8080"))
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 FLUTTERWAVE_VERIFY_URL = "https://api.flutterwave.com/v3/transactions/{transaction_id}/verify"
 MAKETOU_API_BASE = "https://api.maketou.net"
-MAKETOU_PRODUCT_ID = os.environ.get("MAKETOU_PRODUCT_ID", "d307c251-4302-4adf-acce-e69a8dd9951a")
+MAKETOU_PRODUCT_ID = os.environ.get("MAKETOU_PRODUCT_ID", "9f5842bc-8ece-4012-8f24-81761d32a4b8")
 ALLOWED_AMOUNTS = {
-    ("XOF", 30000),
-    ("USD", 50),
+    ("XOF", 10200),
+    ("USD", 17),
 }
 
 
@@ -175,7 +175,7 @@ class Handler(SimpleHTTPRequestHandler):
 def maketou_api_key():
     return os.environ.get(
         "MAKETOU_API_KEY",
-        "msk_11042c8d69a3df9e0ec7bffa592097e18cf6a3c9ef0d4166874d25e0d091073f",
+        "msk_34a43139cb75fcfd894088d0e618f14fda606ab398769436fb31c342842a8f37",
     ).strip()
 
 
