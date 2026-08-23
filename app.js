@@ -3532,7 +3532,7 @@ function buildReferralLink(memberId) {
 }
 
 function referralShareMessage(link) {
-    return `Crash Predictor 2026 — débloque ton accès VIP ici : ${link}`;
+    return `Crash Predictor 2026 — débloque ton accès ici : ${link}`;
 }
 
 function updateReferralProgress(count) {
@@ -3540,17 +3540,15 @@ function updateReferralProgress(count) {
     const current = safeCount % 2;
     const label = document.getElementById("referralProgressLabel");
     const fill = document.getElementById("referralProgressFill");
-    if (label) label.textContent = `${current} / 2 amis ont activé leur accès`;
+    if (label) label.textContent = `Progression : ${current} / 2 amis activés`;
     if (fill) fill.style.width = `${(current / 2) * 100}%`;
 }
 
 function bindReferralShareLinks(link) {
     const message = referralShareMessage(link);
     const whatsapp = document.getElementById("referralShareWhatsapp");
-    const telegram = document.getElementById("referralShareTelegram");
     const facebook = document.getElementById("referralShareFacebook");
     if (whatsapp) whatsapp.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
-    if (telegram) telegram.href = `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(message)}`;
     if (facebook) facebook.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`;
 }
 
@@ -3614,7 +3612,7 @@ function initReferralSystem() {
             input?.select();
             document.execCommand("copy");
         }
-        copyBtn.textContent = "Copié !";
+        copyBtn.textContent = "Lien copié !";
         copyBtn.classList.add("is-copied");
         setTimeout(() => {
             copyBtn.textContent = "Copier le lien";
@@ -3622,17 +3620,21 @@ function initReferralSystem() {
         }, 1800);
     });
 
-    if (nativeBtn && typeof navigator.share === "function") {
-        nativeBtn.classList.remove("hidden");
-        nativeBtn.addEventListener("click", async () => {
-            const link = document.getElementById("referralLinkInput")?.value || buildReferralLink(displayMemberId());
+    nativeBtn?.addEventListener("click", async () => {
+        const link = document.getElementById("referralLinkInput")?.value || buildReferralLink(displayMemberId());
+        if (typeof navigator.share === "function") {
             try {
                 await navigator.share({
                     title: "Crash Predictor 2026",
                     text: referralShareMessage(link),
                     url: link
                 });
+                return;
             } catch {}
-        });
-    }
+        }
+        if (link) {
+            try { await navigator.clipboard.writeText(link); } catch {}
+            showToast("Lien copié !");
+        }
+    });
 }
