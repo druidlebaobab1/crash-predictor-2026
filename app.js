@@ -15,6 +15,7 @@ const CONFIG = {
     adminSecret: "ADMIN2026",
     licenseUsd: 17,
     licenseXof: 10200,
+    subscriptionDays: 30,
     sessionKey: "crash_predictor_user_2026",
     usersDbKey: "crash_users_db_2026",
     guestIdKey: "crash_guest_id_2026",
@@ -64,7 +65,10 @@ const TRANSLATIONS = {
         ticker_live: "EN DIRECT",
         ticker_sub: "utilisateurs connectées sur le site crashpredictor.fr",
         alert_unsubscribed: "<strong>ACCÈS NON ACTIVÉ :</strong> activez votre licence pour ouvrir le cockpit.",
+        alert_expired: "<strong>ABONNEMENT EXPIRÉ :</strong> renouvelez votre accès mensuel à 17 $.",
         btn_alert_unlock: "Débloquer l'accès – 17 $",
+        btn_alert_renew: "Renouveler l'accès – 17 $",
+        toast_expired: "Votre abonnement de 30 jours est expiré. Renouvelez à 17 $.",
         badge_edition: "ÉDITION 2026",
         nav_login: "Connexion",
         nav_register: "Inscription",
@@ -168,7 +172,10 @@ const TRANSLATIONS = {
         ticker_live: "LIVE",
         ticker_sub: "users connected on crashpredictor.fr",
         alert_unsubscribed: "<strong>ACCESS NOT ACTIVATED:</strong> activate your license to open the cockpit.",
+        alert_expired: "<strong>SUBSCRIPTION EXPIRED:</strong> renew your monthly access for $17.",
         btn_alert_unlock: "Unlock Access – $17",
+        btn_alert_renew: "Renew Access – $17",
+        toast_expired: "Your 30-day subscription has expired. Renew for $17.",
         badge_edition: "2026 EDITION",
         nav_login: "Login",
         nav_register: "Sign Up",
@@ -272,7 +279,10 @@ const TRANSLATIONS = {
         ticker_live: "EN VIVO",
         ticker_sub: "usuarios conectados en crashpredictor.fr",
         alert_unsubscribed: "<strong>ACCESO NO ACTIVADO:</strong> active su licencia para abrir el cockpit.",
+        alert_expired: "<strong>SUSCRIPCIÓN CADUCADA:</strong> renueve su acceso mensual por 17 $.",
         btn_alert_unlock: "Desbloquear Acceso – 17 $",
+        btn_alert_renew: "Renovar acceso – 17 $",
+        toast_expired: "Su suscripción de 30 días ha caducado. Renueve por 17 $.",
         badge_edition: "EDICIÓN 2026",
         nav_login: "Iniciar Sesión",
         nav_register: "Registrarse",
@@ -376,7 +386,10 @@ const TRANSLATIONS = {
         ticker_live: "AO VIVO",
         ticker_sub: "utilizadores ligados em crashpredictor.fr",
         alert_unsubscribed: "<strong>ACESSO NÃO ATIVADO:</strong> ative sua licença para abrir o cockpit.",
+        alert_expired: "<strong>ASSINATURA EXPIRADA:</strong> renove o seu acesso mensal por 17 $.",
         btn_alert_unlock: "Desbloquear Acesso – 17 $",
+        btn_alert_renew: "Renovar acesso – 17 $",
+        toast_expired: "A sua assinatura de 30 dias expirou. Renove por 17 $.",
         badge_edition: "EDIÇÃO 2026",
         nav_login: "Entrar",
         nav_register: "Registar",
@@ -480,7 +493,10 @@ const TRANSLATIONS = {
         ticker_live: "LIVE",
         ticker_sub: "Nutzer verbunden auf crashpredictor.fr",
         alert_unsubscribed: "<strong>ZUGANG NICHT AKTIV:</strong> Aktivieren Sie Ihre Lizenz, um das Cockpit zu öffnen.",
+        alert_expired: "<strong>ABO ABGELAUFEN:</strong> verlängern Sie Ihren monatlichen Zugang für 17 $.",
         btn_alert_unlock: "Zugang freischalten – 17 $",
+        btn_alert_renew: "Zugang verlängern – 17 $",
+        toast_expired: "Ihr 30-Tage-Abo ist abgelaufen. Verlängern Sie für 17 $.",
         badge_edition: "EDITION 2026",
         nav_login: "Anmelden",
         nav_register: "Registrieren",
@@ -752,6 +768,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     initCheckout();
     initMasterAdminDashboard();
     subscribeUserRealtime();
+    startSubscriptionGuard();
     await verifyMaketouReturn();
     startMaketouPaymentWatch();
     initPwaInstall();
@@ -1059,6 +1076,7 @@ function applyLanguage(lang, saveUserChoice = true) {
 
     renderCommentsList();
     refreshVipMemberBadge();
+    refreshSubscriptionAlertCopy();
 }
 
 function initLanguageDropdown() {
@@ -1337,7 +1355,11 @@ async function persistAccountToServer(user) {
         phone: user.phone || "",
         passwordHash: user.passwordHash || "",
         isSubscribed: Boolean(user.isSubscribed),
-        registeredAt: user.registeredAt || ""
+        registeredAt: user.registeredAt || "",
+        paymentDate: user.paymentDate || "",
+        subscriptionExpiresAt: user.subscriptionExpiresAt || user.vipUntil || "",
+        vipUntil: user.subscriptionExpiresAt || user.vipUntil || "",
+        lastPaymentRef: user.lastPaymentRef || ""
     };
     const paths = memberServerPaths(user.email).save;
     for (let i = 0; i < paths.length; i++) {
@@ -1369,7 +1391,11 @@ async function fetchAccountFromServer(email) {
                     phone: data.account.phone || "",
                     passwordHash: data.account.passwordHash || "",
                     isSubscribed: Boolean(data.account.isSubscribed),
-                    registeredAt: data.account.registeredAt || ""
+                    registeredAt: data.account.registeredAt || "",
+                    paymentDate: data.account.paymentDate || "",
+                    subscriptionExpiresAt: data.account.subscriptionExpiresAt || data.account.vipUntil || "",
+                    vipUntil: data.account.subscriptionExpiresAt || data.account.vipUntil || "",
+                    lastPaymentRef: data.account.lastPaymentRef || ""
                 };
             }
             if (data && data.ok && data.account === null) continue;
@@ -1382,21 +1408,58 @@ async function upsertUserToSupabase(user) {
     if (!supabaseClient || !user?.email) return;
     const email = normalizeEmail(user.email);
     try {
-        const { data: existing } = await supabaseClient
+        let existing = null;
+        const fullSelect = await supabaseClient
             .from("users")
-            .select("is_subscribed, unique_id, password_hash, email")
+            .select("is_subscribed, unique_id, password_hash, email, payment_date, subscription_expires_at, vip_until, last_payment_ref")
             .ilike("email", email)
             .maybeSingle();
+        if (fullSelect.error) {
+            const liteSelect = await supabaseClient
+                .from("users")
+                .select("is_subscribed, unique_id, password_hash, email")
+                .ilike("email", email)
+                .maybeSingle();
+            existing = liteSelect.data;
+        } else {
+            existing = fullSelect.data;
+        }
         const uniqueId = formatMemberId(existing && existing.unique_id) || persistMemberId(user.uniqueId);
-        await supabaseClient.from("users").upsert({
+        const expiresAt = laterIso(
+            user.subscriptionExpiresAt || user.vipUntil || "",
+            (existing && (existing.subscription_expires_at || existing.vip_until)) || ""
+        );
+        const row = {
             unique_id: uniqueId,
             name: user.name,
             email,
             phone: user.phone || "",
-            is_subscribed: Boolean(user.isSubscribed) || Boolean(existing && existing.is_subscribed),
+            is_subscribed: isSubscriptionActive({
+                ...user,
+                isSubscribed: Boolean(user.isSubscribed) || Boolean(existing && existing.is_subscribed),
+                subscriptionExpiresAt: expiresAt
+            }),
             password_hash: user.passwordHash || (existing && existing.password_hash) || "",
             updated_at: new Date().toISOString()
-        }, { onConflict: "email" });
+        };
+        if (user.paymentDate || (existing && existing.payment_date)) {
+            row.payment_date = laterIso(user.paymentDate || "", (existing && existing.payment_date) || "");
+        }
+        if (expiresAt) {
+            row.subscription_expires_at = expiresAt;
+            row.vip_until = expiresAt;
+        }
+        if (user.lastPaymentRef || (existing && existing.last_payment_ref)) {
+            row.last_payment_ref = user.lastPaymentRef || existing.last_payment_ref || "";
+        }
+        const { error } = await supabaseClient.from("users").upsert(row, { onConflict: "email" });
+        if (error) {
+            delete row.payment_date;
+            delete row.subscription_expires_at;
+            delete row.vip_until;
+            delete row.last_payment_ref;
+            await supabaseClient.from("users").upsert(row, { onConflict: "email" });
+        }
     } catch {}
 }
 
@@ -1424,39 +1487,70 @@ async function findAccountByEmail(email) {
                     phone: data.phone || (remote && remote.phone) || (local && local.phone) || "",
                     passwordHash: data.password_hash || (remote && remote.passwordHash) || (local && local.passwordHash) || "",
                     isSubscribed: Boolean(data.is_subscribed) || Boolean(remote && remote.isSubscribed) || Boolean(local && local.isSubscribed),
-                    registeredAt: (local && local.registeredAt) || (remote && remote.registeredAt) || new Date().toLocaleDateString("fr-FR")
+                    registeredAt: (local && local.registeredAt) || (remote && remote.registeredAt) || new Date().toLocaleDateString("fr-FR"),
+                    paymentDate: data.payment_date || (remote && remote.paymentDate) || (local && local.paymentDate) || "",
+                    subscriptionExpiresAt: laterIso(
+                        data.subscription_expires_at || data.vip_until || "",
+                        (remote && (remote.subscriptionExpiresAt || remote.vipUntil)) || (local && (local.subscriptionExpiresAt || local.vipUntil)) || ""
+                    ),
+                    lastPaymentRef: data.last_payment_ref || (remote && remote.lastPaymentRef) || (local && local.lastPaymentRef) || ""
                 };
+                remote.vipUntil = remote.subscriptionExpiresAt;
             }
         } catch {}
     }
     const found = remote || local;
     if (!found) return null;
-    return {
+    const merged = {
         ...found,
         email: emailKey,
         uniqueId: formatMemberId(found.uniqueId) || (local && local.uniqueId) || "",
-        isSubscribed: Boolean(found.isSubscribed) || Boolean(local && local.isSubscribed),
         passwordHash: found.passwordHash || (local && local.passwordHash) || ""
     };
+    if (local) mergeSubscriptionFields(merged, local);
+    seedLegacySubscriptionWindow(merged);
+    merged.isSubscribed = isSubscriptionActive(merged);
+    return merged;
 }
 
 async function syncUserFromSupabase() {
     if (!supabaseClient || !currentUser?.email) return;
     try {
-        const { data, error } = await supabaseClient
+        let { data, error } = await supabaseClient
             .from("users")
-            .select("unique_id, name, email, phone, is_subscribed, password_hash")
+            .select("unique_id, name, email, phone, is_subscribed, password_hash, payment_date, subscription_expires_at, vip_until, last_payment_ref")
             .ilike("email", normalizeEmail(currentUser.email))
             .maybeSingle();
+        if (error) {
+            const fallback = await supabaseClient
+                .from("users")
+                .select("unique_id, name, email, phone, is_subscribed, password_hash")
+                .ilike("email", normalizeEmail(currentUser.email))
+                .maybeSingle();
+            data = fallback.data;
+            error = fallback.error;
+        }
 
         if (data && !error) {
             let changed = false;
-            const subscribed = Boolean(data.is_subscribed);
+            mergeSubscriptionFields(currentUser, {
+                paymentDate: data.payment_date,
+                subscriptionExpiresAt: data.subscription_expires_at || data.vip_until,
+                lastPaymentRef: data.last_payment_ref,
+                isSubscribed: data.is_subscribed
+            });
+            if (seedLegacySubscriptionWindow(currentUser)) changed = true;
+            const subscribed = isSubscriptionActive(currentUser);
             if (subscribed !== Boolean(currentUser.isSubscribed)) {
                 currentUser.isSubscribed = subscribed;
                 changed = true;
             }
             if (subscribed) grantVerifiedAccess();
+            else if (hasExpiredSubscription(currentUser)) {
+                currentUser.isSubscribed = false;
+                revokeVerifiedAccess();
+                changed = true;
+            }
             const localId = formatMemberId(currentUser.uniqueId) || readPersistedMemberId();
             const remoteId = formatMemberId(data.unique_id);
             if (localId) {
@@ -1487,10 +1581,19 @@ function subscribeUserRealtime() {
                 table: "users",
                 filter: `email=eq.${currentUser.email}`
             }, (payload) => {
-                if (payload?.new && typeof payload.new.is_subscribed !== "undefined") {
-                    currentUser.isSubscribed = Boolean(payload.new.is_subscribed);
+                if (payload?.new && (typeof payload.new.is_subscribed !== "undefined" || payload.new.subscription_expires_at || payload.new.vip_until)) {
+                    mergeSubscriptionFields(currentUser, {
+                        paymentDate: payload.new.payment_date,
+                        subscriptionExpiresAt: payload.new.subscription_expires_at || payload.new.vip_until,
+                        lastPaymentRef: payload.new.last_payment_ref,
+                        isSubscribed: payload.new.is_subscribed
+                    });
+                    currentUser.isSubscribed = isSubscriptionActive(currentUser);
                     if (currentUser.isSubscribed) grantVerifiedAccess();
-                    else if (!readAccessToken()) revokeVerifiedAccess();
+                    else {
+                        revokeVerifiedAccess();
+                        if (hasExpiredSubscription(currentUser)) notifyExpiredAndInviteRenew(true);
+                    }
                     saveUserSession(currentUser, false);
                     initGlobalViewRouter();
                     showToast(currentUser.isSubscribed ? "Licence activée !" : "Statut mis à jour.");
@@ -1500,8 +1603,132 @@ function subscribeUserRealtime() {
     } catch {}
 }
 
+function parseTimeMs(value) {
+    if (!value) return 0;
+    if (typeof value === "number" && Number.isFinite(value)) return value;
+    const parsed = Date.parse(String(value));
+    return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function laterIso(left, right) {
+    const leftMs = parseTimeMs(left);
+    const rightMs = parseTimeMs(right);
+    if (rightMs > leftMs) return String(right || "");
+    return String(left || "");
+}
+
+function getSubscriptionExpiryMs(user) {
+    if (!user) return 0;
+    return parseTimeMs(user.subscriptionExpiresAt || user.vipUntil || user.subscription_expires_at || user.vip_until);
+}
+
+function isSubscriptionActive(user) {
+    if (!user) return false;
+    const expiryMs = getSubscriptionExpiryMs(user);
+    if (expiryMs > 0) return Date.now() < expiryMs;
+    return Boolean(user.isSubscribed);
+}
+
+function hasExpiredSubscription(user) {
+    const expiryMs = getSubscriptionExpiryMs(user);
+    return expiryMs > 0 && Date.now() >= expiryMs;
+}
+
+function computeRenewedExpiryIso(currentExpiryValue) {
+    const now = Date.now();
+    const current = parseTimeMs(currentExpiryValue);
+    const base = current > now ? current : now;
+    return new Date(base + (CONFIG.subscriptionDays * 24 * 60 * 60 * 1000)).toISOString();
+}
+
+function mergeSubscriptionFields(target, source) {
+    if (!target || !source) return target;
+    const sourceExpiry = source.subscriptionExpiresAt || source.vipUntil || source.subscription_expires_at || source.vip_until || "";
+    const mergedExpiry = laterIso(target.subscriptionExpiresAt || target.vipUntil || "", sourceExpiry);
+    if (mergedExpiry) {
+        target.subscriptionExpiresAt = mergedExpiry;
+        target.vipUntil = mergedExpiry;
+    }
+    const sourcePayment = source.paymentDate || source.payment_date || "";
+    if (sourcePayment && parseTimeMs(sourcePayment) >= parseTimeMs(target.paymentDate || "")) {
+        target.paymentDate = sourcePayment;
+    }
+    const sourceRef = source.lastPaymentRef || source.last_payment_ref || "";
+    if (sourceRef) target.lastPaymentRef = sourceRef;
+    return target;
+}
+
+function seedLegacySubscriptionWindow(user) {
+    if (!user || !user.isSubscribed || getSubscriptionExpiryMs(user) > 0) return false;
+    user.paymentDate = user.paymentDate || new Date().toISOString();
+    user.subscriptionExpiresAt = computeRenewedExpiryIso("");
+    user.vipUntil = user.subscriptionExpiresAt;
+    return true;
+}
+
+function applyPaidSubscriptionPeriod(user, paymentRef, serverExpiresAt) {
+    if (!user) return user;
+    const ref = String(paymentRef || "").trim();
+    if (ref && user.lastPaymentRef === ref && isSubscriptionActive(user)) {
+        user.isSubscribed = true;
+        return user;
+    }
+    user.paymentDate = new Date().toISOString();
+    user.subscriptionExpiresAt = serverExpiresAt || computeRenewedExpiryIso(user.subscriptionExpiresAt || user.vipUntil || "");
+    user.vipUntil = user.subscriptionExpiresAt;
+    user.isSubscribed = true;
+    if (ref) user.lastPaymentRef = ref;
+    try { sessionStorage.removeItem("crash_expiry_prompted"); } catch {}
+    return user;
+}
+
+function notifyExpiredAndInviteRenew(openCheckout) {
+    refreshSubscriptionAlertCopy();
+    try {
+        if (sessionStorage.getItem("crash_expiry_prompted") === "1") {
+            if (openCheckout) document.getElementById("buyModal")?.classList.add("active");
+            return;
+        }
+        sessionStorage.setItem("crash_expiry_prompted", "1");
+    } catch {}
+    showToast(i18nText("toast_expired", "Votre abonnement de 30 jours est expiré. Renouvelez à 17 $."), "error");
+    if (openCheckout) document.getElementById("buyModal")?.classList.add("active");
+}
+
+function refreshSubscriptionAlertCopy() {
+    const alertText = document.querySelector("#siteSubscriptionAlert [data-i18n]");
+    const btnText = document.querySelector("#btnAlertSubscribe [data-i18n]");
+    const expired = hasExpiredSubscription(currentUser);
+    if (alertText) {
+        const key = expired ? "alert_expired" : "alert_unsubscribed";
+        alertText.setAttribute("data-i18n", key);
+        alertText.innerHTML = i18nText(key, expired
+            ? "<strong>ABONNEMENT EXPIRÉ :</strong> renouvelez votre accès mensuel à 17 $."
+            : "<strong>ACCÈS NON ACTIVÉ :</strong> activez votre licence pour ouvrir le cockpit.");
+    }
+    if (btnText) {
+        const key = expired ? "btn_alert_renew" : "btn_alert_unlock";
+        btnText.setAttribute("data-i18n", key);
+        btnText.textContent = i18nText(key, expired ? "Renouveler l'accès – 17 $" : "Débloquer l'accès – 17 $");
+    }
+}
+
+function startSubscriptionGuard() {
+    if (window.__subscriptionGuard) return;
+    window.__subscriptionGuard = setInterval(() => {
+        if (!currentUser) return;
+        if (hasExpiredSubscription(currentUser) && verifiedAccessGranted) {
+            currentUser.isSubscribed = false;
+            revokeVerifiedAccess();
+            saveUserSession(currentUser, true);
+            initGlobalViewRouter();
+            notifyExpiredAndInviteRenew(true);
+        }
+    }, 30000);
+}
+
 function isAccessUnlocked() {
-    return verifiedAccessGranted === true;
+    return verifiedAccessGranted === true && isSubscriptionActive(currentUser || { isSubscribed: verifiedAccessGranted });
 }
 
 function readAccessToken() {
@@ -1518,6 +1745,11 @@ function storeAccessToken(token) {
 }
 
 function grantVerifiedAccess(token) {
+    if (currentUser && hasExpiredSubscription(currentUser)) {
+        currentUser.isSubscribed = false;
+        revokeVerifiedAccess();
+        return false;
+    }
     verifiedAccessGranted = true;
     if (token) storeAccessToken(token);
     try {
@@ -1526,6 +1758,7 @@ function grantVerifiedAccess(token) {
         localStorage.setItem(CONFIG.accessVerifiedKey, "true");
     } catch {}
     if (currentUser) currentUser.isSubscribed = true;
+    return true;
 }
 
 function revokeVerifiedAccess() {
@@ -1585,10 +1818,28 @@ function denyPaymentAccess(message) {
 }
 
 async function restoreVerifiedAccess() {
+    if (currentUser) {
+        let remote = null;
+        try { remote = await fetchAccountFromServer(currentUser.email); } catch {}
+        if (remote) mergeSubscriptionFields(currentUser, remote);
+        if (seedLegacySubscriptionWindow(currentUser)) {
+            await saveUserSession(currentUser, true);
+        }
+    }
     const token = readAccessToken();
     if (token) {
         const session = await fetchMaketouSession(token);
         if (session && session.access === true) {
+            if (currentUser) {
+                if (session.expiresAt) mergeSubscriptionFields(currentUser, { subscriptionExpiresAt: session.expiresAt, paymentDate: session.paymentDate });
+                if (hasExpiredSubscription(currentUser)) {
+                    currentUser.isSubscribed = false;
+                    revokeVerifiedAccess();
+                    await saveUserSession(currentUser, true);
+                    notifyExpiredAndInviteRenew(false);
+                    return false;
+                }
+            }
             grantVerifiedAccess(token);
             return true;
         }
@@ -1596,9 +1847,16 @@ async function restoreVerifiedAccess() {
     }
     if (currentUser) {
         await syncUserFromSupabase();
-        if (currentUser.isSubscribed) {
+        if (isSubscriptionActive(currentUser)) {
             grantVerifiedAccess();
             return true;
+        }
+        if (hasExpiredSubscription(currentUser)) {
+            currentUser.isSubscribed = false;
+            revokeVerifiedAccess();
+            await saveUserSession(currentUser, true);
+            notifyExpiredAndInviteRenew(false);
+            return false;
         }
     }
     verifiedAccessGranted = false;
@@ -1619,6 +1877,11 @@ function refreshVipMemberBadge() {
 function initGlobalViewRouter() {
     const publicSite = document.getElementById("publicSiteWrapper");
     const vipSoftware = document.getElementById("vipSoftwareWrapper");
+
+    if (currentUser && hasExpiredSubscription(currentUser)) {
+        currentUser.isSubscribed = false;
+        revokeVerifiedAccess();
+    }
 
     if (isAccessUnlocked()) {
         if (currentUser) currentUser.isSubscribed = true;
@@ -1655,8 +1918,9 @@ function updateAuthPublicHeader() {
             if (navId) navUserIdTag.textContent = `ID: ${navId}`;
         }
 
-        if (!currentUser.isSubscribed) {
+        if (!isSubscriptionActive(currentUser)) {
             siteAlertBanner?.classList.remove("hidden");
+            refreshSubscriptionAlertCopy();
         } else {
             siteAlertBanner?.classList.add("hidden");
         }
@@ -2293,13 +2557,24 @@ function initAuthSecurity() {
                     if (found.passwordHash === btoa(password)) {
                         found.passwordHash = await hashPassword(password);
                     }
-                    await saveUserSession(found, true);
-                    if (found.isSubscribed) grantVerifiedAccess();
+                    if (seedLegacySubscriptionWindow(found)) {
+                        await saveUserSession(found, true);
+                    } else {
+                        await saveUserSession(found, true);
+                    }
                     setButtonLoading(loginSubmitBtn, false);
-                    initGlobalViewRouter();
                     closeAllModals();
                     logForm.reset();
-                    showToast(`Connexion réussie ! Bienvenue, ${found.name}.`);
+                    if (isSubscriptionActive(found)) {
+                        grantVerifiedAccess();
+                        initGlobalViewRouter();
+                        showToast(`Connexion réussie ! Bienvenue, ${found.name}.`);
+                    } else {
+                        revokeVerifiedAccess();
+                        initGlobalViewRouter();
+                        showToast(`Connexion réussie ! Bienvenue, ${found.name}.`);
+                        if (hasExpiredSubscription(found)) notifyExpiredAndInviteRenew(true);
+                    }
 
                     if (pendingCheckoutAfterAuth) {
                         pendingCheckoutAfterAuth = false;
@@ -2367,7 +2642,7 @@ function openProfileModal() {
         btnSavePhone.style.pointerEvents = "";
     }
 
-    const licensed = Boolean((currentUser && currentUser.isSubscribed) || isAccessUnlocked());
+    const licensed = Boolean(isSubscriptionActive(currentUser) || isAccessUnlocked());
     if (profileStatusBadge) {
         if (!licensed) {
             profileStatusBadge.className = "status-tag-badge status-unsubscribed";
@@ -2610,7 +2885,11 @@ async function handlePaymentSuccess(response, currency, amount) {
     showPaymentOverlay("Validation de la licence…");
 
     if (currentUser) {
-        currentUser.isSubscribed = true;
+        applyPaidSubscriptionPeriod(
+            currentUser,
+            response?.tx_ref || response?.transaction_id || "",
+            response?.expiresAt || ""
+        );
         await saveUserSession(currentUser, true);
     }
 
@@ -2795,8 +3074,12 @@ async function fetchMaketouCartStatus(cartId) {
     return fetchMaketouVerification(cartId);
 }
 
-async function activateMaketouLicense(cartId, token) {
+async function activateMaketouLicense(cartId, token, expiresAt, paymentDate) {
     trackMetaPurchase(cartId || token || "maketou");
+    if (currentUser) {
+        applyPaidSubscriptionPeriod(currentUser, cartId, expiresAt);
+        if (paymentDate) currentUser.paymentDate = paymentDate;
+    }
     grantVerifiedAccess(token);
     if (!currentUser) {
         initGlobalViewRouter();
@@ -2807,7 +3090,8 @@ async function activateMaketouLicense(cartId, token) {
         transaction_id: cartId || `maketou-${currentUser.uniqueId}-${Date.now()}`,
         tx_ref: cartId || currentUser.uniqueId,
         status: "successful",
-        payment_type: "maketou"
+        payment_type: "maketou",
+        expiresAt: expiresAt || currentUser.subscriptionExpiresAt || ""
     }, "USD", CONFIG.licenseUsd);
 }
 
@@ -2921,7 +3205,7 @@ async function verifyMaketouReturn() {
         const paid = Boolean(result && result.access === true && result.token);
         if (paid) {
             clearMaketouReturnUrl();
-            await activateMaketouLicense(result.cartId || ref, result.token);
+            await activateMaketouLicense(result.cartId || ref, result.token, result.expiresAt, result.paymentDate);
             return;
         }
         if (returnHint) {
@@ -2991,7 +3275,7 @@ function initMasterAdminDashboard() {
 
         usersDb = usersDb.map((u) => {
             if (u.uniqueId === targetId || u.email?.toUpperCase() === targetId) {
-                u.isSubscribed = true;
+                applyPaidSubscriptionPeriod(u, `admin-${Date.now()}`);
                 found = true;
             }
             return u;
@@ -3000,14 +3284,21 @@ function initMasterAdminDashboard() {
         if (found) {
             saveUsersDb(usersDb);
             if (currentUser && (currentUser.uniqueId === targetId || currentUser.email?.toUpperCase() === targetId)) {
-                currentUser.isSubscribed = true;
+                applyPaidSubscriptionPeriod(currentUser, `admin-${Date.now()}`);
                 grantVerifiedAccess();
                 writeJson(CONFIG.sessionKey, currentUser);
+                persistAccountToServer(currentUser);
                 initGlobalViewRouter();
             }
             if (supabaseClient) {
                 try {
-                    await supabaseClient.from("users").update({ is_subscribed: true }).eq("unique_id", targetId);
+                    const active = usersDb.find((u) => u.uniqueId === targetId);
+                    await supabaseClient.from("users").update({
+                        is_subscribed: true,
+                        payment_date: active && active.paymentDate,
+                        subscription_expires_at: active && active.subscriptionExpiresAt,
+                        vip_until: active && active.subscriptionExpiresAt
+                    }).eq("unique_id", targetId);
                 } catch {}
             }
             renderAdminUsersTable();
@@ -3022,8 +3313,12 @@ function initMasterAdminDashboard() {
                 phone: "",
                 passwordHash: "",
                 isSubscribed: true,
-                registeredAt: new Date().toLocaleDateString("fr-FR")
+                registeredAt: new Date().toLocaleDateString("fr-FR"),
+                paymentDate: new Date().toISOString(),
+                subscriptionExpiresAt: computeRenewedExpiryIso(""),
+                vipUntil: ""
             };
+            newMember.vipUntil = newMember.subscriptionExpiresAt;
             usersDb.push(newMember);
             saveUsersDb(usersDb);
 
@@ -3095,12 +3390,12 @@ async function renderAdminUsersTable() {
             <td>${escapeHtml(u.name || "Client")}</td>
             <td>${escapeHtml(u.email || "-")}</td>
             <td>
-                ${u.isSubscribed
+                ${isSubscriptionActive(u)
                     ? '<span class="badge-tag green"><i class="fa-solid fa-check"></i> ACTIF</span>'
                     : '<span class="badge-tag red"><i class="fa-solid fa-xmark"></i> NON ACTIVÉ</span>'}
             </td>
             <td>
-                ${!u.isSubscribed
+                ${!isSubscriptionActive(u)
                     ? `<button type="button" class="btn-table-action activate" onclick="adminToggleUser('${escapeHtml(u.email)}', true)"><i class="fa-solid fa-bolt"></i> Activer</button>`
                     : `<button type="button" class="btn-table-action deactivate" onclick="adminToggleUser('${escapeHtml(u.email)}', false)"><i class="fa-solid fa-ban"></i> Suspendre</button>`}
             </td>
@@ -3112,20 +3407,36 @@ window.adminToggleUser = async function (email, status) {
     let usersDb = loadUsersDb();
     const idx = usersDb.findIndex((u) => u.email === email);
     if (idx !== -1) {
-        usersDb[idx].isSubscribed = status;
+        if (status) applyPaidSubscriptionPeriod(usersDb[idx], `admin-${Date.now()}`);
+        else {
+            usersDb[idx].isSubscribed = false;
+            usersDb[idx].subscriptionExpiresAt = new Date().toISOString();
+            usersDb[idx].vipUntil = usersDb[idx].subscriptionExpiresAt;
+        }
         saveUsersDb(usersDb);
 
         if (currentUser && currentUser.email === email) {
             currentUser.isSubscribed = status;
-            if (status) grantVerifiedAccess();
-            else revokeVerifiedAccess();
+            if (status) {
+                applyPaidSubscriptionPeriod(currentUser, `admin-${Date.now()}`);
+                grantVerifiedAccess();
+            } else {
+                currentUser.subscriptionExpiresAt = usersDb[idx].subscriptionExpiresAt;
+                currentUser.vipUntil = usersDb[idx].vipUntil;
+                revokeVerifiedAccess();
+            }
             writeJson(CONFIG.sessionKey, currentUser);
+            persistAccountToServer(currentUser);
             initGlobalViewRouter();
         }
 
         if (supabaseClient) {
             try {
-                await supabaseClient.from("users").update({ is_subscribed: status }).eq("email", email);
+                await supabaseClient.from("users").update({
+                    is_subscribed: status,
+                    subscription_expires_at: usersDb[idx].subscriptionExpiresAt || null,
+                    vip_until: usersDb[idx].vipUntil || null
+                }).eq("email", email);
             } catch {}
         }
 

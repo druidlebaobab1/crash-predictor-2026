@@ -23,8 +23,13 @@ if ($code === 502) {
     maketou_json_denied("network_error", 502);
 }
 if ($paid) {
-    $useEmail = maketou_activate_paid_account($ref, $email, $data);
-    maketou_json_paid($ref, $useEmail);
+    $activated = maketou_activate_paid_account($ref, $email, $data);
+    maketou_json_paid(
+        $ref,
+        (string) ($activated["email"] ?? ""),
+        (string) ($activated["expiresAt"] ?? ""),
+        (string) ($activated["paymentDate"] ?? "")
+    );
 }
 
 echo json_encode([

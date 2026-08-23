@@ -41,8 +41,13 @@ function maketou_confirm_paid_ref($ref, $requestEmail) {
         maketou_json_denied("invalid_ref", 400);
     }
     if ($paid) {
-        $email = maketou_activate_paid_account($ref, $requestEmail, $data);
-        maketou_json_paid($ref, $email);
+        $activated = maketou_activate_paid_account($ref, $requestEmail, $data);
+        maketou_json_paid(
+            $ref,
+            (string) ($activated["email"] ?? ""),
+            (string) ($activated["expiresAt"] ?? ""),
+            (string) ($activated["paymentDate"] ?? "")
+        );
     }
     echo json_encode([
         "status" => $cartStatus !== "" ? $cartStatus : "unpaid",
@@ -59,11 +64,18 @@ if ($action === "session") {
     if (!is_array($session)) {
         maketou_json_denied("invalid_token", 401);
     }
+    $email = strtolower(trim((string) ($session["e"] ?? "")));
+    $state = $email !== "" ? maketou_read_subscription_state($email) : null;
+    if (is_array($state) && empty($state["active"])) {
+        maketou_json_denied("expired");
+    }
     echo json_encode([
         "status" => "paid",
         "access" => true,
         "completed" => true,
-        "cartId" => (string) ($session["r"] ?? "")
+        "cartId" => (string) ($session["r"] ?? ""),
+        "expiresAt" => is_array($state) ? (string) ($state["expiresAt"] ?? "") : "",
+        "paymentDate" => is_array($state) ? (string) ($state["paymentDate"] ?? "") : ""
     ]);
     exit;
 }

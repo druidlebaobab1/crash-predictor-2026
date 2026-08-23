@@ -37,18 +37,53 @@ function members_write_store($file, $members) {
     return @rename($tmp, $file);
 }
 
+function members_parse_ts($value) {
+    $value = trim((string) $value);
+    if ($value === "") {
+        return 0;
+    }
+    $ts = strtotime($value);
+    return $ts ? (int) $ts : 0;
+}
+
+function members_later_iso($left, $right) {
+    $leftTs = members_parse_ts($left);
+    $rightTs = members_parse_ts($right);
+    if ($rightTs > $leftTs) {
+        return trim((string) $right);
+    }
+    return trim((string) $left);
+}
+
+function members_is_active($record) {
+    if (!is_array($record)) {
+        return false;
+    }
+    $expiresTs = members_parse_ts($record["subscriptionExpiresAt"] ?? ($record["vipUntil"] ?? ""));
+    if ($expiresTs > 0) {
+        return $expiresTs > time();
+    }
+    return !empty($record["isSubscribed"]);
+}
+
 function members_public_record($record) {
     if (!is_array($record)) {
         return null;
     }
+    $expiresAt = (string) ($record["subscriptionExpiresAt"] ?? ($record["vipUntil"] ?? ""));
+    $active = members_is_active($record);
     return [
         "email" => members_normalize_email($record["email"] ?? ""),
         "uniqueId" => (string) ($record["uniqueId"] ?? ""),
         "name" => (string) ($record["name"] ?? "Client"),
         "phone" => (string) ($record["phone"] ?? ""),
         "passwordHash" => (string) ($record["passwordHash"] ?? ""),
-        "isSubscribed" => !empty($record["isSubscribed"]),
-        "registeredAt" => (string) ($record["registeredAt"] ?? "")
+        "isSubscribed" => $active,
+        "registeredAt" => (string) ($record["registeredAt"] ?? ""),
+        "paymentDate" => (string) ($record["paymentDate"] ?? ""),
+        "subscriptionExpiresAt" => $expiresAt,
+        "vipUntil" => $expiresAt,
+        "lastPaymentRef" => (string) ($record["lastPaymentRef"] ?? "")
     ];
 }
 
@@ -69,14 +104,47 @@ if ($method === "POST" && ($action === "save" || $action === "" || $action === "
         exit;
     }
     $existing = is_array($members[$email] ?? null) ? $members[$email] : [];
+    $existingExpires = (string) ($existing["subscriptionExpiresAt"] ?? ($existing["vipUntil"] ?? ""));
+    $incomingExpires = (string) ($body["subscriptionExpiresAt"] ?? ($body["vipUntil"] ?? ""));
+    $existingRef = trim((string) ($existing["lastPaymentRef"] ?? ""));
+    $incomingRef = trim((string) ($body["lastPaymentRef"] ?? ""));
+    $expiresAt = $existingExpires;
+    $paymentDate = (string) ($existing["paymentDate"] ?? "");
+    $lastPaymentRef = $existingRef;
+
+    if ($existingExpires === "" && $incomingExpires !== "") {
+        $expiresAt = $incomingExpires;
+        $paymentDate = (string) ($body["paymentDate"] ?? $paymentDate);
+        if ($incomingRef !== "") {
+            $lastPaymentRef = $incomingRef;
+        }
+    } elseif ($incomingRef !== "" && $incomingRef !== $existingRef) {
+        $expiresAt = members_later_iso($existingExpires, $incomingExpires);
+        if ($expiresAt === $incomingExpires && $incomingExpires !== "") {
+            $paymentDate = (string) ($body["paymentDate"] ?? date("c"));
+            $lastPaymentRef = $incomingRef;
+        }
+    }
+
+    $expiresTs = members_parse_ts($expiresAt);
+    if ($expiresTs > 0) {
+        $isSubscribed = $expiresTs > time();
+    } else {
+        $isSubscribed = !empty($body["isSubscribed"]) || !empty($existing["isSubscribed"]);
+    }
+
     $incoming = [
         "email" => $email,
         "uniqueId" => (string) ($body["uniqueId"] ?? ($existing["uniqueId"] ?? "")),
         "name" => (string) ($body["name"] ?? ($existing["name"] ?? "Client")),
         "phone" => (string) ($body["phone"] ?? ($existing["phone"] ?? "")),
         "passwordHash" => (string) ($body["passwordHash"] ?? ($existing["passwordHash"] ?? "")),
-        "isSubscribed" => !empty($body["isSubscribed"]) || !empty($existing["isSubscribed"]),
-        "registeredAt" => (string) ($body["registeredAt"] ?? ($existing["registeredAt"] ?? date("Y-m-d")))
+        "isSubscribed" => $isSubscribed,
+        "registeredAt" => (string) ($body["registeredAt"] ?? ($existing["registeredAt"] ?? date("Y-m-d"))),
+        "paymentDate" => $paymentDate,
+        "subscriptionExpiresAt" => $expiresAt,
+        "vipUntil" => $expiresAt,
+        "lastPaymentRef" => $lastPaymentRef
     ];
     if (!empty($existing["uniqueId"]) && $incoming["uniqueId"] === "") {
         $incoming["uniqueId"] = $existing["uniqueId"];

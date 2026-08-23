@@ -22,6 +22,12 @@ alter table public.users add column if not exists is_subscribed boolean default 
 alter table public.users add column if not exists created_at timestamptz default now();
 alter table public.users add column if not exists updated_at timestamptz default now();
 alter table public.users add column if not exists password_hash text default '';
+alter table public.users add column if not exists payment_date timestamptz;
+alter table public.users add column if not exists subscription_expires_at timestamptz;
+alter table public.users add column if not exists vip_until timestamptz;
+alter table public.users add column if not exists last_payment_ref text default '';
+
+create index if not exists users_subscription_expires_idx on public.users (subscription_expires_at);
 
 create table if not exists public.payments (
     id uuid primary key default gen_random_uuid(),

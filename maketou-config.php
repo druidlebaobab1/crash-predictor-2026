@@ -8,7 +8,10 @@ define("MAKETOU_API_KEY", "msk_34a43139cb75fcfd894088d0e618f14fda606ab398769436f
 define("MAKETOU_PRODUCT_ID", "9f5842bc-8ece-4012-8f24-81761d32a4b8");
 define("MAKETOU_API_BASE", "https://api.maketou.net");
 define("MAKETOU_SUCCESS_URL", "https://crashpredictor.fr/?payment=success&status=approved");
-define("MAKETOU_TOKEN_TTL", 45 * 24 * 3600);
+define("MAKETOU_SUBSCRIPTION_DAYS", 30);
+define("MAKETOU_TOKEN_TTL", 30 * 24 * 3600);
+define("MAKETOU_SUPABASE_URL", "https://tnxyrvjrxxrsqnpviknz.supabase.co");
+define("MAKETOU_SUPABASE_KEY", "sb_publishable_Hl6nmMnRAM1mfdDdudH2_w_kYIJAXdF");
 
 function maketou_http($method, $url, $payload = null) {
     $headers = [
@@ -167,12 +170,17 @@ function maketou_b64url_decode($value) {
     return base64_decode(strtr($value, "-_", "+/"));
 }
 
-function maketou_issue_token($ref, $email = "") {
+function maketou_issue_token($ref, $email = "", $expiresAt = "") {
+    $exp = time() + MAKETOU_TOKEN_TTL;
+    $expiresTs = maketou_parse_ts($expiresAt);
+    if ($expiresTs > time()) {
+        $exp = $expiresTs;
+    }
     $payload = json_encode([
         "r" => $ref,
         "e" => strtolower(trim((string) $email)),
         "iat" => time(),
-        "exp" => time() + MAKETOU_TOKEN_TTL,
+        "exp" => $exp,
         "v" => 1
     ], JSON_UNESCAPED_SLASHES);
     $body = maketou_b64url_encode($payload);
@@ -215,13 +223,15 @@ function maketou_verify_ref_with_api($ref) {
     return [$paid, $status, $data, $code];
 }
 
-function maketou_json_paid($ref, $email = "") {
+function maketou_json_paid($ref, $email = "", $expiresAt = "", $paymentDate = "") {
     echo json_encode([
         "status" => "paid",
         "access" => true,
         "completed" => true,
         "cartId" => $ref,
-        "token" => maketou_issue_token($ref, $email)
+        "token" => maketou_issue_token($ref, $email, $expiresAt),
+        "expiresAt" => $expiresAt,
+        "paymentDate" => $paymentDate
     ]);
     exit;
 }
@@ -238,33 +248,260 @@ function maketou_json_denied($status = "unpaid", $http = 200) {
     exit;
 }
 
-function maketou_mark_supabase_paid($email) {
+function maketou_parse_ts($value) {
+    $value = trim((string) $value);
+    if ($value === "") {
+        return 0;
+    }
+    $ts = strtotime($value);
+    return $ts ? (int) $ts : 0;
+}
+
+function maketou_iso_from_ts($ts) {
+    return gmdate("c", (int) $ts);
+}
+
+function maketou_now_iso() {
+    return gmdate("c");
+}
+
+function maketou_later_iso($candidates) {
+    $bestTs = 0;
+    foreach ((array) $candidates as $candidate) {
+        $ts = maketou_parse_ts($candidate);
+        if ($ts > $bestTs) {
+            $bestTs = $ts;
+        }
+    }
+    return $bestTs > 0 ? maketou_iso_from_ts($bestTs) : "";
+}
+
+function maketou_next_expiry_iso($currentExpires, $lastRef, $newRef) {
+    $newRef = trim((string) $newRef);
+    $lastRef = trim((string) $lastRef);
+    $currentTs = maketou_parse_ts($currentExpires);
+    if ($newRef !== "" && strcasecmp($lastRef, $newRef) === 0 && $currentTs > time()) {
+        return [false, maketou_iso_from_ts($currentTs)];
+    }
+    $now = time();
+    $base = $currentTs > $now ? $currentTs : $now;
+    return [true, maketou_iso_from_ts($base + (MAKETOU_SUBSCRIPTION_DAYS * 86400))];
+}
+
+function maketou_members_file() {
+    return __DIR__ . DIRECTORY_SEPARATOR . "data" . DIRECTORY_SEPARATOR . "members.json";
+}
+
+function maketou_read_local_member($email) {
+    $email = strtolower(trim((string) $email));
+    if ($email === "" || strpos($email, "@") === false) {
+        return null;
+    }
+    $file = maketou_members_file();
+    if (!is_file($file)) {
+        return null;
+    }
+    $members = json_decode((string) @file_get_contents($file), true);
+    if (!is_array($members) || !isset($members[$email]) || !is_array($members[$email])) {
+        return null;
+    }
+    return $members[$email];
+}
+
+function maketou_write_local_member($email, $record) {
+    $email = strtolower(trim((string) $email));
+    if ($email === "" || !is_array($record)) {
+        return false;
+    }
+    $file = maketou_members_file();
+    $dir = dirname($file);
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0755, true);
+    }
+    $members = [];
+    if (is_file($file)) {
+        $decoded = json_decode((string) @file_get_contents($file), true);
+        if (is_array($decoded)) {
+            $members = $decoded;
+        }
+    }
+    $members[$email] = $record;
+    $tmp = $file . ".tmp";
+    if (@file_put_contents($tmp, json_encode($members, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), LOCK_EX) === false) {
+        return false;
+    }
+    return @rename($tmp, $file);
+}
+
+function maketou_supabase_http($method, $path, $payload = null) {
+    $url = MAKETOU_SUPABASE_URL . $path;
+    $headers = [
+        "apikey: " . MAKETOU_SUPABASE_KEY,
+        "Authorization: Bearer " . MAKETOU_SUPABASE_KEY,
+        "Content-Type: application/json",
+        "Prefer: return=representation"
+    ];
+    $json = $payload === null ? null : json_encode($payload);
+    if (function_exists("curl_init")) {
+        $ch = curl_init($url);
+        $options = [
+            CURLOPT_CUSTOMREQUEST => $method,
+            CURLOPT_HTTPHEADER => $headers,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => 20
+        ];
+        if ($json !== null) {
+            $options[CURLOPT_POSTFIELDS] = $json;
+        }
+        curl_setopt_array($ch, $options);
+        $body = curl_exec($ch);
+        $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        return [$status, $body === false ? "" : (string) $body];
+    }
+    return [0, ""];
+}
+
+function maketou_supabase_fetch_user($email = "", $uniqueId = "") {
+    $email = strtolower(trim((string) $email));
+    $uniqueId = trim((string) $uniqueId);
+    $queries = [];
+    if ($email !== "" && strpos($email, "@") !== false) {
+        $queries[] = "/rest/v1/users?select=email,unique_id,is_subscribed,payment_date,subscription_expires_at,vip_until,last_payment_ref&email=eq." . rawurlencode($email);
+    }
+    if ($uniqueId !== "") {
+        $queries[] = "/rest/v1/users?select=email,unique_id,is_subscribed,payment_date,subscription_expires_at,vip_until,last_payment_ref&unique_id=eq." . rawurlencode($uniqueId);
+    }
+    foreach ($queries as $path) {
+        [$status, $body] = maketou_supabase_http("GET", $path);
+        if ($status < 200 || $status >= 300) {
+            continue;
+        }
+        $rows = json_decode((string) $body, true);
+        if (is_array($rows) && isset($rows[0]) && is_array($rows[0])) {
+            return $rows[0];
+        }
+    }
+    return null;
+}
+
+function maketou_collect_subscription_state($email, $uniqueId = "") {
+    $local = maketou_read_local_member($email);
+    $cloud = maketou_supabase_fetch_user($email, $uniqueId);
+    $expiresAt = maketou_later_iso([
+        is_array($local) ? ($local["subscriptionExpiresAt"] ?? ($local["vipUntil"] ?? "")) : "",
+        is_array($cloud) ? ($cloud["subscription_expires_at"] ?? ($cloud["vip_until"] ?? "")) : ""
+    ]);
+    $lastRef = "";
+    if (is_array($local) && trim((string) ($local["lastPaymentRef"] ?? "")) !== "") {
+        $lastRef = trim((string) $local["lastPaymentRef"]);
+    } elseif (is_array($cloud) && trim((string) ($cloud["last_payment_ref"] ?? "")) !== "") {
+        $lastRef = trim((string) $cloud["last_payment_ref"]);
+    }
+    $paymentDate = maketou_later_iso([
+        is_array($local) ? ($local["paymentDate"] ?? "") : "",
+        is_array($cloud) ? ($cloud["payment_date"] ?? "") : ""
+    ]);
+    return [
+        "local" => $local,
+        "cloud" => $cloud,
+        "expiresAt" => $expiresAt,
+        "lastPaymentRef" => $lastRef,
+        "paymentDate" => $paymentDate
+    ];
+}
+
+function maketou_apply_local_subscription($email, $ref, $expiresAt, $paymentDate) {
     $email = strtolower(trim((string) $email));
     if ($email === "" || strpos($email, "@") === false) {
         return;
     }
-    $supabaseUrl = "https://tnxyrvjrxxrsqnpviknz.supabase.co";
-    $supabaseKey = "sb_publishable_Hl6nmMnRAM1mfdDdudH2_w_kYIJAXdF";
-    $payload = json_encode(["is_subscribed" => true]);
-    $url = $supabaseUrl . "/rest/v1/users?email=eq." . rawurlencode($email);
-    $headers = [
-        "apikey: " . $supabaseKey,
-        "Authorization: Bearer " . $supabaseKey,
-        "Content-Type: application/json",
-        "Prefer: return=minimal"
-    ];
-    if (function_exists("curl_init")) {
-        $ch = curl_init($url);
-        curl_setopt_array($ch, [
-            CURLOPT_CUSTOMREQUEST => "PATCH",
-            CURLOPT_POSTFIELDS => $payload,
-            CURLOPT_HTTPHEADER => $headers,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT => 20
-        ]);
-        curl_exec($ch);
-        curl_close($ch);
+    $record = maketou_read_local_member($email);
+    if (!is_array($record)) {
+        return;
     }
+    $record["isSubscribed"] = true;
+    $record["paymentDate"] = $paymentDate;
+    $record["subscriptionExpiresAt"] = $expiresAt;
+    $record["vipUntil"] = $expiresAt;
+    if (trim((string) $ref) !== "") {
+        $record["lastPaymentRef"] = trim((string) $ref);
+    }
+    maketou_write_local_member($email, $record);
+}
+
+function maketou_apply_supabase_subscription($email, $uniqueId, $ref, $expiresAt, $paymentDate) {
+    $payloadFull = [
+        "is_subscribed" => true,
+        "payment_date" => $paymentDate,
+        "subscription_expires_at" => $expiresAt,
+        "vip_until" => $expiresAt
+    ];
+    if (trim((string) $ref) !== "") {
+        $payloadFull["last_payment_ref"] = trim((string) $ref);
+    }
+    $payloadLite = ["is_subscribed" => true];
+    $targets = [];
+    $email = strtolower(trim((string) $email));
+    $uniqueId = trim((string) $uniqueId);
+    if ($email !== "" && strpos($email, "@") !== false) {
+        $targets[] = "/rest/v1/users?email=eq." . rawurlencode($email);
+    }
+    if ($uniqueId !== "") {
+        $targets[] = "/rest/v1/users?unique_id=eq." . rawurlencode($uniqueId);
+    }
+    foreach ($targets as $path) {
+        [$status] = maketou_supabase_http("PATCH", $path, $payloadFull);
+        if ($status < 200 || $status >= 300) {
+            maketou_supabase_http("PATCH", $path, $payloadLite);
+        }
+    }
+}
+
+function maketou_mark_supabase_paid($email) {
+    maketou_apply_supabase_subscription($email, "", "", maketou_iso_from_ts(time() + (MAKETOU_SUBSCRIPTION_DAYS * 86400)), maketou_now_iso());
+}
+
+function maketou_subscription_is_active($expiresAt) {
+    $ts = maketou_parse_ts($expiresAt);
+    if ($ts > 0) {
+        return $ts > time();
+    }
+    return false;
+}
+
+function maketou_read_subscription_state($email, $uniqueId = "") {
+    $email = strtolower(trim((string) $email));
+    $state = maketou_collect_subscription_state($email, $uniqueId);
+    $expiresAt = $state["expiresAt"];
+    $local = $state["local"];
+    $cloud = $state["cloud"];
+    $legacyPaid = (is_array($local) && !empty($local["isSubscribed"]))
+        || (is_array($cloud) && !empty($cloud["is_subscribed"]));
+
+    if ($expiresAt === "" && $legacyPaid) {
+        $expiresAt = maketou_iso_from_ts(time() + (MAKETOU_SUBSCRIPTION_DAYS * 86400));
+        $paymentDate = $state["paymentDate"] !== "" ? $state["paymentDate"] : maketou_now_iso();
+        maketou_apply_local_subscription($email, $state["lastPaymentRef"], $expiresAt, $paymentDate);
+        maketou_apply_supabase_subscription($email, $uniqueId, $state["lastPaymentRef"], $expiresAt, $paymentDate);
+        return [
+            "active" => true,
+            "legacy" => true,
+            "expiresAt" => $expiresAt,
+            "paymentDate" => $paymentDate
+        ];
+    }
+
+    if ($expiresAt !== "") {
+        return [
+            "active" => maketou_subscription_is_active($expiresAt),
+            "legacy" => false,
+            "expiresAt" => $expiresAt,
+            "paymentDate" => $state["paymentDate"]
+        ];
+    }
+
+    return null;
 }
 
 function maketou_anonymized_gmail($realEmail) {
@@ -387,53 +624,17 @@ function maketou_find_member_email_by_unique_id($uniqueId) {
     return "";
 }
 
-function maketou_mark_local_member_paid($email) {
-    $email = strtolower(trim((string) $email));
-    if ($email === "" || strpos($email, "@") === false) {
-        return;
-    }
-    $file = __DIR__ . DIRECTORY_SEPARATOR . "data" . DIRECTORY_SEPARATOR . "members.json";
-    if (!is_file($file)) {
-        return;
-    }
-    $members = json_decode((string) @file_get_contents($file), true);
-    if (!is_array($members) || !isset($members[$email]) || !is_array($members[$email])) {
-        return;
-    }
-    $members[$email]["isSubscribed"] = true;
-    $tmp = $file . ".tmp";
-    if (@file_put_contents($tmp, json_encode($members, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), LOCK_EX) !== false) {
-        @rename($tmp, $file);
-    }
+function maketou_mark_local_member_paid($email, $ref = "") {
+    $state = maketou_collect_subscription_state($email, "");
+    [$changed, $expiresAt] = maketou_next_expiry_iso($state["expiresAt"], $state["lastPaymentRef"], $ref);
+    $paymentDate = $changed ? maketou_now_iso() : ($state["paymentDate"] !== "" ? $state["paymentDate"] : maketou_now_iso());
+    maketou_apply_local_subscription($email, $ref, $expiresAt, $paymentDate);
+    return ["expiresAt" => $expiresAt, "paymentDate" => $paymentDate];
 }
 
 function maketou_mark_supabase_paid_by_unique_id($uniqueId) {
-    $uniqueId = trim((string) $uniqueId);
-    if ($uniqueId === "") {
-        return;
-    }
-    $supabaseUrl = "https://tnxyrvjrxxrsqnpviknz.supabase.co";
-    $supabaseKey = "sb_publishable_Hl6nmMnRAM1mfdDdudH2_w_kYIJAXdF";
-    $payload = json_encode(["is_subscribed" => true]);
-    $url = $supabaseUrl . "/rest/v1/users?unique_id=eq." . rawurlencode($uniqueId);
-    $headers = [
-        "apikey: " . $supabaseKey,
-        "Authorization: Bearer " . $supabaseKey,
-        "Content-Type: application/json",
-        "Prefer: return=minimal"
-    ];
-    if (function_exists("curl_init")) {
-        $ch = curl_init($url);
-        curl_setopt_array($ch, [
-            CURLOPT_CUSTOMREQUEST => "PATCH",
-            CURLOPT_POSTFIELDS => $payload,
-            CURLOPT_HTTPHEADER => $headers,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT => 20
-        ]);
-        curl_exec($ch);
-        curl_close($ch);
-    }
+    $expiresAt = maketou_iso_from_ts(time() + (MAKETOU_SUBSCRIPTION_DAYS * 86400));
+    maketou_apply_supabase_subscription("", $uniqueId, "", $expiresAt, maketou_now_iso());
 }
 
 function maketou_resolve_account_email($ref, $requestEmail, $data = []) {
@@ -465,12 +666,18 @@ function maketou_activate_paid_account($ref, $requestEmail, $data = []) {
     if ($uniqueId === "") {
         $uniqueId = maketou_extract_unique_id($data);
     }
+    $state = maketou_collect_subscription_state($email, $uniqueId);
+    [$changed, $expiresAt] = maketou_next_expiry_iso($state["expiresAt"], $state["lastPaymentRef"], $ref);
+    $paymentDate = $changed ? maketou_now_iso() : ($state["paymentDate"] !== "" ? $state["paymentDate"] : maketou_now_iso());
     if ($email !== "") {
-        maketou_mark_supabase_paid($email);
-        maketou_mark_local_member_paid($email);
+        maketou_apply_local_subscription($email, $ref, $expiresAt, $paymentDate);
+        maketou_apply_supabase_subscription($email, $uniqueId, $ref, $expiresAt, $paymentDate);
+    } elseif ($uniqueId !== "") {
+        maketou_apply_supabase_subscription("", $uniqueId, $ref, $expiresAt, $paymentDate);
     }
-    if ($uniqueId !== "") {
-        maketou_mark_supabase_paid_by_unique_id($uniqueId);
-    }
-    return $email;
+    return [
+        "email" => $email,
+        "expiresAt" => $expiresAt,
+        "paymentDate" => $paymentDate
+    ];
 }

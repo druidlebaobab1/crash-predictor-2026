@@ -286,7 +286,7 @@ def issue_maketou_token(ref, email=""):
             "r": ref,
             "e": str(email or "").lower(),
             "iat": int(time.time()),
-            "exp": int(time.time()) + 45 * 24 * 3600,
+            "exp": int(time.time()) + 30 * 24 * 3600,
             "v": 1,
         },
         separators=(",", ":"),
