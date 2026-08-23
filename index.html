@@ -66,7 +66,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=Orbitron:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=u48">
+    <link rel="stylesheet" href="style.css?v=u49">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 </head>
 <body class="dark-theme">
@@ -682,16 +682,54 @@
     </div>
 
     <div class="modal-overlay" id="pwaIosInstallModal">
-        <div class="modal-card">
+        <div class="modal-card pwa-ios-modal-card">
             <button type="button" class="modal-close" id="closePwaIosModal" aria-label="Fermer">&times;</button>
-            <div class="modal-header">
-                <div class="modal-icon-badge gold-glow"><i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i></div>
-                <h3>📲 Installer l'application</h3>
+            <div class="pwa-ios-head">
+                <h3 class="pwa-ios-title">📲 Installer sur votre iPhone</h3>
+                <p class="pwa-ios-subtitle">Accédez à la plateforme en 1 clic depuis votre écran d'accueil</p>
             </div>
-            <ol class="pwa-ios-steps">
-                <li>Appuyer sur l'icône Partager en bas de Safari (carré avec flèche vers le haut ⎋)</li>
-                <li>Sélectionner "Sur l'écran d'accueil" ➕</li>
-            </ol>
+            <div class="pwa-ios-cards">
+                <div class="pwa-ios-step-card">
+                    <div class="pwa-ios-icons" aria-hidden="true">
+                        <span class="pwa-ios-icon-wrap">
+                            <svg class="pwa-ios-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 3.2v10.2" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/>
+                                <path d="M8.3 6.6 12 2.8l3.7 3.8" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M6.2 10.2v8.1c0 1.2.9 2.1 2.1 2.1h7.4c1.2 0 2.1-.9 2.1-2.1v-8.1" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/>
+                            </svg>
+                        </span>
+                        <span class="pwa-ios-icon-wrap">
+                            <svg class="pwa-ios-svg pwa-ios-ellipsis" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="5" cy="12" r="2.1" fill="currentColor"/>
+                                <circle cx="12" cy="12" r="2.1" fill="currentColor"/>
+                                <circle cx="19" cy="12" r="2.1" fill="currentColor"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <p class="pwa-ios-step-text">1. Touchez l'icône Partager en bas au centre de votre écran (ou les <strong>…</strong> si la barre est masquée).</p>
+                </div>
+                <div class="pwa-ios-step-card">
+                    <div class="pwa-ios-icons" aria-hidden="true">
+                        <span class="pwa-ios-icon-wrap">
+                            <svg class="pwa-ios-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="4.2" y="4.2" width="15.6" height="15.6" rx="4.2" stroke="currentColor" stroke-width="2.1"/>
+                                <path d="M12 8.1v7.8M8.1 12h7.8" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <p class="pwa-ios-step-text">2. Faites défiler et appuyez sur « Sur l'écran d'accueil ».</p>
+                </div>
+                <div class="pwa-ios-step-card">
+                    <div class="pwa-ios-icons" aria-hidden="true">
+                        <span class="pwa-ios-add-btn">Ajouter</span>
+                    </div>
+                    <p class="pwa-ios-step-text">3. Confirmez en touchant « Ajouter » en haut à droite.</p>
+                </div>
+            </div>
+            <div class="pwa-ios-hint">
+                <span class="pwa-ios-bounce" aria-hidden="true">↓</span>
+                <p>Le bouton se trouve tout en bas de votre navigateur Safari</p>
+            </div>
         </div>
     </div>
 
