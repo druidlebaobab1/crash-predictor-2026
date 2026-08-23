@@ -66,7 +66,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=Orbitron:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=u47">
+    <link rel="stylesheet" href="style.css?v=u48">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 </head>
 <body class="dark-theme">
@@ -254,12 +254,12 @@
 
                             <button type="button" class="btn-buy-instant" id="directBuyButton">
                                 <i class="fa-solid fa-bolt" aria-hidden="true"></i>
-                                <span data-i18n="btn_buy_instant">Débloquer mon accès complet – 17 $</span>
+                                <span data-i18n="btn_buy_instant">DÉBLOQUER MON ACCÈS 17 $</span>
                             </button>
 
                             <button type="button" class="btn-referral-free" id="openReferralModalBtn">
                                 <i class="fa-solid fa-gift" aria-hidden="true"></i>
-                                <span>ACTIVER MON ACCÈS GRATUITEMENT</span>
+                                <span data-i18n="btn_referral_free">ACTIVER MON ACCÈS GRATUITEMENT</span>
                             </button>
 
                             <div class="secure-guarantee-footer">
@@ -702,7 +702,7 @@
                 <div class="modal-icon-badge gold-glow"><i class="fa-solid fa-gift" aria-hidden="true"></i></div>
                 <h3 class="modal-title-big">Accès gratuit</h3>
             </div>
-            <p class="referral-modal-copy">Partagez votre lien exclusif à vos proches. Dès que 2 amis débloquent leur accès via votre lien, votre propre accès s'active automatiquement et gratuitement pendant 30 jours !</p>
+            <p class="referral-modal-copy" data-i18n="referral_modal_copy">Partagez votre lien d'invitation à vos proches. Dès que 2 amis débloquent leur accès via votre lien, votre propre accès s'active automatiquement et gratuitement pendant 30 jours !</p>
             <div class="referral-progress-box" id="referralProgressBox">
                 <div class="referral-progress-label" id="referralProgressLabel">Progression : 0 / 2 amis activés</div>
                 <div class="referral-progress-track" aria-hidden="true">
@@ -711,7 +711,7 @@
             </div>
             <div class="referral-link-block">
                 <input type="text" class="referral-link-input" id="referralLinkInput" readonly value="" aria-label="Lien de parrainage">
-                <button type="button" class="btn-referral-copy" id="referralCopyBtn">Copier le lien</button>
+                <button type="button" class="btn-referral-copy" id="referralCopyBtn" data-i18n="btn_referral_copy">COPIER MON LIEN D'INVITATION</button>
             </div>
             <p class="referral-login-hint hidden" id="referralLoginHint">Connectez-vous ou créez un compte pour obtenir votre lien exclusif.</p>
             <div class="referral-share-grid">
@@ -728,6 +728,6 @@
         </div>
     </div>
 
-    <script src="app.js?v=u47" defer></script>
+    <script src="app.js?v=u48" defer></script>
 </body>
 </html>

@@ -1696,8 +1696,10 @@ button.vip-member-tag:hover {
     font-family: var(--font-price);
     font-weight: 800;
     font-size: 0.8rem;
-    padding: 0 14px;
-    white-space: nowrap;
+    padding: 8px 12px;
+    white-space: normal;
+    line-height: 1.2;
+    text-align: center;
     cursor: pointer;
     min-height: 42px;
 }

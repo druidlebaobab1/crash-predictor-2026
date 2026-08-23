@@ -92,7 +92,11 @@ const TRANSLATIONS = {
         benefit_3_desc: "Accès complet renouvelé chaque mois, simple abonnement mensuel.",
         benefit_4_title: "Multi-supports",
         benefit_4_desc: "Interface optimisée pour un usage fluide sur smartphone, tablette et ordinateur.",
-        btn_buy_instant: "Débloquer mon accès complet – 17 $",
+        btn_buy_instant: "DÉBLOQUER MON ACCÈS 17 $",
+        btn_referral_free: "ACTIVER MON ACCÈS GRATUITEMENT",
+        referral_modal_copy: "Partagez votre lien d'invitation à vos proches. Dès que 2 amis débloquent leur accès via votre lien, votre propre accès s'active automatiquement et gratuitement pendant 30 jours !",
+        btn_referral_copy: "COPIER MON LIEN D'INVITATION",
+        toast_link_copied: "Lien copié !",
         secure_guarantee: "Paiement sécurisé et chiffré • Activation automatique du cockpit",
         reviews_badge: "RETOURS MEMBRES VÉRIFIÉS (113 AVIS)",
         reviews_title: "Retours d'Expérience & Témoignages",
@@ -199,7 +203,11 @@ const TRANSLATIONS = {
         benefit_3_desc: "Full access renewed every month, simple monthly subscription.",
         benefit_4_title: "Multi-device Support",
         benefit_4_desc: "Optimized interface for seamless performance on smartphones, tablets, and desktops.",
-        btn_buy_instant: "Unlock Full Access – $17",
+        btn_buy_instant: "UNLOCK MY ACCESS $17",
+        btn_referral_free: "ACTIVATE MY ACCESS FOR FREE",
+        referral_modal_copy: "Share your invitation link with your friends. As soon as 2 friends unlock their access through your link, your own access activates automatically and free for 30 days!",
+        btn_referral_copy: "COPY MY INVITE LINK",
+        toast_link_copied: "Link copied!",
         secure_guarantee: "Encrypted & secure checkout • Instant cockpit activation",
         reviews_badge: "VERIFIED MEMBER REVIEWS (113 REVIEWS)",
         reviews_title: "User Experience & Testimonials",
@@ -306,7 +314,11 @@ const TRANSLATIONS = {
         benefit_3_desc: "Acceso completo renovado cada mes, suscripción mensual simple.",
         benefit_4_title: "Multi-dispositivo",
         benefit_4_desc: "Interfaz optimizada para un uso fluido en smartphones, tablets y ordenadores.",
-        btn_buy_instant: "Desbloquear mi acceso completo – 17 $",
+        btn_buy_instant: "DESBLOQUEAR MI ACCESO 17 $",
+        btn_referral_free: "ACTIVAR MI ACCESO GRATUITAMENTE",
+        referral_modal_copy: "Comparte tu enlace de invitación con tus amigos. En cuanto 2 amigos desbloqueen su acceso con tu enlace, tu propio acceso se activa automáticamente y gratis durante 30 días.",
+        btn_referral_copy: "COPIAR MI ENLACE DE INVITACIÓN",
+        toast_link_copied: "¡Enlace copiado!",
         secure_guarantee: "Pago seguro y encriptado • Activación automática del cockpit",
         reviews_badge: "OPINIONES DE MIEMBROS VERIFICADOS (113 RESEÑAS)",
         reviews_title: "Experiencias y Testimonios",
@@ -413,7 +425,11 @@ const TRANSLATIONS = {
         benefit_3_desc: "Acesso completo renovado todos os meses, plano mensal simples.",
         benefit_4_title: "Compatível com Qualquer Dispositivo",
         benefit_4_desc: "Interface otimizada para uso fluido em telemóveis, tablets e computadores.",
-        btn_buy_instant: "Desbloquear Acesso Completo – 17 $",
+        btn_buy_instant: "DESBLOQUEAR MEU ACESSO 17 $",
+        btn_referral_free: "ATIVAR MEU ACESSO GRATUITAMENTE",
+        referral_modal_copy: "Partilhe o seu link de convite com os seus amigos. Assim que 2 amigos desbloquearem o acesso pelo seu link, o seu próprio acesso ativa-se automaticamente e grátis durante 30 dias!",
+        btn_referral_copy: "COPIAR MEU LINK DE CONVITE",
+        toast_link_copied: "Link copiado!",
         secure_guarantee: "Pagamento seguro e encriptado • Ativação imediata do cockpit",
         reviews_badge: "AVALIAÇÕES DE MEMBROS (113 AVALIAÇÕES)",
         reviews_title: "Depoimentos e Avaliações",
@@ -520,7 +536,11 @@ const TRANSLATIONS = {
         benefit_3_desc: "Voller Zugang, der jeden Monat erneuert wird — einfaches Monatsabo.",
         benefit_4_title: "Multi-Geräte Unterstützung",
         benefit_4_desc: "Optimiert für reibungslose Nutzung auf Smartphone, Tablet und PC.",
-        btn_buy_instant: "Vollen Zugang freischalten – 17 $",
+        btn_buy_instant: "MEINEN ZUGANG FREISCHALTEN 17 $",
+        btn_referral_free: "MEINEN ZUGANG KOSTENLOS AKTIVIEREN",
+        referral_modal_copy: "Teilen Sie Ihren Einladungslink mit Ihren Freunden. Sobald 2 Freunde ihren Zugang über Ihren Link freischalten, wird Ihr eigener Zugang automatisch und 30 Tage lang kostenlos aktiviert!",
+        btn_referral_copy: "MEINEN EINLADUNGSLINK KOPIEREN",
+        toast_link_copied: "Link kopiert!",
         secure_guarantee: "Sichere & verschlüsselte Zahlung • Automatische Cockpit-Aktivierung",
         reviews_badge: "VERIFIZIERTE MITGLIEDER (113 BEWERTUNGEN)",
         reviews_title: "Erfahrungsberichte & Feedback",
@@ -3595,11 +3615,17 @@ function initReferralSystem() {
         e.preventDefault();
         e.stopPropagation();
         modal?.classList.add("active");
+        if (modal) modal.style.pointerEvents = "none";
         await refreshReferralModal();
+        setTimeout(() => {
+            if (modal) modal.style.pointerEvents = "";
+        }, 400);
     });
     closeBtn?.addEventListener("click", () => modal?.classList.remove("active"));
 
-    copyBtn?.addEventListener("click", async () => {
+    copyBtn?.addEventListener("click", async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         const link = document.getElementById("referralLinkInput")?.value || "";
         if (!link) {
             document.getElementById("loginModal")?.classList.add("active");
@@ -3612,29 +3638,34 @@ function initReferralSystem() {
             input?.select();
             document.execCommand("copy");
         }
-        copyBtn.textContent = "Lien copié !";
+        const copiedLabel = i18nText("toast_link_copied", "Lien copié !");
+        copyBtn.textContent = copiedLabel;
         copyBtn.classList.add("is-copied");
+        showToast(copiedLabel);
         setTimeout(() => {
-            copyBtn.textContent = "Copier le lien";
+            copyBtn.textContent = i18nText("btn_referral_copy", "COPIER MON LIEN D'INVITATION");
             copyBtn.classList.remove("is-copied");
         }, 1800);
     });
 
-    nativeBtn?.addEventListener("click", async () => {
+    document.getElementById("referralShareWhatsapp")?.addEventListener("click", (e) => {
+        e.stopPropagation();
+    });
+    document.getElementById("referralShareFacebook")?.addEventListener("click", (e) => {
+        e.stopPropagation();
+    });
+
+    nativeBtn?.addEventListener("click", async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         const link = document.getElementById("referralLinkInput")?.value || buildReferralLink(displayMemberId());
-        if (typeof navigator.share === "function") {
-            try {
-                await navigator.share({
-                    title: "Crash Predictor 2026",
-                    text: referralShareMessage(link),
-                    url: link
-                });
-                return;
-            } catch {}
-        }
-        if (link) {
-            try { await navigator.clipboard.writeText(link); } catch {}
-            showToast("Lien copié !");
-        }
+        if (!link || typeof navigator.share !== "function") return;
+        try {
+            await navigator.share({
+                title: "Crash Predictor 2026",
+                text: referralShareMessage(link),
+                url: link
+            });
+        } catch {}
     });
 }
