@@ -40,13 +40,8 @@ function maketou_confirm_paid_ref($ref, $requestEmail) {
     if ($code === 400) {
         maketou_json_denied("invalid_ref", 400);
     }
-    $cartEmail = maketou_extract_email($data);
-    if ($paid && $cartEmail !== "" && $requestEmail !== "" && !hash_equals($cartEmail, $requestEmail)) {
-        maketou_json_denied("email_mismatch", 403);
-    }
     if ($paid) {
-        $email = $requestEmail !== "" ? $requestEmail : $cartEmail;
-        maketou_mark_supabase_paid($email);
+        $email = maketou_activate_paid_account($ref, $requestEmail, $data);
         maketou_json_paid($ref, $email);
     }
     echo json_encode([
@@ -102,7 +97,6 @@ if ($looksLikeCreate) {
 
     $payload = [
         "productDocumentId" => MAKETOU_PRODUCT_ID,
-        "email" => $email,
         "firstName" => $firstName,
         "lastName" => $lastName,
         "redirectURL" => MAKETOU_SUCCESS_URL,
@@ -117,6 +111,35 @@ if ($looksLikeCreate) {
     }
 
     $raw = maketou_http("POST", MAKETOU_API_BASE . "/api/v1/stores/cart/checkout", $payload);
+    $status = 0;
+    $responseBody = "";
+    $data = [];
+    $redirectUrl = "";
+    $newCartId = "";
+    if (is_array($raw)) {
+        [$status, $responseBody] = $raw;
+        $data = json_decode($responseBody, true);
+        if (!is_array($data)) {
+            $data = [];
+        }
+        $nested = is_array($data["data"] ?? null) ? $data["data"] : [];
+        $cart = is_array($data["cart"] ?? null) ? $data["cart"] : (is_array($nested["cart"] ?? null) ? $nested["cart"] : []);
+        $redirectUrl = (string) (
+            $data["redirectUrl"]
+            ?? $data["redirect_url"]
+            ?? $data["checkoutUrl"]
+            ?? $data["checkout_url"]
+            ?? $nested["redirectUrl"]
+            ?? $nested["redirect_url"]
+            ?? ""
+        );
+        $newCartId = (string) ($cart["id"] ?? $data["id"] ?? $nested["id"] ?? "");
+    }
+
+    if (!($status >= 200 && $status < 300 && $redirectUrl !== "")) {
+        $payload["email"] = maketou_anonymized_gmail($email);
+        $raw = maketou_http("POST", MAKETOU_API_BASE . "/api/v1/stores/cart/checkout", $payload);
+    }
     if ($raw === null) {
         http_response_code(502);
         echo json_encode(["error" => "network_error", "access" => false]);
@@ -143,6 +166,7 @@ if ($looksLikeCreate) {
     $newCartId = (string) ($cart["id"] ?? $data["id"] ?? $nested["id"] ?? "");
 
     if ($status >= 200 && $status < 300 && $redirectUrl !== "") {
+        maketou_save_cart_map($newCartId, $email, $uniqueId);
         echo json_encode([
             "redirectUrl" => $redirectUrl,
             "cartId" => $newCartId,

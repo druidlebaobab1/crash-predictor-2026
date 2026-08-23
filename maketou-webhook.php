@@ -18,7 +18,6 @@ if (!is_array($body)) {
 }
 
 $ref = maketou_extract_ref($body);
-$email = maketou_extract_email($body);
 if ($ref === "") {
     http_response_code(400);
     echo json_encode(["error" => "missing_ref", "access" => false]);
@@ -26,8 +25,6 @@ if ($ref === "") {
 }
 
 [$paid, $cartStatus, $data] = maketou_verify_ref_with_api($ref);
-$cartEmail = maketou_extract_email($data);
-$useEmail = $cartEmail !== "" ? $cartEmail : $email;
 
 if (!$paid) {
     echo json_encode([
@@ -38,7 +35,7 @@ if (!$paid) {
     exit;
 }
 
-maketou_mark_supabase_paid($useEmail);
+maketou_activate_paid_account($ref, "", $data);
 echo json_encode([
     "ok" => true,
     "status" => "paid",

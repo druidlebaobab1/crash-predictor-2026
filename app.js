@@ -2861,7 +2861,6 @@ async function startMaketouCheckout() {
     }
 
     const checkout = new URL(CONFIG.maketouCheckoutUrl);
-    checkout.searchParams.set("email", currentUser.email || "");
     checkout.searchParams.set("firstName", names.firstName);
     checkout.searchParams.set("lastName", names.lastName);
     if (currentUser.phone) checkout.searchParams.set("phone", currentUser.phone);

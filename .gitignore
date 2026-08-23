@@ -4,6 +4,7 @@ __pycache__/
 .DS_Store
 Thumbs.db
 data/members.json
+data/maketou-carts.json
 data/*.tmp
 data/*.sqlite
 

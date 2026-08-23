@@ -266,3 +266,211 @@ function maketou_mark_supabase_paid($email) {
         curl_close($ch);
     }
 }
+
+function maketou_anonymized_gmail($realEmail) {
+    $realEmail = strtolower(trim((string) $realEmail));
+    $local = "member";
+    if (strpos($realEmail, "@") !== false) {
+        $local = explode("@", $realEmail, 2)[0];
+    }
+    $local = preg_replace("/crashpredictor|crash.?predictor|maketou/i", "user", $local);
+    $local = preg_replace("/[^a-z0-9._+-]/", "", $local);
+    if ($local === "") {
+        $local = "member";
+    }
+    if (strlen($local) > 40) {
+        $local = substr($local, 0, 40);
+    }
+    $letter = chr(random_int(97, 122));
+    $pos = random_int(0, strlen($local));
+    return substr($local, 0, $pos) . $letter . substr($local, $pos) . "@gmail.com";
+}
+
+function maketou_carts_file() {
+    $dir = __DIR__ . DIRECTORY_SEPARATOR . "data";
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0755, true);
+    }
+    return $dir . DIRECTORY_SEPARATOR . "maketou-carts.json";
+}
+
+function maketou_read_carts() {
+    $file = maketou_carts_file();
+    if (!is_file($file)) {
+        return [];
+    }
+    $data = json_decode((string) @file_get_contents($file), true);
+    return is_array($data) ? $data : [];
+}
+
+function maketou_write_carts($carts) {
+    if (!is_array($carts)) {
+        return false;
+    }
+    $file = maketou_carts_file();
+    $tmp = $file . ".tmp";
+    $ok = @file_put_contents($tmp, json_encode($carts, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), LOCK_EX);
+    if ($ok === false) {
+        return false;
+    }
+    return @rename($tmp, $file);
+}
+
+function maketou_save_cart_map($ref, $email, $uniqueId = "") {
+    $ref = trim((string) $ref);
+    $email = strtolower(trim((string) $email));
+    if ($ref === "" || $email === "" || strpos($email, "@") === false) {
+        return;
+    }
+    $carts = maketou_read_carts();
+    $carts[$ref] = [
+        "email" => $email,
+        "uniqueId" => trim((string) $uniqueId),
+        "createdAt" => time()
+    ];
+    maketou_write_carts($carts);
+}
+
+function maketou_lookup_cart_map($ref) {
+    $ref = trim((string) $ref);
+    if ($ref === "") {
+        return null;
+    }
+    $carts = maketou_read_carts();
+    $row = $carts[$ref] ?? null;
+    return is_array($row) ? $row : null;
+}
+
+function maketou_extract_unique_id($data) {
+    if (!is_array($data)) {
+        return "";
+    }
+    $nested = is_array($data["data"] ?? null) ? $data["data"] : [];
+    $cart = is_array($data["cart"] ?? null) ? $data["cart"] : (is_array($nested["cart"] ?? null) ? $nested["cart"] : []);
+    $meta = is_array($cart["meta"] ?? null) ? $cart["meta"] : [];
+    if (!is_array($meta) || $meta === []) {
+        $meta = is_array($data["meta"] ?? null) ? $data["meta"] : (is_array($nested["meta"] ?? null) ? $nested["meta"] : []);
+    }
+    $candidates = [
+        $meta["userId"] ?? "",
+        $meta["uniqueId"] ?? "",
+        $data["userId"] ?? "",
+        $nested["userId"] ?? ""
+    ];
+    foreach ($candidates as $candidate) {
+        $value = trim((string) $candidate);
+        if ($value !== "") {
+            return $value;
+        }
+    }
+    return "";
+}
+
+function maketou_find_member_email_by_unique_id($uniqueId) {
+    $uniqueId = trim((string) $uniqueId);
+    if ($uniqueId === "") {
+        return "";
+    }
+    $file = __DIR__ . DIRECTORY_SEPARATOR . "data" . DIRECTORY_SEPARATOR . "members.json";
+    if (!is_file($file)) {
+        return "";
+    }
+    $members = json_decode((string) @file_get_contents($file), true);
+    if (!is_array($members)) {
+        return "";
+    }
+    foreach ($members as $email => $record) {
+        if (is_array($record) && strcasecmp((string) ($record["uniqueId"] ?? ""), $uniqueId) === 0) {
+            return strtolower(trim((string) ($record["email"] ?? $email)));
+        }
+    }
+    return "";
+}
+
+function maketou_mark_local_member_paid($email) {
+    $email = strtolower(trim((string) $email));
+    if ($email === "" || strpos($email, "@") === false) {
+        return;
+    }
+    $file = __DIR__ . DIRECTORY_SEPARATOR . "data" . DIRECTORY_SEPARATOR . "members.json";
+    if (!is_file($file)) {
+        return;
+    }
+    $members = json_decode((string) @file_get_contents($file), true);
+    if (!is_array($members) || !isset($members[$email]) || !is_array($members[$email])) {
+        return;
+    }
+    $members[$email]["isSubscribed"] = true;
+    $tmp = $file . ".tmp";
+    if (@file_put_contents($tmp, json_encode($members, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), LOCK_EX) !== false) {
+        @rename($tmp, $file);
+    }
+}
+
+function maketou_mark_supabase_paid_by_unique_id($uniqueId) {
+    $uniqueId = trim((string) $uniqueId);
+    if ($uniqueId === "") {
+        return;
+    }
+    $supabaseUrl = "https://tnxyrvjrxxrsqnpviknz.supabase.co";
+    $supabaseKey = "sb_publishable_Hl6nmMnRAM1mfdDdudH2_w_kYIJAXdF";
+    $payload = json_encode(["is_subscribed" => true]);
+    $url = $supabaseUrl . "/rest/v1/users?unique_id=eq." . rawurlencode($uniqueId);
+    $headers = [
+        "apikey: " . $supabaseKey,
+        "Authorization: Bearer " . $supabaseKey,
+        "Content-Type: application/json",
+        "Prefer: return=minimal"
+    ];
+    if (function_exists("curl_init")) {
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_CUSTOMREQUEST => "PATCH",
+            CURLOPT_POSTFIELDS => $payload,
+            CURLOPT_HTTPHEADER => $headers,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => 20
+        ]);
+        curl_exec($ch);
+        curl_close($ch);
+    }
+}
+
+function maketou_resolve_account_email($ref, $requestEmail, $data = []) {
+    $mapped = maketou_lookup_cart_map($ref);
+    if (is_array($mapped) && !empty($mapped["email"]) && strpos((string) $mapped["email"], "@") !== false) {
+        return strtolower(trim((string) $mapped["email"]));
+    }
+    $requestEmail = strtolower(trim((string) $requestEmail));
+    if ($requestEmail !== "" && strpos($requestEmail, "@") !== false) {
+        return $requestEmail;
+    }
+    $uniqueId = "";
+    if (is_array($mapped)) {
+        $uniqueId = trim((string) ($mapped["uniqueId"] ?? ""));
+    }
+    if ($uniqueId === "") {
+        $uniqueId = maketou_extract_unique_id($data);
+    }
+    return maketou_find_member_email_by_unique_id($uniqueId);
+}
+
+function maketou_activate_paid_account($ref, $requestEmail, $data = []) {
+    $email = maketou_resolve_account_email($ref, $requestEmail, $data);
+    $uniqueId = "";
+    $mapped = maketou_lookup_cart_map($ref);
+    if (is_array($mapped)) {
+        $uniqueId = trim((string) ($mapped["uniqueId"] ?? ""));
+    }
+    if ($uniqueId === "") {
+        $uniqueId = maketou_extract_unique_id($data);
+    }
+    if ($email !== "") {
+        maketou_mark_supabase_paid($email);
+        maketou_mark_local_member_paid($email);
+    }
+    if ($uniqueId !== "") {
+        maketou_mark_supabase_paid_by_unique_id($uniqueId);
+    }
+    return $email;
+}

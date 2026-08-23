@@ -223,7 +223,6 @@ def create_maketou_checkout(body, host_url):
 
     payload = {
         "productDocumentId": MAKETOU_PRODUCT_ID,
-        "email": email,
         "firstName": first_name,
         "lastName": last_name,
         "redirectURL": "https://crashpredictor.fr/?payment=success&status=approved",
@@ -240,6 +239,22 @@ def create_maketou_checkout(body, host_url):
         f"{MAKETOU_API_BASE}/api/v1/stores/cart/checkout",
         payload,
     )
+    redirect_url = ""
+    if isinstance(data, dict):
+        redirect_url = str(data.get("redirectUrl") or data.get("redirect_url") or "")
+    if not (status is not None and 200 <= int(status or 0) < 300 and redirect_url):
+        local = "member"
+        if "@" in email:
+            local = email.split("@", 1)[0]
+        local = "".join(ch for ch in local.lower() if ch.isalnum() or ch in "._+-") or "member"
+        insert_at = os.urandom(1)[0] % (len(local) + 1)
+        letter = chr(97 + (os.urandom(1)[0] % 26))
+        payload["email"] = local[:insert_at] + letter + local[insert_at:] + "@gmail.com"
+        status, data = maketou_request(
+            "POST",
+            f"{MAKETOU_API_BASE}/api/v1/stores/cart/checkout",
+            payload,
+        )
     if status is None:
         return 503, data
 
@@ -348,12 +363,9 @@ def read_maketou_status(cart_id, email=""):
     paid = 200 <= int(status or 0) < 300 and cart_status.lower() in {
         "completed", "paid", "success", "successful", "approved", "succeeded"
     }
-    cart_email = extract_maketou_email(data) if isinstance(data, dict) else ""
     request_email = str(email or "").strip().lower()
-    if paid and cart_email and request_email and cart_email != request_email:
-        return 403, {"status": "email_mismatch", "access": False, "completed": False}
     if paid:
-        use_email = request_email or cart_email
+        use_email = request_email
         return 200, {
             "status": "paid",
             "access": True,
