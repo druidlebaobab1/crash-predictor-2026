@@ -747,24 +747,71 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 }
 
 .btn-buy-instant {
+    position: relative;
     background: var(--gold-gradient);
     color: #0d0614;
     border: none;
-    padding: 16px 20px;
-    border-radius: var(--radius-md);
+    padding: 22px 22px;
+    border-radius: 14px;
     font-family: var(--font-price);
-    font-size: 1.05rem;
+    font-size: 1.16rem;
     font-weight: 900;
-    box-shadow: 0 6px 25px rgba(255, 200, 55, 0.55);
+    letter-spacing: 0.02em;
+    box-shadow:
+        0 10px 28px rgba(255, 128, 8, 0.45),
+        0 0 0 1px rgba(255, 200, 55, 0.5),
+        0 0 22px rgba(255, 200, 55, 0.35);
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
     width: 100%;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
+    animation: buyPulseGlow 2.4s ease-in-out infinite;
 }
-
 .btn-buy-instant:hover { transform: translateY(-2px); }
+.btn-live-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(13, 6, 20, 0.22);
+    color: #fff;
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    padding: 3px 7px;
+    border-radius: 999px;
+}
+.btn-live-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #ff3b30;
+    box-shadow: 0 0 8px #ff3b30;
+    animation: liveDotPulse 1s ease-in-out infinite;
+}
+@keyframes buyPulseGlow {
+    0%, 100% {
+        box-shadow:
+            0 8px 22px rgba(255, 128, 8, 0.38),
+            0 0 0 1px rgba(255, 200, 55, 0.4),
+            0 0 14px rgba(255, 200, 55, 0.28);
+    }
+    50% {
+        box-shadow:
+            0 14px 38px rgba(255, 128, 8, 0.7),
+            0 0 0 1px rgba(255, 200, 55, 0.7),
+            0 0 32px rgba(255, 200, 55, 0.55);
+    }
+}
+@keyframes liveDotPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.45; transform: scale(0.75); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .btn-buy-instant,
+    .btn-live-dot { animation: none; }
+}
 
 .secure-guarantee-footer {
     font-size: 0.74rem;
@@ -1711,25 +1758,29 @@ button.vip-member-tag:hover {
 
 .btn-referral-free {
     width: 100%;
-    margin: 2px 0 10px;
-    padding: 14px 18px;
-    border-radius: var(--radius-md);
-    border: 1.5px solid #34d399;
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.22), rgba(255, 200, 55, 0.12));
-    color: #f8fafc;
-    font-family: var(--font-heading);
-    font-size: 0.96rem;
-    font-weight: 900;
-    letter-spacing: 0.03em;
+    margin: 0 0 10px;
+    padding: 9px 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: transparent;
+    color: #cbd5e1;
+    font-family: var(--font-price);
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
     cursor: pointer;
-    box-shadow: 0 6px 22px rgba(16, 185, 129, 0.28);
+    box-shadow: none;
     transition: var(--transition-smooth);
 }
-.btn-referral-free:hover { transform: translateY(-2px); }
+.btn-referral-free:hover {
+    transform: none;
+    border-color: rgba(255, 200, 55, 0.4);
+    color: #e5e7eb;
+}
 
 .referral-modal-card { max-width: 460px; }
 .referral-modal-copy {

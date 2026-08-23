@@ -66,7 +66,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=Orbitron:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=u49">
+    <link rel="stylesheet" href="style.css?v=u50">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 </head>
 <body class="dark-theme">
@@ -253,13 +253,16 @@
                             </div>
 
                             <button type="button" class="btn-buy-instant" id="directBuyButton">
+                                <span class="btn-live-chip" aria-hidden="true">
+                                    <span class="btn-live-dot"></span>
+                                    LIVE
+                                </span>
                                 <i class="fa-solid fa-bolt" aria-hidden="true"></i>
                                 <span data-i18n="btn_buy_instant">DÉBLOQUER MON ACCÈS 17 $</span>
                             </button>
 
                             <button type="button" class="btn-referral-free" id="openReferralModalBtn">
-                                <i class="fa-solid fa-gift" aria-hidden="true"></i>
-                                <span data-i18n="btn_referral_free">ACTIVER MON ACCÈS GRATUITEMENT</span>
+                                <span data-i18n="btn_referral_free">🎁 DÉBLOQUER 1 MOIS GRATUIT ( CHALLENGE )</span>
                             </button>
 
                             <div class="secure-guarantee-footer">
@@ -766,6 +769,6 @@
         </div>
     </div>
 
-    <script src="app.js?v=u48" defer></script>
+    <script src="app.js?v=u49" defer></script>
 </body>
 </html>
