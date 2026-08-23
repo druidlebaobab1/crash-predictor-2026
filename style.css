@@ -770,24 +770,16 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     animation: buyPulseGlow 2.4s ease-in-out infinite;
 }
 .btn-buy-instant:hover { transform: translateY(-2px); }
-.btn-live-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    background: rgba(13, 6, 20, 0.22);
-    color: #fff;
-    font-size: 0.62rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    padding: 3px 7px;
-    border-radius: 999px;
+.btn-buy-instant .btn-live-dot,
+.btn-buy-instant > i {
+    flex-shrink: 0;
 }
 .btn-live-dot {
-    width: 7px;
-    height: 7px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    background: #ff3b30;
-    box-shadow: 0 0 8px #ff3b30;
+    background: #ff2d2d;
+    box-shadow: 0 0 6px #ff2d2d, 0 0 12px rgba(255, 45, 45, 0.7);
     animation: liveDotPulse 1s ease-in-out infinite;
 }
 @keyframes buyPulseGlow {
@@ -1843,17 +1835,19 @@ button.vip-member-tag:hover {
 .btn-referral-copy {
     border: none;
     border-radius: 10px;
-    background: var(--gold-gradient);
-    color: #0d0614;
+    background: #16a34a;
+    color: #fff;
     font-family: var(--font-price);
     font-weight: 800;
     font-size: 0.8rem;
-    padding: 8px 12px;
-    white-space: normal;
+    padding: 8px 14px;
+    white-space: nowrap;
+    overflow: visible;
     line-height: 1.2;
     text-align: center;
     cursor: pointer;
     min-height: 42px;
+    flex-shrink: 0;
 }
 .btn-referral-copy.is-copied { background: #16a34a; color: #fff; }
 .referral-login-hint {

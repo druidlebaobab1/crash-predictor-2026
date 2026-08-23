@@ -95,8 +95,8 @@ const TRANSLATIONS = {
         btn_buy_instant: "DÉBLOQUER MON ACCÈS 17 $",
         btn_referral_free: "🎁 DÉBLOQUER 1 MOIS GRATUIT ( CHALLENGE )",
         referral_modal_copy: "Partagez votre lien d'invitation à vos proches. Dès que 2 amis débloquent leur accès via votre lien, votre propre accès s'active automatiquement et gratuitement pendant 30 jours !",
-        btn_referral_copy: "COPIER MON LIEN D'INVITATION",
-        toast_link_copied: "Lien copié !",
+        btn_referral_copy: "📋 Copier mon lien",
+        toast_link_copied: "✅ Lien copié !",
         secure_guarantee: "Paiement sécurisé et chiffré • Activation automatique du cockpit",
         reviews_badge: "RETOURS MEMBRES VÉRIFIÉS (113 AVIS)",
         reviews_title: "Retours d'Expérience & Témoignages",
@@ -206,8 +206,8 @@ const TRANSLATIONS = {
         btn_buy_instant: "UNLOCK MY ACCESS $17",
         btn_referral_free: "🎁 UNLOCK 1 FREE MONTH ( CHALLENGE )",
         referral_modal_copy: "Share your invitation link with your friends. As soon as 2 friends unlock their access through your link, your own access activates automatically and free for 30 days!",
-        btn_referral_copy: "COPY MY INVITE LINK",
-        toast_link_copied: "Link copied!",
+        btn_referral_copy: "📋 Copy my link",
+        toast_link_copied: "✅ Link copied!",
         secure_guarantee: "Encrypted & secure checkout • Instant cockpit activation",
         reviews_badge: "VERIFIED MEMBER REVIEWS (113 REVIEWS)",
         reviews_title: "User Experience & Testimonials",
@@ -317,8 +317,8 @@ const TRANSLATIONS = {
         btn_buy_instant: "DESBLOQUEAR MI ACCESO 17 $",
         btn_referral_free: "🎁 DESBLOQUEAR 1 MES GRATIS ( CHALLENGE )",
         referral_modal_copy: "Comparte tu enlace de invitación con tus amigos. En cuanto 2 amigos desbloqueen su acceso con tu enlace, tu propio acceso se activa automáticamente y gratis durante 30 días.",
-        btn_referral_copy: "COPIAR MI ENLACE DE INVITACIÓN",
-        toast_link_copied: "¡Enlace copiado!",
+        btn_referral_copy: "📋 Copiar mi enlace",
+        toast_link_copied: "✅ ¡Enlace copiado!",
         secure_guarantee: "Pago seguro y encriptado • Activación automática del cockpit",
         reviews_badge: "OPINIONES DE MIEMBROS VERIFICADOS (113 RESEÑAS)",
         reviews_title: "Experiencias y Testimonios",
@@ -428,8 +428,8 @@ const TRANSLATIONS = {
         btn_buy_instant: "DESBLOQUEAR MEU ACESSO 17 $",
         btn_referral_free: "🎁 DESBLOQUEAR 1 MÊS GRÁTIS ( CHALLENGE )",
         referral_modal_copy: "Partilhe o seu link de convite com os seus amigos. Assim que 2 amigos desbloquearem o acesso pelo seu link, o seu próprio acesso ativa-se automaticamente e grátis durante 30 dias!",
-        btn_referral_copy: "COPIAR MEU LINK DE CONVITE",
-        toast_link_copied: "Link copiado!",
+        btn_referral_copy: "📋 Copiar meu link",
+        toast_link_copied: "✅ Link copiado!",
         secure_guarantee: "Pagamento seguro e encriptado • Ativação imediata do cockpit",
         reviews_badge: "AVALIAÇÕES DE MEMBROS (113 AVALIAÇÕES)",
         reviews_title: "Depoimentos e Avaliações",
@@ -539,8 +539,8 @@ const TRANSLATIONS = {
         btn_buy_instant: "MEINEN ZUGANG FREISCHALTEN 17 $",
         btn_referral_free: "🎁 1 MONAT GRATIS FREISCHALTEN ( CHALLENGE )",
         referral_modal_copy: "Teilen Sie Ihren Einladungslink mit Ihren Freunden. Sobald 2 Freunde ihren Zugang über Ihren Link freischalten, wird Ihr eigener Zugang automatisch und 30 Tage lang kostenlos aktiviert!",
-        btn_referral_copy: "MEINEN EINLADUNGSLINK KOPIEREN",
-        toast_link_copied: "Link kopiert!",
+        btn_referral_copy: "📋 Link kopieren",
+        toast_link_copied: "✅ Link kopiert!",
         secure_guarantee: "Sichere & verschlüsselte Zahlung • Automatische Cockpit-Aktivierung",
         reviews_badge: "VERIFIZIERTE MITGLIEDER (113 BEWERTUNGEN)",
         reviews_title: "Erfahrungsberichte & Feedback",
@@ -3638,12 +3638,12 @@ function initReferralSystem() {
             input?.select();
             document.execCommand("copy");
         }
-        const copiedLabel = i18nText("toast_link_copied", "Lien copié !");
+        const copiedLabel = i18nText("toast_link_copied", "✅ Lien copié !");
         copyBtn.textContent = copiedLabel;
         copyBtn.classList.add("is-copied");
         showToast(copiedLabel);
         setTimeout(() => {
-            copyBtn.textContent = i18nText("btn_referral_copy", "COPIER MON LIEN D'INVITATION");
+            copyBtn.textContent = i18nText("btn_referral_copy", "📋 Copier mon lien");
             copyBtn.classList.remove("is-copied");
         }, 1800);
     });
