@@ -116,6 +116,8 @@ const TRANSLATIONS = {
         pred_label: "POINT DE SORTIE CALCULÉ",
         pred_stability: "Stabilité :",
         pred_advice: "Retirez vos gains avant cette cote de sécurité",
+        btn_unlock_signal: "VOIR LE SIGNAL",
+        signal_window: "DÉCOLLAGE DANS",
         hud_label: "COTE EN DIRECT",
         scan_title: "CALIBRATION DU SIGNAL",
         scan_subtitle: "Prochain tour en préparation…",
@@ -227,6 +229,8 @@ const TRANSLATIONS = {
         pred_label: "CALCULATED EXIT THRESHOLD",
         pred_stability: "Stability:",
         pred_advice: "Cash-out your profits before this safety threshold",
+        btn_unlock_signal: "SEE THE SIGNAL",
+        signal_window: "TAKEOFF IN",
         hud_label: "LIVE MULTIPLIER",
         scan_title: "SIGNAL CALIBRATION",
         scan_subtitle: "Preparing next round…",
@@ -338,6 +342,8 @@ const TRANSLATIONS = {
         pred_label: "PUNTO DE SALIDA CALCULADO",
         pred_stability: "Estabilidad:",
         pred_advice: "Retire sus ganancias antes de este umbral de seguridad",
+        btn_unlock_signal: "VER LA SEÑAL",
+        signal_window: "DESPEGUE EN",
         hud_label: "MULTIPLICADOR EN VIVO",
         scan_title: "CALIBRACIÓN DE SEÑAL",
         scan_subtitle: "Preparando siguiente ronda…",
@@ -449,6 +455,8 @@ const TRANSLATIONS = {
         pred_label: "PONTO DE SAÍDA CALCULADO",
         pred_stability: "Estabilidade:",
         pred_advice: "Retire os seus ganhos antes deste limiar de segurança",
+        btn_unlock_signal: "VER O SINAL",
+        signal_window: "DESCOLAGEM EM",
         hud_label: "MULTIPLICADOR AO VIVO",
         scan_title: "CALIBRAÇÃO DE SINAL",
         scan_subtitle: "A preparar a próxima ronda…",
@@ -560,6 +568,8 @@ const TRANSLATIONS = {
         pred_label: "BERECHNETER AUSSTIEGSPUNKT",
         pred_stability: "Stabilität:",
         pred_advice: "Realisieren Sie Ihre Gewinne vor dieser Sicherheitsschwelle",
+        btn_unlock_signal: "SIGNAL ANZEIGEN",
+        signal_window: "START IN",
         hud_label: "LIVE-QUOTE",
         scan_title: "SIGNAL-KALIBRIERUNG",
         scan_subtitle: "Nächste Runde wird vorbereitet…",
@@ -754,6 +764,8 @@ let vipAnimationId = null;
 let vipEngineRunning = false;
 let vipResizeHandler = null;
 let vipCalibrationTimer = null;
+let vipSignalTimer = null;
+let vipServerTimeOffset = 0;
 let vipTargetMultiplier = 2.40;
 let vipCurrentFlightNumber = 8492;
 let vipLastHistoryMultiplier = null;
@@ -794,6 +806,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     startMaketouPaymentWatch();
     initReferralSystem();
     initPwaInstall();
+    initCodeStreams();
     document.addEventListener("visibilitychange", () => {
         if (document.visibilityState === "visible") {
             syncUserFromSupabase();
@@ -1083,10 +1096,8 @@ function applyLanguage(lang, saveUserChoice = true) {
 
     // Mise à jour du sélecteur visuel
     const meta = LANG_METAS[lang] || LANG_METAS.fr;
-    const flagEl = document.getElementById("currentLangFlag");
-    const codeEl = document.getElementById("currentLangCode");
-    if (flagEl) flagEl.textContent = meta.flag;
-    if (codeEl) codeEl.textContent = meta.code;
+    document.querySelectorAll(".js-lang-flag").forEach((el) => { el.textContent = meta.flag; });
+    document.querySelectorAll(".js-lang-code").forEach((el) => { el.textContent = meta.code; });
 
     document.querySelectorAll(".lang-option-btn").forEach((btn) => {
         if (btn.dataset.lang === lang) {
@@ -1102,13 +1113,18 @@ function applyLanguage(lang, saveUserChoice = true) {
 }
 
 function initLanguageDropdown() {
-    const toggleBtn = document.getElementById("langToggleBtn");
-    const menu = document.getElementById("langDropdownMenu");
     const optionBtns = document.querySelectorAll(".lang-option-btn");
 
-    toggleBtn?.addEventListener("click", (e) => {
-        e.stopPropagation();
-        menu?.classList.toggle("hidden");
+    document.querySelectorAll(".lang-selector-dropdown").forEach((wrap) => {
+        const toggleBtn = wrap.querySelector(".lang-toggle-btn");
+        const menu = wrap.querySelector(".lang-dropdown-menu");
+        toggleBtn?.addEventListener("click", (e) => {
+            e.stopPropagation();
+            document.querySelectorAll(".lang-dropdown-menu").forEach((other) => {
+                if (other !== menu) other.classList.add("hidden");
+            });
+            menu?.classList.toggle("hidden");
+        });
     });
 
     optionBtns.forEach((btn) => {
@@ -1116,15 +1132,15 @@ function initLanguageDropdown() {
             const lang = btn.dataset.lang;
             if (lang) {
                 applyLanguage(lang, true);
-                menu?.classList.add("hidden");
+                document.querySelectorAll(".lang-dropdown-menu").forEach((menu) => menu.classList.add("hidden"));
                 showToast(`Langue changée : ${LANG_METAS[lang].name}`);
             }
         });
     });
 
     document.addEventListener("click", (e) => {
-        if (!e.target.closest("#langSelectorWrap")) {
-            menu?.classList.add("hidden");
+        if (!e.target.closest(".lang-selector-dropdown")) {
+            document.querySelectorAll(".lang-dropdown-menu").forEach((menu) => menu.classList.add("hidden"));
         }
     });
 }
@@ -2142,6 +2158,129 @@ function initLoadMoreComments() {
 /* Cockpit Radar de Vol                                                       */
 /* -------------------------------------------------------------------------- */
 
+function initCodeStreams() {
+    const lines = [
+        { t: "sync radar.vector[n] checksum=ok", c: "c-green" },
+        { t: "inject payload.hash=0x7af3c1", c: "c-cyan" },
+        { t: "predict.mul compute(seed, entropy)", c: "c-pink" },
+        { t: "filter noise.floor < 0.012", c: "c-green" },
+        { t: "trace flight.path bezier.p3", c: "c-cyan" },
+        { t: "lock entropy=0.991 status=live", c: "c-pink" },
+        { t: "decode tick.stream hz=2400", c: "c-green" },
+        { t: "map crash.curve x1.00 -> xn", c: "c-cyan" },
+        { t: "buffer[i++] = sample.raw", c: "c-pink" },
+        { t: "ok // algorithm heartbeat", c: "c-green" }
+    ];
+    document.querySelectorAll("[data-code-stream]").forEach((el) => {
+        if (el.dataset.bound === "1") return;
+        el.dataset.bound = "1";
+        let n = Math.floor(Math.random() * lines.length);
+        const pushLine = () => {
+            const item = lines[n % lines.length];
+            const row = document.createElement("div");
+            row.className = item.c;
+            row.textContent = `> ${item.t}  ${Math.random().toString(16).slice(2, 8)}`;
+            el.appendChild(row);
+            while (el.childNodes.length > 8) el.removeChild(el.firstChild);
+            el.scrollTop = el.scrollHeight;
+            n += 1;
+        };
+        for (let i = 0; i < 5; i++) pushLine();
+        setInterval(pushLine, 90 + Math.floor(Math.random() * 70));
+    });
+}
+
+const SIGNAL_CYCLE_MS = 30 * 60 * 1000;
+const SIGNAL_ARM_MS = 60 * 1000;
+const SIGNAL_CYCLE_KEY = "crash_signal_cycle_v1";
+
+function unixNowSec() {
+    return Math.floor(Date.now() / 1000) + vipServerTimeOffset;
+}
+
+function signalCycleStorageKey() {
+    const id = displayMemberId() || (currentUser && currentUser.email) || "anon";
+    return `${SIGNAL_CYCLE_KEY}_${id}`;
+}
+
+function readLocalSignalCycle() {
+    try {
+        const raw = JSON.parse(localStorage.getItem(signalCycleStorageKey()) || "null");
+        if (!raw || typeof raw !== "object") return null;
+        return {
+            startedAt: Number(raw.startedAt) || 0,
+            armedAt: Number(raw.armedAt) || 0
+        };
+    } catch {
+        return null;
+    }
+}
+
+function writeLocalSignalCycle(startedAt, armedAt) {
+    try {
+        localStorage.setItem(signalCycleStorageKey(), JSON.stringify({
+            startedAt: Number(startedAt) || 0,
+            armedAt: Number(armedAt) || 0
+        }));
+    } catch {}
+}
+
+async function persistSignalCycle(op) {
+    const now = unixNowSec();
+    let startedAt = 0;
+    let armedAt = 0;
+    const local = readLocalSignalCycle();
+    const email = currentUser && currentUser.email ? String(currentUser.email).trim() : "";
+    const uniqueId = displayMemberId() || "";
+    const paths = email ? memberServerPaths(email).save : [];
+    for (let i = 0; i < paths.length; i++) {
+        try {
+            const response = await fetch(paths[i], {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                body: JSON.stringify({
+                    action: "signal_cycle",
+                    op: op || "ensure",
+                    email,
+                    uniqueId
+                })
+            });
+            const data = await parseJsonResponse(response);
+            if (data && data.ok && data.startedAt) {
+                if (Number(data.now)) vipServerTimeOffset = Number(data.now) - Math.floor(Date.now() / 1000);
+                startedAt = Number(data.startedAt) || 0;
+                armedAt = Number(data.armedAt) || 0;
+                writeLocalSignalCycle(startedAt, armedAt);
+                return {
+                    startedAt,
+                    armedAt,
+                    ready: Boolean(data.ready),
+                    remainingMs: Number(data.remainingMs) || 0,
+                    armRemainingMs: Number(data.armRemainingMs) || 0
+                };
+            }
+        } catch {}
+    }
+    startedAt = local && local.startedAt > 0 && local.startedAt <= now ? local.startedAt : now;
+    armedAt = local && local.armedAt > 0 ? local.armedAt : 0;
+    if (op === "arm" && (now - startedAt) * 1000 >= SIGNAL_CYCLE_MS) {
+        if (!armedAt) armedAt = now;
+    }
+    if (op === "complete") {
+        startedAt = now;
+        armedAt = 0;
+    }
+    writeLocalSignalCycle(startedAt, armedAt);
+    const elapsed = Math.max(0, (now - startedAt) * 1000);
+    const ready = elapsed >= SIGNAL_CYCLE_MS;
+    const armRemainingMs = armedAt > 0 ? Math.max(0, SIGNAL_ARM_MS - Math.max(0, (now - armedAt) * 1000)) : 0;
+    return { startedAt, armedAt, ready, remainingMs: ready ? 0 : SIGNAL_CYCLE_MS - elapsed, armRemainingMs };
+}
+
+/* -------------------------------------------------------------------------- */
+/* Cockpit Radar de Vol                                                       */
+/* -------------------------------------------------------------------------- */
+
 function stopVipRadarEngine() {
     if (vipAnimationId) {
         cancelAnimationFrame(vipAnimationId);
@@ -2155,6 +2294,10 @@ function stopVipRadarEngine() {
     if (vipResizeHandler) {
         window.removeEventListener("resize", vipResizeHandler);
         vipResizeHandler = null;
+    }
+    if (vipSignalTimer) {
+        clearInterval(vipSignalTimer);
+        vipSignalTimer = null;
     }
     vipEngineRunning = false;
 }
@@ -2171,6 +2314,12 @@ function startVipGrandVerticalRadarEngine() {
     const historyList = document.getElementById("vipHistoryList");
     const scannerLoader = document.getElementById("vipScannerLoader");
     const scanProgressFill = document.getElementById("scanProgressFill");
+    const unlockBtn = document.getElementById("vipUnlockSignalBtn");
+    const predReveal = document.getElementById("vipPredReveal");
+    const codeFrame = document.getElementById("vipCodeFrame");
+    const chronoWrap = document.getElementById("vipSignalChrono");
+    const chronoValue = document.getElementById("vipSignalChronoValue");
+    const scanSubtitle = document.getElementById("vipScanRemain");
 
     if (!canvas) {
         vipEngineRunning = false;
@@ -2225,12 +2374,34 @@ function startVipGrandVerticalRadarEngine() {
         flightSpeed = vipTargetMultiplier >= 4.81 ? 0.00105 : (vipTargetMultiplier >= 2.21 ? 0.00128 : 0.00148);
 
         const conf = (98.6 + Math.random() * 1.2).toFixed(1) + "%";
-
         if (targetDisplay) targetDisplay.textContent = `x${vipTargetMultiplier.toFixed(2)}`;
         if (confidenceDisplay) confidenceDisplay.textContent = conf;
-        if (statusMessage) {
-            statusMessage.innerHTML = `🛰️ <strong>SIGNAL STABLE :</strong> x${vipTargetMultiplier.toFixed(2)}`;
-        }
+    }
+
+    function hideSignalUi() {
+        predReveal?.classList.add("hidden");
+        chronoWrap?.classList.add("hidden");
+        unlockBtn?.classList.add("hidden");
+        codeFrame?.classList.remove("hidden");
+        if (targetDisplay) targetDisplay.textContent = "";
+        if (statusMessage) statusMessage.textContent = "";
+    }
+
+    function showAwaitingUnlock() {
+        scannerLoader?.classList.add("hidden");
+        codeFrame?.classList.remove("hidden");
+        predReveal?.classList.add("hidden");
+        chronoWrap?.classList.add("hidden");
+        unlockBtn?.classList.remove("hidden");
+        flightState = "awaitingUnlock";
+        if (statusMessage) statusMessage.textContent = "";
+    }
+
+    function formatRemain(ms) {
+        const total = Math.max(0, Math.ceil(ms / 1000));
+        const m = Math.floor(total / 60);
+        const s = total % 60;
+        return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
     }
 
     function createExplosion(x, y) {
@@ -2268,7 +2439,12 @@ function startVipGrandVerticalRadarEngine() {
     }
 
     function beginTakeoff() {
+        persistSignalCycle("complete");
         scannerLoader?.classList.add("hidden");
+        unlockBtn?.classList.add("hidden");
+        chronoWrap?.classList.add("hidden");
+        codeFrame?.classList.add("hidden");
+        predReveal?.classList.remove("hidden");
         flightState = "flying";
         currentMultiplier = 1.00;
         flightProgress = 0;
@@ -2278,18 +2454,56 @@ function startVipGrandVerticalRadarEngine() {
         generateNextTarget();
     }
 
-    function startCalibrationPhase() {
+    function startArmCountdown(remainingMs) {
+        scannerLoader?.classList.add("hidden");
+        unlockBtn?.classList.add("hidden");
+        predReveal?.classList.add("hidden");
+        codeFrame?.classList.add("hidden");
+        chronoWrap?.classList.remove("hidden");
+        flightState = "arming";
+        let left = Math.max(1, Math.ceil(remainingMs / 1000));
+        if (chronoValue) chronoValue.textContent = String(left);
+        if (vipSignalTimer) clearInterval(vipSignalTimer);
+        vipSignalTimer = setInterval(() => {
+            left -= 1;
+            if (chronoValue) chronoValue.textContent = String(Math.max(0, left));
+            if (left <= 0) {
+                clearInterval(vipSignalTimer);
+                vipSignalTimer = null;
+                beginTakeoff();
+            }
+        }, 1000);
+    }
+
+    async function startCalibrationPhase() {
         flightState = "scanning";
+        hideSignalUi();
         scannerLoader?.classList.remove("hidden");
-        if (scanProgressFill) scanProgressFill.style.width = "0%";
         if (vipCalibrationTimer) {
             cancelAnimationFrame(vipCalibrationTimer);
             clearInterval(vipCalibrationTimer);
             vipCalibrationTimer = null;
         }
+        if (vipSignalTimer) {
+            clearInterval(vipSignalTimer);
+            vipSignalTimer = null;
+        }
 
-        const startedAt = Date.now();
-        const durationMs = 30 * 60 * 1000;
+        const cycle = await persistSignalCycle("ensure");
+        if (!vipEngineRunning) return;
+
+        if (cycle.armedAt > 0) {
+            if (cycle.armRemainingMs > 0) {
+                startArmCountdown(cycle.armRemainingMs);
+                return;
+            }
+            beginTakeoff();
+            return;
+        }
+        if (cycle.ready) {
+            showAwaitingUnlock();
+            return;
+        }
 
         function tickCalibration() {
             if (!vipEngineRunning) {
@@ -2299,17 +2513,30 @@ function startVipGrandVerticalRadarEngine() {
                 }
                 return;
             }
-            const progress = Math.min(100, ((Date.now() - startedAt) / durationMs) * 100);
+            const now = unixNowSec();
+            const elapsedMs = Math.max(0, (now - cycle.startedAt) * 1000);
+            const remain = Math.max(0, SIGNAL_CYCLE_MS - elapsedMs);
+            const progress = Math.min(100, (elapsedMs / SIGNAL_CYCLE_MS) * 100);
             if (scanProgressFill) scanProgressFill.style.width = `${progress}%`;
-            if (progress >= 100) {
+            if (scanSubtitle) scanSubtitle.textContent = formatRemain(remain);
+            if (remain <= 0) {
                 clearInterval(vipCalibrationTimer);
                 vipCalibrationTimer = null;
-                beginTakeoff();
+                showAwaitingUnlock();
             }
         }
         vipCalibrationTimer = setInterval(tickCalibration, 250);
         tickCalibration();
     }
+
+    unlockBtn?.addEventListener("click", async (e) => {
+        e.preventDefault();
+        if (flightState !== "awaitingUnlock") return;
+        unlockBtn.classList.add("hidden");
+        const armed = await persistSignalCycle("arm");
+        const remain = armed.armRemainingMs > 0 ? armed.armRemainingMs : SIGNAL_ARM_MS;
+        startArmCountdown(remain);
+    });
 
     function drawPlane(x, y, angle) {
         ctx.save();
@@ -2462,6 +2689,8 @@ function startVipGrandVerticalRadarEngine() {
             });
 
             if (explosionTimer > 50) {
+                hideSignalUi();
+                flightState = "scanning";
                 startCalibrationPhase();
             }
         }
@@ -2469,7 +2698,7 @@ function startVipGrandVerticalRadarEngine() {
         vipAnimationId = requestAnimationFrame(renderVIPCockpit);
     }
 
-    beginTakeoff();
+    startCalibrationPhase();
     renderVIPCockpit();
 }
 

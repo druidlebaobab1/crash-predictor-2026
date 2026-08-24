@@ -98,6 +98,104 @@ if (!is_array($body)) {
 $action = strtolower(trim((string) ($body["action"] ?? "")));
 $email = members_normalize_email($_GET["email"] ?? ($body["email"] ?? ""));
 $members = members_read_store($storeFile);
+$cycleFile = $dataDir . DIRECTORY_SEPARATOR . "signal-cycles.json";
+
+function signal_cycles_read($file) {
+    if (!is_file($file)) {
+        return [];
+    }
+    $raw = @file_get_contents($file);
+    $data = json_decode((string) $raw, true);
+    return is_array($data) ? $data : [];
+}
+
+function signal_cycles_write($file, $cycles) {
+    $tmp = $file . ".tmp";
+    $json = json_encode($cycles, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    if (@file_put_contents($tmp, $json, LOCK_EX) === false) {
+        return false;
+    }
+    return @rename($tmp, $file);
+}
+
+function signal_cycle_key($email, $uniqueId) {
+    $email = members_normalize_email($email);
+    $uniqueId = strtoupper(trim((string) $uniqueId));
+    if ($email !== "") {
+        return "email:" . $email;
+    }
+    if ($uniqueId !== "") {
+        return "id:" . $uniqueId;
+    }
+    return "";
+}
+
+function signal_cycle_payload($startedAt, $armedAt, $now) {
+    $cycleMs = 30 * 60 * 1000;
+    $armMs = 60 * 1000;
+    $elapsedMs = max(0, ($now - $startedAt) * 1000);
+    $ready = $elapsedMs >= $cycleMs;
+    $armRemain = 0;
+    if ($armedAt > 0) {
+        $armRemain = max(0, $armMs - max(0, ($now - $armedAt) * 1000));
+    }
+    return [
+        "ok" => true,
+        "now" => $now,
+        "startedAt" => $startedAt,
+        "armedAt" => $armedAt,
+        "ready" => $ready,
+        "remainingMs" => $ready ? 0 : max(0, $cycleMs - $elapsedMs),
+        "armRemainingMs" => $armRemain
+    ];
+}
+
+if ($method === "POST" && $action === "signal_cycle") {
+    $uniqueId = strtoupper(trim((string) ($body["uniqueId"] ?? "")));
+    $op = strtolower(trim((string) ($body["op"] ?? "ensure")));
+    $key = signal_cycle_key($email, $uniqueId);
+    if ($key === "") {
+        http_response_code(400);
+        echo json_encode(["ok" => false, "error" => "missing_identity"]);
+        exit;
+    }
+    $now = time();
+    $cycles = signal_cycles_read($cycleFile);
+    $row = is_array($cycles[$key] ?? null) ? $cycles[$key] : [];
+    $startedAt = (int) ($row["startedAt"] ?? 0);
+    $armedAt = (int) ($row["armedAt"] ?? 0);
+    if ($email !== "" && is_array($members[$email] ?? null)) {
+        $startedAt = max($startedAt, (int) ($members[$email]["signalCycleStartedAt"] ?? 0));
+        $armedAt = max($armedAt, (int) ($members[$email]["signalArmedAt"] ?? 0));
+    }
+    if ($startedAt <= 0 || $startedAt > $now) {
+        $startedAt = $now;
+        $armedAt = 0;
+    }
+    $cycleSec = 30 * 60;
+    if ($op === "arm") {
+        if (($now - $startedAt) >= $cycleSec) {
+            if ($armedAt <= 0 || $armedAt > $now) {
+                $armedAt = $now;
+            }
+        }
+    } elseif ($op === "complete") {
+        $startedAt = $now;
+        $armedAt = 0;
+    }
+    $cycles[$key] = ["startedAt" => $startedAt, "armedAt" => $armedAt, "updatedAt" => $now];
+    if ($email !== "" && $uniqueId !== "") {
+        $cycles["id:" . $uniqueId] = $cycles[$key];
+    }
+    signal_cycles_write($cycleFile, $cycles);
+    if ($email !== "" && is_array($members[$email] ?? null)) {
+        $members[$email]["signalCycleStartedAt"] = $startedAt;
+        $members[$email]["signalArmedAt"] = $armedAt;
+        members_write_store($storeFile, $members);
+    }
+    echo json_encode(signal_cycle_payload($startedAt, $armedAt, $now));
+    exit;
+}
 
 if ($method === "POST" && ($action === "save" || $action === "" || $action === "member_account")) {
     if ($email === "" || strpos($email, "@") === false) {
@@ -149,7 +247,9 @@ if ($method === "POST" && ($action === "save" || $action === "" || $action === "
         "lastPaymentRef" => $lastPaymentRef,
         "referredBy" => (string) (($existing["referredBy"] ?? "") !== "" ? $existing["referredBy"] : ($body["referredBy"] ?? "")),
         "paidReferralCount" => (int) ($existing["paidReferralCount"] ?? 0),
-        "creditedFilleuls" => is_array($existing["creditedFilleuls"] ?? null) ? $existing["creditedFilleuls"] : []
+        "creditedFilleuls" => is_array($existing["creditedFilleuls"] ?? null) ? $existing["creditedFilleuls"] : [],
+        "signalCycleStartedAt" => (int) ($existing["signalCycleStartedAt"] ?? 0),
+        "signalArmedAt" => (int) ($existing["signalArmedAt"] ?? 0)
     ];
     if (!empty($existing["uniqueId"]) && $incoming["uniqueId"] === "") {
         $incoming["uniqueId"] = $existing["uniqueId"];

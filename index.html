@@ -6,7 +6,14 @@
     <meta name="theme-color" content="#080512">
     <title data-i18n="doc_title">CRASH PREDICTOR 2026 | Cockpit d'Analyse et Prédictions Officielles</title>
     <meta name="description" content="Crash Predictor 2026 — Plateforme d'analyse algorithmique en temps réel, cockpit interactif et abonnement mensuel.">
-    <link rel="icon" href="assets/crash_hd.jpg" type="image/jpeg">
+    <link rel="icon" href="assets/favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/pwa-icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="assets/pwa-icon-512.png">
+    <link rel="apple-touch-icon" href="assets/pwa-icon-192.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="assets/pwa-icon-192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="assets/pwa-icon-512.png">
+    <link rel="shortcut icon" href="assets/favicon.ico">
+    <meta property="og:image" content="assets/pwa-icon-512.png">
     <!-- Meta Pixel Code -->
     <script>
     !function(f,b,e,v,n,t,s)
@@ -29,7 +36,6 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="CrashApp">
-    <link rel="apple-touch-icon" href="assets/pwa-icon-192.png">
     <script>
     (function () {
         try {
@@ -66,7 +72,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=Orbitron:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=u55">
+    <link rel="stylesheet" href="style.css?v=u57">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 </head>
 <body class="dark-theme">
@@ -127,8 +133,8 @@
                     <!-- SÉLECTEUR DE LANGUE DISCRET & INTUITIF -->
                     <div class="lang-selector-dropdown" id="langSelectorWrap">
                         <button type="button" class="lang-toggle-btn" id="langToggleBtn" aria-label="Changer de langue">
-                            <span class="lang-flag" id="currentLangFlag">🇫🇷</span>
-                            <span class="lang-code" id="currentLangCode">FR</span>
+                            <span class="lang-flag js-lang-flag" id="currentLangFlag">🇫🇷</span>
+                            <span class="lang-code js-lang-code" id="currentLangCode">FR</span>
                             <i class="fa-solid fa-chevron-down lang-chevron"></i>
                         </button>
                         <div class="lang-dropdown-menu hidden" id="langDropdownMenu">
@@ -188,6 +194,10 @@
                             <div class="clean-image-wrapper radiant-gold-frame">
                                 <img src="assets/crash_hd.jpg" alt="Crash Predictor" class="crash-clean-image">
                                 <div class="radiant-light-beam" aria-hidden="true"></div>
+                            </div>
+                            <div class="code-stream-frame" aria-hidden="true">
+                                <div class="code-stream-chrome">algo.inject // live</div>
+                                <pre class="code-stream" data-code-stream></pre>
                             </div>
                             <div class="image-caption-bar">
                                 <span class="badge-algo"><i class="fa-solid fa-microchip" aria-hidden="true"></i> <span data-i18n="badge_algo">MOTEUR 2026</span></span>
@@ -333,6 +343,30 @@
                 </div>
 
                 <div class="vip-user-meta">
+                    <div class="lang-selector-dropdown" id="vipLangSelectorWrap">
+                        <button type="button" class="lang-toggle-btn" id="vipLangToggleBtn" aria-label="Changer de langue">
+                            <span class="lang-flag js-lang-flag">🇫🇷</span>
+                            <span class="lang-code js-lang-code">FR</span>
+                            <i class="fa-solid fa-chevron-down lang-chevron"></i>
+                        </button>
+                        <div class="lang-dropdown-menu hidden" id="vipLangDropdownMenu">
+                            <button type="button" class="lang-option-btn active" data-lang="fr">
+                                <span class="opt-flag">🇫🇷</span> <span class="opt-label">Français</span>
+                            </button>
+                            <button type="button" class="lang-option-btn" data-lang="en">
+                                <span class="opt-flag">🇬🇧</span> <span class="opt-label">English</span>
+                            </button>
+                            <button type="button" class="lang-option-btn" data-lang="es">
+                                <span class="opt-flag">🇪🇸</span> <span class="opt-label">Español</span>
+                            </button>
+                            <button type="button" class="lang-option-btn" data-lang="pt">
+                                <span class="opt-flag">🇵🇹</span> <span class="opt-label">Português</span>
+                            </button>
+                            <button type="button" class="lang-option-btn" data-lang="de">
+                                <span class="opt-flag">🇩🇪</span> <span class="opt-label">Deutsch</span>
+                            </button>
+                        </div>
+                    </div>
                     <div class="vip-member-tag" id="vipProfileBadge">
                         <i class="fa-solid fa-crown text-gold" aria-hidden="true"></i>
                         <span id="vipUsernameDisplay">Membre Actif</span>
@@ -356,12 +390,19 @@
                     </div>
 
                     <div class="vip-prediction-spotlight" id="vipPredictionSpotlight">
-                        <div class="pred-label" data-i18n="pred_label">POINT DE SORTIE CALCULÉ</div>
-                        <div class="pred-multiplier-value" id="vipLiveTargetDisplay">x2.40</div>
-                        <div class="pred-meta-row">
-                            <span class="pred-confidence"><i class="fa-solid fa-shield-halved text-green" aria-hidden="true"></i> <span data-i18n="pred_stability">Stabilité :</span> <strong id="vipLiveConfidence">99.4%</strong></span>
-                            <span class="pred-advice" id="vipLiveAdvice" data-i18n="pred_advice">Retirez vos gains avant cette cote de sécurité</span>
+                        <div class="code-stream-frame vip-code-frame" id="vipCodeFrame" aria-hidden="true">
+                            <div class="code-stream-chrome">core.predict // executing</div>
+                            <pre class="code-stream" data-code-stream></pre>
                         </div>
+                        <div class="vip-pred-reveal hidden" id="vipPredReveal">
+                            <div class="pred-label" data-i18n="pred_label">POINT DE SORTIE CALCULÉ</div>
+                            <div class="pred-multiplier-value" id="vipLiveTargetDisplay"></div>
+                        </div>
+                        <div class="vip-signal-chrono hidden" id="vipSignalChrono">
+                            <span class="chrono-label" data-i18n="signal_window">DÉCOLLAGE DANS</span>
+                            <span class="chrono-digits"><span id="vipSignalChronoValue">60</span>s</span>
+                        </div>
+                        <button type="button" class="btn-unlock-signal hidden" id="vipUnlockSignalBtn" data-i18n="btn_unlock_signal">VOIR LE SIGNAL</button>
                     </div>
 
                     <div class="vip-canvas-viewport grand-vertical-viewport">
@@ -377,7 +418,7 @@
                             <div class="scanner-text-group">
                                 <i class="fa-solid fa-satellite-dish fa-spin text-gold" aria-hidden="true"></i>
                                 <span class="scan-title" data-i18n="scan_title">CALIBRATION DU SIGNAL</span>
-                                <span class="scan-subtitle" data-i18n="scan_subtitle">Prochain tour en préparation…</span>
+                                <span class="scan-subtitle" id="vipScanRemain">30:00</span>
                             </div>
                             <div class="scan-progress-track">
                                 <div class="scan-progress-fill" id="scanProgressFill"></div>
@@ -387,7 +428,7 @@
 
                     <div class="vip-flight-status-bar" id="vipFlightStatusBar">
                         <span class="status-indicator-dot"></span>
-                        <span class="status-message-text" id="vipFlightMessage" data-i18n="vip_flight_init">Analyse des flux… Décollage imminent</span>
+                        <span class="status-message-text" id="vipFlightMessage"></span>
                     </div>
 
                     <div class="live-activity-luxury-card js-live-activity" aria-live="polite">
@@ -765,13 +806,16 @@
 
     <button type="button" id="ambientAudioToggle" class="ambient-audio-toggle" aria-label="Couper le son d'ambiance" aria-pressed="false" title="Son d'ambiance">
         <svg class="icon-on" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 9v6h3.2L12 19.2V4.8L7.2 9H4zm11.5 3c0-1.8-1-3.3-2.5-4v8c1.5-.7 2.5-2.2 2.5-4zm2.5 0c0 2.9-1.6 5.4-4 6.7v-2.1c1.4-.9 2.3-2.6 2.3-4.6S15.4 8.3 14 7.4V5.3c2.4 1.3 4 3.8 4 6.7z"/>
+            <path d="M3 9h4l5-4v14l-5-4H3V9z"/>
+            <path d="M16 8.5c1.5 1.4 1.5 5.6 0 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M18.7 6c2.7 2.5 2.7 9.5 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
         <svg class="icon-muted" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 9v6h3.2L12 19.2V4.8L7.2 9H4zm12.9-3.1-1.4 1.4C16.5 8.6 17 10.2 17 12c0 1.5-.4 2.8-1 3.9l1.5 1.5c1-1.5 1.5-3.4 1.5-5.4 0-2.4-.8-4.6-2.1-6.1zM14 7.4v2.3c.4.5.7 1.1.9 1.8l1.6-1.6c-.6-1-.9-1.7-2.5-2.5zM4.3 3 3 4.3 19.7 21l1.3-1.3L4.3 3z"/>
+            <path d="M3 9h4l5-4v14l-5-4H3V9z"/>
+            <path d="M16.5 9.5l5 5M21.5 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
     </button>
-    <script src="app.js?v=u51" defer></script>
-    <script src="ambient-audio.js?v=3" defer></script>
+    <script src="app.js?v=u52" defer></script>
+    <script src="ambient-audio.js?v=4" defer></script>
 </body>
 </html>

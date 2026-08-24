@@ -165,6 +165,25 @@
         hum.start();
     }
 
+    function playKeyClick() {
+        if (!ctx || !landingGain) return;
+        var t = ctx.currentTime;
+        var osc = ctx.createOscillator();
+        osc.type = "square";
+        osc.frequency.value = 1800 + Math.random() * 1400;
+        var filter = ctx.createBiquadFilter();
+        filter.type = "bandpass";
+        filter.frequency.value = 2400 + Math.random() * 1800;
+        filter.Q.value = 6;
+        var gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.0001, t);
+        gain.gain.exponentialRampToValueAtTime(0.045, t + 0.004);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.03);
+        osc.connect(filter).connect(gain).connect(landingGain);
+        osc.start(t);
+        osc.stop(t + 0.04);
+    }
+
     function playInto(dest, freq, duration, peak) {
         if (!ctx || !dest) return;
         var t = ctx.currentTime;
@@ -239,6 +258,16 @@
             }
         }
         beepTimer = window.setTimeout(scheduleLandingPulse, 1500 + Math.random() * 2600);
+    }
+
+    function keyLoop() {
+        if (started && !isCockpit() && !muted) {
+            playKeyClick();
+            if (Math.random() < 0.4) {
+                window.setTimeout(playKeyClick, 35 + Math.random() * 80);
+            }
+        }
+        window.setTimeout(keyLoop, 65 + Math.random() * 130);
     }
 
     function syncScene() {
@@ -320,6 +349,7 @@
         startLandingLayers();
         startCockpitLayers();
         scheduleLandingPulse();
+        keyLoop();
         pingLoop();
         if (!rafId) loop();
         started = true;
