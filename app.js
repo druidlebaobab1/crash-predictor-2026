@@ -2516,9 +2516,7 @@ function startVipGrandVerticalRadarEngine() {
             const now = unixNowSec();
             const elapsedMs = Math.max(0, (now - cycle.startedAt) * 1000);
             const remain = Math.max(0, SIGNAL_CYCLE_MS - elapsedMs);
-            const progress = Math.min(100, (elapsedMs / SIGNAL_CYCLE_MS) * 100);
-            if (scanProgressFill) scanProgressFill.style.width = `${progress}%`;
-            if (scanSubtitle) scanSubtitle.textContent = formatRemain(remain);
+            if (scanSubtitle) scanSubtitle.textContent = "ANALYSE DU FLUX EN COURS...";
             if (remain <= 0) {
                 clearInterval(vipCalibrationTimer);
                 vipCalibrationTimer = null;

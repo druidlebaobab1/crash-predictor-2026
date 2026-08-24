@@ -72,7 +72,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=Orbitron:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=u57">
+    <link rel="stylesheet" href="style.css?v=u58">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 </head>
 <body class="dark-theme">
@@ -418,7 +418,7 @@
                             <div class="scanner-text-group">
                                 <i class="fa-solid fa-satellite-dish fa-spin text-gold" aria-hidden="true"></i>
                                 <span class="scan-title" data-i18n="scan_title">CALIBRATION DU SIGNAL</span>
-                                <span class="scan-subtitle" id="vipScanRemain">30:00</span>
+                                <span class="scan-subtitle" id="vipScanRemain">ANALYSE DU FLUX EN COURS...</span>
                             </div>
                             <div class="scan-progress-track">
                                 <div class="scan-progress-fill" id="scanProgressFill"></div>
@@ -806,16 +806,16 @@
 
     <button type="button" id="ambientAudioToggle" class="ambient-audio-toggle" aria-label="Couper le son d'ambiance" aria-pressed="false" title="Son d'ambiance">
         <svg class="icon-on" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M3 9h4l5-4v14l-5-4H3V9z"/>
-            <path d="M16 8.5c1.5 1.4 1.5 5.6 0 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            <path d="M18.7 6c2.7 2.5 2.7 9.5 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M5 9h3l4.5-3.5v13L8 15H5V9z"/>
+            <path d="M15.4 9.4c1.2 1.15 1.2 4.05 0 5.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M17.7 7.3c2.15 2 2.15 7.4 0 9.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
         </svg>
         <svg class="icon-muted" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M3 9h4l5-4v14l-5-4H3V9z"/>
-            <path d="M16.5 9.5l5 5M21.5 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M5 9h3l4.5-3.5v13L8 15H5V9z"/>
+            <path d="M16.2 10.2l4.2 4.2M20.4 10.2l-4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
         </svg>
     </button>
-    <script src="app.js?v=u52" defer></script>
-    <script src="ambient-audio.js?v=4" defer></script>
+    <script src="app.js?v=u53" defer></script>
+    <script src="ambient-audio.js?v=5" defer></script>
 </body>
 </html>

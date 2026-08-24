@@ -1125,6 +1125,15 @@ button.vip-member-tag:hover {
 
 .scan-progress-track { width: 220px; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 10px; overflow: hidden; }
 .scan-progress-fill { height: 100%; width: 0%; background: var(--gold-gradient); transition: width 0.35s linear; }
+#vipScannerLoader .scan-progress-fill {
+    width: 38%;
+    animation: scanIndeterminate 1.45s ease-in-out infinite;
+    transition: none;
+}
+@keyframes scanIndeterminate {
+    0% { transform: translateX(-140%); }
+    100% { transform: translateX(280%); }
+}
 
 .vip-flight-status-bar {
     background: rgba(0, 0, 0, 0.4);
@@ -1949,11 +1958,11 @@ button.vip-member-tag:hover {
     top: max(10px, env(safe-area-inset-top, 0px));
     right: max(10px, env(safe-area-inset-right, 0px));
     z-index: 1105;
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
     margin: 0;
     padding: 0;
-    border: 1px solid #ffc837;
+    border: 1.5px solid #ffc837;
     border-radius: 50%;
     background: #0d0818;
     color: #ffc837;
@@ -1962,16 +1971,23 @@ button.vip-member-tag:hover {
     justify-content: center;
     cursor: pointer;
     box-shadow: none;
+    filter: none;
     line-height: 0;
     overflow: hidden;
+    box-sizing: border-box;
     pointer-events: auto;
+}
+.ambient-audio-toggle.on-cockpit {
+    top: max(70px, calc(env(safe-area-inset-top, 0px) + 58px));
+    right: max(10px, env(safe-area-inset-right, 0px));
 }
 .ambient-audio-toggle svg {
     width: 15px;
     height: 15px;
     display: block;
     fill: currentColor;
-    overflow: visible;
+    overflow: hidden;
+    flex-shrink: 0;
     shape-rendering: geometricPrecision;
 }
 .ambient-audio-toggle .icon-muted { display: none; }
