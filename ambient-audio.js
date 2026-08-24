@@ -21,9 +21,7 @@
     var lastTickStep = 0;
     var toggleBtn = null;
 
-    try {
-        muted = localStorage.getItem(STORAGE_KEY) === "1";
-    } catch (err) {}
+    muted = false;
 
     function $(id) {
         return document.getElementById(id);
@@ -328,18 +326,29 @@
         resumeCtx();
     }
 
-    function onFirstGesture() {
+    function isToggleEvent(e) {
+        return Boolean(toggleBtn && e && e.target && toggleBtn.contains(e.target));
+    }
+
+    function onPageGesture(e) {
+        if (isToggleEvent(e)) return;
         startEngine();
         resumeCtx();
     }
 
     function bindUnlock() {
         var opts = { capture: true, passive: true };
-        document.addEventListener("pointerdown", onFirstGesture, opts);
-        document.addEventListener("touchstart", onFirstGesture, opts);
-        document.addEventListener("click", onFirstGesture, opts);
-        document.addEventListener("keydown", onFirstGesture, opts);
-        window.addEventListener("scroll", onFirstGesture, opts);
+        document.addEventListener("pointerdown", onPageGesture, opts);
+        document.addEventListener("touchstart", onPageGesture, opts);
+        document.addEventListener("touchend", onPageGesture, opts);
+        document.addEventListener("click", onPageGesture, opts);
+        document.addEventListener("keydown", onPageGesture, opts);
+        document.addEventListener("wheel", onPageGesture, opts);
+        window.addEventListener("scroll", onPageGesture, opts);
+        window.addEventListener("pageshow", function () {
+            startEngine();
+            resumeCtx();
+        });
     }
 
     function bindToggle() {
@@ -349,28 +358,32 @@
         toggleBtn.addEventListener("click", function (e) {
             e.preventDefault();
             e.stopPropagation();
-            startEngine();
-            resumeCtx();
-            setMuted(!muted);
+            if (muted || !started || (ctx && ctx.state !== "running")) {
+                startEngine();
+                resumeCtx();
+                setMuted(false);
+                return;
+            }
+            setMuted(true);
         });
     }
 
     document.addEventListener("visibilitychange", function () {
-        if (!ctx) return;
-        if (document.hidden) {
-            ctx.suspend().catch(function () {});
-        } else if (!muted) {
-            resumeCtx();
-        }
+        if (document.hidden) return;
+        startEngine();
+        if (!muted) resumeCtx();
     });
 
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", function () {
-            bindToggle();
-            bindUnlock();
-        });
-    } else {
+    function boot() {
         bindToggle();
         bindUnlock();
+        startEngine();
+        resumeCtx();
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", boot);
+    } else {
+        boot();
     }
 })();
