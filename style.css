@@ -1942,3 +1942,39 @@ button.vip-member-tag:hover {
     .btn-referral-copy { width: 100%; min-height: 46px; }
     .referral-share-btn { min-height: 48px; }
 }
+
+/* Bouton mute ambiance : fixed, hors flux, aucun décalage de mise en page */
+.ambient-audio-toggle {
+    position: fixed;
+    top: max(10px, env(safe-area-inset-top, 0px));
+    right: max(10px, env(safe-area-inset-right, 0px));
+    z-index: 1105;
+    width: 40px;
+    height: 40px;
+    margin: 0;
+    padding: 0;
+    border: 1.5px solid #ffc837;
+    border-radius: 50%;
+    background: rgba(8, 5, 18, 0.88);
+    color: #ffc837;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 0 12px rgba(255, 200, 55, 0.45);
+    line-height: 0;
+    pointer-events: auto;
+}
+.ambient-audio-toggle svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+    fill: currentColor;
+}
+.ambient-audio-toggle .icon-muted { display: none; }
+.ambient-audio-toggle.is-muted .icon-on { display: none; }
+.ambient-audio-toggle.is-muted .icon-muted { display: block; }
+.ambient-audio-toggle:hover {
+    color: rgba(255, 200, 55, 0.9);
+    background: rgba(8, 5, 18, 0.55);
+}
