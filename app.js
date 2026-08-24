@@ -3269,7 +3269,6 @@ async function verifyMaketouReturn() {
 /* -------------------------------------------------------------------------- */
 
 function initMasterAdminDashboard() {
-    const linkOpenAdmin = document.getElementById("linkOpenAdminLogin");
     const adminModal = document.getElementById("adminModal");
     const closeAdminModal = document.getElementById("closeAdminModal");
     const formAdminAuth = document.getElementById("formAdminAuth");
@@ -3278,10 +3277,12 @@ function initMasterAdminDashboard() {
     const btnAdminActivate = document.getElementById("btnAdminActivateById");
     const adminTargetIdInput = document.getElementById("adminTargetIdInput");
 
-    linkOpenAdmin?.addEventListener("click", (e) => {
-        e.preventDefault();
-        adminModal?.classList.add("active");
-    });
+    const openAdminModal = () => adminModal?.classList.add("active");
+    const maybeOpenAdminFromHash = () => {
+        if (window.location.hash === "#admin") openAdminModal();
+    };
+    maybeOpenAdminFromHash();
+    window.addEventListener("hashchange", maybeOpenAdminFromHash);
 
     closeAdminModal?.addEventListener("click", () => adminModal?.classList.remove("active"));
 
