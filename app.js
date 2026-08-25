@@ -1598,7 +1598,7 @@ async function syncUserFromSupabase() {
     try {
         let { data, error } = await supabaseClient
             .from("users")
-            .select("unique_id, name, email, phone, is_subscribed, password_hash, payment_date, subscription_expires_at, vip_until, last_payment_ref")
+            .select("unique_id, name, email, phone, is_subscribed, password_hash, payment_date, subscription_expires_at, vip_until, last_payment_ref, referred_by, paid_referral_count")
             .ilike("email", normalizeEmail(currentUser.email))
             .maybeSingle();
         if (error) {
@@ -1640,6 +1640,16 @@ async function syncUserFromSupabase() {
                 }
             } else if (remoteId) {
                 currentUser.uniqueId = persistMemberId(remoteId);
+                changed = true;
+            }
+            const remoteRefCount = Number(data.paid_referral_count || 0);
+            if (remoteRefCount > Number(currentUser.paidReferralCount || 0)) {
+                currentUser.paidReferralCount = remoteRefCount;
+                changed = true;
+            }
+            const remoteReferredBy = formatMemberId(data.referred_by || "");
+            if (remoteReferredBy && !currentUser.referredBy) {
+                currentUser.referredBy = remoteReferredBy;
                 changed = true;
             }
             if (changed) {
@@ -4158,9 +4168,9 @@ async function refreshReferralModal() {
     let count = Number((currentUser && currentUser.paidReferralCount) || 0);
     if (currentUser && currentUser.email) {
         try {
-            const remote = await fetchAccountFromServer(currentUser.email);
+            const remote = await findAccountByEmail(currentUser.email);
             if (remote) {
-                count = Number(remote.paidReferralCount || 0);
+                count = Math.max(count, Number(remote.paidReferralCount || 0));
                 currentUser.paidReferralCount = count;
                 if (remote.referredBy && !currentUser.referredBy) currentUser.referredBy = remote.referredBy;
             }

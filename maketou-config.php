@@ -743,7 +743,28 @@ function maketou_credit_referral_on_payment($filleulEmail, $filleulUniqueId) {
     }
 
     [$sponsorEmail, $sponsor] = maketou_find_member_record_by_unique_id($sponsorId);
-    if ($sponsorEmail === null || !is_array($sponsor)) {
+    $cloudSponsor = maketou_supabase_fetch_user("", $sponsorId);
+    if (($sponsorEmail === null || !is_array($sponsor)) && is_array($cloudSponsor)) {
+        $sponsorEmail = strtolower(trim((string) ($cloudSponsor["email"] ?? "")));
+        if ($sponsorEmail !== "" && strpos($sponsorEmail, "@") !== false) {
+            $sponsor = maketou_read_local_member($sponsorEmail);
+            if (!is_array($sponsor)) {
+                $sponsor = [
+                    "email" => $sponsorEmail,
+                    "uniqueId" => $sponsorId,
+                    "name" => (string) ($cloudSponsor["name"] ?? "Client"),
+                    "isSubscribed" => !empty($cloudSponsor["is_subscribed"]),
+                    "paymentDate" => (string) ($cloudSponsor["payment_date"] ?? ""),
+                    "subscriptionExpiresAt" => (string) ($cloudSponsor["subscription_expires_at"] ?? ($cloudSponsor["vip_until"] ?? "")),
+                    "vipUntil" => (string) ($cloudSponsor["vip_until"] ?? ($cloudSponsor["subscription_expires_at"] ?? "")),
+                    "lastPaymentRef" => (string) ($cloudSponsor["last_payment_ref"] ?? ""),
+                    "paidReferralCount" => (int) ($cloudSponsor["paid_referral_count"] ?? 0),
+                    "creditedFilleuls" => []
+                ];
+            }
+        }
+    }
+    if ($sponsorEmail === null || $sponsorEmail === "" || !is_array($sponsor)) {
         return;
     }
     if ($filleulEmail !== "" && strcasecmp($sponsorEmail, $filleulEmail) === 0) {
@@ -765,7 +786,8 @@ function maketou_credit_referral_on_payment($filleulEmail, $filleulUniqueId) {
         $credited[] = $filleulId;
     }
 
-    $count = (int) ($sponsor["paidReferralCount"] ?? 0) + 1;
+    $cloudCount = is_array($cloudSponsor) ? (int) ($cloudSponsor["paid_referral_count"] ?? 0) : 0;
+    $count = max((int) ($sponsor["paidReferralCount"] ?? 0), $cloudCount) + 1;
     $sponsor["paidReferralCount"] = $count;
     $sponsor["creditedFilleuls"] = $credited;
     maketou_write_local_member($sponsorEmail, $sponsor);
