@@ -107,6 +107,7 @@ const TRANSLATIONS = {
         btn_load_more: "Afficher plus de témoignages",
         remaining_txt: "restants",
         footer_copy: "© PREDICTOR. Tous droits réservés.",
+        footer_rights: "Tous droits réservés.",
         footer_admin: "Espace administrateur",
         vip_official: "OFFICIEL",
         vip_radar_live: "SIGNAUX EN DIRECT",
@@ -229,6 +230,7 @@ const TRANSLATIONS = {
         btn_load_more: "Show more testimonials",
         remaining_txt: "remaining",
         footer_copy: "© PREDICTOR. All rights reserved.",
+        footer_rights: "All rights reserved.",
         footer_admin: "Admin portal",
         vip_official: "OFFICIAL",
         vip_radar_live: "LIVE RADAR FEED",
@@ -344,6 +346,7 @@ const TRANSLATIONS = {
         btn_load_more: "Ver más testimonios",
         remaining_txt: "restantes",
         footer_copy: "© PREDICTOR. Todos los derechos reservados.",
+        footer_rights: "Todos los derechos reservados.",
         footer_admin: "Acceso Administrador",
         vip_official: "OFICIAL",
         vip_radar_live: "RADAR EN VIVO",
@@ -458,6 +461,7 @@ const TRANSLATIONS = {
         btn_load_more: "Ver mais avaliações",
         remaining_txt: "restantes",
         footer_copy: "© PREDICTOR. Todos os direitos reservados.",
+        footer_rights: "Todos os direitos reservados.",
         footer_admin: "Área de Administração",
         vip_official: "OFICIAL",
         vip_radar_live: "RADAR EM DIRETO",
@@ -572,6 +576,7 @@ const TRANSLATIONS = {
         btn_load_more: "Weitere Bewertungen laden",
         remaining_txt: "übrig",
         footer_copy: "© PREDICTOR. Alle Rechte vorbehalten.",
+        footer_rights: "Alle Rechte vorbehalten.",
         footer_admin: "Admin-Bereich",
         vip_official: "OFFIZIELL",
         vip_radar_live: "LIVE-RADARFEED",
@@ -2313,14 +2318,16 @@ function flyerTheme() {
 
 function predictorGameHeading(id) {
     const names = {
-        aviator: "AVIATOR — SIGNAUX EN DIRECT",
-        luckyjet: "LUCKY JET — FLUX COSMIQUE",
-        crash: "CRASH — ALGORITHME LIVE",
-        mines: "MINES — CASES SÛRES",
-        penalty: "PENALTY SHOOT-OUT — CIBLAGE",
-        apple: "APPLE OF FORTUNE — CHEMIN DORÉ"
+        aviator: ["AVIATOR", " — SIGNAUX EN DIRECT"],
+        luckyjet: ["LUCKY JET", " — FLUX COSMIQUE"],
+        crash: ["CRASH", " — ALGORITHME LIVE"],
+        mines: ["MINES", " — CASES SÛRES"],
+        penalty: ["PENALTY SHOOT-OUT", " — CIBLAGE"],
+        apple: ["APPLE OF FORTUNE", " — CHEMIN DORÉ"]
     };
-    return names[id] || i18nText("radar_heading", "SESSION D'ANALYSE HAUTE PRÉCISION");
+    const pair = names[id];
+    if (!pair) return i18nText("radar_heading", "SESSION D'ANALYSE HAUTE PRÉCISION");
+    return `<span class="notranslate" translate="no">${pair[0]}</span>${pair[1]}`;
 }
 
 function clearBoardHighlights() {
@@ -2400,7 +2407,7 @@ function setActivePredictorGame(id, silent) {
     penalty?.classList.toggle("hidden", id !== "penalty");
     apple?.classList.toggle("hidden", id !== "apple");
     const heading = document.getElementById("vipGameHeading");
-    if (heading) heading.textContent = predictorGameHeading(id);
+    if (heading) heading.innerHTML = predictorGameHeading(id);
     const unlock = document.getElementById("vipUnlockSignalBtn");
     if (unlock) {
         const analyse = !showFlyer;

@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#080512">
-    <title data-i18n="doc_title">PREDICTOR | Suite d'analyse algorithmique multi-jeux</title>
+    <meta name="theme-color" content="#061428">
+    <title data-i18n="doc_title" translate="no">PREDICTOR | Suite d'analyse algorithmique multi-jeux</title>
     <meta name="description" content="PREDICTOR — Suite d'analyse algorithmique multi-jeux en temps réel. Un accès 17 $/mois débloque 6 moteurs de prédiction.">
     <link rel="icon" href="assets/favicon.ico" sizes="any">
     <link rel="icon" type="image/png" sizes="192x192" href="assets/pwa-icon-192.png">
@@ -35,7 +35,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Predictor">
+    <meta name="apple-mobile-web-app-title" content="PREDICTOR">
     <script>
     (function () {
         try {
@@ -72,7 +72,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=Orbitron:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=u61">
+    <link rel="stylesheet" href="style.css?v=u62">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 </head>
 <body class="dark-theme">
@@ -120,11 +120,16 @@
         <header class="main-navbar">
             <div class="nav-container">
                 <a href="#" class="brand-logo">
-                    <div class="logo-image-wrap">
-                        <img src="assets/crash_hd.jpg" alt="Predictor" class="brand-logo-img">
+                    <div class="predictor-mosaic" aria-hidden="true">
+                        <img src="assets/games/aviator.jpg" alt="">
+                        <img src="assets/games/luckyjet.jpg" alt="">
+                        <img src="assets/games/crash.jpg" alt="">
+                        <img src="assets/games/mines.jpg" alt="">
+                        <img src="assets/games/penalty.jpg" alt="">
+                        <img src="assets/games/apple.jpg" alt="">
                     </div>
                     <div class="brand-text">
-                        <span class="logo-title"><span class="highlight">PREDICTOR</span></span>
+                        <span class="logo-title"><span class="highlight notranslate" translate="no">PREDICTOR</span></span>
                         <span class="logo-badge" data-i18n="badge_edition">SUITE MULTI-JEUX</span>
                     </div>
                 </a>
@@ -185,28 +190,66 @@
                             <span class="promo-alarm-icon" aria-hidden="true">⏰</span>
                             <span><span data-i18n="promo_offer">DERNIÈRE CHANCE 17 $ :</span> <strong class="countdown-timer-text">47h 59m 50s</strong></span>
                         </div>
-                        <h1 class="hero-main-title">PREDICTOR <span class="gradient-gold">— SUITE D'ANALYSE ALGORITHMIQUE MULTI-JEUX</span></h1>
+                        <h1 class="hero-main-title"><span class="notranslate" translate="no">PREDICTOR</span> <span class="gradient-gold">— SUITE D'ANALYSE ALGORITHMIQUE MULTI-JEUX</span></h1>
                         <p class="hero-subtitle-desc" data-i18n="hero_subtitle">Six moteurs de prédiction en temps réel, un seul accès officiel à 17 $ / mois.</p>
                     </div>
 
                     <div class="suite-games-showcase" id="suiteGamesShowcase">
                         <p class="suite-games-kicker" data-i18n="suite_kicker">Licence unique · 6 jeux débloqués</p>
                         <div class="suite-games-grid">
-                            <article class="suite-game-card theme-aviator"><span class="suite-game-icon" aria-hidden="true">✈</span><strong>AVIATOR</strong><span data-i18n="game_tag_aviator">Signaux en direct</span></article>
-                            <article class="suite-game-card theme-luckyjet"><span class="suite-game-icon" aria-hidden="true">🚀</span><strong>LUCKY JET</strong><span data-i18n="game_tag_luckyjet">Flux cosmique</span></article>
-                            <article class="suite-game-card theme-crash"><span class="suite-game-icon" aria-hidden="true">⚡</span><strong>CRASH</strong><span data-i18n="game_tag_crash">Algorithme live</span></article>
-                            <article class="suite-game-card theme-mines"><span class="suite-game-icon" aria-hidden="true">💎</span><strong>MINES</strong><span data-i18n="game_tag_mines">Cases sûres</span></article>
-                            <article class="suite-game-card theme-penalty"><span class="suite-game-icon" aria-hidden="true">⚽</span><strong>PENALTY SHOOT-OUT</strong><span data-i18n="game_tag_penalty">Ciblage laser</span></article>
-                            <article class="suite-game-card theme-apple"><span class="suite-game-icon" aria-hidden="true">🍎</span><strong>APPLE OF FORTUNE</strong><span data-i18n="game_tag_apple">Chemin doré</span></article>
+                            <article class="suite-game-card theme-aviator">
+                                <div class="suite-game-art">
+                                    <img src="assets/games/aviator.jpg" alt="AVIATOR" class="notranslate" translate="no">
+                                    <span class="suite-game-shine" aria-hidden="true"></span>
+                                </div>
+                                <strong class="notranslate" translate="no">AVIATOR</strong>
+                                <span data-i18n="game_tag_aviator">Signaux en direct</span>
+                            </article>
+                            <article class="suite-game-card theme-luckyjet">
+                                <div class="suite-game-art">
+                                    <img src="assets/games/luckyjet.jpg" alt="LUCKY JET" class="notranslate" translate="no">
+                                    <span class="suite-game-shine" aria-hidden="true"></span>
+                                </div>
+                                <strong class="notranslate" translate="no">LUCKY JET</strong>
+                                <span data-i18n="game_tag_luckyjet">Flux cosmique</span>
+                            </article>
+                            <article class="suite-game-card theme-crash">
+                                <div class="suite-game-art">
+                                    <img src="assets/games/crash.jpg" alt="CRASH" class="notranslate" translate="no">
+                                    <span class="suite-game-shine" aria-hidden="true"></span>
+                                </div>
+                                <strong class="notranslate" translate="no">CRASH</strong>
+                                <span data-i18n="game_tag_crash">Algorithme live</span>
+                            </article>
+                            <article class="suite-game-card theme-mines">
+                                <div class="suite-game-art">
+                                    <img src="assets/games/mines.jpg" alt="MINES" class="notranslate" translate="no">
+                                    <span class="suite-game-shine" aria-hidden="true"></span>
+                                </div>
+                                <strong class="notranslate" translate="no">MINES</strong>
+                                <span data-i18n="game_tag_mines">Cases sûres</span>
+                            </article>
+                            <article class="suite-game-card theme-penalty">
+                                <div class="suite-game-art">
+                                    <img src="assets/games/penalty.jpg" alt="PENALTY SHOOT-OUT" class="notranslate" translate="no">
+                                    <span class="suite-game-shine" aria-hidden="true"></span>
+                                </div>
+                                <strong class="notranslate" translate="no">PENALTY SHOOT-OUT</strong>
+                                <span data-i18n="game_tag_penalty">Ciblage laser</span>
+                            </article>
+                            <article class="suite-game-card theme-apple">
+                                <div class="suite-game-art">
+                                    <img src="assets/games/apple.jpg" alt="APPLE OF FORTUNE" class="notranslate" translate="no">
+                                    <span class="suite-game-shine" aria-hidden="true"></span>
+                                </div>
+                                <strong class="notranslate" translate="no">APPLE OF FORTUNE</strong>
+                                <span data-i18n="game_tag_apple">Chemin doré</span>
+                            </article>
                         </div>
                     </div>
 
                     <div class="master-product-display luxury-alive-box">
                         <div class="product-visual-container">
-                            <div class="clean-image-wrapper radiant-gold-frame">
-                                <img src="assets/crash_hd.jpg" alt="Predictor" class="crash-clean-image">
-                                <div class="radiant-light-beam" aria-hidden="true"></div>
-                            </div>
                             <div class="code-stream-frame" aria-hidden="true">
                                 <div class="code-stream-chrome">algo.inject // live</div>
                                 <pre class="code-stream" data-code-stream></pre>
@@ -333,8 +376,8 @@
 
         <footer class="main-footer">
             <div class="footer-container">
-                <div class="logo-title"><span class="highlight">PREDICTOR</span></div>
-                <div class="footer-copy" data-i18n="footer_copy">&copy; PREDICTOR. Tous droits réservés.</div>
+                <div class="logo-title"><span class="highlight notranslate" translate="no">PREDICTOR</span></div>
+                <div class="footer-copy"><span class="notranslate" translate="no">&copy; PREDICTOR</span>. <span data-i18n="footer_rights">Tous droits réservés.</span></div>
             </div>
         </footer>
     </div>
@@ -347,9 +390,18 @@
         <header class="vip-software-navbar">
             <div class="vip-nav-container">
                 <div class="vip-brand">
-                    <div class="vip-logo-box"><img src="assets/crash_hd.jpg" alt="Logo"></div>
+                    <div class="vip-logo-box">
+                        <div class="predictor-mosaic" aria-hidden="true">
+                            <img src="assets/games/aviator.jpg" alt="">
+                            <img src="assets/games/luckyjet.jpg" alt="">
+                            <img src="assets/games/crash.jpg" alt="">
+                            <img src="assets/games/mines.jpg" alt="">
+                            <img src="assets/games/penalty.jpg" alt="">
+                            <img src="assets/games/apple.jpg" alt="">
+                        </div>
+                    </div>
                     <div class="vip-brand-info">
-                        <span class="vip-software-name">PREDICTOR</span>
+                        <span class="vip-software-name notranslate" translate="no">PREDICTOR</span>
                         <span class="vip-live-indicator"><span class="pulse-dot-green"></span> <span data-i18n="vip_radar_live">SIGNAUX EN DIRECT</span></span>
                     </div>
                 </div>
@@ -391,6 +443,32 @@
         </header>
 
         <main class="vip-software-body">
+            <nav class="vip-game-switcher" id="vipGameSwitcher" aria-label="Sélection du jeu">
+                <button type="button" class="vip-game-chip" data-game="aviator">
+                    <img src="assets/games/aviator.jpg" alt="" class="vip-chip-logo">
+                    <span class="notranslate" translate="no">AVIATOR</span>
+                </button>
+                <button type="button" class="vip-game-chip" data-game="luckyjet">
+                    <img src="assets/games/luckyjet.jpg" alt="" class="vip-chip-logo">
+                    <span class="notranslate" translate="no">LUCKY JET</span>
+                </button>
+                <button type="button" class="vip-game-chip is-active" data-game="crash">
+                    <img src="assets/games/crash.jpg" alt="" class="vip-chip-logo">
+                    <span class="notranslate" translate="no">CRASH</span>
+                </button>
+                <button type="button" class="vip-game-chip" data-game="mines">
+                    <img src="assets/games/mines.jpg" alt="" class="vip-chip-logo">
+                    <span class="notranslate" translate="no">MINES</span>
+                </button>
+                <button type="button" class="vip-game-chip" data-game="penalty">
+                    <img src="assets/games/penalty.jpg" alt="" class="vip-chip-logo">
+                    <span class="notranslate" translate="no">PENALTY SHOOT-OUT</span>
+                </button>
+                <button type="button" class="vip-game-chip" data-game="apple">
+                    <img src="assets/games/apple.jpg" alt="" class="vip-chip-logo">
+                    <span class="notranslate" translate="no">APPLE OF FORTUNE</span>
+                </button>
+            </nav>
             <div class="vip-dashboard-grid">
                 <div class="vip-radar-card">
                     <div class="radar-card-header">
@@ -400,15 +478,6 @@
                         </div>
                         <div class="radar-session-badge" data-i18n="radar_session_badge">SESSION ACTIVE</div>
                     </div>
-
-                    <nav class="vip-game-switcher" id="vipGameSwitcher" aria-label="Sélection du jeu">
-                        <button type="button" class="vip-game-chip" data-game="aviator"><span>✈</span> AVIATOR</button>
-                        <button type="button" class="vip-game-chip" data-game="luckyjet"><span>🚀</span> LUCKY JET</button>
-                        <button type="button" class="vip-game-chip is-active" data-game="crash"><span>⚡</span> CRASH</button>
-                        <button type="button" class="vip-game-chip" data-game="mines"><span>💎</span> MINES</button>
-                        <button type="button" class="vip-game-chip" data-game="penalty"><span>⚽</span> PENALTY</button>
-                        <button type="button" class="vip-game-chip" data-game="apple"><span>🍎</span> APPLE</button>
-                    </nav>
 
                     <div class="vip-prediction-spotlight" id="vipPredictionSpotlight">
                         <div class="code-stream-frame vip-code-frame" id="vipCodeFrame" aria-hidden="true">
@@ -467,7 +536,7 @@
                                 <div class="decode-meta">
                                     <span class="scan-title" data-i18n="scan_title">CALIBRATION DU SIGNAL</span>
                                     <span class="scan-subtitle" id="vipScanRemain">ANALYSE DU FLUX EN COURS...</span>
-                                    <span class="decode-clock" id="vipScanClock">30:00</span>
+                                    <span class="decode-clock" id="vipScanClock" hidden>30:00</span>
                                 </div>
                                 <div class="scan-progress-track decode-progress-track">
                                     <div class="scan-progress-fill" id="scanProgressFill"></div>
@@ -860,7 +929,7 @@
             <path d="M16.2 10.2l4.2 4.2M20.4 10.2l-4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
         </svg>
     </button>
-    <script src="app.js?v=u56" defer></script>
+    <script src="app.js?v=u57" defer></script>
     <script src="ambient-audio.js?v=6" defer></script>
 </body>
 </html>
