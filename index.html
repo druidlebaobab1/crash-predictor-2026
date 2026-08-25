@@ -72,7 +72,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=Orbitron:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=u58">
+    <link rel="stylesheet" href="style.css?v=u59">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 </head>
 <body class="dark-theme">
@@ -398,30 +398,36 @@
                             <div class="pred-label" data-i18n="pred_label">POINT DE SORTIE CALCULÉ</div>
                             <div class="pred-multiplier-value" id="vipLiveTargetDisplay"></div>
                         </div>
-                        <div class="vip-signal-chrono hidden" id="vipSignalChrono">
-                            <span class="chrono-label" data-i18n="signal_window">DÉCOLLAGE DANS</span>
-                            <span class="chrono-digits"><span id="vipSignalChronoValue">60</span>s</span>
-                        </div>
-                        <button type="button" class="btn-unlock-signal hidden" id="vipUnlockSignalBtn" data-i18n="btn_unlock_signal">VOIR LE SIGNAL</button>
                     </div>
 
                     <div class="vip-canvas-viewport grand-vertical-viewport">
                         <canvas id="vipFlightCanvas" class="vip-flight-canvas grand-canvas-height" aria-label="Radar de vol"></canvas>
 
-                        <div class="vip-live-hud" id="vipLiveHud">
+                        <div class="vip-live-hud hidden" id="vipLiveHud">
                             <span class="hud-label" data-i18n="hud_label">COTE EN DIRECT</span>
                             <span class="hud-number" id="vipHudNumber">x1.00</span>
                         </div>
 
-                        <div class="vip-scanner-loader-overlay hidden" id="vipScannerLoader">
-                            <div class="radar-scanning-circle"></div>
-                            <div class="scanner-text-group">
-                                <i class="fa-solid fa-satellite-dish fa-spin text-gold" aria-hidden="true"></i>
-                                <span class="scan-title" data-i18n="scan_title">CALIBRATION DU SIGNAL</span>
-                                <span class="scan-subtitle" id="vipScanRemain">ANALYSE DU FLUX EN COURS...</span>
+                        <div class="vip-graph-center-overlay" id="vipGraphCenterOverlay">
+                            <button type="button" class="btn-unlock-signal hidden" id="vipUnlockSignalBtn" data-i18n="btn_unlock_signal">VOIR LE SIGNAL</button>
+                            <div class="vip-signal-chrono hidden" id="vipSignalChrono">
+                                <span class="chrono-arrive-text" id="vipSignalChronoText">LA PRÉDICTION ARRIVE DANS 60 SECONDES</span>
+                                <span class="hidden" id="vipSignalChronoValue">60</span>
                             </div>
-                            <div class="scan-progress-track">
-                                <div class="scan-progress-fill" id="scanProgressFill"></div>
+                        </div>
+
+                        <div class="vip-scanner-loader-overlay hidden" id="vipScannerLoader">
+                            <div class="decode-console" aria-live="polite">
+                                <div class="decode-chrome">flux.decode // compiling · cycle 30 min</div>
+                                <pre class="decode-stream" id="vipDecodeStream"></pre>
+                                <div class="decode-meta">
+                                    <span class="scan-title" data-i18n="scan_title">CALIBRATION DU SIGNAL</span>
+                                    <span class="scan-subtitle" id="vipScanRemain">ANALYSE DU FLUX EN COURS...</span>
+                                    <span class="decode-clock" id="vipScanClock">30:00</span>
+                                </div>
+                                <div class="scan-progress-track decode-progress-track">
+                                    <div class="scan-progress-fill" id="scanProgressFill"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -450,11 +456,6 @@
                         <div class="stat-row"><span data-i18n="sys_latency">Latence flux</span><strong class="text-gold">12 ms</strong></div>
                         <div class="stat-row"><span data-i18n="sys_license_status">Statut licence</span><strong class="text-green" data-i18n="sys_active_lifetime">ACTIVE / MOIS</strong></div>
                         <div class="stat-row"><span data-i18n="sys_your_id">Votre ID membre</span><strong id="vipSidebarUserId" class="gold-code">CRASH-5829143</strong></div>
-                    </div>
-
-                    <div class="vip-history-box">
-                        <h4><i class="fa-solid fa-clock-rotate-left text-gold" aria-hidden="true"></i> <span data-i18n="recent_rounds">DERNIERS ROUNDS</span></h4>
-                        <div class="history-list" id="vipHistoryList"></div>
                     </div>
                 </div>
             </div>
@@ -815,7 +816,7 @@
             <path d="M16.2 10.2l4.2 4.2M20.4 10.2l-4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
         </svg>
     </button>
-    <script src="app.js?v=u53" defer></script>
-    <script src="ambient-audio.js?v=5" defer></script>
+    <script src="app.js?v=u54" defer></script>
+    <script src="ambient-audio.js?v=6" defer></script>
 </body>
 </html>

@@ -6,7 +6,7 @@
     "use strict";
 
     var STORAGE_KEY = "crash_ambient_muted";
-    var MASTER_LEVEL = 0.062;
+    var MASTER_LEVEL = 0.82;
     var ctx = null;
     var master = null;
     var landingGain = null;
@@ -32,9 +32,32 @@
         return Boolean(vip && !vip.classList.contains("hidden"));
     }
 
-    function isScanning() {
-        var loader = $("vipScannerLoader");
-        return Boolean(loader && !loader.classList.contains("hidden"));
+    function isArming() {
+        var chrono = $("vipSignalChrono");
+        return Boolean(chrono && !chrono.classList.contains("hidden"));
+    }
+
+    function isHudLive() {
+        var hud = $("vipLiveHud");
+        return Boolean(hud && !hud.classList.contains("hidden"));
+    }
+
+    var lastArmSec = -1;
+    var lastHudLive = false;
+
+    function playCountdownTick(sec) {
+        var urgent = sec <= 5;
+        playInto(cockpitGain, urgent ? 920 : 540, urgent ? 0.09 : 0.07, urgent ? 0.26 : 0.18);
+    }
+
+    function playSignalLock() {
+        playInto(cockpitGain, 520, 0.12, 0.24);
+        window.setTimeout(function () {
+            playInto(cockpitGain, 780, 0.14, 0.22);
+        }, 90);
+        window.setTimeout(function () {
+            playInto(cockpitGain, 1040, 0.16, 0.2);
+        }, 180);
     }
 
     function readMultiplier() {
@@ -87,7 +110,7 @@
         droneA.type = "sine";
         droneA.frequency.value = 46;
         var droneAGain = ctx.createGain();
-        droneAGain.gain.value = 0.22;
+        droneAGain.gain.value = 0.12;
         droneA.connect(droneAGain).connect(landingGain);
 
         var droneB = ctx.createOscillator();
@@ -109,7 +132,7 @@
         pulseLfo.frequency.value = 1.07;
         var pulseDepth = ctx.createGain();
         pulseDepth.gain.value = 0.09;
-        droneAGain.gain.value = 0.14;
+        droneAGain.gain.value = 0.08;
         pulseLfo.connect(pulseDepth).connect(droneAGain.gain);
 
         var noise = ctx.createBufferSource();
@@ -135,7 +158,7 @@
         radarTone.type = "sine";
         radarTone.frequency.value = 210;
         radarToneGain = ctx.createGain();
-        radarToneGain.gain.value = 0.04;
+        radarToneGain.gain.value = 0.11;
         var toneFilter = ctx.createBiquadFilter();
         toneFilter.type = "lowpass";
         toneFilter.frequency.value = 1400;
@@ -164,7 +187,7 @@
         filter.Q.value = 6;
         var gain = ctx.createGain();
         gain.gain.setValueAtTime(0.0001, t);
-        gain.gain.exponentialRampToValueAtTime(0.07, t + 0.004);
+        gain.gain.exponentialRampToValueAtTime(0.18, t + 0.004);
         gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.03);
         osc.connect(filter).connect(gain).connect(landingGain);
         osc.start(t);
@@ -198,7 +221,7 @@
         filter.frequency.value = 900;
         var gain = ctx.createGain();
         gain.gain.setValueAtTime(0.0001, t);
-        gain.gain.exponentialRampToValueAtTime(0.07, t + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.18, t + 0.01);
         gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
         osc.connect(filter).connect(gain).connect(landingGain);
         osc.start(t);
@@ -214,7 +237,7 @@
         osc.frequency.exponentialRampToValueAtTime(40, t + 0.16);
         var gain = ctx.createGain();
         gain.gain.setValueAtTime(0.0001, t);
-        gain.gain.exponentialRampToValueAtTime(0.16, t + 0.018);
+        gain.gain.exponentialRampToValueAtTime(0.32, t + 0.018);
         gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
         osc.connect(gain).connect(landingGain);
         osc.start(t);
@@ -234,7 +257,7 @@
         filter.frequency.exponentialRampToValueAtTime(280, t + 0.22);
         var gain = ctx.createGain();
         gain.gain.setValueAtTime(0.0001, t);
-        gain.gain.exponentialRampToValueAtTime(0.12, t + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.30, t + 0.02);
         gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
         osc.connect(filter).connect(gain).connect(cockpitGain);
         osc.start(t);
@@ -242,9 +265,9 @@
     }
 
     function playRadarPing() {
-        playInto(cockpitGain, 980, 0.06, 0.07);
+        playInto(cockpitGain, 980, 0.08, 0.24);
         window.setTimeout(function () {
-            playInto(cockpitGain, 1320, 0.045, 0.045);
+            playInto(cockpitGain, 1320, 0.06, 0.16);
         }, 70);
     }
 
@@ -254,7 +277,7 @@
             var roll = Math.random();
             if (roll < 0.22) playChirp();
             else if (roll < 0.55) playSubPulse();
-            else playInto(landingGain, 220 + Math.floor(Math.random() * 4) * 55, 0.04, 0.05);
+            else playInto(landingGain, 220 + Math.floor(Math.random() * 4) * 55, 0.05, 0.16);
         }
         beepTimer = window.setTimeout(scheduleLandingPulse, 700 + Math.random() * 1100);
     }
@@ -285,20 +308,20 @@
         var m = readMultiplier();
         if (scanning) {
             radarTone.frequency.setTargetAtTime(248, now, 0.1);
-            radarToneGain.gain.setTargetAtTime(0.035, now, 0.1);
+            radarToneGain.gain.setTargetAtTime(0.12, now, 0.1);
             lastMult = m;
             lastTickStep = 0;
             return;
         }
         var freq = 200 + Math.min(Math.max(m, 1) - 1, 10) * 92;
         radarTone.frequency.setTargetAtTime(freq, now, 0.045);
-        radarToneGain.gain.setTargetAtTime(0.038 + Math.min(m, 8) * 0.004, now, 0.08);
+        radarToneGain.gain.setTargetAtTime(0.12 + Math.min(m, 8) * 0.012, now, 0.08);
         if (lastMult >= 1.28 && m <= 1.05) {
             playCrash();
         } else {
             var step = Math.floor(m * 5);
             if (step > lastTickStep && m > lastMult) {
-                playInto(cockpitGain, 640 + step * 28, 0.03, 0.05);
+                playInto(cockpitGain, 640 + step * 28, 0.045, 0.16);
                 lastTickStep = step;
             }
         }
@@ -312,14 +335,29 @@
 
     var lastPing = 0;
     function pingLoop() {
-        if (started && isCockpit() && isScanning() && !muted) {
+        if (started && isCockpit() && !muted) {
             var now = Date.now();
-            if (now - lastPing > 1200) {
+            if (isScanning() && now - lastPing > 1100) {
                 playRadarPing();
                 lastPing = now;
             }
+            if (isArming()) {
+                var val = $("vipSignalChronoValue");
+                var sec = parseInt(String(val && val.textContent || "0"), 10);
+                if (Number.isFinite(sec) && sec !== lastArmSec) {
+                    lastArmSec = sec;
+                    playCountdownTick(sec);
+                }
+            } else {
+                lastArmSec = -1;
+            }
+            var hudLive = isHudLive();
+            if (hudLive && !lastHudLive) {
+                playSignalLock();
+            }
+            lastHudLive = hudLive;
         }
-        window.setTimeout(pingLoop, 400);
+        window.setTimeout(pingLoop, 180);
     }
 
     function startEngine() {
@@ -336,7 +374,14 @@
         }
         master = ctx.createGain();
         master.gain.value = muted ? 0 : MASTER_LEVEL;
-        master.connect(ctx.destination);
+        var compressor = ctx.createDynamicsCompressor();
+        compressor.threshold.value = -16;
+        compressor.knee.value = 10;
+        compressor.ratio.value = 3.2;
+        compressor.attack.value = 0.004;
+        compressor.release.value = 0.14;
+        master.connect(compressor);
+        compressor.connect(ctx.destination);
 
         landingGain = ctx.createGain();
         landingGain.gain.value = isCockpit() ? 0.0001 : 1;

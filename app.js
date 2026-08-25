@@ -118,6 +118,7 @@ const TRANSLATIONS = {
         pred_advice: "Retirez vos gains avant cette cote de sécurité",
         btn_unlock_signal: "VOIR LE SIGNAL",
         signal_window: "DÉCOLLAGE DANS",
+        signal_arrive: "LA PRÉDICTION ARRIVE DANS {n} SECONDES",
         hud_label: "COTE EN DIRECT",
         scan_title: "CALIBRATION DU SIGNAL",
         scan_subtitle: "Prochain tour en préparation…",
@@ -231,6 +232,7 @@ const TRANSLATIONS = {
         pred_advice: "Cash-out your profits before this safety threshold",
         btn_unlock_signal: "SEE THE SIGNAL",
         signal_window: "TAKEOFF IN",
+        signal_arrive: "PREDICTION ARRIVES IN {n} SECONDS",
         hud_label: "LIVE MULTIPLIER",
         scan_title: "SIGNAL CALIBRATION",
         scan_subtitle: "Preparing next round…",
@@ -344,6 +346,7 @@ const TRANSLATIONS = {
         pred_advice: "Retire sus ganancias antes de este umbral de seguridad",
         btn_unlock_signal: "VER LA SEÑAL",
         signal_window: "DESPEGUE EN",
+        signal_arrive: "LA PREDICCIÓN LLEGA EN {n} SEGUNDOS",
         hud_label: "MULTIPLICADOR EN VIVO",
         scan_title: "CALIBRACIÓN DE SEÑAL",
         scan_subtitle: "Preparando siguiente ronda…",
@@ -457,6 +460,7 @@ const TRANSLATIONS = {
         pred_advice: "Retire os seus ganhos antes deste limiar de segurança",
         btn_unlock_signal: "VER O SINAL",
         signal_window: "DESCOLAGEM EM",
+        signal_arrive: "A PREVISÃO CHEGA EM {n} SEGUNDOS",
         hud_label: "MULTIPLICADOR AO VIVO",
         scan_title: "CALIBRAÇÃO DE SINAL",
         scan_subtitle: "A preparar a próxima ronda…",
@@ -570,6 +574,7 @@ const TRANSLATIONS = {
         pred_advice: "Realisieren Sie Ihre Gewinne vor dieser Sicherheitsschwelle",
         btn_unlock_signal: "SIGNAL ANZEIGEN",
         signal_window: "START IN",
+        signal_arrive: "DIE PROGNOSE KOMMT IN {n} SEKUNDEN",
         hud_label: "LIVE-QUOTE",
         scan_title: "SIGNAL-KALIBRIERUNG",
         scan_subtitle: "Nächste Runde wird vorbereitet…",
@@ -765,6 +770,7 @@ let vipEngineRunning = false;
 let vipResizeHandler = null;
 let vipCalibrationTimer = null;
 let vipSignalTimer = null;
+let vipDecodeTimer = null;
 let vipServerTimeOffset = 0;
 let vipTargetMultiplier = 2.40;
 let vipCurrentFlightNumber = 8492;
@@ -2299,6 +2305,10 @@ function stopVipRadarEngine() {
         clearInterval(vipSignalTimer);
         vipSignalTimer = null;
     }
+    if (vipDecodeTimer) {
+        clearInterval(vipDecodeTimer);
+        vipDecodeTimer = null;
+    }
     vipEngineRunning = false;
 }
 
@@ -2308,6 +2318,7 @@ function startVipGrandVerticalRadarEngine() {
 
     const canvas = document.getElementById("vipFlightCanvas");
     const hudNumber = document.getElementById("vipHudNumber");
+    const liveHud = document.getElementById("vipLiveHud");
     const targetDisplay = document.getElementById("vipLiveTargetDisplay");
     const confidenceDisplay = document.getElementById("vipLiveConfidence");
     const statusMessage = document.getElementById("vipFlightMessage");
@@ -2319,7 +2330,21 @@ function startVipGrandVerticalRadarEngine() {
     const codeFrame = document.getElementById("vipCodeFrame");
     const chronoWrap = document.getElementById("vipSignalChrono");
     const chronoValue = document.getElementById("vipSignalChronoValue");
+    const chronoText = document.getElementById("vipSignalChronoText");
     const scanSubtitle = document.getElementById("vipScanRemain");
+    const scanClock = document.getElementById("vipScanClock");
+    const decodeStream = document.getElementById("vipDecodeStream");
+    const decodePackets = [
+        { t: "open channel.radar entropy=live", c: "c-green" },
+        { t: "ingest pkt.batch n=2048 crc=ok", c: "c-cyan" },
+        { t: "compile predict.window=1800s", c: "c-pink" },
+        { t: "filter noise.floor < -41.2dB", c: "c-green" },
+        { t: "lock vector.hash 0x7af3c1", c: "c-cyan" },
+        { t: "decode tick.stream hz=2400", c: "c-pink" },
+        { t: "map crash.curve seed.ok", c: "c-green" },
+        { t: "sync pulse.gate latency=12ms", c: "c-cyan" }
+    ];
+    let decodeLineIndex = 0;
 
     if (!canvas) {
         vipEngineRunning = false;
@@ -2378,20 +2403,81 @@ function startVipGrandVerticalRadarEngine() {
         if (confidenceDisplay) confidenceDisplay.textContent = conf;
     }
 
+    function keepCodeTerminal() {
+        codeFrame?.classList.remove("hidden");
+    }
+
+    function signalArriveText(seconds) {
+        const dict = TRANSLATIONS[currentLang] || TRANSLATIONS.fr;
+        const tpl = dict.signal_arrive || TRANSLATIONS.fr.signal_arrive;
+        return tpl.replace("{n}", String(Math.max(0, seconds)));
+    }
+
+    function setArmCountdownLabel(seconds) {
+        const n = Math.max(0, Math.ceil(seconds));
+        if (chronoText) chronoText.textContent = signalArriveText(n);
+        if (chronoValue) chronoValue.textContent = String(n);
+    }
+
+    function pushDecodeLine() {
+        if (!decodeStream) return;
+        const item = decodePackets[decodeLineIndex % decodePackets.length];
+        const row = document.createElement("div");
+        row.className = item.c;
+        row.textContent = `> ${item.t}  ${Math.random().toString(16).slice(2, 8)}`;
+        decodeStream.appendChild(row);
+        while (decodeStream.childNodes.length > 7) decodeStream.removeChild(decodeStream.firstChild);
+        decodeStream.scrollTop = decodeStream.scrollHeight;
+        decodeLineIndex += 1;
+    }
+
+    function stopDecodeFeed() {
+        if (vipDecodeTimer) {
+            clearInterval(vipDecodeTimer);
+            vipDecodeTimer = null;
+        }
+    }
+
+    function startDecodeFeed() {
+        stopDecodeFeed();
+        if (decodeStream) decodeStream.textContent = "";
+        decodeLineIndex = 0;
+        for (let i = 0; i < 4; i++) pushDecodeLine();
+        vipDecodeTimer = setInterval(pushDecodeLine, 420);
+    }
+
+    function hideLiveHud() {
+        liveHud?.classList.add("hidden");
+        liveHud?.classList.remove("is-tracking");
+        if (liveHud) {
+            liveHud.style.left = "";
+            liveHud.style.top = "";
+        }
+    }
+
+    function showLiveHud() {
+        liveHud?.classList.remove("hidden");
+        liveHud?.classList.add("is-tracking");
+        if (hudNumber) hudNumber.textContent = "x1.00";
+    }
+
     function hideSignalUi() {
         predReveal?.classList.add("hidden");
         chronoWrap?.classList.add("hidden");
         unlockBtn?.classList.add("hidden");
-        codeFrame?.classList.remove("hidden");
+        hideLiveHud();
+        keepCodeTerminal();
         if (targetDisplay) targetDisplay.textContent = "";
         if (statusMessage) statusMessage.textContent = "";
     }
 
     function showAwaitingUnlock() {
+        stopDecodeFeed();
         scannerLoader?.classList.add("hidden");
-        codeFrame?.classList.remove("hidden");
+        keepCodeTerminal();
         predReveal?.classList.add("hidden");
         chronoWrap?.classList.add("hidden");
+        hideLiveHud();
         unlockBtn?.classList.remove("hidden");
         flightState = "awaitingUnlock";
         if (statusMessage) statusMessage.textContent = "";
@@ -2440,33 +2526,36 @@ function startVipGrandVerticalRadarEngine() {
 
     function beginTakeoff() {
         persistSignalCycle("complete");
+        stopDecodeFeed();
         scannerLoader?.classList.add("hidden");
         unlockBtn?.classList.add("hidden");
         chronoWrap?.classList.add("hidden");
-        codeFrame?.classList.add("hidden");
+        keepCodeTerminal();
         predReveal?.classList.remove("hidden");
         flightState = "flying";
         currentMultiplier = 1.00;
         flightProgress = 0;
         explosionTimer = 0;
         particles = [];
-        if (hudNumber) hudNumber.textContent = "x1.00";
+        showLiveHud();
         generateNextTarget();
     }
 
     function startArmCountdown(remainingMs) {
+        stopDecodeFeed();
         scannerLoader?.classList.add("hidden");
         unlockBtn?.classList.add("hidden");
         predReveal?.classList.add("hidden");
-        codeFrame?.classList.add("hidden");
+        keepCodeTerminal();
+        hideLiveHud();
         chronoWrap?.classList.remove("hidden");
         flightState = "arming";
         let left = Math.max(1, Math.ceil(remainingMs / 1000));
-        if (chronoValue) chronoValue.textContent = String(left);
+        setArmCountdownLabel(left);
         if (vipSignalTimer) clearInterval(vipSignalTimer);
         vipSignalTimer = setInterval(() => {
             left -= 1;
-            if (chronoValue) chronoValue.textContent = String(Math.max(0, left));
+            setArmCountdownLabel(left);
             if (left <= 0) {
                 clearInterval(vipSignalTimer);
                 vipSignalTimer = null;
@@ -2479,6 +2568,7 @@ function startVipGrandVerticalRadarEngine() {
         flightState = "scanning";
         hideSignalUi();
         scannerLoader?.classList.remove("hidden");
+        startDecodeFeed();
         if (vipCalibrationTimer) {
             cancelAnimationFrame(vipCalibrationTimer);
             clearInterval(vipCalibrationTimer);
@@ -2493,6 +2583,7 @@ function startVipGrandVerticalRadarEngine() {
         if (!vipEngineRunning) return;
 
         if (cycle.armedAt > 0) {
+            stopDecodeFeed();
             if (cycle.armRemainingMs > 0) {
                 startArmCountdown(cycle.armRemainingMs);
                 return;
@@ -2511,12 +2602,20 @@ function startVipGrandVerticalRadarEngine() {
                     clearInterval(vipCalibrationTimer);
                     vipCalibrationTimer = null;
                 }
+                stopDecodeFeed();
                 return;
             }
             const now = unixNowSec();
             const elapsedMs = Math.max(0, (now - cycle.startedAt) * 1000);
             const remain = Math.max(0, SIGNAL_CYCLE_MS - elapsedMs);
+            const pct = Math.min(100, (elapsedMs / SIGNAL_CYCLE_MS) * 100);
             if (scanSubtitle) scanSubtitle.textContent = "ANALYSE DU FLUX EN COURS...";
+            if (scanClock) scanClock.textContent = formatRemain(remain);
+            if (scanProgressFill) {
+                scanProgressFill.style.width = `${pct}%`;
+                scanProgressFill.style.animation = "none";
+                scanProgressFill.style.transform = "none";
+            }
             if (remain <= 0) {
                 clearInterval(vipCalibrationTimer);
                 vipCalibrationTimer = null;
@@ -2623,49 +2722,78 @@ function startVipGrandVerticalRadarEngine() {
         const multiplierRatio = Math.min(Math.max((vipTargetMultiplier - 1.0) / 8.5, 0.12), 0.95);
         const targetX = startX + (W - startX - 28) * (0.52 + multiplierRatio * 0.38);
         const targetY = 42 + (startY - 42) * (0.42 - multiplierRatio * 0.28);
+        const cp1X = startX + (targetX - startX) * 0.22;
+        const cp1Y = startY - (startY - targetY) * 0.08;
+        const cp2X = startX + (targetX - startX) * 0.62;
+        const cp2Y = targetY + (startY - targetY) * 0.18;
 
-        const cpX = startX + (targetX - startX) * 0.25;
-        const cpY = startY;
+        function curvePoint(t) {
+            const u = 1 - t;
+            return {
+                x: u * u * u * startX + 3 * u * u * t * cp1X + 3 * u * t * t * cp2X + t * t * t * targetX,
+                y: u * u * u * startY + 3 * u * u * t * cp1Y + 3 * u * t * t * cp2Y + t * t * t * targetY
+            };
+        }
+
+        function curveTangent(t) {
+            const u = 1 - t;
+            return {
+                x: 3 * u * u * (cp1X - startX) + 6 * u * t * (cp2X - cp1X) + 3 * t * t * (targetX - cp2X),
+                y: 3 * u * u * (cp1Y - startY) + 6 * u * t * (cp2Y - cp1Y) + 3 * t * t * (targetY - cp2Y)
+            };
+        }
+
+        function trackHud(x, y) {
+            if (!liveHud || liveHud.classList.contains("hidden")) return;
+            const pad = 8;
+            const hudW = liveHud.offsetWidth || 110;
+            const hudH = liveHud.offsetHeight || 56;
+            const left = Math.min(W - hudW / 2 - pad, Math.max(hudW / 2 + pad, x));
+            const top = Math.min(H - pad, Math.max(hudH + pad, y - 10));
+            liveHud.style.left = `${left}px`;
+            liveHud.style.top = `${top}px`;
+        }
 
         if (flightState === "flying") {
             flightProgress += flightSpeed;
             const p = Math.min(flightProgress, 1);
+            const ease = 1 - Math.pow(1 - p, 1.35);
 
-            currentMultiplier = 1.00 + (vipTargetMultiplier - 1.00) * Math.pow(p, 1.15);
+            currentMultiplier = 1.00 + (vipTargetMultiplier - 1.00) * ease;
             if (hudNumber) hudNumber.textContent = `x${currentMultiplier.toFixed(2)}`;
 
-            const curX = (1 - p) * (1 - p) * startX + 2 * (1 - p) * p * cpX + p * p * targetX;
-            const curY = (1 - p) * (1 - p) * startY + 2 * (1 - p) * p * cpY + p * p * targetY;
+            const pos = curvePoint(p);
+            const tan = curveTangent(p);
 
             ctx.beginPath();
             ctx.moveTo(startX, startY);
-            for (let s = 0; s <= p; s += 0.01) {
-                const px = (1 - s) * (1 - s) * startX + 2 * (1 - s) * s * cpX + s * s * targetX;
-                const py = (1 - s) * (1 - s) * startY + 2 * (1 - s) * s * cpY + s * s * targetY;
-                ctx.lineTo(px, py);
+            for (let s = 0; s <= p; s += 0.006) {
+                const pt = curvePoint(s);
+                ctx.lineTo(pt.x, pt.y);
             }
+            ctx.lineTo(pos.x, pos.y);
             ctx.strokeStyle = "#ffc837";
             ctx.lineWidth = 6;
             ctx.lineCap = "round";
+            ctx.lineJoin = "round";
             ctx.shadowColor = "#ffc837";
-            ctx.shadowBlur = 20;
+            ctx.shadowBlur = 22;
             ctx.stroke();
             ctx.shadowBlur = 0;
 
-            const dx = 2 * (1 - p) * (cpX - startX) + 2 * p * (targetX - cpX);
-            const dy = 2 * (1 - p) * (cpY - startY) + 2 * p * (targetY - cpY);
-            const angle = Math.atan2(dy, dx) || -0.55;
+            const angle = Math.atan2(tan.y, tan.x) || -0.55;
 
             ctx.beginPath();
             ctx.arc(startX, startY, 7, 0, Math.PI * 2);
             ctx.fillStyle = "rgba(255, 200, 55, 0.35)";
             ctx.fill();
 
-            drawPlane(curX, curY, angle);
+            drawPlane(pos.x, pos.y, angle);
+            trackHud(pos.x, pos.y);
 
             if (p >= 1) {
                 flightState = "crashed";
-                createExplosion(curX, curY);
+                createExplosion(pos.x, pos.y);
                 pushWinningHistory(vipTargetMultiplier);
             }
         } else if (flightState === "crashed") {
