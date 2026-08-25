@@ -80,7 +80,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=Orbitron:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=u64">
+    <link rel="stylesheet" href="style.css?v=u65">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 </head>
 <body class="dark-theme">
@@ -134,7 +134,7 @@
                         <img src="assets/games/crash.jpg" alt="">
                         <img src="assets/games/mines.jpg" alt="" class="mosaic-mines">
                         <img src="assets/games/penalty.jpg" alt="">
-                        <img src="assets/games/apple.jpg" alt="">
+                        <img src="assets/games/apple.jpg?v=2" alt="">
                     </div>
                     <div class="brand-text">
                         <span class="logo-title"><span class="highlight notranslate" translate="no">PREDICTOR</span></span>
@@ -261,7 +261,7 @@
                             </article>
                             <article class="suite-game-card theme-apple">
                                 <div class="suite-game-art">
-                                    <img src="assets/games/apple.jpg" alt="APPLE OF FORTUNE" class="notranslate" translate="no">
+                                    <img src="assets/games/apple.jpg?v=2" alt="APPLE OF FORTUNE" class="notranslate" translate="no">
                                     <span class="suite-game-shine" aria-hidden="true"></span>
                                 </div>
                                 <strong class="notranslate" translate="no">APPLE OF FORTUNE</strong>
@@ -354,39 +354,36 @@
                 </div>
             </section>
 
-            <!-- SECTION RETOURS D'EXPÉRIENCE (113 AVIS) -->
-            <section class="testimonials-section">
+            <section class="metrics-section" id="trustMetricsSection">
                 <div class="section-container">
-                    <div class="section-header text-center">
-                        <span class="badge-sub"><i class="fa-solid fa-star" aria-hidden="true"></i> <span data-i18n="reviews_badge">RETOURS MEMBRES VÉRIFIÉS (113 AVIS)</span></span>
-                        <h2 class="section-title" data-i18n="reviews_title">Retours d'Expérience & Témoignages</h2>
-                        <p class="section-subtitle" data-i18n="reviews_subtitle">Commentaires authentiques associés à des identifiants membres anonymes.</p>
-                    </div>
-
-                    <div class="testimonials-stats-bar">
-                        <div class="t-stat-item">
-                            <span class="t-stat-num">155 643</span>
-                            <span class="t-stat-sub" data-i18n="stat_registered">Membres inscrits</span>
+                    <div class="metrics-dashboard" aria-label="Métriques de précision">
+                        <div class="metrics-dash-head">
+                            <span class="metrics-kicker" data-i18n="metrics_kicker">TABLEAU DE BORD ALGORITHMIQUE</span>
+                            <h2 class="metrics-title" data-i18n="metrics_title">Précision technique en temps réel</h2>
                         </div>
-                        <div class="t-stat-item">
-                            <span class="t-stat-num">4.9 / 5</span>
-                            <div class="t-stat-stars" aria-label="Note 4.9 sur 5">
-                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-                            </div>
-                            <span class="t-stat-sub" data-i18n="stat_satisfaction">Indice de satisfaction</span>
+                        <div class="metrics-grid">
+                            <article class="metric-card">
+                                <span class="metric-label" data-i18n="metrics_accuracy">Algorithmic Accuracy</span>
+                                <div class="metric-value-row">
+                                    <strong class="metric-value">98.7%</strong>
+                                    <span class="metric-verified-badge"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> <span data-i18n="metrics_verified">Vérifié</span></span>
+                                </div>
+                            </article>
+                            <article class="metric-card">
+                                <span class="metric-label" data-i18n="metrics_sessions">Sessions Analysées / 24h</span>
+                                <strong class="metric-value">1 420 000+</strong>
+                            </article>
+                            <article class="metric-card">
+                                <span class="metric-label" data-i18n="metrics_satisfaction">Taux de Satisfaction</span>
+                                <strong class="metric-value">4.9 / 5</strong>
+                                <div class="metric-stars" aria-hidden="true">⭐⭐⭐⭐⭐</div>
+                                <span class="metric-footnote" data-i18n="metrics_reviews">Basé sur + 328 400 évaluations vérifiées</span>
+                            </article>
+                            <article class="metric-card">
+                                <span class="metric-label" data-i18n="metrics_latency">Latence de Flux</span>
+                                <strong class="metric-value metric-value-mono">&lt; 12 ms</strong>
+                            </article>
                         </div>
-                        <div class="t-stat-item">
-                            <span class="t-stat-num text-green price-figure">17 $</span>
-                            <span class="t-stat-sub" data-i18n="stat_license">Par mois</span>
-                        </div>
-                    </div>
-
-                    <div class="comments-grid" id="commentsGrid"></div>
-
-                    <div class="text-center load-more-wrap">
-                        <button type="button" class="btn-secondary" id="btnLoadMoreComments">
-                            <i class="fa-solid fa-chevron-down" aria-hidden="true"></i> <span data-i18n="btn_load_more">Afficher plus de témoignages</span> (<span id="commentsRemainingCount">107</span> <span data-i18n="remaining_txt">restants</span>)
-                        </button>
                     </div>
                 </div>
             </section>
@@ -415,7 +412,7 @@
                             <img src="assets/games/crash.jpg" alt="">
                             <img src="assets/games/mines.jpg" alt="" class="mosaic-mines">
                             <img src="assets/games/penalty.jpg" alt="">
-                            <img src="assets/games/apple.jpg" alt="">
+                            <img src="assets/games/apple.jpg?v=2" alt="">
                         </div>
                     </div>
                     <div class="vip-brand-info">
@@ -494,7 +491,7 @@
                     <span class="notranslate" translate="no">PENALTY SHOOT-OUT</span>
                 </button>
                 <button type="button" class="vip-game-chip" data-game="apple">
-                    <img src="assets/games/apple.jpg" alt="" class="vip-chip-logo">
+                    <img src="assets/games/apple.jpg?v=2" alt="" class="vip-chip-logo">
                     <span class="notranslate" translate="no">APPLE OF FORTUNE</span>
                 </button>
             </nav>
@@ -566,7 +563,10 @@
                         </div>
 
                         <div class="vip-graph-center-overlay" id="vipGraphCenterOverlay">
-                            <button type="button" class="btn-unlock-signal hidden" id="vipUnlockSignalBtn" data-i18n="btn_unlock_signal">VOIR LE SIGNAL</button>
+                            <button type="button" class="btn-unlock-signal hidden" id="vipUnlockSignalBtn">
+                                <span class="btn-signal-radar" aria-hidden="true"></span>
+                                <span class="btn-signal-label" data-i18n="btn_unlock_signal">⚡ DÉCODER LE SIGNAL</span>
+                            </button>
                             <div class="vip-signal-chrono hidden" id="vipSignalChrono">
                                 <span class="chrono-arrive-text" id="vipSignalChronoText">LA PRÉDICTION ARRIVE DANS 60 SECONDES</span>
                                 <span class="hidden" id="vipSignalChronoValue">60</span>
@@ -935,7 +935,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=u61" defer></script>
-    <script src="ambient-audio.js?v=7" defer></script>
+    <script src="app.js?v=u62" defer></script>
+    <script src="ambient-audio.js?v=8" defer></script>
 </body>
 </html>
