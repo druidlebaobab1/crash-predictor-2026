@@ -62,32 +62,32 @@ function trackMetaPurchase(orderId) {
 // ==========================================================================
 const TRANSLATIONS = {
     fr: {
-        doc_title: "CRASH PREDICTOR 2026 | Cockpit d'Analyse et Prédictions Officielles",
+        doc_title: "PREDICTOR | Suite d'analyse algorithmique multi-jeux",
         ticker_live: "EN DIRECT",
         ticker_sub: "utilisateurs connectées sur le site crashpredictor.fr",
-        alert_unsubscribed: "<strong>ACCÈS NON ACTIVÉ :</strong> activez votre licence pour ouvrir le cockpit.",
+        alert_unsubscribed: "<strong>ACCÈS NON ACTIVÉ :</strong> activez votre licence pour ouvrir la session d'analyse.",
         alert_expired: "<strong>ABONNEMENT EXPIRÉ :</strong> renouvelez votre accès mensuel à 17 $.",
         btn_alert_unlock: "Débloquer l'accès – 17 $",
         btn_alert_renew: "Renouveler l'accès – 17 $",
         toast_expired: "Votre abonnement de 30 jours est expiré. Renouvelez à 17 $.",
-        badge_edition: "ÉDITION 2026",
+        badge_edition: "SUITE MULTI-JEUX",
         nav_login: "Connexion",
         nav_register: "Inscription",
         promo_offer: "DERNIÈRE CHANCE 17 $ :",
         promo_remaining: "restante(s)",
-        hero_subtitle: "Plateforme d'analyse haute fréquence et anticipation des trajectoires en direct.",
-        badge_algo: "MOTEUR 2026",
+        hero_subtitle: "Six moteurs de prédiction en temps réel, un seul accès officiel à 17 $ / mois.",
+        badge_algo: "MOTEUR LIVE",
         badge_live_session: "SESSION TEMPS RÉEL",
         badge_verified: "VÉRIFIÉ",
         flash_default: "vient d'activer sa licence",
         offer_title: "Licence Officielle & Accès Illimité",
-        offer_desc: "Débloquez l'accès complet au cockpit d'analyse, aux prédictions en direct et à l'historique complet.",
+        offer_desc: "Un seul accès à 17 $ / mois débloque les 6 moteurs de prédiction en temps réel.",
         price_lifetime: "/ Mois",
         price_cfa: "",
         benefit_1_title: "Précision Algorithmique Optimale",
-        benefit_1_desc: "Analyse en temps réel et anticipation précise des trajectoires.",
+        benefit_1_desc: "Analyse en temps réel et anticipation précise des signaux en direct.",
         benefit_2_title: "Activation Immédiate",
-        benefit_2_desc: "Accès instantané à l'ensemble des prédictions et au cockpit dès la validation de votre paiement.",
+        benefit_2_desc: "Accès instantané aux 6 sessions d'analyse dès la validation de votre paiement.",
         benefit_3_title: "Abonnement Mensuel",
         benefit_3_desc: "Accès complet renouvelé chaque mois, simple abonnement mensuel.",
         benefit_4_title: "Multi-supports",
@@ -97,7 +97,7 @@ const TRANSLATIONS = {
         referral_modal_copy: "Partagez votre lien d'invitation à vos proches. Dès que 2 amis débloquent leur accès via votre lien, votre propre accès s'active automatiquement et gratuitement pendant 30 jours !",
         btn_referral_copy: "📋 Copier mon lien",
         toast_link_copied: "✅ Lien copié !",
-        secure_guarantee: "Paiement sécurisé et chiffré • Activation automatique du cockpit",
+        secure_guarantee: "Paiement sécurisé et chiffré • Activation automatique de la session",
         reviews_badge: "RETOURS MEMBRES VÉRIFIÉS (113 AVIS)",
         reviews_title: "Retours d'Expérience & Témoignages",
         reviews_subtitle: "Commentaires authentiques associés à des identifiants membres anonymes.",
@@ -106,23 +106,31 @@ const TRANSLATIONS = {
         stat_license: "Par mois",
         btn_load_more: "Afficher plus de témoignages",
         remaining_txt: "restants",
-        footer_copy: "© 2026 CRASH PREDICTOR TECHNOLOGIES. Tous droits réservés.",
+        footer_copy: "© PREDICTOR. Tous droits réservés.",
         footer_admin: "Espace administrateur",
         vip_official: "OFFICIEL",
-        vip_radar_live: "FLUX RADAR EN DIRECT",
+        vip_radar_live: "SIGNAUX EN DIRECT",
         vip_member_active: "Membre Actif",
-        radar_heading: "RADAR DE VOL VERTICAL HAUTE PRÉCISION",
+        radar_heading: "SESSION D'ANALYSE HAUTE PRÉCISION",
         radar_session_badge: "SESSION ACTIVE",
         pred_label: "POINT DE SORTIE CALCULÉ",
         pred_stability: "Stabilité :",
         pred_advice: "Retirez vos gains avant cette cote de sécurité",
         btn_unlock_signal: "VOIR LE SIGNAL",
+        btn_analyse_signal: "ANALYSER LE SIGNAL",
+        suite_kicker: "Licence unique · 6 jeux débloqués",
+        game_tag_aviator: "Signaux en direct",
+        game_tag_luckyjet: "Flux cosmique",
+        game_tag_crash: "Algorithme live",
+        game_tag_mines: "Cases sûres",
+        game_tag_penalty: "Ciblage laser",
+        game_tag_apple: "Chemin doré",
         signal_window: "DÉCOLLAGE DANS",
         signal_arrive: "LA PRÉDICTION ARRIVE DANS {n} SECONDES",
         hud_label: "COTE EN DIRECT",
         scan_title: "CALIBRATION DU SIGNAL",
         scan_subtitle: "Prochain tour en préparation…",
-        vip_flight_init: "Analyse des flux… Décollage imminent",
+        vip_flight_init: "Analyse des flux… signal imminent",
         sys_params: "PARAMÈTRES DU SYSTÈME",
         sys_algo_stab: "Stabilité algorithmique",
         sys_latency: "Latence flux",
@@ -162,7 +170,7 @@ const TRANSLATIONS = {
         checkout_gate_msg: "Connectez-vous ou créez un compte pour lier la licence à votre ID.",
         checkout_momo_num: "Numéro Mobile Money",
         btn_pay_momo: "Payer par Mobile Money — 10 200 F",
-        checkout_guarantee_note: "Le cockpit s’ouvre immédiatement après la validation de votre paiement.",
+        checkout_guarantee_note: "La session d'analyse s’ouvre immédiatement après la validation de votre paiement.",
         btn_pay_card: "Payer par carte bancaire — 17 $",
         pay_verif_title: "Vérification du paiement",
         pay_verif_sub: "Connexion sécurisée en cours…",
@@ -176,7 +184,7 @@ const TRANSLATIONS = {
         ph_confirm_pass: "Confirmer le nouveau mot de passe"
     },
     en: {
-        doc_title: "CRASH PREDICTOR 2026 | Official Analysis Cockpit & Live Signals",
+        doc_title: "PREDICTOR | Multi-game algorithmic analysis suite",
         ticker_live: "LIVE",
         ticker_sub: "users connected on crashpredictor.fr",
         alert_unsubscribed: "<strong>ACCESS NOT ACTIVATED:</strong> activate your license to open the cockpit.",
@@ -184,13 +192,13 @@ const TRANSLATIONS = {
         btn_alert_unlock: "Unlock Access – $17",
         btn_alert_renew: "Renew Access – $17",
         toast_expired: "Your 30-day subscription has expired. Renew for $17.",
-        badge_edition: "2026 EDITION",
+        badge_edition: "MULTI-GAME SUITE",
         nav_login: "Login",
         nav_register: "Sign Up",
         promo_offer: "LAST CHANCE $17:",
         promo_remaining: "remaining",
         hero_subtitle: "High-frequency algorithmic analysis and real-time flight trajectory anticipation.",
-        badge_algo: "2026 ENGINE",
+        badge_algo: "LIVE ENGINE",
         badge_live_session: "REAL-TIME SESSION",
         badge_verified: "VERIFIED",
         flash_default: "just activated their license",
@@ -220,7 +228,7 @@ const TRANSLATIONS = {
         stat_license: "Per month",
         btn_load_more: "Show more testimonials",
         remaining_txt: "remaining",
-        footer_copy: "© 2026 CRASH PREDICTOR TECHNOLOGIES. All rights reserved.",
+        footer_copy: "© PREDICTOR. All rights reserved.",
         footer_admin: "Admin portal",
         vip_official: "OFFICIAL",
         vip_radar_live: "LIVE RADAR FEED",
@@ -231,6 +239,7 @@ const TRANSLATIONS = {
         pred_stability: "Stability:",
         pred_advice: "Cash-out your profits before this safety threshold",
         btn_unlock_signal: "SEE THE SIGNAL",
+        btn_analyse_signal: "ANALYZE THE SIGNAL",
         signal_window: "TAKEOFF IN",
         signal_arrive: "PREDICTION ARRIVES IN {n} SECONDS",
         hud_label: "LIVE MULTIPLIER",
@@ -290,7 +299,7 @@ const TRANSLATIONS = {
         ph_confirm_pass: "Confirm new password"
     },
     es: {
-        doc_title: "CRASH PREDICTOR 2026 | Cockpit Oficial de Análisis y Predicciones",
+        doc_title: "PREDICTOR | Suite de análisis algorítmico multi-juegos",
         ticker_live: "EN VIVO",
         ticker_sub: "usuarios conectados en crashpredictor.fr",
         alert_unsubscribed: "<strong>ACCESO NO ACTIVADO:</strong> active su licencia para abrir el cockpit.",
@@ -298,13 +307,13 @@ const TRANSLATIONS = {
         btn_alert_unlock: "Desbloquear Acceso – 17 $",
         btn_alert_renew: "Renovar acceso – 17 $",
         toast_expired: "Su suscripción de 30 días ha caducado. Renueve por 17 $.",
-        badge_edition: "EDICIÓN 2026",
+        badge_edition: "SUITE MULTI-JUEGOS",
         nav_login: "Iniciar Sesión",
         nav_register: "Registrarse",
         promo_offer: "ÚLTIMA OPORTUNIDAD 17 $:",
         promo_remaining: "restante(s)",
         hero_subtitle: "Plataforma de análisis de alta frecuencia y anticipación de trayectorias en vivo.",
-        badge_algo: "MOTOR 2026",
+        badge_algo: "MOTOR LIVE",
         badge_live_session: "SESIÓN EN TIEMPO REAL",
         badge_verified: "VERIFICADO",
         flash_default: "acaba de activar su licencia",
@@ -334,7 +343,7 @@ const TRANSLATIONS = {
         stat_license: "Por mes",
         btn_load_more: "Ver más testimonios",
         remaining_txt: "restantes",
-        footer_copy: "© 2026 CRASH PREDICTOR TECHNOLOGIES. Todos los derechos reservados.",
+        footer_copy: "© PREDICTOR. Todos los derechos reservados.",
         footer_admin: "Acceso Administrador",
         vip_official: "OFICIAL",
         vip_radar_live: "RADAR EN VIVO",
@@ -404,7 +413,7 @@ const TRANSLATIONS = {
         ph_confirm_pass: "Confirmar nueva contraseña"
     },
     pt: {
-        doc_title: "CRASH PREDICTOR 2026 | Cockpit Oficial de Análise e Predições",
+        doc_title: "PREDICTOR | Suite de análise algorítmica multi-jogos",
         ticker_live: "AO VIVO",
         ticker_sub: "utilizadores ligados em crashpredictor.fr",
         alert_unsubscribed: "<strong>ACESSO NÃO ATIVADO:</strong> ative sua licença para abrir o cockpit.",
@@ -412,13 +421,13 @@ const TRANSLATIONS = {
         btn_alert_unlock: "Desbloquear Acesso – 17 $",
         btn_alert_renew: "Renovar acesso – 17 $",
         toast_expired: "A sua assinatura de 30 dias expirou. Renove por 17 $.",
-        badge_edition: "EDIÇÃO 2026",
+        badge_edition: "SUITE MULTI-JOGOS",
         nav_login: "Entrar",
         nav_register: "Registar",
         promo_offer: "ÚLTIMA CHANCE 17 $:",
         promo_remaining: "restante(s)",
         hero_subtitle: "Plataforma de análise de alta frequência e antecipação de trajetórias em tempo real.",
-        badge_algo: "MOTOR 2026",
+        badge_algo: "MOTOR LIVE",
         badge_live_session: "SESSÃO EM TEMPO REAL",
         badge_verified: "VERIFICADO",
         flash_default: "acabou de ativar a sua licença",
@@ -448,7 +457,7 @@ const TRANSLATIONS = {
         stat_license: "Por mês",
         btn_load_more: "Ver mais avaliações",
         remaining_txt: "restantes",
-        footer_copy: "© 2026 CRASH PREDICTOR TECHNOLOGIES. Todos os direitos reservados.",
+        footer_copy: "© PREDICTOR. Todos os direitos reservados.",
         footer_admin: "Área de Administração",
         vip_official: "OFICIAL",
         vip_radar_live: "RADAR EM DIRETO",
@@ -518,7 +527,7 @@ const TRANSLATIONS = {
         ph_confirm_pass: "Confirmar nova palavra-passe"
     },
     de: {
-        doc_title: "CRASH PREDICTOR 2026 | Offizielles Analyse-Cockpit & Live-Signale",
+        doc_title: "PREDICTOR | Algorithmische Multi-Game-Analyse-Suite",
         ticker_live: "LIVE",
         ticker_sub: "Nutzer verbunden auf crashpredictor.fr",
         alert_unsubscribed: "<strong>ZUGANG NICHT AKTIV:</strong> Aktivieren Sie Ihre Lizenz, um das Cockpit zu öffnen.",
@@ -526,13 +535,13 @@ const TRANSLATIONS = {
         btn_alert_unlock: "Zugang freischalten – 17 $",
         btn_alert_renew: "Zugang verlängern – 17 $",
         toast_expired: "Ihr 30-Tage-Abo ist abgelaufen. Verlängern Sie für 17 $.",
-        badge_edition: "EDITION 2026",
+        badge_edition: "MULTI-GAME SUITE",
         nav_login: "Anmelden",
         nav_register: "Registrieren",
         promo_offer: "LETZTE CHANCE 17 $:",
         promo_remaining: "verbleibend",
         hero_subtitle: "Hochfrequenz-Algorithmen und Echtzeit-Flugbahnvorhersage im Live-Cockpit.",
-        badge_algo: "2026 ENGINE",
+        badge_algo: "LIVE ENGINE",
         badge_live_session: "ECHTZEIT-SITZUNG",
         badge_verified: "VERIFIZIERT",
         flash_default: "hat soeben die Lizenz aktiviert",
@@ -562,7 +571,7 @@ const TRANSLATIONS = {
         stat_license: "Pro Monat",
         btn_load_more: "Weitere Bewertungen laden",
         remaining_txt: "übrig",
-        footer_copy: "© 2026 CRASH PREDICTOR TECHNOLOGIES. Alle Rechte vorbehalten.",
+        footer_copy: "© PREDICTOR. Alle Rechte vorbehalten.",
         footer_admin: "Admin-Bereich",
         vip_official: "OFFIZIELL",
         vip_radar_live: "LIVE-RADARFEED",
@@ -645,9 +654,9 @@ const LANG_METAS = {
 // 113 AVIS CLIENTS DYNAMIQUES & NATURELS (IDs 7 CHIFFRES : 5 000 000 - 10 000 000)
 // ==========================================================================
 const WINNER_COMMENTS = [
-    { username: "CRASH-7797398", lang: "FR", gain: "+$450", comment: "Cockpit très clair, prédictions nettes et prise en main immédiate." },
-    { username: "CRASH-4820194", lang: "EN", gain: "+$1,380", comment: "Clean cockpit, stable animation and instant access after payment." },
-    { username: "CRASH-9182301", lang: "ES", gain: "+$580", comment: "Increíble precisión. El cockpit se abrió de inmediato tras el pago." },
+    { username: "CRASH-7797398", lang: "FR", gain: "+$450", comment: "Interface très claire, prédictions nettes et prise en main immédiate." },
+    { username: "CRASH-4820194", lang: "EN", gain: "+$1,380", comment: "Clean interface, stable animation and instant access after payment." },
+    { username: "CRASH-9182301", lang: "ES", gain: "+$580", comment: "Increíble precisión. La sesión se abrió de inmediato tras el pago." },
     { username: "CRASH-6391024", lang: "AR", gain: "+$720", comment: "المنصة سريعة ودقيقة، والوصول فُتح مباشرة بعد الدفع." },
     { username: "CRASH-7518392", lang: "PT", gain: "+$1,650", comment: "Pagamento confirmado e o cockpit abriu na hora. Visual excelente." },
     { username: "CRASH-8642019", lang: "HI", gain: "+$810", comment: "बहुत साफ़ इंटरफ़ेस और लाइव भविष्यवाणियाँ एकदम स्थिर हैं।" },
@@ -775,6 +784,9 @@ let vipServerTimeOffset = 0;
 let vipTargetMultiplier = 2.40;
 let vipCurrentFlightNumber = 8492;
 let vipLastHistoryMultiplier = null;
+let activePredictorGame = "crash";
+let boardRoundPred = null;
+let appleRevealTimer = null;
 let realtimeChannel = null;
 let paymentInFlight = false;
 let pendingCheckoutAfterAuth = false;
@@ -813,6 +825,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     initReferralSystem();
     initPwaInstall();
     initCodeStreams();
+    initPredictorGameSuite();
     document.addEventListener("visibilitychange", () => {
         if (document.visibilityState === "visible") {
             syncUserFromSupabase();
@@ -1116,6 +1129,7 @@ function applyLanguage(lang, saveUserChoice = true) {
     renderCommentsList();
     refreshVipMemberBadge();
     refreshSubscriptionAlertCopy();
+    if (typeof setActivePredictorGame === "function") setActivePredictorGame(activePredictorGame, true);
 }
 
 function initLanguageDropdown() {
@@ -1765,7 +1779,7 @@ function refreshSubscriptionAlertCopy() {
         alertText.setAttribute("data-i18n", key);
         alertText.innerHTML = i18nText(key, expired
             ? "<strong>ABONNEMENT EXPIRÉ :</strong> renouvelez votre accès mensuel à 17 $."
-            : "<strong>ACCÈS NON ACTIVÉ :</strong> activez votre licence pour ouvrir le cockpit.");
+            : "<strong>ACCÈS NON ACTIVÉ :</strong> activez votre licence pour ouvrir la session d'analyse.");
     }
     if (btnText) {
         const key = expired ? "btn_alert_renew" : "btn_alert_unlock";
@@ -2283,11 +2297,159 @@ async function persistSignalCycle(op) {
     return { startedAt, armedAt, ready, remainingMs: ready ? 0 : SIGNAL_CYCLE_MS - elapsed, armRemainingMs };
 }
 
+function isFlyerGame(id) {
+    return id === "crash" || id === "aviator" || id === "luckyjet";
+}
+
+function flyerTheme() {
+    if (activePredictorGame === "aviator") {
+        return { bg: "#120308", grid: "rgba(239,68,68,0.16)", stroke: "#ef2222", body: "#e11d48", wing: "#9f1239", window: "#111111", flame: "#fb923c", stars: false };
+    }
+    if (activePredictorGame === "luckyjet") {
+        return { bg: "#0b0518", grid: "rgba(168,85,247,0.18)", stroke: "#c084fc", body: "#a855f7", wing: "#6d28d9", window: "#1e1b4b", flame: "#22d3ee", stars: true };
+    }
+    return { bg: "#060a18", grid: "rgba(255,200,55,0.08)", stroke: "#ffc837", body: "#ffc837", wing: "#f59e0b", window: "#1e1b4b", flame: "#ef4444", stars: false };
+}
+
+function predictorGameHeading(id) {
+    const names = {
+        aviator: "AVIATOR — SIGNAUX EN DIRECT",
+        luckyjet: "LUCKY JET — FLUX COSMIQUE",
+        crash: "CRASH — ALGORITHME LIVE",
+        mines: "MINES — CASES SÛRES",
+        penalty: "PENALTY SHOOT-OUT — CIBLAGE",
+        apple: "APPLE OF FORTUNE — CHEMIN DORÉ"
+    };
+    return names[id] || i18nText("radar_heading", "SESSION D'ANALYSE HAUTE PRÉCISION");
+}
+
+function clearBoardHighlights() {
+    document.querySelectorAll("#vipMinesGrid .mine-cell").forEach((cell) => cell.classList.remove("is-safe"));
+    document.querySelectorAll("#vipPenaltyGoal .penalty-zone").forEach((z) => z.classList.remove("is-target"));
+    document.getElementById("vipPenaltyReadout")?.classList.add("hidden");
+    document.querySelectorAll("#vipAppleTower .apple-cell").forEach((cell) => cell.classList.remove("is-gold"));
+    if (appleRevealTimer) {
+        clearInterval(appleRevealTimer);
+        appleRevealTimer = null;
+    }
+}
+
+function generateBoardRound() {
+    const safeCount = 3 + Math.floor(Math.random() * 3);
+    const minesSafe = [];
+    while (minesSafe.length < safeCount) {
+        const n = Math.floor(Math.random() * 25);
+        if (minesSafe.indexOf(n) === -1) minesSafe.push(n);
+    }
+    const zones = ["tl", "tr", "ml", "mr", "c"];
+    boardRoundPred = {
+        minesSafe,
+        penaltyZone: zones[Math.floor(Math.random() * zones.length)],
+        penaltyPct: 74 + Math.floor(Math.random() * 18),
+        applePath: Array.from({ length: 10 }, () => Math.floor(Math.random() * 5))
+    };
+}
+
+function revealBoardRound() {
+    if (!boardRoundPred) generateBoardRound();
+    document.querySelectorAll("#vipMinesGrid .mine-cell").forEach((cell, i) => {
+        cell.classList.toggle("is-safe", boardRoundPred.minesSafe.indexOf(i) !== -1);
+    });
+    document.querySelectorAll("#vipPenaltyGoal .penalty-zone").forEach((z) => {
+        z.classList.toggle("is-target", z.getAttribute("data-zone") === boardRoundPred.penaltyZone);
+    });
+    const readout = document.getElementById("vipPenaltyReadout");
+    if (readout) {
+        const labels = { tl: "Lucarne Gauche", tr: "Lucarne Droite", ml: "Ras du poteau Gauche", mr: "Ras du poteau Droit", c: "Plein Centre" };
+        readout.textContent = `${labels[boardRoundPred.penaltyZone] || ""} · ${boardRoundPred.penaltyPct}%`;
+        readout.classList.remove("hidden");
+    }
+    const rows = Array.from(document.querySelectorAll("#vipAppleTower .apple-row"));
+    rows.forEach((row) => row.querySelectorAll(".apple-cell").forEach((c) => c.classList.remove("is-gold")));
+    let floor = 0;
+    if (appleRevealTimer) clearInterval(appleRevealTimer);
+    appleRevealTimer = setInterval(() => {
+        if (floor >= rows.length) {
+            clearInterval(appleRevealTimer);
+            appleRevealTimer = null;
+            return;
+        }
+        const col = boardRoundPred.applePath[floor];
+        const cell = rows[floor]?.querySelectorAll(".apple-cell")[col];
+        if (cell) cell.classList.add("is-gold");
+        floor += 1;
+    }, 220);
+}
+
+function setActivePredictorGame(id, silent) {
+    if (!id) return;
+    activePredictorGame = id;
+    const stage = document.getElementById("vipGameStage");
+    if (stage) stage.setAttribute("data-game", id);
+    document.querySelectorAll("#vipGameSwitcher .vip-game-chip").forEach((btn) => {
+        btn.classList.toggle("is-active", btn.getAttribute("data-game") === id);
+    });
+    const flyer = document.getElementById("vipFlyerPanel");
+    const mines = document.getElementById("vipMinesPanel");
+    const penalty = document.getElementById("vipPenaltyPanel");
+    const apple = document.getElementById("vipApplePanel");
+    const showFlyer = isFlyerGame(id);
+    flyer?.classList.toggle("hidden", !showFlyer);
+    flyer?.classList.toggle("is-active", showFlyer);
+    mines?.classList.toggle("hidden", id !== "mines");
+    penalty?.classList.toggle("hidden", id !== "penalty");
+    apple?.classList.toggle("hidden", id !== "apple");
+    const heading = document.getElementById("vipGameHeading");
+    if (heading) heading.textContent = predictorGameHeading(id);
+    const unlock = document.getElementById("vipUnlockSignalBtn");
+    if (unlock) {
+        const analyse = !showFlyer;
+        const key = analyse ? "btn_analyse_signal" : "btn_unlock_signal";
+        unlock.setAttribute("data-i18n", key);
+        unlock.textContent = i18nText(key, analyse ? "ANALYSER LE SIGNAL" : "VOIR LE SIGNAL");
+    }
+    if (typeof window.__vipResizeCanvas === "function") window.__vipResizeCanvas();
+}
+
+function initPredictorGameSuite() {
+    const grid = document.getElementById("vipMinesGrid");
+    if (grid && grid.childElementCount === 0) {
+        for (let i = 0; i < 25; i++) {
+            const cell = document.createElement("div");
+            cell.className = "mine-cell";
+            grid.appendChild(cell);
+        }
+    }
+    const tower = document.getElementById("vipAppleTower");
+    if (tower && tower.childElementCount === 0) {
+        for (let r = 0; r < 10; r++) {
+            const row = document.createElement("div");
+            row.className = "apple-row";
+            for (let c = 0; c < 5; c++) {
+                const cell = document.createElement("div");
+                cell.className = "apple-cell";
+                row.appendChild(cell);
+            }
+            tower.appendChild(row);
+        }
+    }
+    document.getElementById("vipGameSwitcher")?.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-game]");
+        if (!btn) return;
+        setActivePredictorGame(btn.getAttribute("data-game"));
+    });
+    setActivePredictorGame(activePredictorGame, true);
+}
+
 /* -------------------------------------------------------------------------- */
-/* Cockpit Radar de Vol                                                       */
+/* Session d'analyse — radar & jeux                                           */
 /* -------------------------------------------------------------------------- */
 
 function stopVipRadarEngine() {
+    if (appleRevealTimer) {
+        clearInterval(appleRevealTimer);
+        appleRevealTimer = null;
+    }
     if (vipAnimationId) {
         cancelAnimationFrame(vipAnimationId);
         vipAnimationId = null;
@@ -2355,10 +2517,10 @@ function startVipGrandVerticalRadarEngine() {
     let viewH = 520;
 
     function resizeCanvas() {
-        const parent = canvas.parentElement;
-        if (!parent) return;
-        const cssW = Math.max(parent.clientWidth || 320, 260);
-        const cssH = Math.max(parent.clientHeight || 320, 240);
+        const host = document.getElementById("vipGameStage") || canvas.parentElement;
+        if (!host) return;
+        const cssW = Math.max(host.clientWidth || 320, 260);
+        const cssH = Math.max(host.clientHeight || 320, 240);
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
         viewW = cssW;
         viewH = cssH;
@@ -2370,6 +2532,7 @@ function startVipGrandVerticalRadarEngine() {
     }
     resizeCanvas();
     vipResizeHandler = resizeCanvas;
+    window.__vipResizeCanvas = resizeCanvas;
     window.addEventListener("resize", vipResizeHandler);
 
     let flightState = "scanning";
@@ -2467,6 +2630,7 @@ function startVipGrandVerticalRadarEngine() {
         unlockBtn?.classList.add("hidden");
         hideLiveHud();
         keepCodeTerminal();
+        clearBoardHighlights();
         if (targetDisplay) targetDisplay.textContent = "";
         if (statusMessage) statusMessage.textContent = "";
     }
@@ -2531,14 +2695,22 @@ function startVipGrandVerticalRadarEngine() {
         unlockBtn?.classList.add("hidden");
         chronoWrap?.classList.add("hidden");
         keepCodeTerminal();
-        predReveal?.classList.remove("hidden");
-        flightState = "flying";
+        generateNextTarget();
+        generateBoardRound();
         currentMultiplier = 1.00;
         flightProgress = 0;
         explosionTimer = 0;
         particles = [];
-        showLiveHud();
-        generateNextTarget();
+        if (isFlyerGame(activePredictorGame)) {
+            predReveal?.classList.remove("hidden");
+            flightState = "flying";
+            showLiveHud();
+        } else {
+            predReveal?.classList.add("hidden");
+            hideLiveHud();
+            revealBoardRound();
+            flightState = "boardReveal";
+        }
     }
 
     function startArmCountdown(remainingMs) {
@@ -2636,42 +2808,64 @@ function startVipGrandVerticalRadarEngine() {
     });
 
     function drawPlane(x, y, angle) {
+        const theme = flyerTheme();
         ctx.save();
         ctx.translate(x, y);
         ctx.rotate(angle);
 
-        ctx.fillStyle = "#ffc837";
-        ctx.beginPath();
-        ctx.ellipse(0, 0, 24, 11, 0, 0, Math.PI * 2);
-        ctx.fill();
+        if (activePredictorGame === "luckyjet") {
+            ctx.fillStyle = theme.flame;
+            ctx.beginPath();
+            ctx.moveTo(-10, 8);
+            ctx.lineTo(-6 - Math.random() * 10, 22);
+            ctx.lineTo(-2, 8);
+            ctx.closePath();
+            ctx.fill();
+            ctx.fillStyle = theme.body;
+            ctx.beginPath();
+            ctx.ellipse(0, 2, 9, 13, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = "#fde68a";
+            ctx.beginPath();
+            ctx.arc(0, -10, 6, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = theme.wing;
+            ctx.fillRect(-14, -2, 8, 12);
+            ctx.fillRect(6, -2, 8, 12);
+        } else {
+            ctx.fillStyle = theme.body;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, 24, 11, 0, 0, Math.PI * 2);
+            ctx.fill();
 
-        ctx.fillStyle = "#1e1b4b";
-        ctx.beginPath();
-        ctx.arc(7, -2, 4, 0, Math.PI * 2);
-        ctx.fill();
+            ctx.fillStyle = theme.window;
+            ctx.beginPath();
+            ctx.arc(7, -2, 4, 0, Math.PI * 2);
+            ctx.fill();
 
-        ctx.fillStyle = "#f59e0b";
-        ctx.beginPath();
-        ctx.moveTo(-3, 0);
-        ctx.lineTo(-14, -20);
-        ctx.lineTo(5, -3);
-        ctx.closePath();
-        ctx.fill();
+            ctx.fillStyle = theme.wing;
+            ctx.beginPath();
+            ctx.moveTo(-3, 0);
+            ctx.lineTo(-14, -20);
+            ctx.lineTo(5, -3);
+            ctx.closePath();
+            ctx.fill();
 
-        ctx.beginPath();
-        ctx.moveTo(-3, 0);
-        ctx.lineTo(-14, 20);
-        ctx.lineTo(5, 3);
-        ctx.closePath();
-        ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(-3, 0);
+            ctx.lineTo(-14, 20);
+            ctx.lineTo(5, 3);
+            ctx.closePath();
+            ctx.fill();
 
-        ctx.fillStyle = "#ef4444";
-        ctx.beginPath();
-        ctx.moveTo(-24, -4);
-        ctx.lineTo(-42 - Math.random() * 14, 0);
-        ctx.lineTo(-24, 4);
-        ctx.closePath();
-        ctx.fill();
+            ctx.fillStyle = theme.flame;
+            ctx.beginPath();
+            ctx.moveTo(-24, -4);
+            ctx.lineTo(-42 - Math.random() * 14, 0);
+            ctx.lineTo(-24, 4);
+            ctx.closePath();
+            ctx.fill();
+        }
 
         ctx.restore();
     }
@@ -2682,11 +2876,23 @@ function startVipGrandVerticalRadarEngine() {
         const W = viewW;
         const H = viewH;
 
+        const theme = flyerTheme();
         ctx.clearRect(0, 0, W, H);
-        ctx.fillStyle = "#060a18";
+        ctx.fillStyle = theme.bg;
         ctx.fillRect(0, 0, W, H);
 
-        ctx.strokeStyle = "rgba(255, 200, 55, 0.08)";
+        if (theme.stars) {
+            ctx.fillStyle = "rgba(255,255,255,0.55)";
+            for (let i = 0; i < 28; i++) {
+                const sx = (i * 73) % Math.max(W, 1);
+                const sy = (i * 47) % Math.max(H, 1);
+                ctx.beginPath();
+                ctx.arc(sx, sy, i % 5 === 0 ? 1.6 : 0.8, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        ctx.strokeStyle = theme.grid;
         ctx.lineWidth = 1;
         ctx.setLineDash([4, 4]);
 
@@ -2772,11 +2978,11 @@ function startVipGrandVerticalRadarEngine() {
                 ctx.lineTo(pt.x, pt.y);
             }
             ctx.lineTo(pos.x, pos.y);
-            ctx.strokeStyle = "#ffc837";
+            ctx.strokeStyle = theme.stroke;
             ctx.lineWidth = 6;
             ctx.lineCap = "round";
             ctx.lineJoin = "round";
-            ctx.shadowColor = "#ffc837";
+            ctx.shadowColor = theme.stroke;
             ctx.shadowBlur = 22;
             ctx.stroke();
             ctx.shadowBlur = 0;
@@ -2785,8 +2991,10 @@ function startVipGrandVerticalRadarEngine() {
 
             ctx.beginPath();
             ctx.arc(startX, startY, 7, 0, Math.PI * 2);
-            ctx.fillStyle = "rgba(255, 200, 55, 0.35)";
+            ctx.fillStyle = theme.stroke;
+            ctx.globalAlpha = 0.35;
             ctx.fill();
+            ctx.globalAlpha = 1;
 
             drawPlane(pos.x, pos.y, angle);
             trackHud(pos.x, pos.y);
@@ -2815,6 +3023,13 @@ function startVipGrandVerticalRadarEngine() {
             });
 
             if (explosionTimer > 50) {
+                hideSignalUi();
+                flightState = "scanning";
+                startCalibrationPhase();
+            }
+        } else if (flightState === "boardReveal") {
+            explosionTimer++;
+            if (explosionTimer > 420) {
                 hideSignalUi();
                 flightState = "scanning";
                 startCalibrationPhase();
@@ -3319,7 +3534,7 @@ async function handlePaymentSuccess(response, currency, amount) {
     hidePaymentOverlay();
     closeAllModals();
     initGlobalViewRouter();
-    showToast("🎉 Félicitations ! Votre cockpit d'analyse est débloqué pour le mois !");
+    showToast("🎉 Félicitations ! Votre session d'analyse est débloquée pour le mois !");
 }
 
 function splitCustomerName(fullName) {
@@ -3482,7 +3697,7 @@ async function activateMaketouLicense(cartId, token, expiresAt, paymentDate) {
     grantVerifiedAccess(token);
     if (!currentUser) {
         initGlobalViewRouter();
-        showToast("🎉 Félicitations ! Votre cockpit d'analyse est débloqué pour le mois !");
+        showToast("🎉 Félicitations ! Votre session d'analyse est débloquée pour le mois !");
         return;
     }
     await handlePaymentSuccess({
@@ -3574,7 +3789,7 @@ async function verifyMaketouReturn() {
                     grantVerifiedAccess();
                     clearMaketouReturnUrl();
                     initGlobalViewRouter();
-                    showToast("🎉 Félicitations ! Votre cockpit d'analyse est débloqué pour le mois !");
+                    showToast("🎉 Félicitations ! Votre session d'analyse est débloquée pour le mois !");
                     trackMetaPurchase("maketou-return");
                     return;
                 }
@@ -3908,7 +4123,7 @@ function buildReferralLink(memberId) {
 }
 
 function referralShareMessage(link) {
-    return `Crash Predictor 2026 — débloque ton accès ici : ${link}`;
+    return `PREDICTOR — débloque ton accès ici : ${link}`;
 }
 
 function updateReferralProgress(count) {
@@ -4018,7 +4233,7 @@ function initReferralSystem() {
         if (!link || typeof navigator.share !== "function") return;
         try {
             await navigator.share({
-                title: "Crash Predictor 2026",
+                title: "PREDICTOR",
                 text: referralShareMessage(link),
                 url: link
             });

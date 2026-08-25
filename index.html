@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#080512">
-    <title data-i18n="doc_title">CRASH PREDICTOR 2026 | Cockpit d'Analyse et Prédictions Officielles</title>
-    <meta name="description" content="Crash Predictor 2026 — Plateforme d'analyse algorithmique en temps réel, cockpit interactif et abonnement mensuel.">
+    <title data-i18n="doc_title">PREDICTOR | Suite d'analyse algorithmique multi-jeux</title>
+    <meta name="description" content="PREDICTOR — Suite d'analyse algorithmique multi-jeux en temps réel. Un accès 17 $/mois débloque 6 moteurs de prédiction.">
     <link rel="icon" href="assets/favicon.ico" sizes="any">
     <link rel="icon" type="image/png" sizes="192x192" href="assets/pwa-icon-192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="assets/pwa-icon-512.png">
@@ -35,7 +35,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="CrashApp">
+    <meta name="apple-mobile-web-app-title" content="Predictor">
     <script>
     (function () {
         try {
@@ -72,7 +72,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=Orbitron:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=u59">
+    <link rel="stylesheet" href="style.css?v=u61">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 </head>
 <body class="dark-theme">
@@ -108,7 +108,7 @@
             <div class="alert-banner-content">
                 <div class="alert-icon-text">
                     <i class="fa-solid fa-triangle-exclamation text-red pulse-icon" aria-hidden="true"></i>
-                    <span data-i18n="alert_unsubscribed"><strong>ACCÈS NON ACTIVÉ :</strong> activez votre licence pour ouvrir le cockpit.</span>
+                    <span data-i18n="alert_unsubscribed"><strong>ACCÈS NON ACTIVÉ :</strong> activez votre licence pour ouvrir la session d'analyse.</span>
                 </div>
                 <button type="button" class="btn-alert-unlock" id="btnAlertSubscribe">
                     <i class="fa-solid fa-unlock-keyhole" aria-hidden="true"></i> <span data-i18n="btn_alert_unlock">Débloquer l'accès – 17 $</span>
@@ -121,11 +121,11 @@
             <div class="nav-container">
                 <a href="#" class="brand-logo">
                     <div class="logo-image-wrap">
-                        <img src="assets/crash_hd.jpg" alt="Crash Predictor" class="brand-logo-img">
+                        <img src="assets/crash_hd.jpg" alt="Predictor" class="brand-logo-img">
                     </div>
                     <div class="brand-text">
-                        <span class="logo-title">CRASH<span class="highlight">PREDICTOR</span></span>
-                        <span class="logo-badge" data-i18n="badge_edition">ÉDITION 2026</span>
+                        <span class="logo-title"><span class="highlight">PREDICTOR</span></span>
+                        <span class="logo-badge" data-i18n="badge_edition">SUITE MULTI-JEUX</span>
                     </div>
                 </a>
 
@@ -185,14 +185,26 @@
                             <span class="promo-alarm-icon" aria-hidden="true">⏰</span>
                             <span><span data-i18n="promo_offer">DERNIÈRE CHANCE 17 $ :</span> <strong class="countdown-timer-text">47h 59m 50s</strong></span>
                         </div>
-                        <h1 class="hero-main-title">CRASH <span class="gradient-gold">PREDICTOR 2026</span></h1>
-                        <p class="hero-subtitle-desc" data-i18n="hero_subtitle">Plateforme d'analyse haute fréquence et anticipation des trajectoires en direct.</p>
+                        <h1 class="hero-main-title">PREDICTOR <span class="gradient-gold">— SUITE D'ANALYSE ALGORITHMIQUE MULTI-JEUX</span></h1>
+                        <p class="hero-subtitle-desc" data-i18n="hero_subtitle">Six moteurs de prédiction en temps réel, un seul accès officiel à 17 $ / mois.</p>
+                    </div>
+
+                    <div class="suite-games-showcase" id="suiteGamesShowcase">
+                        <p class="suite-games-kicker" data-i18n="suite_kicker">Licence unique · 6 jeux débloqués</p>
+                        <div class="suite-games-grid">
+                            <article class="suite-game-card theme-aviator"><span class="suite-game-icon" aria-hidden="true">✈</span><strong>AVIATOR</strong><span data-i18n="game_tag_aviator">Signaux en direct</span></article>
+                            <article class="suite-game-card theme-luckyjet"><span class="suite-game-icon" aria-hidden="true">🚀</span><strong>LUCKY JET</strong><span data-i18n="game_tag_luckyjet">Flux cosmique</span></article>
+                            <article class="suite-game-card theme-crash"><span class="suite-game-icon" aria-hidden="true">⚡</span><strong>CRASH</strong><span data-i18n="game_tag_crash">Algorithme live</span></article>
+                            <article class="suite-game-card theme-mines"><span class="suite-game-icon" aria-hidden="true">💎</span><strong>MINES</strong><span data-i18n="game_tag_mines">Cases sûres</span></article>
+                            <article class="suite-game-card theme-penalty"><span class="suite-game-icon" aria-hidden="true">⚽</span><strong>PENALTY SHOOT-OUT</strong><span data-i18n="game_tag_penalty">Ciblage laser</span></article>
+                            <article class="suite-game-card theme-apple"><span class="suite-game-icon" aria-hidden="true">🍎</span><strong>APPLE OF FORTUNE</strong><span data-i18n="game_tag_apple">Chemin doré</span></article>
+                        </div>
                     </div>
 
                     <div class="master-product-display luxury-alive-box">
                         <div class="product-visual-container">
                             <div class="clean-image-wrapper radiant-gold-frame">
-                                <img src="assets/crash_hd.jpg" alt="Crash Predictor" class="crash-clean-image">
+                                <img src="assets/crash_hd.jpg" alt="Predictor" class="crash-clean-image">
                                 <div class="radiant-light-beam" aria-hidden="true"></div>
                             </div>
                             <div class="code-stream-frame" aria-hidden="true">
@@ -200,7 +212,7 @@
                                 <pre class="code-stream" data-code-stream></pre>
                             </div>
                             <div class="image-caption-bar">
-                                <span class="badge-algo"><i class="fa-solid fa-microchip" aria-hidden="true"></i> <span data-i18n="badge_algo">MOTEUR 2026</span></span>
+                                <span class="badge-algo"><i class="fa-solid fa-microchip" aria-hidden="true"></i> <span data-i18n="badge_algo">MOTEUR LIVE</span></span>
                                 <span class="badge-status-live"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="badge_live_session">SESSION TEMPS RÉEL</span></span>
                             </div>
 
@@ -219,7 +231,7 @@
 
                         <div class="product-order-box">
                             <h2 class="access-title" data-i18n="offer_title">Licence Officielle & Accès Illimité</h2>
-                            <p class="access-desc" data-i18n="offer_desc">Débloquez l'accès complet au cockpit d'analyse, aux prédictions en direct et à l'historique complet.</p>
+                            <p class="access-desc" data-i18n="offer_desc">Un seul accès à 17 $ / mois débloque les 6 moteurs de prédiction en temps réel.</p>
 
                             <div class="price-display-wrapper">
                                 <div class="price-highlight">
@@ -237,14 +249,14 @@
                                         <i class="fa-solid fa-circle-check text-green" aria-hidden="true"></i>
                                         <span class="benefit-name" data-i18n="benefit_1_title">Précision Algorithmique Optimale</span>
                                     </div>
-                                    <p class="benefit-text" data-i18n="benefit_1_desc">Analyse en temps réel et anticipation précise des trajectoires.</p>
+                                    <p class="benefit-text" data-i18n="benefit_1_desc">Analyse en temps réel et anticipation précise des signaux en direct.</p>
                                 </div>
                                 <div class="benefit-card">
                                     <div class="benefit-head">
                                         <i class="fa-solid fa-circle-check text-green" aria-hidden="true"></i>
                                         <span class="benefit-name" data-i18n="benefit_2_title">Activation Immédiate</span>
                                     </div>
-                                    <p class="benefit-text" data-i18n="benefit_2_desc">Accès instantané à l'ensemble des prédictions et au cockpit dès la validation de votre paiement.</p>
+                                    <p class="benefit-text" data-i18n="benefit_2_desc">Accès instantané aux 6 sessions d'analyse dès la validation de votre paiement.</p>
                                 </div>
                                 <div class="benefit-card">
                                     <div class="benefit-head">
@@ -274,7 +286,7 @@
 
                             <div class="secure-guarantee-footer">
                                 <i class="fa-solid fa-shield-halved text-gold" aria-hidden="true"></i>
-                                <span data-i18n="secure_guarantee">Paiement sécurisé et chiffré • Activation automatique du cockpit</span>
+                                <span data-i18n="secure_guarantee">Paiement sécurisé et chiffré • Activation automatique de la session</span>
                             </div>
                         </div>
                     </div>
@@ -321,15 +333,15 @@
 
         <footer class="main-footer">
             <div class="footer-container">
-                <div class="logo-title">CRASH <span class="highlight">PREDICTOR 2026</span></div>
-                <div class="footer-copy" data-i18n="footer_copy">&copy; 2026 CRASH PREDICTOR TECHNOLOGIES. Tous droits réservés.</div>
+                <div class="logo-title"><span class="highlight">PREDICTOR</span></div>
+                <div class="footer-copy" data-i18n="footer_copy">&copy; PREDICTOR. Tous droits réservés.</div>
             </div>
         </footer>
     </div>
 
 
     <!-- ==========================================================================
-         VUE 2 : LE COCKPIT D'ANALYSE COMPLET (MEMBRES ACTIFS)
+         VUE 2 : SESSION D'ANALYSE MULTI-JEUX (MEMBRES ACTIFS)
          ========================================================================== -->
     <div id="vipSoftwareWrapper" class="site-view-wrapper hidden">
         <header class="vip-software-navbar">
@@ -337,8 +349,8 @@
                 <div class="vip-brand">
                     <div class="vip-logo-box"><img src="assets/crash_hd.jpg" alt="Logo"></div>
                     <div class="vip-brand-info">
-                        <span class="vip-software-name">CRASH PREDICTOR</span>
-                        <span class="vip-live-indicator"><span class="pulse-dot-green"></span> <span data-i18n="vip_radar_live">FLUX RADAR EN DIRECT</span></span>
+                        <span class="vip-software-name">PREDICTOR</span>
+                        <span class="vip-live-indicator"><span class="pulse-dot-green"></span> <span data-i18n="vip_radar_live">SIGNAUX EN DIRECT</span></span>
                     </div>
                 </div>
 
@@ -384,10 +396,19 @@
                     <div class="radar-card-header">
                         <div class="radar-title-group">
                             <i class="fa-solid fa-satellite-dish text-green" aria-hidden="true"></i>
-                            <h3 data-i18n="radar_heading">RADAR DE VOL VERTICAL HAUTE PRÉCISION</h3>
+                            <h3 id="vipGameHeading">SESSION D'ANALYSE HAUTE PRÉCISION</h3>
                         </div>
                         <div class="radar-session-badge" data-i18n="radar_session_badge">SESSION ACTIVE</div>
                     </div>
+
+                    <nav class="vip-game-switcher" id="vipGameSwitcher" aria-label="Sélection du jeu">
+                        <button type="button" class="vip-game-chip" data-game="aviator"><span>✈</span> AVIATOR</button>
+                        <button type="button" class="vip-game-chip" data-game="luckyjet"><span>🚀</span> LUCKY JET</button>
+                        <button type="button" class="vip-game-chip is-active" data-game="crash"><span>⚡</span> CRASH</button>
+                        <button type="button" class="vip-game-chip" data-game="mines"><span>💎</span> MINES</button>
+                        <button type="button" class="vip-game-chip" data-game="penalty"><span>⚽</span> PENALTY</button>
+                        <button type="button" class="vip-game-chip" data-game="apple"><span>🍎</span> APPLE</button>
+                    </nav>
 
                     <div class="vip-prediction-spotlight" id="vipPredictionSpotlight">
                         <div class="code-stream-frame vip-code-frame" id="vipCodeFrame" aria-hidden="true">
@@ -400,12 +421,35 @@
                         </div>
                     </div>
 
-                    <div class="vip-canvas-viewport grand-vertical-viewport">
-                        <canvas id="vipFlightCanvas" class="vip-flight-canvas grand-canvas-height" aria-label="Radar de vol"></canvas>
+                    <div class="vip-game-stage grand-vertical-viewport" id="vipGameStage" data-game="crash">
+                        <div class="vip-canvas-viewport game-panel is-active" id="vipFlyerPanel" data-game-panel="flyer">
+                            <canvas id="vipFlightCanvas" class="vip-flight-canvas grand-canvas-height" aria-label="Flux de données"></canvas>
+                            <div class="vip-live-hud hidden" id="vipLiveHud">
+                                <span class="hud-label" data-i18n="hud_label">COTE EN DIRECT</span>
+                                <span class="hud-number" id="vipHudNumber">x1.00</span>
+                            </div>
+                        </div>
 
-                        <div class="vip-live-hud hidden" id="vipLiveHud">
-                            <span class="hud-label" data-i18n="hud_label">COTE EN DIRECT</span>
-                            <span class="hud-number" id="vipHudNumber">x1.00</span>
+                        <div class="game-panel mines-panel hidden" id="vipMinesPanel" data-game-panel="mines">
+                            <div class="mines-grid" id="vipMinesGrid"></div>
+                        </div>
+
+                        <div class="game-panel penalty-panel hidden" id="vipPenaltyPanel" data-game-panel="penalty">
+                            <div class="penalty-pitch">
+                                <div class="penalty-goal" id="vipPenaltyGoal">
+                                    <button type="button" class="penalty-zone" data-zone="tl">Lucarne G</button>
+                                    <button type="button" class="penalty-zone" data-zone="tr">Lucarne D</button>
+                                    <button type="button" class="penalty-zone" data-zone="ml">Ras poteau G</button>
+                                    <button type="button" class="penalty-zone" data-zone="mr">Ras poteau D</button>
+                                    <button type="button" class="penalty-zone penalty-zone-center" data-zone="c">Plein Centre</button>
+                                </div>
+                                <div class="penalty-keeper" aria-hidden="true">🧤</div>
+                                <div class="penalty-readout hidden" id="vipPenaltyReadout"></div>
+                            </div>
+                        </div>
+
+                        <div class="game-panel apple-panel hidden" id="vipApplePanel" data-game-panel="apple">
+                            <div class="apple-tower" id="vipAppleTower"></div>
                         </div>
 
                         <div class="vip-graph-center-overlay" id="vipGraphCenterOverlay">
@@ -418,7 +462,7 @@
 
                         <div class="vip-scanner-loader-overlay hidden" id="vipScannerLoader">
                             <div class="decode-console" aria-live="polite">
-                                <div class="decode-chrome">flux.decode // compiling · cycle 30 min</div>
+                                <div class="decode-chrome">core.predict // compiling · cycle 30 min</div>
                                 <pre class="decode-stream" id="vipDecodeStream"></pre>
                                 <div class="decode-meta">
                                     <span class="scan-title" data-i18n="scan_title">CALIBRATION DU SIGNAL</span>
@@ -636,7 +680,7 @@
 
                     <div class="brief-footer-note">
                         <i class="fa-solid fa-shield-halved text-green" aria-hidden="true"></i>
-                        <span data-i18n="checkout_guarantee_note">Le cockpit s’ouvre immédiatement après la validation de votre paiement.</span>
+                        <span data-i18n="checkout_guarantee_note">La session d'analyse s’ouvre immédiatement après la validation de votre paiement.</span>
                     </div>
 
                     <div class="card-link-sub">
@@ -816,7 +860,7 @@
             <path d="M16.2 10.2l4.2 4.2M20.4 10.2l-4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
         </svg>
     </button>
-    <script src="app.js?v=u54" defer></script>
+    <script src="app.js?v=u56" defer></script>
     <script src="ambient-audio.js?v=6" defer></script>
 </body>
 </html>

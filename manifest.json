@@ -1,6 +1,6 @@
 {
-  "name": "Crash Predictor",
-  "short_name": "CrashApp",
+  "name": "Predictor",
+  "short_name": "Predictor",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
