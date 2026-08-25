@@ -675,7 +675,6 @@ function maketou_activate_paid_account($ref, $requestEmail, $data = []) {
     } elseif ($uniqueId !== "") {
         maketou_apply_supabase_subscription("", $uniqueId, $ref, $expiresAt, $paymentDate);
     }
-    maketou_credit_referral_on_payment($email, $uniqueId);
     return [
         "email" => $email,
         "expiresAt" => $expiresAt,

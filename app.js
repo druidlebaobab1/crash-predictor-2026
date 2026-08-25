@@ -62,7 +62,7 @@ function trackMetaPurchase(orderId) {
 // ==========================================================================
 const TRANSLATIONS = {
     fr: {
-        doc_title: "PREDICTOR | Suite d'analyse algorithmique multi-jeux",
+        doc_title: "PREDICTOR | Suite d'Analyse Multi-Jeux en Direct",
         ticker_live: "EN DIRECT",
         ticker_sub: "utilisateurs connectées sur le site crashpredictor.fr",
         alert_unsubscribed: "<strong>ACCÈS NON ACTIVÉ :</strong> activez votre licence pour ouvrir la session d'analyse.",
@@ -120,6 +120,10 @@ const TRANSLATIONS = {
         btn_unlock_signal: "VOIR LE SIGNAL",
         btn_analyse_signal: "ANALYSER LE SIGNAL",
         suite_kicker: "Licence unique · 6 jeux débloqués",
+        hero_live_badge: "LIVE SIGNAL",
+        session_locked_kicker: "EN ATTENTE",
+        session_locked_title: "VERROUILLÉ",
+        session_locked_copy: "Une analyse est déjà en cours sur un autre jeu.",
         game_tag_aviator: "Signaux en direct",
         game_tag_luckyjet: "Flux cosmique",
         game_tag_crash: "Algorithme live",
@@ -185,7 +189,7 @@ const TRANSLATIONS = {
         ph_confirm_pass: "Confirmer le nouveau mot de passe"
     },
     en: {
-        doc_title: "PREDICTOR | Multi-game algorithmic analysis suite",
+        doc_title: "PREDICTOR | Live Multi-Game Analysis Suite",
         ticker_live: "LIVE",
         ticker_sub: "users connected on crashpredictor.fr",
         alert_unsubscribed: "<strong>ACCESS NOT ACTIVATED:</strong> activate your license to open the cockpit.",
@@ -242,8 +246,19 @@ const TRANSLATIONS = {
         pred_advice: "Cash-out your profits before this safety threshold",
         btn_unlock_signal: "SEE THE SIGNAL",
         btn_analyse_signal: "ANALYZE THE SIGNAL",
+        suite_kicker: "SINGLE LICENSE · 6 UNLOCKED GAMES",
+        game_tag_aviator: "Live signals",
+        game_tag_luckyjet: "Cosmic flow",
+        game_tag_crash: "Live algorithm",
+        game_tag_mines: "Safe tiles",
+        game_tag_penalty: "Laser targeting",
+        game_tag_apple: "Golden path",
         signal_window: "TAKEOFF IN",
         signal_arrive: "PREDICTION ARRIVES IN {n} SECONDS",
+        hero_live_badge: "LIVE SIGNAL",
+        session_locked_kicker: "WAITING",
+        session_locked_title: "LOCKED",
+        session_locked_copy: "An analysis is already running on another game.",
         hud_label: "LIVE MULTIPLIER",
         scan_title: "SIGNAL CALIBRATION",
         scan_subtitle: "Preparing next round…",
@@ -301,7 +316,7 @@ const TRANSLATIONS = {
         ph_confirm_pass: "Confirm new password"
     },
     es: {
-        doc_title: "PREDICTOR | Suite de análisis algorítmico multi-juegos",
+        doc_title: "PREDICTOR | Suite de Análisis Multi-Juegos en Directo",
         ticker_live: "EN VIVO",
         ticker_sub: "usuarios conectados en crashpredictor.fr",
         alert_unsubscribed: "<strong>ACCESO NO ACTIVADO:</strong> active su licencia para abrir el cockpit.",
@@ -357,8 +372,20 @@ const TRANSLATIONS = {
         pred_stability: "Estabilidad:",
         pred_advice: "Retire sus ganancias antes de este umbral de seguridad",
         btn_unlock_signal: "VER LA SEÑAL",
+        btn_analyse_signal: "ANALIZAR LA SEÑAL",
+        suite_kicker: "LICENCIA ÚNICA · 6 JUEGOS DESBLOQUEADOS",
         signal_window: "DESPEGUE EN",
         signal_arrive: "LA PREDICCIÓN LLEGA EN {n} SEGUNDOS",
+        hero_live_badge: "LIVE SIGNAL",
+        session_locked_kicker: "EN ESPERA",
+        session_locked_title: "BLOQUEADO",
+        session_locked_copy: "Ya hay un análisis en curso en otro juego.",
+        game_tag_aviator: "Señales en vivo",
+        game_tag_luckyjet: "Flujo cósmico",
+        game_tag_crash: "Algoritmo en vivo",
+        game_tag_mines: "Casillas seguras",
+        game_tag_penalty: "Apuntando láser",
+        game_tag_apple: "Camino dorado",
         hud_label: "MULTIPLICADOR EN VIVO",
         scan_title: "CALIBRACIÓN DE SEÑAL",
         scan_subtitle: "Preparando siguiente ronda…",
@@ -416,7 +443,7 @@ const TRANSLATIONS = {
         ph_confirm_pass: "Confirmar nueva contraseña"
     },
     pt: {
-        doc_title: "PREDICTOR | Suite de análise algorítmica multi-jogos",
+        doc_title: "PREDICTOR | Suite de Análise Multi-Jogos em Direto",
         ticker_live: "AO VIVO",
         ticker_sub: "utilizadores ligados em crashpredictor.fr",
         alert_unsubscribed: "<strong>ACESSO NÃO ATIVADO:</strong> ative sua licença para abrir o cockpit.",
@@ -472,8 +499,20 @@ const TRANSLATIONS = {
         pred_stability: "Estabilidade:",
         pred_advice: "Retire os seus ganhos antes deste limiar de segurança",
         btn_unlock_signal: "VER O SINAL",
+        btn_analyse_signal: "ANALISAR O SINAL",
+        suite_kicker: "LICENÇA ÚNICA · 6 JOGOS DESBLOQUEADOS",
         signal_window: "DESCOLAGEM EM",
         signal_arrive: "A PREVISÃO CHEGA EM {n} SEGUNDOS",
+        hero_live_badge: "LIVE SIGNAL",
+        session_locked_kicker: "EM ESPERA",
+        session_locked_title: "BLOQUEADO",
+        session_locked_copy: "Já existe uma análise a decorrer noutro jogo.",
+        game_tag_aviator: "Sinais em direto",
+        game_tag_luckyjet: "Fluxo cósmico",
+        game_tag_crash: "Algoritmo live",
+        game_tag_mines: "Casas seguras",
+        game_tag_penalty: "Mira laser",
+        game_tag_apple: "Caminho dourado",
         hud_label: "MULTIPLICADOR AO VIVO",
         scan_title: "CALIBRAÇÃO DE SINAL",
         scan_subtitle: "A preparar a próxima ronda…",
@@ -531,7 +570,7 @@ const TRANSLATIONS = {
         ph_confirm_pass: "Confirmar nova palavra-passe"
     },
     de: {
-        doc_title: "PREDICTOR | Algorithmische Multi-Game-Analyse-Suite",
+        doc_title: "PREDICTOR | Live Multi-Game Analyse-Suite",
         ticker_live: "LIVE",
         ticker_sub: "Nutzer verbunden auf crashpredictor.fr",
         alert_unsubscribed: "<strong>ZUGANG NICHT AKTIV:</strong> Aktivieren Sie Ihre Lizenz, um das Cockpit zu öffnen.",
@@ -587,8 +626,20 @@ const TRANSLATIONS = {
         pred_stability: "Stabilität:",
         pred_advice: "Realisieren Sie Ihre Gewinne vor dieser Sicherheitsschwelle",
         btn_unlock_signal: "SIGNAL ANZEIGEN",
+        btn_analyse_signal: "SIGNAL ANALYSIEREN",
+        suite_kicker: "EINZELLIZENZ · 6 FREIGESCHALTETE SPIELE",
         signal_window: "START IN",
         signal_arrive: "DIE PROGNOSE KOMMT IN {n} SEKUNDEN",
+        hero_live_badge: "LIVE SIGNAL",
+        session_locked_kicker: "WARTEND",
+        session_locked_title: "GESPERRT",
+        session_locked_copy: "Auf einem anderen Spiel läuft bereits eine Analyse.",
+        game_tag_aviator: "Live-Signale",
+        game_tag_luckyjet: "Kosmischer Fluss",
+        game_tag_crash: "Live-Algorithmus",
+        game_tag_mines: "Sichere Felder",
+        game_tag_penalty: "Laser-Ziel",
+        game_tag_apple: "Goldener Pfad",
         hud_label: "LIVE-QUOTE",
         scan_title: "SIGNAL-KALIBRIERUNG",
         scan_subtitle: "Nächste Runde wird vorbereitet…",
@@ -790,6 +841,8 @@ let vipTargetMultiplier = 2.40;
 let vipCurrentFlightNumber = 8492;
 let vipLastHistoryMultiplier = null;
 let activePredictorGame = "crash";
+let armedSessionGame = null;
+let vipSessionState = "scanning";
 let boardRoundPred = null;
 let appleRevealTimer = null;
 let realtimeChannel = null;
@@ -827,7 +880,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     startSubscriptionGuard();
     await verifyMaketouReturn();
     startMaketouPaymentWatch();
-    initReferralSystem();
     initPwaInstall();
     initCodeStreams();
     initPredictorGameSuite();
@@ -2316,11 +2368,30 @@ function isFlyerGame(id) {
     return id === "crash" || id === "aviator" || id === "luckyjet";
 }
 
+function sessionVisualGame() {
+    const busy = ["arming", "flying", "boardReveal", "crashed"].indexOf(vipSessionState) !== -1;
+    if (busy && armedSessionGame) return armedSessionGame;
+    return activePredictorGame;
+}
+
+function isGameSessionLocked() {
+    const busy = ["arming", "flying", "boardReveal", "crashed"].indexOf(vipSessionState) !== -1;
+    return Boolean(busy && armedSessionGame && armedSessionGame !== activePredictorGame);
+}
+
+function updateGameSessionLock() {
+    const lock = document.getElementById("vipGameSessionLock");
+    const locked = isGameSessionLocked();
+    lock?.classList.toggle("hidden", !locked);
+    if (typeof window.__vipApplySessionUi === "function") window.__vipApplySessionUi(locked);
+}
+
 function flyerTheme() {
-    if (activePredictorGame === "aviator") {
+    const game = sessionVisualGame();
+    if (game === "aviator") {
         return { bg: "#120308", grid: "rgba(239,68,68,0.16)", stroke: "#ef2222", body: "#e11d48", wing: "#9f1239", window: "#111111", flame: "#fb923c", stars: false };
     }
-    if (activePredictorGame === "luckyjet") {
+    if (game === "luckyjet") {
         return { bg: "#0b0518", grid: "rgba(168,85,247,0.18)", stroke: "#c084fc", body: "#a855f7", wing: "#6d28d9", window: "#1e1b4b", flame: "#22d3ee", stars: true };
     }
     return { bg: "#060a18", grid: "rgba(255,200,55,0.08)", stroke: "#ffc837", body: "#ffc837", wing: "#f59e0b", window: "#1e1b4b", flame: "#ef4444", stars: false };
@@ -2340,10 +2411,25 @@ function predictorGameHeading(id) {
     return `<span class="notranslate" translate="no">${pair[0]}</span>${pair[1]}`;
 }
 
+function positionPenaltyLaser() {
+    const laser = document.getElementById("vipPenaltyLaser");
+    const goal = document.getElementById("vipPenaltyGoal");
+    if (!laser || !goal || !boardRoundPred) return;
+    const targetZone = document.querySelector(`#vipPenaltyGoal .penalty-zone[data-zone="${boardRoundPred.penaltyZone}"]`);
+    if (!targetZone) return;
+    const g = goal.getBoundingClientRect();
+    const z = targetZone.getBoundingClientRect();
+    if (g.width < 8 || z.width < 8) return;
+    laser.style.left = `${z.left - g.left + z.width / 2}px`;
+    laser.style.top = `${z.top - g.top + z.height / 2}px`;
+    laser.classList.add("is-on");
+}
+
 function clearBoardHighlights() {
     document.querySelectorAll("#vipMinesGrid .mine-cell").forEach((cell) => cell.classList.remove("is-safe"));
     document.querySelectorAll("#vipPenaltyGoal .penalty-zone").forEach((z) => z.classList.remove("is-target"));
     document.getElementById("vipPenaltyReadout")?.classList.add("hidden");
+    document.getElementById("vipPenaltyLaser")?.classList.remove("is-on");
     document.querySelectorAll("#vipAppleTower .apple-cell").forEach((cell) => cell.classList.remove("is-gold"));
     if (appleRevealTimer) {
         clearInterval(appleRevealTimer);
@@ -2381,6 +2467,7 @@ function revealBoardRound() {
         readout.textContent = `${labels[boardRoundPred.penaltyZone] || ""} · ${boardRoundPred.penaltyPct}%`;
         readout.classList.remove("hidden");
     }
+    requestAnimationFrame(positionPenaltyLaser);
     const rows = Array.from(document.querySelectorAll("#vipAppleTower .apple-row"));
     rows.forEach((row) => row.querySelectorAll(".apple-cell").forEach((c) => c.classList.remove("is-gold")));
     let floor = 0;
@@ -2426,6 +2513,10 @@ function setActivePredictorGame(id, silent) {
         unlock.textContent = i18nText(key, analyse ? "ANALYSER LE SIGNAL" : "VOIR LE SIGNAL");
     }
     if (typeof window.__vipResizeCanvas === "function") window.__vipResizeCanvas();
+    updateGameSessionLock();
+    if (!isGameSessionLocked() && sessionVisualGame() === "penalty" && vipSessionState === "boardReveal") {
+        requestAnimationFrame(positionPenaltyLaser);
+    }
 }
 
 function initPredictorGameSuite() {
@@ -2553,6 +2644,17 @@ function startVipGrandVerticalRadarEngine() {
     window.addEventListener("resize", vipResizeHandler);
 
     let flightState = "scanning";
+    vipSessionState = "scanning";
+
+    function setFlightState(next) {
+        flightState = next;
+        vipSessionState = next;
+        if (next === "scanning" || next === "awaitingUnlock") {
+            armedSessionGame = null;
+        }
+        updateGameSessionLock();
+    }
+
     let currentMultiplier = 1.00;
     let flightProgress = 0;
     let flightSpeed = 0.0014;
@@ -2660,9 +2762,56 @@ function startVipGrandVerticalRadarEngine() {
         chronoWrap?.classList.add("hidden");
         hideLiveHud();
         unlockBtn?.classList.remove("hidden");
-        flightState = "awaitingUnlock";
+        setFlightState("awaitingUnlock");
         if (statusMessage) statusMessage.textContent = "";
     }
+
+    window.__vipApplySessionUi = function (locked) {
+        if (locked) {
+            predReveal?.classList.add("hidden");
+            chronoWrap?.classList.add("hidden");
+            unlockBtn?.classList.add("hidden");
+            hideLiveHud();
+            return;
+        }
+        if (flightState === "arming") {
+            chronoWrap?.classList.remove("hidden");
+            unlockBtn?.classList.add("hidden");
+            predReveal?.classList.add("hidden");
+            hideLiveHud();
+            keepCodeTerminal();
+            return;
+        }
+        if (flightState === "awaitingUnlock") {
+            chronoWrap?.classList.add("hidden");
+            predReveal?.classList.add("hidden");
+            hideLiveHud();
+            unlockBtn?.classList.remove("hidden");
+            keepCodeTerminal();
+            return;
+        }
+        if (flightState === "flying") {
+            chronoWrap?.classList.add("hidden");
+            unlockBtn?.classList.add("hidden");
+            keepCodeTerminal();
+            if (isFlyerGame(sessionVisualGame())) {
+                predReveal?.classList.remove("hidden");
+                showLiveHud();
+            } else {
+                predReveal?.classList.add("hidden");
+                hideLiveHud();
+            }
+            return;
+        }
+        if (flightState === "boardReveal") {
+            chronoWrap?.classList.add("hidden");
+            unlockBtn?.classList.add("hidden");
+            predReveal?.classList.add("hidden");
+            hideLiveHud();
+            keepCodeTerminal();
+            if (sessionVisualGame() === "penalty") requestAnimationFrame(positionPenaltyLaser);
+        }
+    };
 
     function formatRemain(ms) {
         const total = Math.max(0, Math.ceil(ms / 1000));
@@ -2718,15 +2867,15 @@ function startVipGrandVerticalRadarEngine() {
         flightProgress = 0;
         explosionTimer = 0;
         particles = [];
-        if (isFlyerGame(activePredictorGame)) {
+        if (isFlyerGame(sessionVisualGame())) {
             predReveal?.classList.remove("hidden");
-            flightState = "flying";
+            setFlightState("flying");
             showLiveHud();
         } else {
             predReveal?.classList.add("hidden");
             hideLiveHud();
             revealBoardRound();
-            flightState = "boardReveal";
+            setFlightState("boardReveal");
         }
     }
 
@@ -2738,7 +2887,8 @@ function startVipGrandVerticalRadarEngine() {
         keepCodeTerminal();
         hideLiveHud();
         chronoWrap?.classList.remove("hidden");
-        flightState = "arming";
+        armedSessionGame = activePredictorGame;
+        setFlightState("arming");
         let left = Math.max(1, Math.ceil(remainingMs / 1000));
         setArmCountdownLabel(left);
         if (vipSignalTimer) clearInterval(vipSignalTimer);
@@ -2754,7 +2904,7 @@ function startVipGrandVerticalRadarEngine() {
     }
 
     async function startCalibrationPhase() {
-        flightState = "scanning";
+        setFlightState("scanning");
         hideSignalUi();
         scannerLoader?.classList.remove("hidden");
         startDecodeFeed();
@@ -2817,6 +2967,7 @@ function startVipGrandVerticalRadarEngine() {
 
     unlockBtn?.addEventListener("click", async (e) => {
         e.preventDefault();
+        if (isGameSessionLocked()) return;
         if (flightState !== "awaitingUnlock") return;
         unlockBtn.classList.add("hidden");
         const armed = await persistSignalCycle("arm");
@@ -2830,7 +2981,7 @@ function startVipGrandVerticalRadarEngine() {
         ctx.translate(x, y);
         ctx.rotate(angle);
 
-        if (activePredictorGame === "luckyjet") {
+        if (sessionVisualGame() === "luckyjet") {
             ctx.fillStyle = theme.flame;
             ctx.beginPath();
             ctx.moveTo(-10, 8);
@@ -3017,7 +3168,7 @@ function startVipGrandVerticalRadarEngine() {
             trackHud(pos.x, pos.y);
 
             if (p >= 1) {
-                flightState = "crashed";
+                setFlightState("crashed");
                 createExplosion(pos.x, pos.y);
                 pushWinningHistory(vipTargetMultiplier);
             }
@@ -3041,14 +3192,14 @@ function startVipGrandVerticalRadarEngine() {
 
             if (explosionTimer > 50) {
                 hideSignalUi();
-                flightState = "scanning";
+                setFlightState("scanning");
                 startCalibrationPhase();
             }
         } else if (flightState === "boardReveal") {
             explosionTimer++;
             if (explosionTimer > 420) {
                 hideSignalUi();
-                flightState = "scanning";
+                setFlightState("scanning");
                 startCalibrationPhase();
             }
         }
@@ -4106,154 +4257,10 @@ function normalizeReferralCode(value) {
     return formatMemberId(value);
 }
 
-function captureReferralCode() {
-    try {
-        const params = new URLSearchParams(window.location.search);
-        const incoming = normalizeReferralCode(params.get("ref") || "");
-        if (!incoming) return;
-        const ownId = formatMemberId((currentUser && currentUser.uniqueId) || readPersistedMemberId());
-        if (ownId && incoming === ownId) return;
-        if (!localStorage.getItem(CONFIG.referralKey)) {
-            localStorage.setItem(CONFIG.referralKey, incoming);
-        }
-        document.cookie = `crash_ref=${encodeURIComponent(incoming)};path=/;max-age=${60 * 24 * 3600};SameSite=Lax`;
-    } catch {}
-}
+function captureReferralCode() {}
 
 function readStoredReferralCode() {
-    try {
-        const stored = normalizeReferralCode(localStorage.getItem(CONFIG.referralKey) || "");
-        if (stored) return stored;
-    } catch {}
-    try {
-        const match = document.cookie.match(/(?:^|; )crash_ref=([^;]*)/);
-        if (match && match[1]) return normalizeReferralCode(decodeURIComponent(match[1]));
-    } catch {}
     return "";
 }
 
-function buildReferralLink(memberId) {
-    const id = normalizeReferralCode(memberId);
-    const url = new URL(window.location.origin + window.location.pathname);
-    if (id) url.searchParams.set("ref", id);
-    return url.toString();
-}
-
-function referralShareMessage(link) {
-    return `PREDICTOR — débloque ton accès ici : ${link}`;
-}
-
-function updateReferralProgress(count) {
-    const safeCount = Math.max(0, Number(count) || 0);
-    const current = safeCount % 2;
-    const label = document.getElementById("referralProgressLabel");
-    const fill = document.getElementById("referralProgressFill");
-    if (label) label.textContent = `Progression : ${current} / 2 amis activés`;
-    if (fill) fill.style.width = `${(current / 2) * 100}%`;
-}
-
-function bindReferralShareLinks(link) {
-    const message = referralShareMessage(link);
-    const whatsapp = document.getElementById("referralShareWhatsapp");
-    const facebook = document.getElementById("referralShareFacebook");
-    if (whatsapp) whatsapp.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
-    if (facebook) facebook.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`;
-}
-
-async function refreshReferralModal() {
-    const memberId = displayMemberId();
-    const linkInput = document.getElementById("referralLinkInput");
-    const loginHint = document.getElementById("referralLoginHint");
-    const copyBtn = document.getElementById("referralCopyBtn");
-    let count = Number((currentUser && currentUser.paidReferralCount) || 0);
-    if (currentUser && currentUser.email) {
-        try {
-            const remote = await findAccountByEmail(currentUser.email);
-            if (remote) {
-                count = Math.max(count, Number(remote.paidReferralCount || 0));
-                currentUser.paidReferralCount = count;
-                if (remote.referredBy && !currentUser.referredBy) currentUser.referredBy = remote.referredBy;
-            }
-        } catch {}
-    }
-    updateReferralProgress(count);
-    if (memberId) {
-        const link = buildReferralLink(memberId);
-        if (linkInput) linkInput.value = link;
-        if (copyBtn) copyBtn.disabled = false;
-        loginHint?.classList.add("hidden");
-        bindReferralShareLinks(link);
-    } else {
-        if (linkInput) linkInput.value = "";
-        if (copyBtn) copyBtn.disabled = true;
-        loginHint?.classList.remove("hidden");
-        bindReferralShareLinks(window.location.origin + window.location.pathname);
-    }
-}
-
-function initReferralSystem() {
-    captureReferralCode();
-    const openBtn = document.getElementById("openReferralModalBtn");
-    const modal = document.getElementById("referralModal");
-    const closeBtn = document.getElementById("closeReferralModal");
-    const copyBtn = document.getElementById("referralCopyBtn");
-    const nativeBtn = document.getElementById("referralShareNative");
-
-    openBtn?.addEventListener("click", async (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        modal?.classList.add("active");
-        if (modal) modal.style.pointerEvents = "none";
-        await refreshReferralModal();
-        setTimeout(() => {
-            if (modal) modal.style.pointerEvents = "";
-        }, 400);
-    });
-    closeBtn?.addEventListener("click", () => modal?.classList.remove("active"));
-
-    copyBtn?.addEventListener("click", async (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const link = document.getElementById("referralLinkInput")?.value || "";
-        if (!link) {
-            document.getElementById("loginModal")?.classList.add("active");
-            return;
-        }
-        try {
-            await navigator.clipboard.writeText(link);
-        } catch {
-            const input = document.getElementById("referralLinkInput");
-            input?.select();
-            document.execCommand("copy");
-        }
-        const copiedLabel = i18nText("toast_link_copied", "✅ Lien copié !");
-        copyBtn.textContent = copiedLabel;
-        copyBtn.classList.add("is-copied");
-        showToast(copiedLabel);
-        setTimeout(() => {
-            copyBtn.textContent = i18nText("btn_referral_copy", "📋 Copier mon lien");
-            copyBtn.classList.remove("is-copied");
-        }, 1800);
-    });
-
-    document.getElementById("referralShareWhatsapp")?.addEventListener("click", (e) => {
-        e.stopPropagation();
-    });
-    document.getElementById("referralShareFacebook")?.addEventListener("click", (e) => {
-        e.stopPropagation();
-    });
-
-    nativeBtn?.addEventListener("click", async (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const link = document.getElementById("referralLinkInput")?.value || buildReferralLink(displayMemberId());
-        if (!link || typeof navigator.share !== "function") return;
-        try {
-            await navigator.share({
-                title: "PREDICTOR",
-                text: referralShareMessage(link),
-                url: link
-            });
-        } catch {}
-    });
-}
+function initReferralSystem() {}

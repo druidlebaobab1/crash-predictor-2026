@@ -19,7 +19,7 @@
     var rafId = 0;
     var lastMult = 1;
     var lastTickStep = 0;
-    var toggleBtn = null;
+    var toggleBtns = [];
 
     muted = false;
 
@@ -68,11 +68,12 @@
     }
 
     function applyMuteUi() {
-        if (!toggleBtn) return;
-        toggleBtn.setAttribute("aria-pressed", muted ? "true" : "false");
-        toggleBtn.setAttribute("aria-label", muted ? "Activer le son d'ambiance" : "Couper le son d'ambiance");
-        toggleBtn.title = muted ? "Son coupé" : "Son d'ambiance";
-        toggleBtn.classList.toggle("is-muted", muted);
+        toggleBtns.forEach(function (toggleBtn) {
+            toggleBtn.setAttribute("aria-pressed", muted ? "true" : "false");
+            toggleBtn.setAttribute("aria-label", muted ? "Activer le son d'ambiance" : "Couper le son d'ambiance");
+            toggleBtn.title = muted ? "Son coupé" : "Son d'ambiance";
+            toggleBtn.classList.toggle("is-muted", muted);
+        });
     }
 
     function setMuted(next) {
@@ -295,7 +296,6 @@
     function syncScene() {
         if (!ctx || !landingGain || !cockpitGain) return;
         var vip = isCockpit();
-        if (toggleBtn) toggleBtn.classList.toggle("on-cockpit", vip);
         var now = ctx.currentTime;
         landingGain.gain.setTargetAtTime(vip ? 0.0001 : 1, now, 0.12);
         cockpitGain.gain.setTargetAtTime(vip ? 1 : 0.0001, now, 0.12);
@@ -402,7 +402,9 @@
     }
 
     function isToggleEvent(e) {
-        return Boolean(toggleBtn && e && e.target && toggleBtn.contains(e.target));
+        return toggleBtns.some(function (btn) {
+            return btn && e && e.target && btn.contains(e.target);
+        });
     }
 
     function onPageGesture(e) {
@@ -427,19 +429,20 @@
     }
 
     function bindToggle() {
-        toggleBtn = $("ambientAudioToggle");
-        if (!toggleBtn) return;
+        toggleBtns = Array.prototype.slice.call(document.querySelectorAll(".ambient-audio-toggle"));
         applyMuteUi();
-        toggleBtn.addEventListener("click", function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            if (muted || !started || (ctx && ctx.state !== "running")) {
-                startEngine();
-                resumeCtx();
-                setMuted(false);
-                return;
-            }
-            setMuted(true);
+        toggleBtns.forEach(function (toggleBtn) {
+            toggleBtn.addEventListener("click", function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (muted || !started || (ctx && ctx.state !== "running")) {
+                    startEngine();
+                    resumeCtx();
+                    setMuted(false);
+                    return;
+                }
+                setMuted(true);
+            });
         });
     }
 
@@ -449,9 +452,7 @@
         if (!muted) resumeCtx();
     });
 
-    function placeToggle() {
-        if (toggleBtn) toggleBtn.classList.toggle("on-cockpit", isCockpit());
-    }
+    function placeToggle() {}
 
     function boot() {
         bindToggle();

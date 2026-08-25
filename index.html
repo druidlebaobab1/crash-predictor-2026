@@ -4,16 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#061428">
-    <title data-i18n="doc_title" translate="no">PREDICTOR | Suite d'analyse algorithmique multi-jeux</title>
-    <meta name="description" content="PREDICTOR — Suite d'analyse algorithmique multi-jeux en temps réel. Un accès 17 $/mois débloque 6 moteurs de prédiction.">
+    <title data-i18n="doc_title">PREDICTOR | Suite d'Analyse Multi-Jeux en Direct</title>
+    <meta name="description" content="Accès officiel à la suite algorithmique en temps réel pour Aviator, Lucky Jet, Crash, Mines, Penalty Shoot-Out et Apple of Fortune. Licence 17 $ / mois.">
     <link rel="icon" href="assets/favicon.ico" sizes="any">
-    <link rel="icon" type="image/png" sizes="192x192" href="assets/pwa-icon-192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="assets/pwa-icon-512.png">
-    <link rel="apple-touch-icon" href="assets/pwa-icon-192.png">
-    <link rel="apple-touch-icon" sizes="192x192" href="assets/pwa-icon-192.png">
+    <link rel="apple-touch-icon" href="assets/favicon-192.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="assets/favicon-192.png">
     <link rel="apple-touch-icon" sizes="512x512" href="assets/pwa-icon-512.png">
     <link rel="shortcut icon" href="assets/favicon.ico">
-    <meta property="og:image" content="assets/pwa-icon-512.png">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="PREDICTOR | Suite d'Analyse Multi-Jeux en Direct">
+    <meta property="og:description" content="Accès officiel à la suite algorithmique en temps réel pour Aviator, Lucky Jet, Crash, Mines, Penalty Shoot-Out et Apple of Fortune. Licence 17 $ / mois.">
+    <meta property="og:image" content="https://crashpredictor.fr/assets/pwa-icon-512.png">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="PREDICTOR | Suite d'Analyse Multi-Jeux en Direct">
+    <meta name="twitter:description" content="Accès officiel à la suite algorithmique en temps réel pour Aviator, Lucky Jet, Crash, Mines, Penalty Shoot-Out et Apple of Fortune. Licence 17 $ / mois.">
     <!-- Meta Pixel Code -->
     <script>
     !function(f,b,e,v,n,t,s)
@@ -72,7 +80,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=Orbitron:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=u62">
+    <link rel="stylesheet" href="style.css?v=u64">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 </head>
 <body class="dark-theme">
@@ -124,7 +132,7 @@
                         <img src="assets/games/aviator.jpg" alt="">
                         <img src="assets/games/luckyjet.jpg" alt="">
                         <img src="assets/games/crash.jpg" alt="">
-                        <img src="assets/games/mines.jpg" alt="">
+                        <img src="assets/games/mines.jpg" alt="" class="mosaic-mines">
                         <img src="assets/games/penalty.jpg" alt="">
                         <img src="assets/games/apple.jpg" alt="">
                     </div>
@@ -136,6 +144,17 @@
 
                 <div class="nav-auth-actions">
                     <!-- SÉLECTEUR DE LANGUE DISCRET & INTUITIF -->
+                    <button type="button" id="ambientAudioToggle" class="ambient-audio-toggle" aria-label="Couper le son d'ambiance" aria-pressed="false" title="Son d'ambiance">
+                        <svg class="icon-on" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M5 9h3l4.5-3.5v13L8 15H5V9z"/>
+                            <path d="M15.4 9.4c1.2 1.15 1.2 4.05 0 5.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                            <path d="M17.7 7.3c2.15 2 2.15 7.4 0 9.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                        </svg>
+                        <svg class="icon-muted" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M5 9h3l4.5-3.5v13L8 15H5V9z"/>
+                            <path d="M16.2 10.2l4.2 4.2M20.4 10.2l-4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                        </svg>
+                    </button>
                     <div class="lang-selector-dropdown" id="langSelectorWrap">
                         <button type="button" class="lang-toggle-btn" id="langToggleBtn" aria-label="Changer de langue">
                             <span class="lang-flag js-lang-flag" id="currentLangFlag">🇫🇷</span>
@@ -190,7 +209,10 @@
                             <span class="promo-alarm-icon" aria-hidden="true">⏰</span>
                             <span><span data-i18n="promo_offer">DERNIÈRE CHANCE 17 $ :</span> <strong class="countdown-timer-text">47h 59m 50s</strong></span>
                         </div>
-                        <h1 class="hero-main-title"><span class="notranslate" translate="no">PREDICTOR</span> <span class="gradient-gold">— SUITE D'ANALYSE ALGORITHMIQUE MULTI-JEUX</span></h1>
+                        <div class="hero-predictor-frame">
+                            <span class="hero-live-badge" data-i18n="hero_live_badge">LIVE SIGNAL</span>
+                            <h1 class="hero-predictor-title"><span aria-hidden="true">🤖</span> <span class="notranslate" translate="no">PREDICTOR</span></h1>
+                        </div>
                         <p class="hero-subtitle-desc" data-i18n="hero_subtitle">Six moteurs de prédiction en temps réel, un seul accès officiel à 17 $ / mois.</p>
                     </div>
 
@@ -323,10 +345,6 @@
                                 <span data-i18n="btn_buy_instant">DÉBLOQUER MON ACCÈS 17 $</span>
                             </button>
 
-                            <button type="button" class="btn-referral-free" id="openReferralModalBtn">
-                                <span data-i18n="btn_referral_free">🎁 DÉBLOQUER 1 MOIS GRATUIT ( CHALLENGE )</span>
-                            </button>
-
                             <div class="secure-guarantee-footer">
                                 <i class="fa-solid fa-shield-halved text-gold" aria-hidden="true"></i>
                                 <span data-i18n="secure_guarantee">Paiement sécurisé et chiffré • Activation automatique de la session</span>
@@ -377,7 +395,7 @@
         <footer class="main-footer">
             <div class="footer-container">
                 <div class="logo-title"><span class="highlight notranslate" translate="no">PREDICTOR</span></div>
-                <div class="footer-copy"><span class="notranslate" translate="no">&copy; PREDICTOR</span>. <span data-i18n="footer_rights">Tous droits réservés.</span></div>
+                <div class="footer-copy"><span>&copy; <span class="notranslate" translate="no">PREDICTOR</span></span>. <span data-i18n="footer_rights">Tous droits réservés.</span></div>
             </div>
         </footer>
     </div>
@@ -395,7 +413,7 @@
                             <img src="assets/games/aviator.jpg" alt="">
                             <img src="assets/games/luckyjet.jpg" alt="">
                             <img src="assets/games/crash.jpg" alt="">
-                            <img src="assets/games/mines.jpg" alt="">
+                            <img src="assets/games/mines.jpg" alt="" class="mosaic-mines">
                             <img src="assets/games/penalty.jpg" alt="">
                             <img src="assets/games/apple.jpg" alt="">
                         </div>
@@ -435,6 +453,17 @@
                         <i class="fa-solid fa-crown text-gold" aria-hidden="true"></i>
                         <span id="vipUsernameDisplay">Membre Actif</span>
                     </div>
+                    <button type="button" id="vipAmbientAudioToggle" class="ambient-audio-toggle" aria-label="Couper le son d'ambiance" aria-pressed="false" title="Son d'ambiance">
+                        <svg class="icon-on" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M5 9h3l4.5-3.5v13L8 15H5V9z"/>
+                            <path d="M15.4 9.4c1.2 1.15 1.2 4.05 0 5.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                            <path d="M17.7 7.3c2.15 2 2.15 7.4 0 9.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                        </svg>
+                        <svg class="icon-muted" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M5 9h3l4.5-3.5v13L8 15H5V9z"/>
+                            <path d="M16.2 10.2l4.2 4.2M20.4 10.2l-4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                        </svg>
+                    </button>
                     <button type="button" class="btn-vip-profile" id="vipProfileBtn" title="Mon Profil / Paramètres" aria-label="Mon Profil / Paramètres">
                         <i class="fa-solid fa-user" aria-hidden="true"></i>
                     </button>
@@ -505,14 +534,29 @@
 
                         <div class="game-panel penalty-panel hidden" id="vipPenaltyPanel" data-game-panel="penalty">
                             <div class="penalty-pitch">
-                                <div class="penalty-goal" id="vipPenaltyGoal">
-                                    <button type="button" class="penalty-zone" data-zone="tl">Lucarne G</button>
-                                    <button type="button" class="penalty-zone" data-zone="tr">Lucarne D</button>
-                                    <button type="button" class="penalty-zone" data-zone="ml">Ras poteau G</button>
-                                    <button type="button" class="penalty-zone" data-zone="mr">Ras poteau D</button>
-                                    <button type="button" class="penalty-zone penalty-zone-center" data-zone="c">Plein Centre</button>
+                                <div class="penalty-stadium">
+                                    <div class="penalty-goal" id="vipPenaltyGoal">
+                                        <div class="penalty-net" aria-hidden="true"></div>
+                                        <div class="penalty-zone" data-zone="tl"><span class="penalty-reticle" aria-hidden="true"></span><span class="penalty-zone-label">Lucarne G</span></div>
+                                        <div class="penalty-zone" data-zone="tr"><span class="penalty-reticle" aria-hidden="true"></span><span class="penalty-zone-label">Lucarne D</span></div>
+                                        <div class="penalty-zone" data-zone="ml"><span class="penalty-reticle" aria-hidden="true"></span><span class="penalty-zone-label">Ras poteau G</span></div>
+                                        <div class="penalty-zone" data-zone="mr"><span class="penalty-reticle" aria-hidden="true"></span><span class="penalty-zone-label">Ras poteau D</span></div>
+                                        <div class="penalty-zone penalty-zone-center" data-zone="c"><span class="penalty-reticle" aria-hidden="true"></span><span class="penalty-zone-label">Plein Centre</span></div>
+                                        <div class="penalty-keeper" aria-hidden="true">
+                                            <span class="keeper-head"></span>
+                                            <span class="keeper-torso"></span>
+                                            <span class="keeper-arms"></span>
+                                            <span class="keeper-gloves"></span>
+                                            <span class="keeper-shorts"></span>
+                                            <span class="keeper-legs"></span>
+                                        </div>
+                                        <div class="penalty-laser" id="vipPenaltyLaser" aria-hidden="true">
+                                            <span class="laser-cross"></span>
+                                            <span class="laser-arrow"></span>
+                                            <span class="laser-dart"></span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="penalty-keeper" aria-hidden="true">🧤</div>
                                 <div class="penalty-readout hidden" id="vipPenaltyReadout"></div>
                             </div>
                         </div>
@@ -527,6 +571,12 @@
                                 <span class="chrono-arrive-text" id="vipSignalChronoText">LA PRÉDICTION ARRIVE DANS 60 SECONDES</span>
                                 <span class="hidden" id="vipSignalChronoValue">60</span>
                             </div>
+                        </div>
+
+                        <div class="vip-session-lock hidden" id="vipGameSessionLock">
+                            <span class="session-lock-kicker" data-i18n="session_locked_kicker">EN ATTENTE</span>
+                            <strong data-i18n="session_locked_title">VERROUILLÉ</strong>
+                            <p data-i18n="session_locked_copy">Une analyse est déjà en cours sur un autre jeu.</p>
                         </div>
 
                         <div class="vip-scanner-loader-overlay hidden" id="vipScannerLoader">
@@ -885,51 +935,7 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="referralModal">
-        <div class="modal-card referral-modal-card">
-            <button type="button" class="modal-close" id="closeReferralModal" aria-label="Fermer">&times;</button>
-            <div class="modal-header">
-                <div class="modal-icon-badge gold-glow"><i class="fa-solid fa-gift" aria-hidden="true"></i></div>
-                <h3 class="modal-title-big">Accès gratuit</h3>
-            </div>
-            <p class="referral-modal-copy" data-i18n="referral_modal_copy">Partagez votre lien d'invitation à vos proches. Dès que 2 amis débloquent leur accès via votre lien, votre propre accès s'active automatiquement et gratuitement pendant 30 jours !</p>
-            <div class="referral-progress-box" id="referralProgressBox">
-                <div class="referral-progress-label" id="referralProgressLabel">Progression : 0 / 2 amis activés</div>
-                <div class="referral-progress-track" aria-hidden="true">
-                    <div class="referral-progress-fill" id="referralProgressFill" style="width: 0%"></div>
-                </div>
-            </div>
-            <div class="referral-link-block">
-                <input type="text" class="referral-link-input" id="referralLinkInput" readonly value="" aria-label="Lien de parrainage">
-                <button type="button" class="btn-referral-copy" id="referralCopyBtn" data-i18n="btn_referral_copy">📋 Copier mon lien</button>
-            </div>
-            <p class="referral-login-hint hidden" id="referralLoginHint">Connectez-vous ou créez un compte pour obtenir votre lien exclusif.</p>
-            <div class="referral-share-grid">
-                <a class="referral-share-btn whatsapp" id="referralShareWhatsapp" href="#" target="_blank" rel="noopener noreferrer">
-                    <i class="fa-brands fa-whatsapp" aria-hidden="true"></i> WhatsApp
-                </a>
-                <a class="referral-share-btn facebook" id="referralShareFacebook" href="#" target="_blank" rel="noopener noreferrer">
-                    <i class="fa-brands fa-facebook-f" aria-hidden="true"></i> Facebook
-                </a>
-                <button type="button" class="referral-share-btn native" id="referralShareNative">
-                    <i class="fa-solid fa-share-nodes" aria-hidden="true"></i> Partager
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <button type="button" id="ambientAudioToggle" class="ambient-audio-toggle" aria-label="Couper le son d'ambiance" aria-pressed="false" title="Son d'ambiance">
-        <svg class="icon-on" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M5 9h3l4.5-3.5v13L8 15H5V9z"/>
-            <path d="M15.4 9.4c1.2 1.15 1.2 4.05 0 5.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-            <path d="M17.7 7.3c2.15 2 2.15 7.4 0 9.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-        </svg>
-        <svg class="icon-muted" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M5 9h3l4.5-3.5v13L8 15H5V9z"/>
-            <path d="M16.2 10.2l4.2 4.2M20.4 10.2l-4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-        </svg>
-    </button>
-    <script src="app.js?v=u58" defer></script>
-    <script src="ambient-audio.js?v=6" defer></script>
+    <script src="app.js?v=u61" defer></script>
+    <script src="ambient-audio.js?v=7" defer></script>
 </body>
 </html>
