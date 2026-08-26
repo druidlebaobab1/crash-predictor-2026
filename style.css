@@ -615,8 +615,16 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     text-transform: uppercase;
     text-align: center;
 }
-.hero-subtitle-desc span {
+.hero-subtitle-desc > span {
     display: block;
+    white-space: nowrap;
+}
+.hero-subtitle-desc .hero-price-digits {
+    display: inline;
+    font-family: var(--font-price);
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    font-variant-numeric: tabular-nums;
     white-space: nowrap;
 }
 
@@ -2995,7 +3003,7 @@ button.vip-member-tag:hover {
         gap: 1px;
         max-width: calc(100% - 16px);
     }
-    .hero-subtitle-desc span { white-space: nowrap; }
+    .hero-subtitle-desc > span { white-space: nowrap; }
     .suite-game-card strong { font-size: 0.62rem; }
     .suite-game-boss { width: 100%; max-width: none; }
     .suite-game-boss .suite-game-art { aspect-ratio: auto; height: auto; max-height: none; }
