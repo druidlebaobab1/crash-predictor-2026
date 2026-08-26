@@ -35,12 +35,48 @@ const CONFIG = {
     referralKey: "crash_referral_ref"
 };
 
+const META_PIXEL_ID = "902325525891827";
+const META_LICENSE_EVENT = {
+    value: 17.00,
+    currency: "USD",
+    content_name: "Licence Predictor 6 Jeux"
+};
+
 function trackMetaPixel(eventName, params) {
-    try {
-        if (typeof window.fbq === "function") {
-            window.fbq("track", eventName, params || {});
+    const payload = params || {};
+    function send() {
+        if (typeof window.fbq !== "function") return false;
+        try {
+            window.fbq("track", eventName, payload);
+            return true;
+        } catch (err) {
+            return false;
         }
-    } catch (err) {}
+    }
+    if (send()) return;
+    let attempts = 0;
+    const timer = setInterval(() => {
+        attempts += 1;
+        if (send() || attempts >= 24) clearInterval(timer);
+    }, 250);
+}
+
+let lastMetaPageKey = null;
+function trackMetaPageView(pageKey) {
+    const key = pageKey || "home";
+    if (lastMetaPageKey === key) return;
+    const isFirstPaint = lastMetaPageKey === null;
+    lastMetaPageKey = key;
+    if (isFirstPaint) return;
+    trackMetaPixel("PageView");
+}
+
+let lastInitiateCheckoutAt = 0;
+function trackMetaInitiateCheckout() {
+    const now = Date.now();
+    if (now - lastInitiateCheckoutAt < 2000) return;
+    lastInitiateCheckoutAt = now;
+    trackMetaPixel("InitiateCheckout", META_LICENSE_EVENT);
 }
 
 function trackMetaPurchase(orderId) {
@@ -50,11 +86,7 @@ function trackMetaPurchase(orderId) {
         if (sessionStorage.getItem(key) === "1") return;
         sessionStorage.setItem(key, "1");
     } catch (err) {}
-    trackMetaPixel("Purchase", {
-        content_name: "Crash Predictor VIP License",
-        value: 17.00,
-        currency: "USD"
-    });
+    trackMetaPixel("Purchase", META_LICENSE_EVENT);
 }
 
 // ==========================================================================
@@ -836,7 +868,7 @@ function initPwaInstall() {
     const PWA_WAIT_MS = 150000;
 
     if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("sw.js").catch(() => {});
+        navigator.serviceWorker.register("sw.js?v=pixel2").catch(() => {});
     }
 
     if (!banner || isPwaStandalone()) return;
@@ -1956,11 +1988,13 @@ function initGlobalViewRouter() {
         if (user7Id && vipSidebarUserId) vipSidebarUserId.textContent = user7Id;
 
         startVipGrandVerticalRadarEngine();
+        trackMetaPageView("vip");
     } else {
         publicSite?.classList.remove("hidden");
         vipSoftware?.classList.add("hidden");
         stopVipRadarEngine();
         updateAuthPublicHeader();
+        trackMetaPageView("home");
     }
 }
 
@@ -3488,6 +3522,7 @@ function initCheckout() {
     directBuyButtons.forEach((btn) => {
         btn.addEventListener("click", (e) => {
             e.preventDefault();
+            trackMetaInitiateCheckout();
             openCheckoutModal();
         });
     });
@@ -3558,6 +3593,7 @@ async function handlePaymentSuccess(response, currency, amount) {
     hidePaymentOverlay();
     closeAllModals();
     initGlobalViewRouter();
+    trackMetaPurchase(response?.tx_ref || response?.transaction_id || "paid");
     showToast("🎉 Félicitations ! Votre session d'analyse est débloquée pour le mois !");
 }
 
@@ -3750,11 +3786,7 @@ function startMaketouPaymentWatch() {
 }
 
 async function startMaketouCheckout() {
-    trackMetaPixel("InitiateCheckout", {
-        content_name: "Crash Predictor VIP License",
-        value: 17.00,
-        currency: "USD"
-    });
+    trackMetaInitiateCheckout();
     if (!currentUser) {
         pendingCheckoutAfterAuth = true;
         closeAllModals();
