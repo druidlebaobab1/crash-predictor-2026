@@ -2302,15 +2302,20 @@ function isFlyerGame(id) {
     return id === "crash" || id === "aviator" || id === "luckyjet";
 }
 
+function isSharedSessionGame(id) {
+    return id && id !== "sport";
+}
+
 function sessionVisualGame() {
     const busy = ["arming", "flying", "boardReveal", "crashed"].indexOf(vipSessionState) !== -1;
-    if (busy && armedSessionGame) return armedSessionGame;
+    if (busy && armedSessionGame && isSharedSessionGame(activePredictorGame)) return armedSessionGame;
     return activePredictorGame;
 }
 
 function isGameSessionLocked() {
+    if (!isSharedSessionGame(activePredictorGame)) return false;
     const busy = ["arming", "flying", "boardReveal", "crashed"].indexOf(vipSessionState) !== -1;
-    return Boolean(busy && armedSessionGame && armedSessionGame !== activePredictorGame);
+    return Boolean(busy && armedSessionGame && armedSessionGame !== activePredictorGame && isSharedSessionGame(armedSessionGame));
 }
 
 function updateGameSessionLock() {
@@ -2453,9 +2458,14 @@ function setActivePredictorGame(id, silent) {
     const heading = document.getElementById("vipGameHeading");
     if (heading) heading.innerHTML = predictorGameHeading(id);
     const unlock = document.getElementById("vipUnlockSignalBtn");
-    if (unlock) {
+    const chrono = document.getElementById("vipSignalChrono");
+    if (id === "sport") {
+        unlock?.classList.add("hidden");
+        chrono?.classList.add("hidden");
+        document.getElementById("vipScannerLoader")?.classList.add("hidden");
+    } else if (unlock) {
         const analyse = !showFlyer;
-        const key = id === "sport" ? "btn_sport_signal" : (analyse ? "btn_analyse_signal" : "btn_unlock_signal");
+        const key = analyse ? "btn_analyse_signal" : "btn_unlock_signal";
         const label = unlock.querySelector(".btn-signal-label") || unlock;
         label.setAttribute("data-i18n", key);
         label.textContent = i18nText(key, "⚡ DÉCODER LE SIGNAL");
@@ -2716,6 +2726,18 @@ function startVipGrandVerticalRadarEngine() {
     }
 
     window.__vipApplySessionUi = function (locked) {
+        if (activePredictorGame === "sport") {
+            predReveal?.classList.add("hidden");
+            chronoWrap?.classList.add("hidden");
+            unlockBtn?.classList.add("hidden");
+            hideLiveHud();
+            scannerLoader?.classList.add("hidden");
+            if (typeof syncSportPredictionReveal === "function") syncSportPredictionReveal();
+            return;
+        }
+        if (flightState === "scanning") {
+            scannerLoader?.classList.remove("hidden");
+        }
         if (locked) {
             predReveal?.classList.add("hidden");
             chronoWrap?.classList.add("hidden");

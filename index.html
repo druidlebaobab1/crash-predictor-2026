@@ -80,7 +80,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=Orbitron:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=u68">
+    <link rel="stylesheet" href="style.css?v=u69">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 </head>
 <body class="dark-theme">
@@ -221,7 +221,7 @@
                         <article class="suite-game-card theme-sport suite-game-boss">
                             <span class="boss-ribbon" data-i18n="sport_boss_ribbon">LE BOSS</span>
                             <div class="suite-game-art">
-                                <img src="assets/games/sports.jpg" alt="SPORTS PREDICTIONS" class="notranslate" translate="no">
+                                <img src="assets/games/sports.jpg?v=3" alt="SPORTS PREDICTIONS" class="notranslate" translate="no">
                                 <span class="suite-game-shine" aria-hidden="true"></span>
                             </div>
                             <strong class="notranslate" translate="no">SPORTS PREDICTIONS</strong>
@@ -279,24 +279,23 @@
                         </div>
                         <section class="sport-teaser" id="sportMatchTeaser" aria-label="Match du jour">
                             <p class="sport-teaser-kicker" data-i18n="sport_teaser_kicker">MATCH DU JOUR</p>
-                            <h2 class="sport-teaser-title"><span class="sport-club sport-club-lyon notranslate" translate="no">LYON</span> <span class="sport-teaser-vs notranslate" translate="no">vs</span> <span class="sport-club sport-club-fener notranslate" translate="no">FENERBAHÇE</span></h2>
-                            <div class="sport-odds-row" role="list">
-                                <div class="sport-odd-cell" role="listitem">
-                                    <span class="sport-club sport-club-lyon notranslate" translate="no">LYON</span>
+                            <div class="sport-teaser-matchup">
+                                <div class="sport-teaser-side">
+                                    <strong class="sport-club sport-club-lyon notranslate" translate="no">LYON</strong>
                                     <span class="sport-odd-val">1.97</span>
                                 </div>
-                                <span class="sport-odds-sep" aria-hidden="true">—</span>
-                                <div class="sport-odd-cell" role="listitem">
-                                    <span class="sport-club" data-i18n="sport_odd_draw">NUL</span>
-                                    <span class="sport-odd-val">3.66</span>
+                                <div class="sport-teaser-mid">
+                                    <span class="sport-teaser-vs notranslate" translate="no">VS</span>
+                                    <span class="sport-teaser-draw">
+                                        <span data-i18n="sport_odd_draw">NUL</span>
+                                        <strong>3.66</strong>
+                                    </span>
                                 </div>
-                                <span class="sport-odds-sep" aria-hidden="true">—</span>
-                                <div class="sport-odd-cell" role="listitem">
-                                    <span class="sport-club sport-club-fener notranslate" translate="no">FENERBAHÇE</span>
+                                <div class="sport-teaser-side">
+                                    <strong class="sport-club sport-club-fener notranslate" translate="no">FENERBAHÇE</strong>
                                     <span class="sport-odd-val">4.07</span>
                                 </div>
                             </div>
-                            <p class="sport-teaser-note" data-i18n="sport_teaser_note">Cotes neutres · prédiction réservée à l'espace membre</p>
                         </section>
                     </div>
 
@@ -501,7 +500,7 @@
         <main class="vip-software-body">
             <nav class="vip-game-switcher" id="vipGameSwitcher" aria-label="Sélection du jeu">
                 <button type="button" class="vip-game-chip vip-chip-boss" data-game="sport">
-                    <img src="assets/games/sports.jpg" alt="" class="vip-chip-logo">
+                    <img src="assets/games/sports.jpg?v=3" alt="" class="vip-chip-logo">
                     <span class="notranslate" translate="no">SPORT</span>
                 </button>
                 <button type="button" class="vip-game-chip" data-game="aviator">
@@ -990,7 +989,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=u66" defer></script>
+    <script src="app.js?v=u67" defer></script>
     <script src="ambient-audio.js?v=9" defer></script>
 </body>
 </html>
