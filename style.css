@@ -825,70 +825,111 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 
 .btn-buy-instant {
     position: relative;
+    isolation: isolate;
+    overflow: hidden;
     box-sizing: border-box;
-    background: var(--gold-gradient);
+    background: linear-gradient(105deg, #ffe08a 0%, #ffc837 18%, #ff8008 48%, #ffd76a 72%, #ff9a1a 100%);
+    background-size: 240% 240%;
     color: #0d0614;
     border: none;
-    padding: 18px 16px;
-    border-radius: 14px;
+    min-height: 64px;
+    padding: 20px 18px;
+    border-radius: 16px;
     font-family: var(--font-price);
-    font-size: clamp(0.95rem, 3.8vw, 1.16rem);
+    font-size: clamp(1.05rem, 4.2vw, 1.32rem);
     font-weight: 900;
-    letter-spacing: 0.01em;
-    line-height: 1.25;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
     text-align: center;
     box-shadow:
-        0 10px 28px rgba(255, 128, 8, 0.45),
-        0 0 0 1px rgba(255, 200, 55, 0.5),
-        0 0 22px rgba(255, 200, 55, 0.35);
+        0 12px 32px rgba(255, 128, 8, 0.5),
+        0 0 0 1px rgba(255, 215, 90, 0.55),
+        0 0 28px rgba(255, 200, 55, 0.42);
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 10px;
     width: 100%;
     max-width: 100%;
     margin-bottom: 16px;
-    animation: buyPulseGlow 2.4s ease-in-out infinite;
+    animation: buyPulseGlow 2.1s ease-in-out infinite, buyGoldShift 3.4s linear infinite;
+}
+.btn-buy-instant::before {
+    content: "";
+    position: absolute;
+    inset: -40% -20%;
+    background: radial-gradient(circle at 30% 50%, rgba(255, 255, 255, 0.38), transparent 42%),
+                radial-gradient(circle at 80% 50%, rgba(255, 170, 40, 0.35), transparent 46%);
+    animation: buyGlowSweep 2.6s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+}
+.btn-buy-instant::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(115deg, transparent 32%, rgba(255, 255, 255, 0.42) 50%, transparent 68%);
+    transform: translateX(-130%);
+    animation: buyShineSweep 2.8s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
 }
 .btn-buy-instant:hover { transform: translateY(-2px); }
 .btn-buy-instant .btn-live-dot,
-.btn-buy-instant > i {
-    flex: 0 0 auto;
+.btn-buy-instant > i,
+.btn-buy-instant > span {
     position: relative;
     z-index: 1;
+}
+.btn-buy-instant .btn-live-dot,
+.btn-buy-instant > i {
+    flex: 0 0 auto;
 }
 .btn-buy-instant > span:not(.btn-live-dot) {
     flex: 0 1 auto;
     min-width: 0;
-    max-width: calc(100% - 48px);
+    max-width: calc(100% - 52px);
     text-align: center;
-    line-height: 1.25;
+    line-height: 1.2;
     overflow-wrap: break-word;
     hyphens: none;
 }
 .btn-live-dot {
-    width: 8px;
-    height: 8px;
+    width: 11px;
+    height: 11px;
     border-radius: 50%;
-    background: #ff2d2d;
-    box-shadow: 0 0 6px #ff2d2d, 0 0 12px rgba(255, 45, 45, 0.7);
+    background: #22c55e;
+    box-shadow: 0 0 8px #22c55e, 0 0 14px rgba(255, 140, 20, 0.85);
     animation: liveDotPulse 1s ease-in-out infinite;
 }
 @keyframes buyPulseGlow {
     0%, 100% {
         box-shadow:
-            0 8px 22px rgba(255, 128, 8, 0.38),
-            0 0 0 1px rgba(255, 200, 55, 0.4),
-            0 0 14px rgba(255, 200, 55, 0.28);
+            0 10px 24px rgba(255, 128, 8, 0.42),
+            0 0 0 1px rgba(255, 215, 90, 0.45),
+            0 0 16px rgba(255, 200, 55, 0.32);
     }
     50% {
         box-shadow:
-            0 14px 38px rgba(255, 128, 8, 0.7),
-            0 0 0 1px rgba(255, 200, 55, 0.7),
-            0 0 32px rgba(255, 200, 55, 0.55);
+            0 16px 44px rgba(255, 128, 8, 0.82),
+            0 0 0 2px rgba(255, 230, 140, 0.85),
+            0 0 40px rgba(255, 160, 20, 0.7);
     }
+}
+@keyframes buyGoldShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+@keyframes buyGlowSweep {
+    0%, 100% { opacity: 0.45; transform: translateX(-8%) scale(1); }
+    50% { opacity: 0.9; transform: translateX(10%) scale(1.08); }
+}
+@keyframes buyShineSweep {
+    0% { transform: translateX(-130%); }
+    45%, 100% { transform: translateX(130%); }
 }
 @keyframes liveDotPulse {
     0%, 100% { opacity: 1; transform: scale(1); }
@@ -896,6 +937,8 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 }
 @media (prefers-reduced-motion: reduce) {
     .btn-buy-instant,
+    .btn-buy-instant::before,
+    .btn-buy-instant::after,
     .btn-live-dot { animation: none; }
 }
 
@@ -1962,14 +2005,15 @@ button.vip-member-tag:hover {
 
 @media (max-width: 430px) {
     .btn-buy-instant {
-        padding: 14px 12px;
+        min-height: 58px;
+        padding: 16px 12px;
         gap: 8px;
-        font-size: clamp(0.95rem, 3.8vw, 1.2rem);
-        letter-spacing: 0;
+        font-size: clamp(0.98rem, 4.4vw, 1.18rem);
+        letter-spacing: 0.01em;
         margin-bottom: 16px;
     }
     .btn-buy-instant > span:not(.btn-live-dot) {
-        max-width: calc(100% - 42px);
+        max-width: calc(100% - 44px);
     }
     .secure-guarantee-footer {
         margin-top: 16px;
@@ -2240,8 +2284,12 @@ button.vip-member-tag:hover {
     background: #0b1f16;
 }
 .suite-game-card.theme-apple .suite-game-art img {
-    object-fit: cover;
-    object-position: 50% 50%;
+    object-fit: contain;
+    object-position: center center;
+    padding: 6px 8px;
+    background: #0b1f16;
+    width: 100%;
+    height: 100%;
 }
 .vip-game-chip[data-game="apple"] .vip-chip-logo {
     object-fit: cover;

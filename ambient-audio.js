@@ -117,40 +117,40 @@
     function startLandingLayers() {
         var sub = ctx.createOscillator();
         sub.type = "sine";
-        sub.frequency.value = 42;
+        sub.frequency.value = 48;
         var subGain = ctx.createGain();
-        subGain.gain.value = 0.09;
+        subGain.gain.value = 0.07;
         sub.connect(subGain).connect(landingGain);
 
         var neural = ctx.createOscillator();
         neural.type = "sine";
-        neural.frequency.value = 110;
+        neural.frequency.value = 174.6;
         var neuralGain = ctx.createGain();
-        neuralGain.gain.value = 0.028;
+        neuralGain.gain.value = 0.018;
         neural.connect(neuralGain).connect(landingGain);
 
         var fifth = ctx.createOscillator();
         fifth.type = "triangle";
-        fifth.frequency.value = 164.8;
+        fifth.frequency.value = 261.6;
         var fifthGain = ctx.createGain();
-        fifthGain.gain.value = 0.016;
+        fifthGain.gain.value = 0.01;
         fifth.connect(fifthGain).connect(landingGain);
 
         var lfo = ctx.createOscillator();
         lfo.type = "sine";
-        lfo.frequency.value = 0.07;
+        lfo.frequency.value = 0.11;
         var lfoDepth = ctx.createGain();
-        lfoDepth.gain.value = 18;
-        lfo.connect(lfoDepth).connect(neural.frequency);
+        lfoDepth.gain.value = 0.008;
+        lfo.connect(lfoDepth).connect(neuralGain.gain);
 
         var air = ctx.createBufferSource();
         air.buffer = makeNoiseBuffer(ctx);
         air.loop = true;
         var airFilter = ctx.createBiquadFilter();
         airFilter.type = "highpass";
-        airFilter.frequency.value = 4200;
+        airFilter.frequency.value = 6800;
         var airGain = ctx.createGain();
-        airGain.gain.value = 0.012;
+        airGain.gain.value = 0.008;
         air.connect(airFilter).connect(airGain).connect(landingGain);
 
         var server = ctx.createBufferSource();
@@ -158,27 +158,28 @@
         server.loop = true;
         var serverFilter = ctx.createBiquadFilter();
         serverFilter.type = "bandpass";
-        serverFilter.frequency.value = 640;
-        serverFilter.Q.value = 2.4;
+        serverFilter.frequency.value = 2100;
+        serverFilter.Q.value = 4.8;
         var serverGain = ctx.createGain();
-        serverGain.gain.value = 0.018;
+        serverGain.gain.value = 0.012;
         server.connect(serverFilter).connect(serverGain).connect(landingGain);
 
-        var sweep = ctx.createOscillator();
-        sweep.type = "sine";
-        sweep.frequency.value = 880;
-        var sweepFilter = ctx.createBiquadFilter();
-        sweepFilter.type = "lowpass";
-        sweepFilter.frequency.value = 1200;
-        var sweepGain = ctx.createGain();
-        sweepGain.gain.value = 0.008;
-        var sweepLfo = ctx.createOscillator();
-        sweepLfo.type = "sine";
-        sweepLfo.frequency.value = 0.13;
-        var sweepDepth = ctx.createGain();
-        sweepDepth.gain.value = 420;
-        sweepLfo.connect(sweepDepth).connect(sweep.frequency);
-        sweep.connect(sweepFilter).connect(sweepGain).connect(landingGain);
+        var scan = ctx.createBufferSource();
+        scan.buffer = makeNoiseBuffer(ctx);
+        scan.loop = true;
+        var scanFilter = ctx.createBiquadFilter();
+        scanFilter.type = "bandpass";
+        scanFilter.frequency.value = 3400;
+        scanFilter.Q.value = 8;
+        var scanGain = ctx.createGain();
+        scanGain.gain.value = 0.006;
+        var scanLfo = ctx.createOscillator();
+        scanLfo.type = "sine";
+        scanLfo.frequency.value = 0.18;
+        var scanDepth = ctx.createGain();
+        scanDepth.gain.value = 900;
+        scanLfo.connect(scanDepth).connect(scanFilter.frequency);
+        scan.connect(scanFilter).connect(scanGain).connect(landingGain);
 
         sub.start();
         neural.start();
@@ -186,8 +187,8 @@
         lfo.start();
         air.start();
         server.start();
-        sweep.start();
-        sweepLfo.start();
+        scan.start();
+        scanLfo.start();
     }
 
     function startCockpitLayers() {
@@ -249,20 +250,21 @@
     function playChirp() {
         if (!ctx || !landingGain) return;
         var t = ctx.currentTime;
-        var notes = [196, 233, 262, 311];
+        var notes = [1244, 1480, 1760, 2093];
         var osc = ctx.createOscillator();
-        osc.type = "square";
+        osc.type = "sine";
         osc.frequency.value = notes[Math.floor(Math.random() * notes.length)];
         var filter = ctx.createBiquadFilter();
-        filter.type = "lowpass";
-        filter.frequency.value = 900;
+        filter.type = "bandpass";
+        filter.frequency.value = osc.frequency.value;
+        filter.Q.value = 10;
         var gain = ctx.createGain();
         gain.gain.setValueAtTime(0.0001, t);
-        gain.gain.exponentialRampToValueAtTime(0.18, t + 0.01);
-        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
+        gain.gain.exponentialRampToValueAtTime(0.055, t + 0.006);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.045);
         osc.connect(filter).connect(gain).connect(landingGain);
         osc.start(t);
-        osc.stop(t + 0.1);
+        osc.stop(t + 0.055);
     }
 
     function playSubPulse() {
@@ -270,15 +272,15 @@
         var t = ctx.currentTime;
         var osc = ctx.createOscillator();
         osc.type = "sine";
-        osc.frequency.setValueAtTime(78, t);
-        osc.frequency.exponentialRampToValueAtTime(40, t + 0.16);
+        osc.frequency.setValueAtTime(96, t);
+        osc.frequency.exponentialRampToValueAtTime(72, t + 0.09);
         var gain = ctx.createGain();
         gain.gain.setValueAtTime(0.0001, t);
-        gain.gain.exponentialRampToValueAtTime(0.32, t + 0.018);
-        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
+        gain.gain.exponentialRampToValueAtTime(0.07, t + 0.012);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
         osc.connect(gain).connect(landingGain);
         osc.start(t);
-        osc.stop(t + 0.24);
+        osc.stop(t + 0.14);
     }
 
     function playCrash() {
@@ -312,11 +314,11 @@
         if (!ctx) return;
         if (!isCockpit()) {
             var roll = Math.random();
-            if (roll < 0.22) playChirp();
-            else if (roll < 0.55) playSubPulse();
-            else playInto(landingGain, 220 + Math.floor(Math.random() * 4) * 55, 0.05, 0.16);
+            if (roll < 0.42) playChirp();
+            else if (roll < 0.62) playSubPulse();
+            else playInto(landingGain, 980 + Math.floor(Math.random() * 4) * 140, 0.04, 0.05);
         }
-        beepTimer = window.setTimeout(scheduleLandingPulse, 1400 + Math.random() * 1800);
+        beepTimer = window.setTimeout(scheduleLandingPulse, 900 + Math.random() * 1400);
     }
 
     function keyLoop() {

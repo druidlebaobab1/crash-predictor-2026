@@ -2338,7 +2338,7 @@ function generateBoardRound() {
         minesSafe,
         penaltyZone: zones[Math.floor(Math.random() * zones.length)],
         penaltyPct: 74 + Math.floor(Math.random() * 18),
-        applePath: Array.from({ length: 10 }, () => Math.floor(Math.random() * 5))
+        applePath: Array.from({ length: 3 }, () => Math.floor(Math.random() * 5))
     };
 }
 
@@ -2359,10 +2359,11 @@ function revealBoardRound() {
     requestAnimationFrame(positionPenaltyLaser);
     const rows = Array.from(document.querySelectorAll("#vipAppleTower .apple-row"));
     rows.forEach((row) => row.querySelectorAll(".apple-cell").forEach((c) => c.classList.remove("is-gold")));
+    const appleFloors = Math.min(3, rows.length, (boardRoundPred.applePath || []).length);
     let floor = 0;
     if (appleRevealTimer) clearInterval(appleRevealTimer);
     appleRevealTimer = setInterval(() => {
-        if (floor >= rows.length) {
+        if (floor >= appleFloors) {
             clearInterval(appleRevealTimer);
             appleRevealTimer = null;
             return;
