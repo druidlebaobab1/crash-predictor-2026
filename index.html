@@ -80,7 +80,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=Orbitron:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=u67">
+    <link rel="stylesheet" href="style.css?v=u68">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 </head>
 <body class="dark-theme">
@@ -279,24 +279,21 @@
                         </div>
                         <section class="sport-teaser" id="sportMatchTeaser" aria-label="Match du jour">
                             <p class="sport-teaser-kicker" data-i18n="sport_teaser_kicker">MATCH DU JOUR</p>
-                            <h2 class="sport-teaser-title" data-i18n="sport_teaser_title">Grande affiche</h2>
-                            <div class="sport-teaser-matchup">
-                                <div class="sport-teaser-side">
-                                    <span class="sport-crest sport-crest-lyon" aria-hidden="true">OL</span>
-                                    <strong class="notranslate" translate="no">LYON</strong>
-                                    <span class="sport-teaser-odd">1.97</span>
+                            <h2 class="sport-teaser-title"><span class="sport-club sport-club-lyon notranslate" translate="no">LYON</span> <span class="sport-teaser-vs notranslate" translate="no">vs</span> <span class="sport-club sport-club-fener notranslate" translate="no">FENERBAHÇE</span></h2>
+                            <div class="sport-odds-row" role="list">
+                                <div class="sport-odd-cell" role="listitem">
+                                    <span class="sport-club sport-club-lyon notranslate" translate="no">LYON</span>
+                                    <span class="sport-odd-val">1.97</span>
                                 </div>
-                                <div class="sport-teaser-mid">
-                                    <span class="sport-teaser-vs notranslate" translate="no">VS</span>
-                                    <span class="sport-teaser-draw">
-                                        <span data-i18n="sport_odd_draw">NUL</span>
-                                        <strong>3.66</strong>
-                                    </span>
+                                <span class="sport-odds-sep" aria-hidden="true">—</span>
+                                <div class="sport-odd-cell" role="listitem">
+                                    <span class="sport-club" data-i18n="sport_odd_draw">NUL</span>
+                                    <span class="sport-odd-val">3.66</span>
                                 </div>
-                                <div class="sport-teaser-side">
-                                    <span class="sport-crest sport-crest-fener" aria-hidden="true">FB</span>
-                                    <strong class="notranslate" translate="no">FENERBAHÇE</strong>
-                                    <span class="sport-teaser-odd">4.07</span>
+                                <span class="sport-odds-sep" aria-hidden="true">—</span>
+                                <div class="sport-odd-cell" role="listitem">
+                                    <span class="sport-club sport-club-fener notranslate" translate="no">FENERBAHÇE</span>
+                                    <span class="sport-odd-val">4.07</span>
                                 </div>
                             </div>
                             <p class="sport-teaser-note" data-i18n="sport_teaser_note">Cotes neutres · prédiction réservée à l'espace membre</p>
@@ -602,23 +599,20 @@
                         <div class="game-panel sport-panel hidden" id="vipSportPanel" data-game-panel="sport">
                             <div class="sport-match-board" id="vipSportBoard">
                                 <p class="sport-match-kicker" data-i18n="sport_teaser_kicker">MATCH DU JOUR</p>
-                                <div class="sport-matchup">
-                                    <div class="sport-side" data-team="lyon">
-                                        <span class="sport-target-ring" aria-hidden="true"></span>
-                                        <span class="sport-crest sport-crest-lyon" aria-hidden="true">OL</span>
-                                        <strong class="notranslate" translate="no">LYON</strong>
-                                        <span class="sport-odd">1.97</span>
-                                        <span class="sport-win-badge" data-i18n="sport_win_badge">WIN / PREDICTION CONFIRMÉE</span>
-                                    </div>
-                                    <div class="sport-side sport-side-draw" data-team="draw">
-                                        <span class="sport-draw-label" data-i18n="sport_odd_draw">NUL</span>
-                                        <span class="sport-odd">3.66</span>
-                                    </div>
-                                    <div class="sport-side" data-team="fener">
-                                        <span class="sport-crest sport-crest-fener" aria-hidden="true">FB</span>
-                                        <strong class="notranslate" translate="no">FENERBAHÇE</strong>
-                                        <span class="sport-odd">4.07</span>
-                                    </div>
+                                <h3 class="sport-match-title">
+                                    <span class="sport-club sport-club-lyon notranslate" translate="no">LYON</span>
+                                    <span class="sport-teaser-vs notranslate" translate="no">vs</span>
+                                    <span class="sport-club sport-club-fener notranslate" translate="no">FENERBAHÇE</span>
+                                </h3>
+                                <div class="sport-pick">
+                                    <p class="sport-pick-line" data-i18n="sport_pred_line">PRÉDICTION : VICTOIRE LYON @ 1.97</p>
+                                    <span class="sport-win-badge" data-i18n="sport_win_badge">WIN / CONFIRMÉ</span>
+                                </div>
+                                <div class="sport-secondary-odds">
+                                    <span><span data-i18n="sport_odd_draw">NUL</span> 3.66</span>
+                                    <span class="sport-odds-sep" aria-hidden="true">|</span>
+                                    <span class="sport-club sport-club-fener notranslate" translate="no">FENERBAHÇE</span>
+                                    <span>4.07</span>
                                 </div>
                             </div>
                         </div>
@@ -996,7 +990,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=u65" defer></script>
+    <script src="app.js?v=u66" defer></script>
     <script src="ambient-audio.js?v=9" defer></script>
 </body>
 </html>
