@@ -594,21 +594,30 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 
 .hero-subtitle-desc {
     font-family: var(--font-heading);
-    font-size: clamp(0.92rem, 4.5vw, 1.52rem);
+    font-size: clamp(0.78rem, 2.4vw, 1.22rem);
     font-weight: 900;
     letter-spacing: 0.04em;
-    line-height: 1.28;
+    line-height: 1.2;
     color: #0b1220;
     background: #f3f4f6;
     border: 1px solid rgba(11, 18, 32, 0.14);
     box-shadow: 0 10px 28px rgba(0, 0, 0, 0.32);
-    display: inline-block;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
     width: auto;
-    max-width: min(920px, calc(100% - 12px));
-    margin: 16px auto 0;
-    padding: 12px 16px;
+    max-width: min(920px, calc(100% - 16px));
+    margin: 12px auto 0;
+    padding: 10px 16px;
     border-radius: 12px;
     text-transform: uppercase;
+    text-align: center;
+}
+.hero-subtitle-desc span {
+    display: block;
+    white-space: nowrap;
 }
 
 .luxury-alive-box {
@@ -2473,6 +2482,50 @@ button.vip-member-tag:hover {
     font-size: clamp(1.2rem, 4vw, 1.7rem);
     color: #f8fafc;
 }
+.sport-teaser-hit {
+    gap: 6px;
+    padding: 8px 6px 10px;
+    border-radius: 14px;
+    border: 1.5px solid rgba(74, 222, 128, 0.9);
+    background: radial-gradient(circle at 50% 0%, rgba(250, 204, 21, 0.2), rgba(6, 78, 59, 0.42) 62%, rgba(4, 20, 16, 0.35));
+    animation: sportHitPulse 1.8s ease-in-out infinite;
+}
+.sport-hit-badge {
+    display: inline-block;
+    font-family: var(--font-heading);
+    font-size: clamp(0.48rem, 2.2vw, 0.62rem);
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #052e16;
+    background: linear-gradient(135deg, #22c55e, #facc15);
+    padding: 4px 7px;
+    border-radius: 999px;
+    line-height: 1.2;
+    text-align: center;
+    box-shadow: 0 0 12px rgba(34, 197, 94, 0.65);
+    max-width: 100%;
+}
+.sport-teaser-hit .sport-club {
+    background: #ecfdf5;
+    color: #052e16;
+    box-shadow: 0 0 10px rgba(250, 204, 21, 0.4);
+}
+.sport-teaser-hit .sport-odd-val {
+    color: #facc15;
+    text-shadow: 0 0 14px rgba(250, 204, 21, 0.85);
+}
+@keyframes sportHitPulse {
+    0%, 100% {
+        box-shadow: 0 0 8px rgba(34, 197, 94, 0.35), 0 0 6px rgba(250, 204, 21, 0.22);
+    }
+    50% {
+        box-shadow: 0 0 22px rgba(34, 197, 94, 0.9), 0 0 16px rgba(250, 204, 21, 0.55);
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .sport-teaser-hit { animation: none; }
+}
 .sport-teaser-mid {
     display: flex;
     flex-direction: column;
@@ -2934,6 +2987,15 @@ button.vip-member-tag:hover {
 @media (max-width: 600px) {
     .suite-games-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
     .hero-predictor-title { font-size: clamp(1.45rem, 8vw, 2.1rem); }
+    .hero-subtitle-desc {
+        font-size: clamp(0.58rem, 3.2vw, 0.78rem);
+        letter-spacing: 0.02em;
+        padding: 8px 10px;
+        margin-top: 10px;
+        gap: 1px;
+        max-width: calc(100% - 16px);
+    }
+    .hero-subtitle-desc span { white-space: nowrap; }
     .suite-game-card strong { font-size: 0.62rem; }
     .suite-game-boss { width: 100%; max-width: none; }
     .suite-game-boss .suite-game-art { aspect-ratio: auto; height: auto; max-height: none; }
@@ -2947,9 +3009,11 @@ button.vip-member-tag:hover {
         letter-spacing: 0.01em;
         padding: 8px 4px;
     }
-    .sport-teaser-vs {
-        font-size: clamp(0.85rem, 3.2vw, 1.05rem);
-        letter-spacing: 0.1em;
+    .sport-teaser-hit { padding: 6px 4px 8px; }
+    .sport-hit-badge {
+        font-size: 0.46rem;
+        letter-spacing: 0.04em;
+        padding: 3px 5px;
     }
     .sport-panel { padding-bottom: 20px; }
     .vip-game-chip { padding: 3px 10px 3px 3px; font-size: 0.62rem; }
