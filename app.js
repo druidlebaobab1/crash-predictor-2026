@@ -159,7 +159,7 @@ const TRANSLATIONS = {
         metrics_satisfaction: "Taux de Satisfaction",
         metrics_reviews: "Basé sur + 328 400 évaluations vérifiées",
         metrics_latency: "Latence de Flux",
-        suite_kicker: "Licence unique · 6 jeux débloqués",
+        suite_kicker: "LE BOSS · SPORTS PREDICTIONS + 6 JEUX",
         hero_live_badge: "LIVE SIGNAL",
         session_locked_kicker: "EN ATTENTE",
         session_locked_title: "VERROUILLÉ",
@@ -170,6 +170,14 @@ const TRANSLATIONS = {
         game_tag_mines: "Cases sûres",
         game_tag_penalty: "Ciblage laser",
         game_tag_apple: "Chemin doré",
+        game_tag_sport: "Paris sportifs · algorithme live",
+        sport_boss_ribbon: "LE BOSS",
+        sport_teaser_kicker: "MATCH DU JOUR",
+        sport_teaser_title: "Grande affiche",
+        sport_teaser_note: "Cotes neutres · prédiction réservée à l'espace membre",
+        sport_odd_draw: "NUL",
+        sport_win_badge: "WIN / PREDICTION CONFIRMÉE",
+        btn_sport_signal: "⚡ DÉCODER LE SIGNAL",
         signal_window: "DÉCOLLAGE DANS",
         signal_arrive: "LA PRÉDICTION ARRIVE DANS {n} SECONDES",
         hud_label: "COTE EN DIRECT",
@@ -294,13 +302,21 @@ const TRANSLATIONS = {
         metrics_satisfaction: "Satisfaction Rate",
         metrics_reviews: "Based on + 328,400 verified ratings",
         metrics_latency: "Feed Latency",
-        suite_kicker: "SINGLE LICENSE · 6 UNLOCKED GAMES",
+        suite_kicker: "THE BOSS · SPORTS PREDICTIONS + 6 GAMES",
         game_tag_aviator: "Live signals",
         game_tag_luckyjet: "Cosmic flow",
         game_tag_crash: "Live algorithm",
         game_tag_mines: "Safe tiles",
         game_tag_penalty: "Laser targeting",
         game_tag_apple: "Golden path",
+        game_tag_sport: "Sports betting · live algorithm",
+        sport_boss_ribbon: "THE BOSS",
+        sport_teaser_kicker: "MATCH OF THE DAY",
+        sport_teaser_title: "Headline fixture",
+        sport_teaser_note: "Neutral odds · prediction reserved for members",
+        sport_odd_draw: "DRAW",
+        sport_win_badge: "WIN / PREDICTION CONFIRMED",
+        btn_sport_signal: "⚡ DECODE THE SIGNAL",
         signal_window: "TAKEOFF IN",
         signal_arrive: "PREDICTION ARRIVES IN {n} SECONDS",
         hero_live_badge: "LIVE SIGNAL",
@@ -429,7 +445,7 @@ const TRANSLATIONS = {
         metrics_satisfaction: "Tasa de satisfacción",
         metrics_reviews: "Basado en + 328 400 evaluaciones verificadas",
         metrics_latency: "Latencia de flujo",
-        suite_kicker: "LICENCIA ÚNICA · 6 JUEGOS DESBLOQUEADOS",
+        suite_kicker: "EL BOSS · SPORTS PREDICTIONS + 6 JUEGOS",
         signal_window: "DESPEGUE EN",
         signal_arrive: "LA PREDICCIÓN LLEGA EN {n} SEGUNDOS",
         hero_live_badge: "LIVE SIGNAL",
@@ -442,6 +458,14 @@ const TRANSLATIONS = {
         game_tag_mines: "Casillas seguras",
         game_tag_penalty: "Apuntando láser",
         game_tag_apple: "Camino dorado",
+        game_tag_sport: "Apuestas deportivas · algoritmo live",
+        sport_boss_ribbon: "EL BOSS",
+        sport_teaser_kicker: "PARTIDO DEL DÍA",
+        sport_teaser_title: "Cartelera",
+        sport_teaser_note: "Cuotas neutrales · predicción reservada al espacio miembro",
+        sport_odd_draw: "EMPATE",
+        sport_win_badge: "WIN / PREDICCIÓN CONFIRMADA",
+        btn_sport_signal: "⚡ DECODIFICAR LA SEÑAL",
         hud_label: "MULTIPLICADOR EN VIVO",
         scan_title: "CALIBRACIÓN DE SEÑAL",
         scan_subtitle: "Preparando siguiente ronda…",
@@ -564,7 +588,7 @@ const TRANSLATIONS = {
         metrics_satisfaction: "Taxa de satisfação",
         metrics_reviews: "Com base em + 328 400 avaliações verificadas",
         metrics_latency: "Latência de fluxo",
-        suite_kicker: "LICENÇA ÚNICA · 6 JOGOS DESBLOQUEADOS",
+        suite_kicker: "O BOSS · SPORTS PREDICTIONS + 6 JOGOS",
         signal_window: "DESCOLAGEM EM",
         signal_arrive: "A PREVISÃO CHEGA EM {n} SEGUNDOS",
         hero_live_badge: "LIVE SIGNAL",
@@ -577,6 +601,14 @@ const TRANSLATIONS = {
         game_tag_mines: "Casas seguras",
         game_tag_penalty: "Mira laser",
         game_tag_apple: "Caminho dourado",
+        game_tag_sport: "Apostas desportivas · algoritmo live",
+        sport_boss_ribbon: "O BOSS",
+        sport_teaser_kicker: "JOGO DO DIA",
+        sport_teaser_title: "Cartaz principal",
+        sport_teaser_note: "Odds neutras · previsão reservada ao espaço membro",
+        sport_odd_draw: "EMPATE",
+        sport_win_badge: "WIN / PREVISÃO CONFIRMADA",
+        btn_sport_signal: "⚡ DESCODIFICAR O SINAL",
         hud_label: "MULTIPLICADOR AO VIVO",
         scan_title: "CALIBRAÇÃO DE SINAL",
         scan_subtitle: "A preparar a próxima ronda…",
@@ -699,7 +731,7 @@ const TRANSLATIONS = {
         metrics_satisfaction: "Zufriedenheitsrate",
         metrics_reviews: "Basierend auf + 328.400 verifizierten Bewertungen",
         metrics_latency: "Feed-Latenz",
-        suite_kicker: "EINZELLIZENZ · 6 FREIGESCHALTETE SPIELE",
+        suite_kicker: "DER BOSS · SPORTS PREDICTIONS + 6 SPIELE",
         signal_window: "START IN",
         signal_arrive: "DIE PROGNOSE KOMMT IN {n} SEKUNDEN",
         hero_live_badge: "LIVE SIGNAL",
@@ -712,6 +744,14 @@ const TRANSLATIONS = {
         game_tag_mines: "Sichere Felder",
         game_tag_penalty: "Laser-Ziel",
         game_tag_apple: "Goldener Pfad",
+        game_tag_sport: "Sportwetten · Live-Algorithmus",
+        sport_boss_ribbon: "DER BOSS",
+        sport_teaser_kicker: "SPIEL DES TAGES",
+        sport_teaser_title: "Top-Spiel",
+        sport_teaser_note: "Neutrale Quoten · Prognose nur im Mitgliederbereich",
+        sport_odd_draw: "UNENTSCHIEDEN",
+        sport_win_badge: "WIN / PROGNOSE BESTÄTIGT",
+        btn_sport_signal: "⚡ SIGNAL DECODIEREN",
         hud_label: "LIVE-QUOTE",
         scan_title: "SIGNAL-KALIBRIERUNG",
         scan_subtitle: "Nächste Runde wird vorbereitet…",
@@ -2293,7 +2333,8 @@ function predictorGameHeading(id) {
         crash: ["CRASH", " — ALGORITHME LIVE"],
         mines: ["MINES", " — CASES SÛRES"],
         penalty: ["PENALTY SHOOT-OUT", " — CIBLAGE"],
-        apple: ["APPLE OF FORTUNE", " — CHEMIN DORÉ"]
+        apple: ["APPLE OF FORTUNE", " — CHEMIN DORÉ"],
+        sport: ["SPORTS PREDICTIONS", " — PARIS SPORTIFS"]
     };
     const pair = names[id];
     if (!pair) return i18nText("radar_heading", "SESSION D'ANALYSE HAUTE PRÉCISION");
@@ -2320,6 +2361,7 @@ function clearBoardHighlights() {
     document.getElementById("vipPenaltyReadout")?.classList.add("hidden");
     document.getElementById("vipPenaltyLaser")?.classList.remove("is-on");
     document.querySelectorAll("#vipAppleTower .apple-cell").forEach((cell) => cell.classList.remove("is-gold"));
+    document.getElementById("vipSportBoard")?.classList.remove("is-revealed");
     if (appleRevealTimer) {
         clearInterval(appleRevealTimer);
         appleRevealTimer = null;
@@ -2373,6 +2415,14 @@ function revealBoardRound() {
         if (cell) cell.classList.add("is-gold");
         floor += 1;
     }, 220);
+    syncSportPredictionReveal();
+}
+
+function syncSportPredictionReveal() {
+    const board = document.getElementById("vipSportBoard");
+    if (!board) return;
+    const onSport = activePredictorGame === "sport" && !isGameSessionLocked();
+    board.classList.toggle("is-revealed", onSport);
 }
 
 function setActivePredictorGame(id, silent) {
@@ -2387,24 +2437,27 @@ function setActivePredictorGame(id, silent) {
     const mines = document.getElementById("vipMinesPanel");
     const penalty = document.getElementById("vipPenaltyPanel");
     const apple = document.getElementById("vipApplePanel");
+    const sport = document.getElementById("vipSportPanel");
     const showFlyer = isFlyerGame(id);
     flyer?.classList.toggle("hidden", !showFlyer);
     flyer?.classList.toggle("is-active", showFlyer);
     mines?.classList.toggle("hidden", id !== "mines");
     penalty?.classList.toggle("hidden", id !== "penalty");
     apple?.classList.toggle("hidden", id !== "apple");
+    sport?.classList.toggle("hidden", id !== "sport");
     const heading = document.getElementById("vipGameHeading");
     if (heading) heading.innerHTML = predictorGameHeading(id);
     const unlock = document.getElementById("vipUnlockSignalBtn");
     if (unlock) {
         const analyse = !showFlyer;
-        const key = analyse ? "btn_analyse_signal" : "btn_unlock_signal";
+        const key = id === "sport" ? "btn_sport_signal" : (analyse ? "btn_analyse_signal" : "btn_unlock_signal");
         const label = unlock.querySelector(".btn-signal-label") || unlock;
         label.setAttribute("data-i18n", key);
         label.textContent = i18nText(key, "⚡ DÉCODER LE SIGNAL");
     }
     if (typeof window.__vipResizeCanvas === "function") window.__vipResizeCanvas();
     updateGameSessionLock();
+    syncSportPredictionReveal();
     if (!isGameSessionLocked() && sessionVisualGame() === "penalty" && vipSessionState === "boardReveal") {
         requestAnimationFrame(positionPenaltyLaser);
     }
@@ -2701,6 +2754,7 @@ function startVipGrandVerticalRadarEngine() {
             hideLiveHud();
             keepCodeTerminal();
             if (sessionVisualGame() === "penalty") requestAnimationFrame(positionPenaltyLaser);
+            if (typeof syncSportPredictionReveal === "function") syncSportPredictionReveal();
         }
     };
 
