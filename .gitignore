@@ -5,6 +5,9 @@ __pycache__/
 Thumbs.db
 data/signal-cycles.json
 data/maketou-events.log
+data/maketou-carts.json
+data/maketou-repair-queue.json
+data/members.json
 data/*.tmp
 data/*.sqlite
 

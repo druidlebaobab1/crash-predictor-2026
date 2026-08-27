@@ -928,52 +928,198 @@ function maketou_recover_paid_return($source) {
     return $unlocked;
 }
 
-function maketou_repair_paid_unactivated($limit = 12, $offset = 0) {
-    $limit = max(1, min(20, (int) $limit));
+function maketou_queue_put(&$queue, $ref, $email = "", $uniqueId = "") {
+    $ref = trim((string) $ref);
+    if ($ref === "" || $ref === MAKETOU_PRODUCT_ID || !maketou_looks_like_ref($ref)) {
+        return;
+    }
+    if (!isset($queue[$ref]) || !is_array($queue[$ref])) {
+        $queue[$ref] = ["email" => "", "uniqueId" => ""];
+    }
+    $email = strtolower(trim((string) $email));
+    if ($email !== "" && strpos($email, "@") !== false) {
+        $queue[$ref]["email"] = $email;
+    }
+    $uniqueId = maketou_normalize_member_id($uniqueId);
+    if ($uniqueId !== "") {
+        $queue[$ref]["uniqueId"] = $uniqueId;
+    }
+}
+
+function maketou_collect_log_cart_ids() {
+    $file = __DIR__ . DIRECTORY_SEPARATOR . "data" . DIRECTORY_SEPARATOR . "maketou-events.log";
+    if (!is_file($file)) {
+        return [];
+    }
+    $text = (string) @file_get_contents($file);
+    if ($text === "") {
+        return [];
+    }
+    $ids = [];
+    if (preg_match_all('/"(?:cartId|cart_id|ref)"\s*:\s*"([^"]+)"/', $text, $matches)) {
+        foreach ($matches[1] as $ref) {
+            $ref = trim((string) $ref);
+            if ($ref !== "" && $ref !== MAKETOU_PRODUCT_ID && maketou_looks_like_ref($ref)) {
+                $ids[$ref] = true;
+            }
+        }
+    }
+    return array_keys($ids);
+}
+
+function maketou_supabase_repair_rows() {
+    [$status, $body] = maketou_supabase_http(
+        "GET",
+        "/rest/v1/users?select=email,unique_id,is_subscribed,last_payment_ref,subscription_expires_at,vip_until&limit=400"
+    );
+    if ($status < 200 || $status >= 300) {
+        return [];
+    }
+    $rows = json_decode((string) $body, true);
+    return is_array($rows) ? $rows : [];
+}
+
+function maketou_repair_queue_file() {
+    $dir = __DIR__ . DIRECTORY_SEPARATOR . "data";
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0755, true);
+    }
+    return $dir . DIRECTORY_SEPARATOR . "maketou-repair-queue.json";
+}
+
+function maketou_build_repair_queue($extraRefs = []) {
+    $queue = [];
+    foreach (maketou_read_carts() as $ref => $row) {
+        if (!is_array($row)) {
+            continue;
+        }
+        maketou_queue_put($queue, $ref, $row["email"] ?? "", $row["uniqueId"] ?? "");
+    }
+    $membersFile = maketou_members_file();
+    if (is_file($membersFile)) {
+        $members = json_decode((string) @file_get_contents($membersFile), true);
+        if (is_array($members)) {
+            foreach ($members as $email => $record) {
+                if (!is_array($record)) {
+                    continue;
+                }
+                maketou_queue_put(
+                    $queue,
+                    $record["lastPaymentRef"] ?? "",
+                    $record["email"] ?? $email,
+                    $record["uniqueId"] ?? ""
+                );
+            }
+        }
+    }
+    foreach (maketou_collect_log_cart_ids() as $ref) {
+        $mapped = maketou_lookup_cart_map($ref);
+        maketou_queue_put(
+            $queue,
+            $ref,
+            is_array($mapped) ? ($mapped["email"] ?? "") : "",
+            is_array($mapped) ? ($mapped["uniqueId"] ?? "") : ""
+        );
+    }
+    foreach (maketou_supabase_repair_rows() as $row) {
+        if (!is_array($row)) {
+            continue;
+        }
+        maketou_queue_put(
+            $queue,
+            $row["last_payment_ref"] ?? "",
+            $row["email"] ?? "",
+            $row["unique_id"] ?? ""
+        );
+    }
+    if (is_array($extraRefs)) {
+        foreach ($extraRefs as $ref) {
+            maketou_queue_put($queue, $ref);
+        }
+    }
+    $file = maketou_repair_queue_file();
+    @file_put_contents($file, json_encode($queue, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    maketou_log("repair_queue", ["total" => count($queue)]);
+    return $queue;
+}
+
+function maketou_load_repair_queue($rebuild, $extraRefs = []) {
+    $file = maketou_repair_queue_file();
+    if (!$rebuild && is_file($file)) {
+        $decoded = json_decode((string) @file_get_contents($file), true);
+        if (is_array($decoded) && $decoded) {
+            return $decoded;
+        }
+    }
+    return maketou_build_repair_queue($extraRefs);
+}
+
+function maketou_repair_paid_unactivated($limit = 6, $offset = 0, $rebuild = false, $extraRefs = []) {
+    $limit = max(1, min(8, (int) $limit));
     $offset = max(0, (int) $offset);
+    $queue = maketou_load_repair_queue($rebuild, $extraRefs);
+    $entries = [];
+    foreach ($queue as $ref => $row) {
+        $entries[] = [(string) $ref, is_array($row) ? $row : []];
+    }
+    $total = count($entries);
+    $slice = array_slice($entries, $offset, $limit);
     $scanned = 0;
     $paidUnactivated = 0;
     $activated = 0;
     $alreadyActive = 0;
     $skipped = 0;
     $memberIds = [];
-    $all = maketou_read_carts();
-    $entries = [];
-    foreach ($all as $ref => $row) {
-        if (is_array($row)) {
-            $entries[] = [(string) $ref, $row];
-        }
-    }
-    $total = count($entries);
-    $slice = array_slice($entries, $offset, $limit);
     foreach ($slice as $item) {
         $ref = $item[0];
         $row = $item[1];
         $scanned++;
         $email = strtolower(trim((string) ($row["email"] ?? "")));
         $uniqueId = maketou_normalize_member_id($row["uniqueId"] ?? "");
-        $state = $email !== "" ? maketou_read_subscription_state($email, $uniqueId) : null;
+        if ($email === "") {
+            $mapped = maketou_lookup_cart_map($ref);
+            if (is_array($mapped)) {
+                $email = strtolower(trim((string) ($mapped["email"] ?? "")));
+                if ($uniqueId === "") {
+                    $uniqueId = maketou_normalize_member_id($mapped["uniqueId"] ?? "");
+                }
+            }
+        }
+        $state = ($email !== "" || $uniqueId !== "") ? maketou_read_subscription_state($email, $uniqueId) : null;
         if (is_array($state) && !empty($state["active"])) {
             $alreadyActive++;
             continue;
         }
-        [$paid, $status, $data] = maketou_verify_ref_with_api($ref, 8);
+        [$paid, $status, $data] = maketou_verify_ref_with_api($ref, 6);
         if (!$paid) {
             $skipped++;
             continue;
         }
+        if ($email === "") {
+            $email = maketou_extract_email($data);
+        }
+        if ($uniqueId === "") {
+            $uniqueId = maketou_normalize_member_id(maketou_extract_unique_id($data));
+        }
+        if ($uniqueId !== "" && $email === "") {
+            $email = maketou_find_member_email_by_unique_id($uniqueId);
+        }
         $paidUnactivated++;
         $result = maketou_activate_paid_account($ref, $email, $data);
-        if (is_array($result)) {
+        if (is_array($result) && (trim((string) ($result["email"] ?? "")) !== "" || $uniqueId !== "")) {
             $activated++;
             if ($uniqueId !== "") {
                 $memberIds[] = $uniqueId;
+            }
+            if (trim((string) ($result["email"] ?? "")) !== "") {
+                maketou_save_cart_map($ref, $result["email"], $uniqueId);
             }
         }
         maketou_log("repair_activate", [
             "ref" => $ref,
             "uniqueId" => $uniqueId,
-            "status" => $status
+            "status" => $status,
+            "hasEmail" => $email !== ""
         ]);
     }
     $memberIds = array_values(array_unique($memberIds));
@@ -987,7 +1133,8 @@ function maketou_repair_paid_unactivated($limit = 12, $offset = 0) {
         "unpaidOrUnknown" => $skipped,
         "memberIds" => $memberIds,
         "hasMore" => $nextOffset < $total,
-        "nextOffset" => $nextOffset
+        "nextOffset" => $nextOffset,
+        "expectedPaid" => 19
     ];
 }
 
