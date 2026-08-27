@@ -12,7 +12,9 @@ if (!is_dir($dataDir)) {
 $storeFile = $dataDir . DIRECTORY_SEPARATOR . "members.json";
 
 function members_normalize_email($email) {
-    return strtolower(trim((string) $email));
+    $email = str_replace(["\r", "\n", "\t", "\0", "\xC2\xA0"], "", (string) $email);
+    $email = strtolower(trim($email));
+    return str_replace(" ", "", $email);
 }
 
 function members_read_store($file) {
@@ -282,19 +284,20 @@ if ($method === "POST" && ($action === "save" || $action === "" || $action === "
     }
     $members[$email] = $incoming;
     members_write_store($storeFile, $members);
-    echo json_encode(["ok" => true, "account" => members_public_record($incoming)]);
     if ($isNewMember) {
         require_once __DIR__ . DIRECTORY_SEPARATOR . "mail-resend.php";
-        if (function_exists("mail_release_client")) {
-            mail_release_client();
-        }
         if (function_exists("mail_send_welcome")) {
             try {
                 mail_send_welcome($email, (string) ($incoming["uniqueId"] ?? ""), (string) ($incoming["name"] ?? ""));
             } catch (Throwable $e) {
+                if (function_exists("maketou_log")) {
+                    maketou_log("mail_send", ["ok" => false, "error" => $e->getMessage()]);
+                }
+                error_log("[resend] error message=" . $e->getMessage());
             }
         }
     }
+    echo json_encode(["ok" => true, "account" => members_public_record($incoming)]);
     exit;
 }
 

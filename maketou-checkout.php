@@ -251,22 +251,21 @@ if ($looksLikeCreate) {
             "http" => $status,
             "directPay" => (strpos($redirectUrl, "moneroo") !== false || strpos($redirectUrl, "checkout.") !== false)
         ]);
+        require_once __DIR__ . DIRECTORY_SEPARATOR . "mail-resend.php";
+        if (function_exists("mail_on_checkout")) {
+            try {
+                mail_on_checkout($newCartId, $email, $uniqueId !== "" ? $uniqueId : $metaId);
+            } catch (Throwable $e) {
+                maketou_log("mail_send", ["ok" => false, "error" => $e->getMessage()]);
+                error_log("[resend] error message=" . $e->getMessage());
+            }
+        }
         echo json_encode([
             "redirectUrl" => $redirectUrl,
             "cartId" => $newCartId,
             "status" => "waiting_payment",
             "access" => false
         ]);
-        require_once __DIR__ . DIRECTORY_SEPARATOR . "mail-resend.php";
-        if (function_exists("mail_release_client")) {
-            mail_release_client();
-        }
-        if (function_exists("mail_on_checkout")) {
-            try {
-                mail_on_checkout($newCartId, $email, $uniqueId !== "" ? $uniqueId : $metaId);
-            } catch (Throwable $e) {
-            }
-        }
         exit;
     }
 

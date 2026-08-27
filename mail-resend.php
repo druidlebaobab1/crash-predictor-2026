@@ -3,7 +3,7 @@ require_once __DIR__ . "/maketou-config.php";
 
 if (!defined("RESEND_FROM")) {
     define("RESEND_FROM", "PREDICTOR <support@mail.crashpredictor.fr>");
-    define("RESEND_REPLY_TO", "support@mail.crashpredictor.fr");
+    define("RESEND_REPLY_TO", "PREDICTOR <support@mail.crashpredictor.fr>");
     define("RESEND_SITE", "https://crashpredictor.fr");
     define("RESEND_UNSUB_SECRET", "crashpredictor-unsub-2026");
 }
@@ -49,6 +49,80 @@ function mail_save_api_key($key) {
         return false;
     }
     return @rename($tmp, $file);
+}
+
+function mail_normalize_address($email) {
+    $email = html_entity_decode((string) $email, ENT_QUOTES | ENT_HTML5, "UTF-8");
+    $email = str_replace(["\r", "\n", "\t", "\0", "\xC2\xA0"], "", $email);
+    if (function_exists("preg_replace")) {
+        $email = preg_replace("/[\x00-\x1F\x7F]/", "", $email);
+        $email = preg_replace("/^[\p{Z}\p{C}]+|[\p{Z}\p{C}]+$/u", "", $email);
+    }
+    $email = strtolower(trim((string) $email));
+    $email = str_replace(" ", "", $email);
+    return $email;
+}
+
+function mail_address_ok($email) {
+    if ($email === "" || strpos($email, "@") === false || substr_count($email, "@") !== 1) {
+        return false;
+    }
+    if (function_exists("filter_var") && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        return false;
+    }
+    return true;
+}
+
+function mail_rate_lock_file() {
+    $dir = __DIR__ . DIRECTORY_SEPARATOR . "data";
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0755, true);
+    }
+    return $dir . DIRECTORY_SEPARATOR . "mail-rate.lock";
+}
+
+function mail_wait_rate_slot() {
+    $file = mail_rate_lock_file();
+    $fh = @fopen($file, "c+");
+    if ($fh === false) {
+        usleep(550000);
+        return;
+    }
+    if (!flock($fh, LOCK_EX)) {
+        fclose($fh);
+        usleep(550000);
+        return;
+    }
+    $raw = stream_get_contents($fh);
+    $last = is_numeric($raw) ? (float) $raw : 0.0;
+    $now = microtime(true);
+    $gap = 0.55;
+    $wait = $gap - ($now - $last);
+    if ($wait > 0 && $wait < 5) {
+        usleep((int) round($wait * 1000000));
+        $now = microtime(true);
+    }
+    ftruncate($fh, 0);
+    rewind($fh);
+    fwrite($fh, (string) $now);
+    fflush($fh);
+    flock($fh, LOCK_UN);
+    fclose($fh);
+}
+
+function mail_log_result($ok, $id, $status, $errorMessage, $extra = []) {
+    $payload = array_merge([
+        "ok" => (bool) $ok,
+        "resendId" => (string) $id,
+        "http" => (int) $status,
+        "error" => (string) $errorMessage
+    ], is_array($extra) ? $extra : []);
+    maketou_log("mail_send", $payload);
+    if ($ok) {
+        error_log("[resend] ok id=" . $id);
+    } else {
+        error_log("[resend] error http=" . (int) $status . " message=" . $errorMessage);
+    }
 }
 
 function mail_http($method, $path, $payload = null) {
@@ -121,12 +195,12 @@ function mail_email_is_active($email) {
 }
 
 function mail_opted_out($email) {
-    $record = maketou_read_local_member($email);
+    $record = maketou_read_local_member(mail_normalize_address($email));
     return is_array($record) && !empty($record["emailOptOut"]);
 }
 
 function mail_mark_opt_out($email) {
-    $email = strtolower(trim((string) $email));
+    $email = mail_normalize_address($email);
     $record = maketou_read_local_member($email);
     if (!is_array($record)) {
         return false;
@@ -239,19 +313,20 @@ function mail_html_reactivate($email, $uniqueId, $name = "") {
 }
 
 function mail_send($to, $subject, $html, $extra = []) {
-    $to = strtolower(trim((string) $to));
-    if ($to === "" || strpos($to, "@") === false || mail_opted_out($to)) {
+    $to = mail_normalize_address($to);
+    if (!mail_address_ok($to) || mail_opted_out($to)) {
+        mail_log_result(false, "", 0, "invalid_or_opted_out");
         return ["ok" => false, "id" => ""];
     }
     if (!mail_is_configured()) {
-        maketou_log("mail_skip", ["reason" => "no_key"]);
+        mail_log_result(false, "", 0, "no_key");
         return ["ok" => false, "id" => ""];
     }
     $unsub = RESEND_SITE . "/index.php?action=mail_unsub&t=" . rawurlencode(mail_unsub_token($to));
     $payload = [
         "from" => RESEND_FROM,
         "to" => [$to],
-        "reply_to" => RESEND_REPLY_TO,
+        "reply_to" => [RESEND_REPLY_TO],
         "subject" => $subject,
         "html" => $html,
         "headers" => [
@@ -272,37 +347,65 @@ function mail_send($to, $subject, $html, $extra = []) {
     }
     $json = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     if (!function_exists("curl_init")) {
-        maketou_log("mail_send", ["ok" => false, "reason" => "no_curl"]);
+        mail_log_result(false, "", 0, "no_curl");
         return ["ok" => false, "id" => ""];
     }
+    $attempts = 0;
+    $maxAttempts = 3;
+    $status = 0;
+    $id = "";
+    $errorMessage = "";
+    $body = "";
     try {
-        $ch = curl_init("https://api.resend.com/emails");
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_POST => true,
-            CURLOPT_HTTPHEADER => $chHeaders,
-            CURLOPT_POSTFIELDS => $json,
-            CURLOPT_CONNECTTIMEOUT => 2,
-            CURLOPT_TIMEOUT => 5
-        ]);
-        $body = curl_exec($ch);
-        $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $err = curl_error($ch);
-        curl_close($ch);
-        $data = json_decode((string) $body, true);
-        $id = is_array($data) ? (string) ($data["id"] ?? "") : "";
+        while ($attempts < $maxAttempts) {
+            $attempts++;
+            mail_wait_rate_slot();
+            $ch = curl_init("https://api.resend.com/emails");
+            curl_setopt_array($ch, [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST => true,
+                CURLOPT_HTTPHEADER => $chHeaders,
+                CURLOPT_POSTFIELDS => $json,
+                CURLOPT_CONNECTTIMEOUT => 4,
+                CURLOPT_TIMEOUT => 12
+            ]);
+            $body = curl_exec($ch);
+            $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlErr = curl_error($ch);
+            curl_close($ch);
+            $data = json_decode((string) $body, true);
+            if (!is_array($data)) {
+                $data = [];
+            }
+            $id = (string) ($data["id"] ?? "");
+            $errorMessage = (string) ($data["message"] ?? ($data["error"]["message"] ?? ""));
+            if ($errorMessage === "" && $curlErr !== "") {
+                $errorMessage = $curlErr;
+            }
+            if ($errorMessage === "" && ($body === false || $body === "") && $status === 0) {
+                $errorMessage = "empty_response";
+            }
+            if ($status === 429 && $attempts < $maxAttempts) {
+                mail_log_result(false, $id, $status, $errorMessage !== "" ? $errorMessage : "rate_limited", ["retry" => $attempts]);
+                usleep(700000);
+                continue;
+            }
+            break;
+        }
         $ok = $status >= 200 && $status < 300 && $id !== "";
-        maketou_log("mail_send", [
-            "ok" => $ok,
-            "http" => $status,
-            "hasId" => $id !== "",
-            "timeout" => $err !== "",
-            "scheduled" => !empty($extra["scheduled_at"])
+        if ($ok) {
+            $errorMessage = "";
+        } elseif ($errorMessage === "") {
+            $errorMessage = "http_" . $status;
+        }
+        mail_log_result($ok, $id, $status, $errorMessage, [
+            "scheduled" => !empty($extra["scheduled_at"]),
+            "attempts" => $attempts
         ]);
-        return ["ok" => $ok, "id" => $id, "http" => $status];
+        return ["ok" => $ok, "id" => $id, "http" => $status, "error" => $errorMessage];
     } catch (Throwable $e) {
-        maketou_log("mail_send", ["ok" => false, "reason" => "exception"]);
-        return ["ok" => false, "id" => ""];
+        mail_log_result(false, "", 0, $e->getMessage());
+        return ["ok" => false, "id" => "", "error" => $e->getMessage()];
     }
 }
 
@@ -315,7 +418,7 @@ function mail_cancel($emailId) {
 }
 
 function mail_send_welcome($email, $uniqueId, $name = "") {
-    $email = strtolower(trim((string) $email));
+    $email = mail_normalize_address($email);
     $record = maketou_read_local_member($email);
     if (is_array($record) && !empty($record["welcomeSent"])) {
         return false;
@@ -344,7 +447,7 @@ function mail_send_welcome($email, $uniqueId, $name = "") {
 }
 
 function mail_email_abandon_recent($email) {
-    $email = strtolower(trim((string) $email));
+    $email = mail_normalize_address($email);
     foreach (maketou_read_carts() as $row) {
         if (!is_array($row) || strtolower((string) ($row["email"] ?? "")) !== $email) {
             continue;
@@ -362,7 +465,7 @@ function mail_email_abandon_recent($email) {
 
 function mail_on_checkout($ref, $email, $uniqueId) {
     $ref = trim((string) $ref);
-    $email = strtolower(trim((string) $email));
+    $email = mail_normalize_address($email);
     if ($ref === "" || $email === "" || mail_opted_out($email)) {
         return;
     }
@@ -398,7 +501,7 @@ function mail_on_checkout($ref, $email, $uniqueId) {
 }
 
 function mail_on_paid($email, $ref) {
-    $email = strtolower(trim((string) $email));
+    $email = mail_normalize_address($email);
     $ref = trim((string) $ref);
     $carts = maketou_read_carts();
     $changed = false;
@@ -445,7 +548,7 @@ function mail_process_abandoned($limit = 8) {
         }
         if (!empty($row["abandonEmailId"])) {
             $row["abandonEmailed"] = true;
-            $emailDone = strtolower(trim((string) ($row["email"] ?? "")));
+            $emailDone = mail_normalize_address($row["email"] ?? "");
             if ($emailDone !== "") {
                 $member = maketou_read_local_member($emailDone);
                 if (is_array($member)) {
@@ -456,7 +559,7 @@ function mail_process_abandoned($limit = 8) {
             $carts[$ref] = $row;
             continue;
         }
-        $email = strtolower(trim((string) ($row["email"] ?? "")));
+        $email = mail_normalize_address($row["email"] ?? "");
         $uniqueId = (string) ($row["uniqueId"] ?? "");
         if ($email === "" || mail_opted_out($email) || mail_email_is_active($email)) {
             $row["abandonEmailed"] = true;
@@ -499,7 +602,7 @@ function mail_broadcast_inactive($limit = 8, $offset = 0) {
         if (!is_array($record)) {
             continue;
         }
-        $email = strtolower(trim((string) ($record["email"] ?? $email)));
+        $email = mail_normalize_address($record["email"] ?? $email);
         if ($email === "" || !empty($record["emailOptOut"]) || !empty($record["broadcastSent"])) {
             continue;
         }
@@ -528,7 +631,7 @@ function mail_broadcast_inactive($limit = 8, $offset = 0) {
                 maketou_write_local_member($email, $record);
             }
         }
-        usleep(180000);
+        usleep(600000);
     }
     $remaining = max(0, count($targets) - count($slice));
     return [
