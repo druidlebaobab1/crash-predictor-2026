@@ -80,7 +80,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=Orbitron:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=u78">
+    <link rel="stylesheet" href="style.css?v=u79">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 </head>
 <body class="dark-theme">
@@ -282,17 +282,17 @@
                         <section class="sport-teaser" id="sportMatchTeaser" aria-label="Résultat du dernier signal foot">
                             <p class="sport-signal-badge" data-i18n="sport_signal_title">RÉSULTAT DU DERNIER SIGNAL FOOT ⚽</p>
                             <div class="sport-teaser-matchup">
-                                <div class="sport-teaser-side">
-                                    <strong class="sport-club sport-club-lyon notranslate" translate="no">LYON</strong>
-                                    <span class="sport-odd-val">1.97</span>
+                                <div class="sport-teaser-side sport-teaser-hit">
+                                    <span class="sport-hit-badge" data-i18n="sport_hit_badge">PRÉDICTION VALIDÉE ✅</span>
+                                    <strong class="sport-club sport-club-kauno notranslate" translate="no">KAUNO ZALGIRIS</strong>
+                                    <span class="sport-odd-val">9.58</span>
                                 </div>
                                 <div class="sport-teaser-mid">
                                     <span class="sport-teaser-vs notranslate" translate="no">VS</span>
                                 </div>
-                                <div class="sport-teaser-side sport-teaser-hit">
-                                    <span class="sport-hit-badge" data-i18n="sport_hit_badge">PRÉDICTION VALIDÉE ✅</span>
-                                    <strong class="sport-club sport-club-fener notranslate" translate="no">FENERBAHÇE</strong>
-                                    <span class="sport-odd-val">4.07</span>
+                                <div class="sport-teaser-side sport-teaser-neutral">
+                                    <strong class="sport-club sport-club-besiktas notranslate" translate="no">BESIKTAS</strong>
+                                    <span class="sport-odd-val">1.29</span>
                                 </div>
                             </div>
                         </section>
@@ -603,14 +603,9 @@
 
                         <div class="game-panel sport-panel hidden" id="vipSportPanel" data-game-panel="sport">
                             <div class="sport-match-board" id="vipSportBoard">
-                                <p class="sport-match-kicker" data-i18n="sport_teaser_kicker">MATCH DU JOUR</p>
-                                <h3 class="sport-match-title">
-                                    <span class="sport-club sport-club-lyon notranslate" translate="no">LYON</span>
-                                    <span class="sport-teaser-vs notranslate" translate="no">vs</span>
-                                    <span class="sport-club sport-club-fener notranslate" translate="no">FENERBAHÇE</span>
-                                </h3>
+                                <h3 class="sport-match-title notranslate" translate="no"><strong>KAUNO ZALGIRIS vs BESIKTAS</strong></h3>
                                 <div class="sport-pick">
-                                    <p class="sport-pick-line" data-i18n="sport_pred_line">PRÉDICTION : VICTOIRE FENERBAHÇE 4.07</p>
+                                    <p class="sport-pick-line" data-i18n="sport_pred_line">PRÉDICTION : VICTOIRE KAUNO ZALGIRIS 9.58</p>
                                     <span class="sport-win-badge" data-i18n="sport_win_badge">WIN / CONFIRMÉ</span>
                                 </div>
                             </div>
@@ -1015,7 +1010,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=u77" defer></script>
+    <script src="app.js?v=u78" defer></script>
     <script src="ambient-audio.js?v=9" defer></script>
     <script src="fire-embers.js?v=2" defer></script>
 </body>

@@ -197,6 +197,23 @@ if ($method === "POST" && $action === "signal_cycle") {
     exit;
 }
 
+if ($method === "POST" && $action === "heartbeat") {
+    if ($email === "" || strpos($email, "@") === false) {
+        echo json_encode(["ok" => false]);
+        exit;
+    }
+    if (is_array($members[$email] ?? null)) {
+        $members[$email]["lastSeen"] = time();
+        $uid = trim((string) ($body["uniqueId"] ?? ""));
+        if ($uid !== "" && trim((string) ($members[$email]["uniqueId"] ?? "")) === "") {
+            $members[$email]["uniqueId"] = $uid;
+        }
+        members_write_store($storeFile, $members);
+    }
+    echo json_encode(["ok" => true]);
+    exit;
+}
+
 if ($method === "POST" && ($action === "save" || $action === "" || $action === "member_account")) {
     if ($email === "" || strpos($email, "@") === false) {
         http_response_code(400);
@@ -249,7 +266,8 @@ if ($method === "POST" && ($action === "save" || $action === "" || $action === "
         "paidReferralCount" => (int) ($existing["paidReferralCount"] ?? 0),
         "creditedFilleuls" => is_array($existing["creditedFilleuls"] ?? null) ? $existing["creditedFilleuls"] : [],
         "signalCycleStartedAt" => (int) ($existing["signalCycleStartedAt"] ?? 0),
-        "signalArmedAt" => (int) ($existing["signalArmedAt"] ?? 0)
+        "signalArmedAt" => (int) ($existing["signalArmedAt"] ?? 0),
+        "lastSeen" => (int) ($existing["lastSeen"] ?? 0)
     ];
     if (!empty($existing["uniqueId"]) && $incoming["uniqueId"] === "") {
         $incoming["uniqueId"] = $existing["uniqueId"];

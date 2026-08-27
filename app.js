@@ -181,7 +181,7 @@ const TRANSLATIONS = {
         sport_teaser_note: "Cotes neutres · prédiction réservée à l'espace membre",
         sport_odd_draw: "NUL",
         sport_win_badge: "WIN / CONFIRMÉ",
-        sport_pred_line: "PRÉDICTION : VICTOIRE FENERBAHÇE 4.07",
+        sport_pred_line: "PRÉDICTION : VICTOIRE KAUNO ZALGIRIS 9.58",
         sport_hit_badge: "PRÉDICTION VALIDÉE ✅",
         btn_sport_signal: "⚡ DÉCODER LE SIGNAL",
         signal_window: "DÉCOLLAGE DANS",
@@ -330,7 +330,7 @@ const TRANSLATIONS = {
         sport_teaser_note: "Neutral odds · prediction reserved for members",
         sport_odd_draw: "DRAW",
         sport_win_badge: "WIN / CONFIRMED",
-        sport_pred_line: "PREDICTION: FENERBAHÇE WIN 4.07",
+        sport_pred_line: "PREDICTION: KAUNO ZALGIRIS WIN 9.58",
         sport_hit_badge: "PREDICTION VALIDATED ✅",
         btn_sport_signal: "⚡ DECODE THE SIGNAL",
         signal_window: "TAKEOFF IN",
@@ -489,7 +489,7 @@ const TRANSLATIONS = {
         sport_teaser_note: "Cuotas neutrales · predicción reservada al espacio miembro",
         sport_odd_draw: "EMPATE",
         sport_win_badge: "WIN / CONFIRMADO",
-        sport_pred_line: "PREDICCIÓN: VICTORIA FENERBAHÇE 4.07",
+        sport_pred_line: "PREDICCIÓN: VICTORIA KAUNO ZALGIRIS 9.58",
         sport_hit_badge: "PREDICCIÓN VALIDADA ✅",
         btn_sport_signal: "⚡ DECODIFICAR LA SEÑAL",
         hud_label: "MULTIPLICADOR EN VIVO",
@@ -642,7 +642,7 @@ const TRANSLATIONS = {
         sport_teaser_note: "Odds neutras · previsão reservada ao espaço membro",
         sport_odd_draw: "EMPATE",
         sport_win_badge: "WIN / CONFIRMADO",
-        sport_pred_line: "PREVISÃO: VITÓRIA FENERBAHÇE 4.07",
+        sport_pred_line: "PREVISÃO: VITÓRIA KAUNO ZALGIRIS 9.58",
         sport_hit_badge: "PREVISÃO VALIDADA ✅",
         btn_sport_signal: "⚡ DESCODIFICAR O SINAL",
         hud_label: "MULTIPLICADOR AO VIVO",
@@ -795,7 +795,7 @@ const TRANSLATIONS = {
         sport_teaser_note: "Neutrale Quoten · Prognose nur im Mitgliederbereich",
         sport_odd_draw: "UNENTSCHIEDEN",
         sport_win_badge: "WIN / BESTÄTIGT",
-        sport_pred_line: "PROGNOSE: SIEG FENERBAHÇE 4.07",
+        sport_pred_line: "PROGNOSE: SIEG KAUNO ZALGIRIS 9.58",
         sport_hit_badge: "PROGNOSE BESTÄTIGT ✅",
         btn_sport_signal: "⚡ SIGNAL DECODIEREN",
         hud_label: "LIVE-QUOTE",
@@ -919,6 +919,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     initModals();
     initCheckout();
     initMasterAdminDashboard();
+    startMemberPresencePing();
     subscribeUserRealtime();
     startSubscriptionGuard();
     await verifyMaketouReturn();
@@ -4274,226 +4275,35 @@ async function verifyMaketouReturn() {
 /* -------------------------------------------------------------------------- */
 
 function initMasterAdminDashboard() {
-    const adminModal = document.getElementById("adminModal");
-    const closeAdminModal = document.getElementById("closeAdminModal");
-    const formAdminAuth = document.getElementById("formAdminAuth");
-    const adminAuthScreen = document.getElementById("adminAuthScreen");
-    const adminDashboardScreen = document.getElementById("adminDashboardScreen");
-    const btnAdminActivate = document.getElementById("btnAdminActivateById");
-    const adminTargetIdInput = document.getElementById("adminTargetIdInput");
-
-    const openAdminModal = () => adminModal?.classList.add("active");
-    const maybeOpenAdminFromHash = () => {
-        if (window.location.hash === "#admin") openAdminModal();
-    };
-    maybeOpenAdminFromHash();
-    window.addEventListener("hashchange", maybeOpenAdminFromHash);
-
-    closeAdminModal?.addEventListener("click", () => adminModal?.classList.remove("active"));
-
-    formAdminAuth?.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const key = document.getElementById("adminSecretKeyInput").value.trim();
-        if (key === CONFIG.adminSecret || key === "ADMIN" || key === "BAOBAB2026") {
-            adminAuthScreen?.classList.add("hidden");
-            adminDashboardScreen?.classList.remove("hidden");
-            renderAdminUsersTable();
-            showToast("Accès administrateur déverrouillé.");
-        } else {
-            showToast("Mot de passe administrateur incorrect.", "error");
-        }
-    });
-
-    btnAdminActivate?.addEventListener("click", async () => {
-        const targetId = adminTargetIdInput?.value.trim().toUpperCase();
-        if (!targetId) {
-            showToast("Veuillez saisir un ID membre (ex: CRASH-5627883).", "error");
-            return;
-        }
-        if (!/^CRASH-\d{7}$/.test(targetId)) {
-            showToast("ID invalide. Format attendu : CRASH-5627883.", "error");
-            return;
-        }
-        const idNumber = parseInt(targetId.replace(/\D/g, ""), 10);
-        if (idNumber < 5000000 || idNumber > 9999999) {
-            showToast("L'ID doit être compris entre CRASH-5000000 et CRASH-9999999.", "error");
-            return;
-        }
-
-        let usersDb = loadUsersDb();
-        let found = false;
-
-        usersDb = usersDb.map((u) => {
-            if (u.uniqueId === targetId || u.email?.toUpperCase() === targetId) {
-                applyPaidSubscriptionPeriod(u, `admin-${Date.now()}`);
-                found = true;
-            }
-            return u;
-        });
-
-        if (found) {
-            saveUsersDb(usersDb);
-            if (currentUser && (currentUser.uniqueId === targetId || currentUser.email?.toUpperCase() === targetId)) {
-                applyPaidSubscriptionPeriod(currentUser, `admin-${Date.now()}`);
-                grantVerifiedAccess();
-                writeJson(CONFIG.sessionKey, currentUser);
-                persistAccountToServer(currentUser);
-                initGlobalViewRouter();
-            }
-            if (supabaseClient) {
-                try {
-                    const active = usersDb.find((u) => u.uniqueId === targetId);
-                    await supabaseClient.from("users").update({
-                        is_subscribed: true,
-                        payment_date: active && active.paymentDate,
-                        subscription_expires_at: active && active.subscriptionExpiresAt,
-                        vip_until: active && active.subscriptionExpiresAt
-                    }).eq("unique_id", targetId);
-                } catch {}
-            }
-            renderAdminUsersTable();
-            adminTargetIdInput.value = "";
-            showToast(`Succès : accès activé pour ${targetId}`);
-        } else {
-            const newMember = {
-                id: Date.now(),
-                uniqueId: targetId,
-                name: `Membre_${targetId}`,
-                email: `${targetId.toLowerCase()}@client.com`,
-                phone: "",
-                passwordHash: "",
-                isSubscribed: true,
-                registeredAt: new Date().toLocaleDateString("fr-FR"),
-                paymentDate: new Date().toISOString(),
-                subscriptionExpiresAt: computeRenewedExpiryIso(""),
-                vipUntil: ""
-            };
-            newMember.vipUntil = newMember.subscriptionExpiresAt;
-            usersDb.push(newMember);
-            saveUsersDb(usersDb);
-
-            if (currentUser) {
-                currentUser.isSubscribed = true;
-                currentUser.uniqueId = targetId;
-                grantVerifiedAccess();
-                writeJson(CONFIG.sessionKey, currentUser);
-                initGlobalViewRouter();
-            }
-
-            if (supabaseClient) {
-                try {
-                    await supabaseClient.from("users").upsert({
-                        unique_id: targetId,
-                        name: `Membre_${targetId}`,
-                        email: `${targetId.toLowerCase()}@client.com`,
-                        is_subscribed: true
-                    });
-                } catch {}
-            }
-
-            renderAdminUsersTable();
-            adminTargetIdInput.value = "";
-            showToast(`Nouvel ID ${targetId} créé et activé.`);
-        }
-    });
-}
-
-async function renderAdminUsersTable() {
-    const tbody = document.getElementById("adminUsersTableBody");
-    if (!tbody) return;
-
-    let usersDb = loadUsersDb();
-
-    if (supabaseClient) {
-        try {
-            const { data } = await supabaseClient.from("users").select("*");
-            if (data && data.length > 0) {
-                data.forEach((cloudUser) => {
-                    const idx = usersDb.findIndex((u) => u.email === cloudUser.email || u.uniqueId === cloudUser.unique_id);
-                    if (idx !== -1) {
-                        usersDb[idx].isSubscribed = Boolean(cloudUser.is_subscribed);
-                    } else {
-                        usersDb.push({
-                            id: cloudUser.id || Date.now(),
-                            uniqueId: sanitize7DigitId(cloudUser.unique_id),
-                            name: cloudUser.name || "Client",
-                            email: cloudUser.email,
-                            phone: cloudUser.phone || "",
-                            isSubscribed: Boolean(cloudUser.is_subscribed),
-                            registeredAt: new Date().toLocaleDateString("fr-FR")
-                        });
-                    }
-                });
-                saveUsersDb(usersDb);
-            }
-        } catch {}
-    }
-
-    if (usersDb.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#9ca3af;padding:15px;">Aucun utilisateur inscrit.</td></tr>`;
+    if (window.location.hash === "#admin") {
+        window.location.replace("admin.php");
         return;
     }
-
-    tbody.innerHTML = usersDb.map((u) => `
-        <tr>
-            <td><strong class="gold-code">${escapeHtml(sanitize7DigitId(u.uniqueId))}</strong></td>
-            <td>${escapeHtml(u.name || "Client")}</td>
-            <td>${escapeHtml(u.email || "-")}</td>
-            <td>
-                ${isSubscriptionActive(u)
-                    ? '<span class="badge-tag green"><i class="fa-solid fa-check"></i> ACTIF</span>'
-                    : '<span class="badge-tag red"><i class="fa-solid fa-xmark"></i> NON ACTIVÉ</span>'}
-            </td>
-            <td>
-                ${!isSubscriptionActive(u)
-                    ? `<button type="button" class="btn-table-action activate" onclick="adminToggleUser('${escapeHtml(u.email)}', true)"><i class="fa-solid fa-bolt"></i> Activer</button>`
-                    : `<button type="button" class="btn-table-action deactivate" onclick="adminToggleUser('${escapeHtml(u.email)}', false)"><i class="fa-solid fa-ban"></i> Suspendre</button>`}
-            </td>
-        </tr>
-    `).join("");
+    window.addEventListener("hashchange", () => {
+        if (window.location.hash === "#admin") {
+            window.location.replace("admin.php");
+        }
+    });
 }
 
-window.adminToggleUser = async function (email, status) {
-    let usersDb = loadUsersDb();
-    const idx = usersDb.findIndex((u) => u.email === email);
-    if (idx !== -1) {
-        if (status) applyPaidSubscriptionPeriod(usersDb[idx], `admin-${Date.now()}`);
-        else {
-            usersDb[idx].isSubscribed = false;
-            usersDb[idx].subscriptionExpiresAt = new Date().toISOString();
-            usersDb[idx].vipUntil = usersDb[idx].subscriptionExpiresAt;
-        }
-        saveUsersDb(usersDb);
-
-        if (currentUser && currentUser.email === email) {
-            currentUser.isSubscribed = status;
-            if (status) {
-                applyPaidSubscriptionPeriod(currentUser, `admin-${Date.now()}`);
-                grantVerifiedAccess();
-            } else {
-                currentUser.subscriptionExpiresAt = usersDb[idx].subscriptionExpiresAt;
-                currentUser.vipUntil = usersDb[idx].vipUntil;
-                revokeVerifiedAccess();
-            }
-            writeJson(CONFIG.sessionKey, currentUser);
-            persistAccountToServer(currentUser);
-            initGlobalViewRouter();
-        }
-
-        if (supabaseClient) {
-            try {
-                await supabaseClient.from("users").update({
-                    is_subscribed: status,
-                    subscription_expires_at: usersDb[idx].subscriptionExpiresAt || null,
-                    vip_until: usersDb[idx].vipUntil || null
-                }).eq("email", email);
-            } catch {}
-        }
-
-        renderAdminUsersTable();
-        showToast(status ? "Membre activé !" : "Accès membre suspendu.");
-    }
-};
+function startMemberPresencePing() {
+    const send = () => {
+        if (!currentUser || !currentUser.email) return;
+        const paths = memberServerPaths(currentUser.email).save;
+        const payload = JSON.stringify({
+            action: "heartbeat",
+            email: normalizeEmail(currentUser.email),
+            uniqueId: currentUser.uniqueId || ""
+        });
+        fetch(paths[0], {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Accept: "application/json" },
+            body: payload
+        }).catch(() => {});
+    };
+    send();
+    setInterval(send, 90000);
+}
 
 /* -------------------------------------------------------------------------- */
 /* Toasts                                                                     */

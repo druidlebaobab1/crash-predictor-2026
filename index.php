@@ -21,6 +21,10 @@ if ($maketouAction === "member_account") {
     require __DIR__ . "/member-account.php";
     exit();
 }
+if ($maketouAction === "admin") {
+    require __DIR__ . "/admin.php";
+    exit();
+}
 
 $paymentHint = strtolower((string) ($_GET["payment"] ?? ""));
 $statusHint = strtolower((string) ($_GET["status"] ?? ""));
