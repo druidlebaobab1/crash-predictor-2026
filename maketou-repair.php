@@ -23,7 +23,8 @@ if ($key === "" || !hash_equals(MAKETOU_REPAIR_KEY, $key)) {
     exit;
 }
 
-$report = maketou_repair_paid_unactivated();
+$offset = (int) ($body["offset"] ?? 0);
+$report = maketou_repair_paid_unactivated(12, $offset);
 maketou_log("repair_run", [
     "scannedCarts" => $report["scannedCarts"],
     "paidUnactivated" => $report["paidUnactivated"],
@@ -33,8 +34,12 @@ maketou_log("repair_run", [
 echo json_encode([
     "ok" => true,
     "scannedCarts" => $report["scannedCarts"],
+    "totalCarts" => $report["totalCarts"],
     "alreadyActive" => $report["alreadyActive"],
     "paidUnactivated" => $report["paidUnactivated"],
     "activated" => $report["activated"],
-    "memberIds" => $report["memberIds"]
+    "unpaidOrUnknown" => $report["unpaidOrUnknown"],
+    "memberIds" => $report["memberIds"],
+    "hasMore" => $report["hasMore"],
+    "nextOffset" => $report["nextOffset"]
 ], JSON_UNESCAPED_SLASHES);

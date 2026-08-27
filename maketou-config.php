@@ -14,13 +14,14 @@ define("MAKETOU_REPAIR_KEY", "ADMIN2026");
 define("MAKETOU_SUPABASE_URL", "https://tnxyrvjrxxrsqnpviknz.supabase.co");
 define("MAKETOU_SUPABASE_KEY", "sb_publishable_Hl6nmMnRAM1mfdDdudH2_w_kYIJAXdF");
 
-function maketou_http($method, $url, $payload = null) {
+function maketou_http($method, $url, $payload = null, $timeout = 25) {
     $headers = [
         "Authorization: Bearer " . MAKETOU_API_KEY,
         "Content-Type: application/json",
         "Accept: application/json"
     ];
     $json = $payload === null ? null : json_encode($payload);
+    $timeout = max(5, (int) $timeout);
 
     if (function_exists("curl_init")) {
         $ch = curl_init($url);
@@ -28,7 +29,7 @@ function maketou_http($method, $url, $payload = null) {
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_CUSTOMREQUEST => $method,
             CURLOPT_HTTPHEADER => $headers,
-            CURLOPT_TIMEOUT => 25,
+            CURLOPT_TIMEOUT => $timeout,
             CURLOPT_FOLLOWLOCATION => true
         ];
         if ($json !== null) {
@@ -52,7 +53,7 @@ function maketou_http($method, $url, $payload = null) {
             "method" => $method,
             "header" => implode("\r\n", $headers),
             "content" => $json === null ? "" : $json,
-            "timeout" => 25,
+            "timeout" => $timeout,
             "ignore_errors" => true
         ]
     ]);
@@ -253,11 +254,11 @@ function maketou_read_token($token) {
     return $data;
 }
 
-function maketou_verify_ref_with_api($ref) {
+function maketou_verify_ref_with_api($ref, $timeout = 25) {
     if (!maketou_looks_like_ref($ref)) {
         return [false, "", [], 400];
     }
-    $raw = maketou_http("GET", MAKETOU_API_BASE . "/api/v1/stores/cart/" . rawurlencode($ref));
+    $raw = maketou_http("GET", MAKETOU_API_BASE . "/api/v1/stores/cart/" . rawurlencode($ref), null, $timeout);
     if (!is_array($raw)) {
         return [false, "", [], 502];
     }
@@ -927,21 +928,28 @@ function maketou_recover_paid_return($source) {
     return $unlocked;
 }
 
-function maketou_repair_paid_unactivated() {
+function maketou_repair_paid_unactivated($limit = 12, $offset = 0) {
+    $limit = max(1, min(20, (int) $limit));
+    $offset = max(0, (int) $offset);
     $scanned = 0;
     $paidUnactivated = 0;
     $activated = 0;
     $alreadyActive = 0;
+    $skipped = 0;
     $memberIds = [];
-    foreach (maketou_read_carts() as $ref => $row) {
-        if (!is_array($row)) {
-            continue;
+    $all = maketou_read_carts();
+    $entries = [];
+    foreach ($all as $ref => $row) {
+        if (is_array($row)) {
+            $entries[] = [(string) $ref, $row];
         }
+    }
+    $total = count($entries);
+    $slice = array_slice($entries, $offset, $limit);
+    foreach ($slice as $item) {
+        $ref = $item[0];
+        $row = $item[1];
         $scanned++;
-        [$paid, $status, $data] = maketou_verify_ref_with_api((string) $ref);
-        if (!$paid) {
-            continue;
-        }
         $email = strtolower(trim((string) ($row["email"] ?? "")));
         $uniqueId = maketou_normalize_member_id($row["uniqueId"] ?? "");
         $state = $email !== "" ? maketou_read_subscription_state($email, $uniqueId) : null;
@@ -949,8 +957,13 @@ function maketou_repair_paid_unactivated() {
             $alreadyActive++;
             continue;
         }
+        [$paid, $status, $data] = maketou_verify_ref_with_api($ref, 8);
+        if (!$paid) {
+            $skipped++;
+            continue;
+        }
         $paidUnactivated++;
-        $result = maketou_activate_paid_account((string) $ref, $email, $data);
+        $result = maketou_activate_paid_account($ref, $email, $data);
         if (is_array($result)) {
             $activated++;
             if ($uniqueId !== "") {
@@ -958,18 +971,23 @@ function maketou_repair_paid_unactivated() {
             }
         }
         maketou_log("repair_activate", [
-            "ref" => (string) $ref,
+            "ref" => $ref,
             "uniqueId" => $uniqueId,
             "status" => $status
         ]);
     }
     $memberIds = array_values(array_unique($memberIds));
+    $nextOffset = $offset + count($slice);
     return [
         "scannedCarts" => $scanned,
+        "totalCarts" => $total,
         "alreadyActive" => $alreadyActive,
         "paidUnactivated" => $paidUnactivated,
         "activated" => $activated,
-        "memberIds" => $memberIds
+        "unpaidOrUnknown" => $skipped,
+        "memberIds" => $memberIds,
+        "hasMore" => $nextOffset < $total,
+        "nextOffset" => $nextOffset
     ];
 }
 
