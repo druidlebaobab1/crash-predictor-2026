@@ -244,10 +244,9 @@ function mail_cta($label, $url) {
 function mail_platform_links() {
     $url = htmlspecialchars(RESEND_SITE, ENT_QUOTES, "UTF-8");
     return mail_cta("ACCÉDER À MON ESPACE / SE CONNECTER", RESEND_SITE)
-        . '<p style="text-align:center;margin:14px 0 4px;font-size:13px;line-height:1.45;color:#e5e7eb;">👉 Lien direct vers la plateforme :</p>'
-        . '<p style="text-align:center;margin:0 0 6px;font-size:13px;line-height:1.4;white-space:nowrap;">'
-        . '<a href="' . $url . '" style="color:#ffc837;font-weight:700;font-size:13px;text-decoration:underline;white-space:nowrap;word-break:keep-all;">' . $url . "</a>"
-        . "</p>";
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:14px 0 6px;"><tr><td align="center" style="font-size:12px;line-height:1.4;color:#e5e7eb;white-space:nowrap;word-break:normal;">'
+        . '<span style="white-space:nowrap;word-break:normal;font-size:12px;">👉 Lien direct vers la plateforme : <a href="' . $url . '" style="color:#ffc837;font-weight:700;font-size:12px;text-decoration:underline;white-space:nowrap;word-break:normal;">' . $url . "</a></span>"
+        . "</td></tr></table>";
 }
 
 function mail_wrap($preheader, $innerHtml, $email) {
@@ -280,7 +279,7 @@ function mail_html_welcome($email, $uniqueId, $name = "") {
     $inner = "<p style=\"font-size:18px;font-weight:800;color:#fff;margin:8px 0 16px;\">" . $hello . "</p>"
         . "<p>Email : <strong style=\"color:#fff;\">" . $safeEmail . "</strong></p>"
         . ($uniqueId !== "" ? "<p>Identifiant : <strong style=\"color:#ffc837;\">" . $id . "</strong></p>" : "")
-        . "<p>Connectez-vous pour débloquer vos signaux VIP.</p>"
+        . "<p style=\"margin:12px 0 8px;font-size:14px;line-height:1.4;white-space:nowrap;word-break:normal;\">Connectez-vous pour débloquer vos signaux.</p>"
         . mail_platform_links();
     return mail_wrap($hello, $inner, $email);
 }
