@@ -121,12 +121,14 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     box-shadow: 0 0 12px rgba(56, 189, 248, 0.35);
 }
 .xbet-cta-text {
-    font-family: var(--font-heading);
-    font-weight: 900;
-    font-size: clamp(0.7rem, 3vw, 0.95rem);
-    letter-spacing: 0.04em;
+    font-family: var(--font-body);
+    font-weight: 800;
+    font-size: clamp(0.72rem, 2.6vw, 0.92rem);
+    letter-spacing: 0.02em;
     text-align: left;
     line-height: 1.25;
+    min-width: 0;
+    flex: 1 1 auto;
 }
 .xbet-cta-arrow {
     font-size: 1.05rem;
@@ -2511,6 +2513,25 @@ button.vip-member-tag:hover {
     letter-spacing: 0.16em;
     color: var(--gold-primary);
 }
+.sport-signal-badge {
+    display: inline-block;
+    margin: 0 auto 14px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-family: var(--font-heading);
+    font-size: clamp(0.68rem, 3.1vw, 0.88rem);
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    line-height: 1.25;
+    text-align: center;
+    text-transform: uppercase;
+    color: #0d0614;
+    background: linear-gradient(135deg, #ffe08a, #ffc837 45%, #7dd3fc);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    box-shadow:
+        0 0 16px rgba(255, 200, 55, 0.55),
+        0 0 10px rgba(56, 189, 248, 0.28);
+}
 .sport-teaser-title,
 .sport-match-title {
     margin: 0 0 14px;
@@ -3116,10 +3137,31 @@ button.vip-member-tag:hover {
     .apple-cell { height: 22px; }
     .xbet-cta-banner {
         margin: 6px 10px 18px;
-        padding: 10px 10px 10px 12px;
+        padding: 12px 10px 12px 12px;
         gap: 8px;
+        align-items: center;
     }
-    .xbet-cta-logo { height: 28px; max-width: 92px; }
-    .xbet-cta-text { font-size: 0.64rem; }
-    .xbet-cta-arrow { font-size: 0.9rem; }
+    .xbet-cta-copy {
+        gap: 6px;
+        flex: 1 1 0;
+        min-width: 0;
+        align-items: center;
+    }
+    .xbet-cta-logo {
+        height: 28px;
+        max-width: 88px;
+        flex-shrink: 0;
+    }
+    .xbet-cta-text {
+        font-size: clamp(0.62rem, 2.8vw, 0.74rem);
+        letter-spacing: 0.01em;
+        line-height: 1.22;
+        white-space: normal;
+    }
+    .xbet-cta-arrow { font-size: 0.85rem; flex-shrink: 0; }
+    .sport-signal-badge {
+        font-size: clamp(0.62rem, 3.2vw, 0.78rem);
+        padding: 7px 10px;
+        letter-spacing: 0.04em;
+    }
 }
