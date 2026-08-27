@@ -282,13 +282,19 @@ if ($method === "POST" && ($action === "save" || $action === "" || $action === "
     }
     $members[$email] = $incoming;
     members_write_store($storeFile, $members);
+    echo json_encode(["ok" => true, "account" => members_public_record($incoming)]);
     if ($isNewMember) {
         require_once __DIR__ . DIRECTORY_SEPARATOR . "mail-resend.php";
+        if (function_exists("mail_release_client")) {
+            mail_release_client();
+        }
         if (function_exists("mail_send_welcome")) {
-            mail_send_welcome($email, (string) ($incoming["uniqueId"] ?? ""));
+            try {
+                mail_send_welcome($email, (string) ($incoming["uniqueId"] ?? ""), (string) ($incoming["name"] ?? ""));
+            } catch (Throwable $e) {
+            }
         }
     }
-    echo json_encode(["ok" => true, "account" => members_public_record($incoming)]);
     exit;
 }
 

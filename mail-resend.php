@@ -67,7 +67,8 @@ function mail_http($method, $path, $payload = null) {
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_CUSTOMREQUEST => $method,
         CURLOPT_HTTPHEADER => $headers,
-        CURLOPT_TIMEOUT => 20
+        CURLOPT_CONNECTTIMEOUT => 2,
+        CURLOPT_TIMEOUT => 8
     ];
     if ($json !== null) {
         $options[CURLOPT_POSTFIELDS] = $json;
@@ -134,10 +135,44 @@ function mail_mark_opt_out($email) {
     return maketou_write_local_member($email, $record);
 }
 
+function mail_release_client() {
+    ignore_user_abort(true);
+    if (function_exists("session_write_close")) {
+        @session_write_close();
+    }
+    if (function_exists("fastcgi_finish_request")) {
+        @fastcgi_finish_request();
+        return;
+    }
+    while (ob_get_level() > 0) {
+        @ob_end_flush();
+    }
+    @flush();
+}
+
+function mail_display_name($name) {
+    $name = trim(preg_replace("/\s+/", " ", (string) $name));
+    if ($name === "" || strcasecmp($name, "Client") === 0) {
+        return "";
+    }
+    $parts = preg_split("/\s+/", $name);
+    return is_array($parts) && isset($parts[0]) ? (string) $parts[0] : $name;
+}
+
 function mail_cta($label, $url) {
     $label = htmlspecialchars((string) $label, ENT_QUOTES, "UTF-8");
     $url = htmlspecialchars((string) $url, ENT_QUOTES, "UTF-8");
-    return '<a href="' . $url . '" style="display:inline-block;padding:14px 22px;border-radius:999px;background:linear-gradient(135deg,#ffe08a,#ffc837 45%,#f59e0b);color:#140a08;font-weight:900;text-decoration:none;letter-spacing:.04em;">' . $label . "</a>";
+    return '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:22px 0 10px;"><tr><td align="center">'
+        . '<a href="' . $url . '" style="display:block;width:100%;max-width:100%;box-sizing:border-box;padding:18px 14px;border-radius:14px;background:#ffc837;background:linear-gradient(135deg,#ffe08a,#ffc837 45%,#f59e0b);color:#140a08;font-weight:900;font-size:16px;line-height:1.35;text-decoration:none;letter-spacing:.03em;text-align:center;">' . $label . "</a>"
+        . "</td></tr></table>";
+}
+
+function mail_platform_links() {
+    $url = htmlspecialchars(RESEND_SITE, ENT_QUOTES, "UTF-8");
+    return mail_cta("ACCÉDER À MON ESPACE / SE CONNECTER", RESEND_SITE)
+        . '<p style="text-align:center;margin:14px 0 6px;font-size:15px;line-height:1.6;color:#e5e7eb;">'
+        . '👉 Lien direct vers la plateforme : <a href="' . $url . '" style="color:#ffc837;font-weight:700;text-decoration:underline;word-break:break-all;">' . $url . "</a>"
+        . "</p>";
 }
 
 function mail_wrap($preheader, $innerHtml, $email) {
@@ -153,49 +188,63 @@ function mail_wrap($preheader, $innerHtml, $email) {
         . '<div style="color:#ffc837;font-size:13px;letter-spacing:.18em;font-weight:800;">PREDICTOR</div>'
         . '<div style="color:#fff;font-size:22px;font-weight:900;margin-top:8px;">SUITE MULTI-JEUX</div>'
         . "</td></tr>"
-        . '<tr><td style="padding:8px 24px 28px;font-size:15px;line-height:1.55;color:#e5e7eb;">' . $innerHtml . "</td></tr>"
-        . '<tr><td style="padding:0 24px 22px;font-size:12px;color:#9ca3af;text-align:center;">'
+        . '<tr><td style="padding:8px 24px 8px;font-size:15px;line-height:1.55;color:#e5e7eb;">' . $innerHtml . "</td></tr>"
+        . '<tr><td style="padding:25px 24px 18px;font-size:11px;line-height:1.5;color:#777777;text-align:center;">'
         . "PREDICTOR · crashpredictor.fr<br>"
-        . '<a href="' . htmlspecialchars($unsub, ENT_QUOTES, "UTF-8") . '" style="color:#ffc837;">Se désabonner</a>'
+        . '<a href="' . htmlspecialchars($unsub, ENT_QUOTES, "UTF-8") . '" style="color:#777777;font-size:11px;text-decoration:underline;">Ne plus recevoir d\'emails de Predictor</a>'
         . "</td></tr></table></td></tr></table></body></html>";
 }
 
-function mail_html_welcome($email, $uniqueId) {
+function mail_html_welcome($email, $uniqueId, $name = "") {
     $id = htmlspecialchars((string) $uniqueId, ENT_QUOTES, "UTF-8");
     $safeEmail = htmlspecialchars((string) $email, ENT_QUOTES, "UTF-8");
-    $inner = "<p>Bienvenue. Votre compte PREDICTOR est prêt.</p>"
-        . "<p>Email confirmé : <strong style=\"color:#fff;\">" . $safeEmail . "</strong></p>"
-        . "<p>Votre identifiant unique : <strong style=\"color:#ffc837;\">" . $id . "</strong></p>"
-        . "<p>Conservez cet ID. Il relie votre licence VIP à votre compte.</p>"
-        . '<p style="text-align:center;margin:28px 0;">' . mail_cta("ACCÉDER À MON ESPACE", RESEND_SITE) . "</p>";
-    return mail_wrap("Votre compte PREDICTOR est prêt.", $inner, $email);
+    $display = mail_display_name($name);
+    $hello = $display !== ""
+        ? "Bienvenue " . htmlspecialchars($display, ENT_QUOTES, "UTF-8") . ", votre compte PREDICTOR est prêt !"
+        : "Bienvenue, votre compte PREDICTOR est prêt !";
+    $inner = "<p style=\"font-size:18px;font-weight:800;color:#fff;margin:8px 0 16px;\">" . $hello . "</p>"
+        . "<p>Email : <strong style=\"color:#fff;\">" . $safeEmail . "</strong></p>"
+        . ($uniqueId !== "" ? "<p>Identifiant : <strong style=\"color:#ffc837;\">" . $id . "</strong></p>" : "")
+        . "<p>Connectez-vous pour débloquer vos signaux VIP.</p>"
+        . mail_platform_links();
+    return mail_wrap($hello, $inner, $email);
 }
 
-function mail_html_abandon($email, $uniqueId) {
+function mail_html_abandon($email, $uniqueId, $name = "") {
     $id = htmlspecialchars((string) $uniqueId, ENT_QUOTES, "UTF-8");
-    $inner = "<p>Vous avez commencé à débloquer PREDICTOR, mais le paiement n’est pas allé au bout.</p>"
-        . "<p>Pour <strong style=\"color:#ffc837;\">17 $ par mois</strong>, vous ouvrez :</p>"
-        . "<p>Crash, Aviator, Lucky Jet, Mines, Penalty, Apple of Fortune, et le module sport <strong>LE BOSS</strong>.</p>"
+    $display = mail_display_name($name);
+    $hello = $display !== ""
+        ? "Bonjour " . htmlspecialchars($display, ENT_QUOTES, "UTF-8") . ","
+        : "Bonjour,";
+    $inner = "<p>" . $hello . " vous avez commencé à débloquer PREDICTOR, mais le paiement n’est pas allé au bout.</p>"
+        . "<p>Pour <strong style=\"color:#ffc837;\">17 $ par mois</strong>, vous ouvrez Crash, Aviator, Lucky Jet, Mines, Penalty, Apple of Fortune, et le module sport <strong>LE BOSS</strong>.</p>"
         . "<p>Dernier signal validé : <strong style=\"color:#facc15;\">KAUNO ZALGIRIS @ 9.58</strong>.</p>"
-        . ($uniqueId !== "" ? "<p>Compte : <strong style=\"color:#ffc837;\">" . $id . "</strong></p>" : "")
-        . '<p style="text-align:center;margin:28px 0;">' . mail_cta("FINALISER MON DÉBLOCAGE (17 $ PAR MOIS)", RESEND_SITE . "/?checkout=1") . "</p>"
-        . "<p style=\"font-size:12px;color:#9ca3af;\">Un seul rappel pour cette session. Si vous avez déjà payé, ignorez ce message.</p>";
+        . ($uniqueId !== "" ? "<p>ID : <strong style=\"color:#ffc837;\">" . $id . "</strong></p>" : "")
+        . mail_platform_links();
     return mail_wrap("Votre accès VIP à 17 $ n’est pas encore débloqué.", $inner, $email);
 }
 
-function mail_html_reactivate($email, $uniqueId) {
+function mail_html_reactivate($email, $uniqueId, $name = "") {
     $id = htmlspecialchars((string) $uniqueId, ENT_QUOTES, "UTF-8");
-    $inner = "<p>Votre compte PREDICTOR est toujours là, mais la licence n’est pas activée.</p>"
-        . ($uniqueId !== "" ? "<p>ID membre : <strong style=\"color:#ffc837;\">" . $id . "</strong></p>" : "")
+    $display = mail_display_name($name);
+    $hello = $display !== ""
+        ? "Bonjour " . htmlspecialchars($display, ENT_QUOTES, "UTF-8") . ","
+        : "Bonjour,";
+    $inner = "<p>" . $hello . " votre compte PREDICTOR est toujours là, mais la licence n’est pas activée.</p>"
+        . ($uniqueId !== "" ? "<p>ID : <strong style=\"color:#ffc837;\">" . $id . "</strong></p>" : "")
         . "<p>Les 6 algorithmes live et le module sport <strong>LE BOSS</strong> tournent déjà. Dernier signal validé : <strong style=\"color:#facc15;\">KAUNO ZALGIRIS @ 9.58</strong>.</p>"
         . "<p>Débloquez vos signaux VIP pour <strong>17 $ PAR MOIS</strong>.</p>"
-        . '<p style="text-align:center;margin:28px 0;">' . mail_cta("RÉACTIVER MA LICENCE VIP", RESEND_SITE) . "</p>";
+        . mail_platform_links();
     return mail_wrap("Reprenez vos signaux VIP sur PREDICTOR.", $inner, $email);
 }
 
 function mail_send($to, $subject, $html, $extra = []) {
     $to = strtolower(trim((string) $to));
-    if ($to === "" || strpos($to, "@") === false || mail_opted_out($to) || !mail_is_configured()) {
+    if ($to === "" || strpos($to, "@") === false || mail_opted_out($to)) {
+        return ["ok" => false, "id" => ""];
+    }
+    if (!mail_is_configured()) {
+        maketou_log("mail_skip", ["reason" => "no_key"]);
         return ["ok" => false, "id" => ""];
     }
     $unsub = RESEND_SITE . "/index.php?action=mail_unsub&t=" . rawurlencode(mail_unsub_token($to));
@@ -213,10 +262,6 @@ function mail_send($to, $subject, $html, $extra = []) {
     if (!empty($extra["scheduled_at"])) {
         $payload["scheduled_at"] = $extra["scheduled_at"];
     }
-    if (!empty($extra["idempotency"])) {
-        // sent via header below
-    }
-    $urlPath = "/emails";
     $chHeaders = [
         "Authorization: Bearer " . mail_api_key(),
         "Content-Type: application/json",
@@ -226,27 +271,39 @@ function mail_send($to, $subject, $html, $extra = []) {
         $chHeaders[] = "Idempotency-Key: " . substr((string) $extra["idempotency"], 0, 256);
     }
     $json = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-    $ch = curl_init("https://api.resend.com" . $urlPath);
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POST => true,
-        CURLOPT_HTTPHEADER => $chHeaders,
-        CURLOPT_POSTFIELDS => $json,
-        CURLOPT_TIMEOUT => 20
-    ]);
-    $body = curl_exec($ch);
-    $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-    $data = json_decode((string) $body, true);
-    $id = is_array($data) ? (string) ($data["id"] ?? "") : "";
-    $ok = $status >= 200 && $status < 300 && $id !== "";
-    maketou_log("mail_send", [
-        "ok" => $ok,
-        "http" => $status,
-        "hasId" => $id !== "",
-        "scheduled" => !empty($extra["scheduled_at"])
-    ]);
-    return ["ok" => $ok, "id" => $id, "http" => $status];
+    if (!function_exists("curl_init")) {
+        maketou_log("mail_send", ["ok" => false, "reason" => "no_curl"]);
+        return ["ok" => false, "id" => ""];
+    }
+    try {
+        $ch = curl_init("https://api.resend.com/emails");
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_HTTPHEADER => $chHeaders,
+            CURLOPT_POSTFIELDS => $json,
+            CURLOPT_CONNECTTIMEOUT => 2,
+            CURLOPT_TIMEOUT => 5
+        ]);
+        $body = curl_exec($ch);
+        $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $err = curl_error($ch);
+        curl_close($ch);
+        $data = json_decode((string) $body, true);
+        $id = is_array($data) ? (string) ($data["id"] ?? "") : "";
+        $ok = $status >= 200 && $status < 300 && $id !== "";
+        maketou_log("mail_send", [
+            "ok" => $ok,
+            "http" => $status,
+            "hasId" => $id !== "",
+            "timeout" => $err !== "",
+            "scheduled" => !empty($extra["scheduled_at"])
+        ]);
+        return ["ok" => $ok, "id" => $id, "http" => $status];
+    } catch (Throwable $e) {
+        maketou_log("mail_send", ["ok" => false, "reason" => "exception"]);
+        return ["ok" => false, "id" => ""];
+    }
 }
 
 function mail_cancel($emailId) {
@@ -257,22 +314,31 @@ function mail_cancel($emailId) {
     mail_http("DELETE", "/emails/" . rawurlencode($emailId));
 }
 
-function mail_send_welcome($email, $uniqueId) {
+function mail_send_welcome($email, $uniqueId, $name = "") {
     $email = strtolower(trim((string) $email));
     $record = maketou_read_local_member($email);
     if (is_array($record) && !empty($record["welcomeSent"])) {
         return false;
     }
     $uniqueId = $uniqueId !== "" ? $uniqueId : (is_array($record) ? (string) ($record["uniqueId"] ?? "") : "");
+    if ($name === "" && is_array($record)) {
+        $name = (string) ($record["name"] ?? "");
+    }
     $sent = mail_send(
         $email,
         "🚀 Bienvenue sur PREDICTOR — Votre compte est prêt !",
-        mail_html_welcome($email, $uniqueId),
+        mail_html_welcome($email, $uniqueId, $name),
         ["idempotency" => "welcome-" . md5($email)]
     );
     if ($sent["ok"] && is_array($record)) {
         $record["welcomeSent"] = true;
         maketou_write_local_member($email, $record);
+    } elseif ($sent["ok"] && !is_array($record)) {
+        $fresh = maketou_read_local_member($email);
+        if (is_array($fresh)) {
+            $fresh["welcomeSent"] = true;
+            maketou_write_local_member($email, $fresh);
+        }
     }
     return !empty($sent["ok"]);
 }
@@ -312,10 +378,12 @@ function mail_on_checkout($ref, $email, $uniqueId) {
     if (mail_email_abandon_recent($email)) {
         return;
     }
+    $member = maketou_read_local_member($email);
+    $name = is_array($member) ? (string) ($member["name"] ?? "") : "";
     $sent = mail_send(
         $email,
         "🔥 Débloquez vos signaux VIP — L'offre à 17 $ expire bientôt !",
-        mail_html_abandon($email, $uniqueId),
+        mail_html_abandon($email, $uniqueId, $name),
         [
             "scheduled_at" => gmdate("c", time() + 3600),
             "idempotency" => "abandon-" . md5($ref)
@@ -395,16 +463,17 @@ function mail_process_abandoned($limit = 8) {
             $carts[$ref] = $row;
             continue;
         }
+        $member = maketou_read_local_member($email);
+        $name = is_array($member) ? (string) ($member["name"] ?? "") : "";
         $result = mail_send(
             $email,
             "🔥 Débloquez vos signaux VIP — L'offre à 17 $ expire bientôt !",
-            mail_html_abandon($email, $uniqueId),
+            mail_html_abandon($email, $uniqueId, $name),
             ["idempotency" => "abandon-due-" . md5((string) $ref)]
         );
         $row["abandonEmailed"] = true;
         if (!empty($result["ok"])) {
             $sent++;
-            $member = maketou_read_local_member($email);
             if (is_array($member)) {
                 $member["lastAbandonEmailAt"] = $now;
                 maketou_write_local_member($email, $member);
@@ -437,17 +506,18 @@ function mail_broadcast_inactive($limit = 8, $offset = 0) {
         if (mail_record_is_active($record)) {
             continue;
         }
-        $targets[] = [$email, (string) ($record["uniqueId"] ?? "")];
+        $targets[] = [$email, (string) ($record["uniqueId"] ?? ""), (string) ($record["name"] ?? "")];
     }
     $slice = array_slice($targets, 0, $limit);
     $sent = 0;
     foreach ($slice as $item) {
         $email = $item[0];
         $uniqueId = $item[1];
+        $name = $item[2];
         $result = mail_send(
             $email,
             "🔥 Vos prédictions sont prêtes — Reprenez vos signaux VIP sur PREDICTOR",
-            mail_html_reactivate($email, $uniqueId),
+            mail_html_reactivate($email, $uniqueId, $name),
             ["idempotency" => "broadcast-" . md5($email)]
         );
         if (!empty($result["ok"])) {

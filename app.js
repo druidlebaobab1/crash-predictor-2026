@@ -1555,7 +1555,8 @@ async function persistAccountToServer(user) {
             const response = await fetch(paths[i], {
                 method: "POST",
                 headers: { "Content-Type": "application/json", "Accept": "application/json" },
-                body: JSON.stringify(payload)
+                body: JSON.stringify(payload),
+                keepalive: true
             });
             const data = await parseJsonResponse(response);
             if (data && data.ok) return;
