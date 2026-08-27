@@ -14,45 +14,27 @@ if (strtoupper((string) ($_SERVER["REQUEST_METHOD"] ?? "")) !== "GET") {
 
 $ref = maketou_extract_ref($_GET);
 $email = strtolower(trim((string) ($_GET["email"] ?? "")));
-if ($ref === "") {
-    if ($email !== "") {
-        $unlocked = maketou_try_unlock_by_email($email);
-        if (is_array($unlocked)) {
-            maketou_json_paid(
-                $unlocked["ref"],
-                $unlocked["email"],
-                $unlocked["expiresAt"],
-                $unlocked["paymentDate"]
-            );
-        }
-        maketou_json_denied("unpaid");
-    }
-    maketou_json_denied("missing_ref", 400);
-}
-
-[$paid, $cartStatus, $data, $code] = maketou_verify_ref_with_api($ref);
+$uniqueId = maketou_request_unique_id($_GET);
+$unlocked = maketou_try_unlock_any($ref, $email, $uniqueId);
 maketou_log("status_check", [
     "ref" => $ref,
     "email" => $email,
-    "paid" => $paid,
-    "status" => $cartStatus,
-    "code" => $code
+    "uniqueId" => $uniqueId,
+    "unlocked" => is_array($unlocked)
 ]);
-if ($code === 502) {
-    maketou_json_denied("network_error", 502);
-}
-if ($paid) {
-    $activated = maketou_activate_paid_account($ref, $email, $data);
+if (is_array($unlocked)) {
     maketou_json_paid(
-        $ref,
-        (string) ($activated["email"] ?? ""),
-        (string) ($activated["expiresAt"] ?? ""),
-        (string) ($activated["paymentDate"] ?? "")
+        $unlocked["ref"],
+        $unlocked["email"],
+        $unlocked["expiresAt"],
+        $unlocked["paymentDate"]
     );
 }
-
+if ($ref === "" && $email === "" && $uniqueId === "") {
+    maketou_json_denied("missing_ref", 400);
+}
 echo json_encode([
-    "status" => $cartStatus !== "" ? $cartStatus : "unpaid",
+    "status" => "unpaid",
     "access" => false,
     "completed" => false,
     "cartId" => $ref

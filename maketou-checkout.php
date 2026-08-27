@@ -42,52 +42,24 @@ function maketou_request_email($body) {
 }
 
 function maketou_confirm_paid_ref($ref, $requestEmail) {
-    if ($ref === "" && $requestEmail !== "") {
-        $unlocked = maketou_try_unlock_by_email($requestEmail);
-        maketou_log("verify_email", [
-            "email" => $requestEmail,
-            "unlocked" => is_array($unlocked)
-        ]);
-        if (is_array($unlocked)) {
-            maketou_json_paid(
-                $unlocked["ref"],
-                $unlocked["email"],
-                $unlocked["expiresAt"],
-                $unlocked["paymentDate"]
-            );
-        }
-        echo json_encode([
-            "status" => "unpaid",
-            "access" => false,
-            "completed" => false
-        ]);
-        exit;
-    }
-    [$paid, $cartStatus, $data, $code] = maketou_verify_ref_with_api($ref);
-    maketou_log("verify_ref", [
+    $uniqueId = maketou_request_unique_id($_GET);
+    $unlocked = maketou_try_unlock_any($ref, $requestEmail, $uniqueId);
+    maketou_log("verify_request", [
         "ref" => $ref,
         "email" => $requestEmail,
-        "paid" => $paid,
-        "status" => $cartStatus,
-        "code" => $code
+        "uniqueId" => $uniqueId,
+        "unlocked" => is_array($unlocked)
     ]);
-    if ($code === 502) {
-        maketou_json_denied("network_error", 502);
-    }
-    if ($code === 400) {
-        maketou_json_denied("invalid_ref", 400);
-    }
-    if ($paid) {
-        $activated = maketou_activate_paid_account($ref, $requestEmail, $data);
+    if (is_array($unlocked)) {
         maketou_json_paid(
-            $ref,
-            (string) ($activated["email"] ?? ""),
-            (string) ($activated["expiresAt"] ?? ""),
-            (string) ($activated["paymentDate"] ?? "")
+            $unlocked["ref"],
+            $unlocked["email"],
+            $unlocked["expiresAt"],
+            $unlocked["paymentDate"]
         );
     }
     echo json_encode([
-        "status" => $cartStatus !== "" ? $cartStatus : "unpaid",
+        "status" => "unpaid",
         "access" => false,
         "completed" => false,
         "cartId" => $ref
@@ -146,11 +118,7 @@ if ($looksLikeCreate) {
     $lastName = maketou_clean_person_name($body["lastName"] ?? "");
     $phone = trim((string) ($body["phone"] ?? ""));
     $uniqueId = trim((string) ($body["uniqueId"] ?? ""));
-    $clientRedirect = trim((string) ($body["redirectURL"] ?? ($body["redirect_url"] ?? "")));
-    $redirectUrl = MAKETOU_SUCCESS_URL;
-    if ($clientRedirect !== "" && strpos($clientRedirect, "crashpredictor.fr") !== false) {
-        $redirectUrl = $clientRedirect;
-    }
+    $redirectUrl = maketou_success_url_with_uid($uniqueId);
 
     $payload = [
         "productDocumentId" => MAKETOU_PRODUCT_ID,

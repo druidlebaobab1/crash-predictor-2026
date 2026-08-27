@@ -18,6 +18,18 @@ if ($maketouAction === "member_account") {
     exit();
 }
 
+$paymentHint = strtolower((string) ($_GET["payment"] ?? ""));
+$statusHint = strtolower((string) ($_GET["status"] ?? ""));
+$maketouHint = strtolower((string) ($_GET["maketou"] ?? ""));
+if (
+    $paymentHint === "success"
+    || in_array($statusHint, ["approved", "success", "completed"], true)
+    || $maketouHint === "success"
+) {
+    require_once __DIR__ . "/maketou-config.php";
+    maketou_recover_paid_return($_GET);
+}
+
 header("Cache-Control: no-cache, must-revalidate");
 
 $geoCountry = strtoupper((string) (

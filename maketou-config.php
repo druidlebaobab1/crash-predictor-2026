@@ -753,6 +753,179 @@ function maketou_try_unlock_by_email($email) {
     return null;
 }
 
+function maketou_request_unique_id($source) {
+    if (!is_array($source)) {
+        return "";
+    }
+    $candidates = [
+        $source["uid"] ?? "",
+        $source["uniqueId"] ?? "",
+        $source["unique_id"] ?? "",
+        $source["userId"] ?? "",
+        $source["user_id"] ?? ""
+    ];
+    foreach ($candidates as $candidate) {
+        $id = maketou_normalize_member_id($candidate);
+        if ($id !== "") {
+            return $id;
+        }
+    }
+    return maketou_normalize_member_id(maketou_extract_unique_id($source));
+}
+
+function maketou_success_url_with_uid($uniqueId) {
+    $url = MAKETOU_SUCCESS_URL;
+    $uid = maketou_normalize_member_id($uniqueId);
+    if ($uid === "") {
+        return $url;
+    }
+    $join = strpos($url, "?") !== false ? "&" : "?";
+    return $url . $join . "uid=" . rawurlencode($uid);
+}
+
+function maketou_carts_for_unique_id($uniqueId) {
+    $uniqueId = maketou_normalize_member_id($uniqueId);
+    if ($uniqueId === "") {
+        return [];
+    }
+    $ranked = [];
+    foreach (maketou_read_carts() as $ref => $row) {
+        if (!is_array($row)) {
+            continue;
+        }
+        if (maketou_normalize_member_id($row["uniqueId"] ?? "") !== $uniqueId) {
+            continue;
+        }
+        $ranked[] = [trim((string) $ref), (int) ($row["createdAt"] ?? 0)];
+    }
+    usort($ranked, function ($left, $right) {
+        return $right[1] - $left[1];
+    });
+    $refs = [];
+    foreach ($ranked as $row) {
+        if ($row[0] !== "") {
+            $refs[] = $row[0];
+        }
+    }
+    return $refs;
+}
+
+function maketou_pack_unlock($ref, $email, $expiresAt, $paymentDate) {
+    return [
+        "email" => strtolower(trim((string) $email)),
+        "ref" => (string) $ref,
+        "expiresAt" => (string) $expiresAt,
+        "paymentDate" => (string) $paymentDate
+    ];
+}
+
+function maketou_try_unlock_by_unique_id($uniqueId) {
+    $uniqueId = maketou_normalize_member_id($uniqueId);
+    if ($uniqueId === "") {
+        return null;
+    }
+    $email = maketou_find_member_email_by_unique_id($uniqueId);
+    if ($email !== "") {
+        $unlocked = maketou_try_unlock_by_email($email);
+        if (is_array($unlocked)) {
+            return $unlocked;
+        }
+    }
+    foreach (maketou_carts_for_unique_id($uniqueId) as $ref) {
+        [$paid, $status, $data, $code] = maketou_verify_ref_with_api($ref);
+        maketou_log("unlock_by_uid_cart", [
+            "uniqueId" => $uniqueId,
+            "ref" => $ref,
+            "paid" => $paid,
+            "status" => $status,
+            "code" => $code
+        ]);
+        if ($paid) {
+            $activated = maketou_activate_paid_account($ref, $email, $data);
+            return maketou_pack_unlock(
+                $ref,
+                (string) ($activated["email"] ?? $email),
+                (string) ($activated["expiresAt"] ?? ""),
+                (string) ($activated["paymentDate"] ?? "")
+            );
+        }
+    }
+    $cloud = maketou_supabase_fetch_user($email, $uniqueId);
+    if (is_array($cloud) && !empty($cloud["is_subscribed"])) {
+        $cloudEmail = strtolower(trim((string) ($cloud["email"] ?? $email)));
+        $state = $cloudEmail !== "" ? maketou_read_subscription_state($cloudEmail, $uniqueId) : null;
+        if (is_array($state) && !empty($state["active"])) {
+            return maketou_pack_unlock(
+                (string) ($state["lastPaymentRef"] ?? "subscription"),
+                $cloudEmail,
+                (string) ($state["expiresAt"] ?? ""),
+                (string) ($state["paymentDate"] ?? "")
+            );
+        }
+    }
+    return null;
+}
+
+function maketou_try_unlock_any($ref, $email, $uniqueId, $data = []) {
+    $ref = trim((string) $ref);
+    $email = strtolower(trim((string) $email));
+    $uniqueId = maketou_normalize_member_id($uniqueId);
+    if ($ref !== "") {
+        [$paid, $status, $payload, $code] = maketou_verify_ref_with_api($ref);
+        maketou_log("unlock_any_ref", [
+            "ref" => $ref,
+            "email" => $email,
+            "uniqueId" => $uniqueId,
+            "paid" => $paid,
+            "status" => $status,
+            "code" => $code
+        ]);
+        if ($paid) {
+            $merged = is_array($payload) ? array_merge(is_array($data) ? $data : [], $payload) : $data;
+            $activated = maketou_activate_paid_account($ref, $email, $merged);
+            return maketou_pack_unlock(
+                $ref,
+                (string) ($activated["email"] ?? $email),
+                (string) ($activated["expiresAt"] ?? ""),
+                (string) ($activated["paymentDate"] ?? "")
+            );
+        }
+    }
+    if ($email !== "" && strpos($email, "@") !== false) {
+        $unlocked = maketou_try_unlock_by_email($email);
+        if (is_array($unlocked)) {
+            return $unlocked;
+        }
+    }
+    if ($uniqueId !== "") {
+        $unlocked = maketou_try_unlock_by_unique_id($uniqueId);
+        if (is_array($unlocked)) {
+            return $unlocked;
+        }
+    }
+    return null;
+}
+
+function maketou_recover_paid_return($source) {
+    if (!is_array($source)) {
+        return null;
+    }
+    $ref = maketou_extract_ref($source);
+    $email = strtolower(trim((string) ($source["email"] ?? "")));
+    if ($email === "") {
+        $email = maketou_extract_email($source);
+    }
+    $uniqueId = maketou_request_unique_id($source);
+    $unlocked = maketou_try_unlock_any($ref, $email, $uniqueId, $source);
+    maketou_log("recover_return", [
+        "ref" => $ref,
+        "email" => $email,
+        "uniqueId" => $uniqueId,
+        "ok" => is_array($unlocked)
+    ]);
+    return $unlocked;
+}
+
 function maketou_mark_supabase_paid_by_unique_id($uniqueId) {
     $expiresAt = maketou_iso_from_ts(time() + (MAKETOU_SUBSCRIPTION_DAYS * 86400));
     maketou_apply_supabase_subscription("", $uniqueId, "", $expiresAt, maketou_now_iso());

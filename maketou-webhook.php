@@ -21,43 +21,26 @@ if (!is_array($body)) {
 $payload = array_merge(is_array($_GET) ? $_GET : [], $body);
 
 $ref = maketou_extract_ref($payload);
-$email = strtolower(trim((string) (
-    $payload["email"]
-    ?? maketou_extract_email($payload)
-    ?? ""
-)));
+$email = strtolower(trim((string) ($payload["email"] ?? "")));
+if ($email === "") {
+    $email = maketou_extract_email($payload);
+}
+$uniqueId = maketou_request_unique_id($payload);
 
 maketou_log("webhook_in", [
     "method" => $method,
     "ref" => $ref,
     "email" => $email,
+    "uniqueId" => $uniqueId,
     "status" => maketou_extract_status($payload),
     "event" => $payload["event"] ?? ($payload["type"] ?? "")
 ]);
 
-if ($ref === "" && $email !== "") {
-    $unlocked = maketou_try_unlock_by_email($email);
-    if (is_array($unlocked)) {
-        echo json_encode([
-            "ok" => true,
-            "status" => "paid",
-            "access" => true,
-            "cartId" => $unlocked["ref"],
-            "email" => $unlocked["email"]
-        ]);
-        exit;
-    }
-}
-
-if ($ref === "") {
-    http_response_code(400);
-    echo json_encode(["error" => "missing_ref", "access" => false]);
-    exit;
-}
-
-[$apiPaid, $cartStatus, $data, $code] = maketou_verify_ref_with_api($ref);
+[$apiPaid, $cartStatus, $data, $code] = $ref !== ""
+    ? maketou_verify_ref_with_api($ref)
+    : [false, "", [], 0];
 $bodyPaid = maketou_payload_looks_paid($payload);
-$mapped = maketou_lookup_cart_map($ref);
+$mapped = $ref !== "" ? maketou_lookup_cart_map($ref) : null;
 $paid = $apiPaid || ($bodyPaid && is_array($mapped));
 
 maketou_log("webhook_verify", [
@@ -69,21 +52,33 @@ maketou_log("webhook_verify", [
     "code" => $code
 ]);
 
-if (!$paid) {
+if ($paid && $ref !== "") {
+    $merged = is_array($data) ? array_merge($payload, $data) : $payload;
+    $activated = maketou_activate_paid_account($ref, $email, $merged);
     echo json_encode([
-        "ok" => false,
-        "status" => $cartStatus !== "" ? $cartStatus : "unpaid",
-        "access" => false
+        "ok" => true,
+        "status" => "paid",
+        "access" => true,
+        "cartId" => $ref,
+        "email" => (string) ($activated["email"] ?? $email)
     ]);
     exit;
 }
 
-$merged = is_array($data) ? array_merge($payload, $data) : $payload;
-$activated = maketou_activate_paid_account($ref, $email, $merged);
+$unlocked = maketou_try_unlock_any($ref, $email, $uniqueId, $payload);
+if (is_array($unlocked)) {
+    echo json_encode([
+        "ok" => true,
+        "status" => "paid",
+        "access" => true,
+        "cartId" => $unlocked["ref"],
+        "email" => $unlocked["email"]
+    ]);
+    exit;
+}
+
 echo json_encode([
-    "ok" => true,
-    "status" => "paid",
-    "access" => true,
-    "cartId" => $ref,
-    "email" => (string) ($activated["email"] ?? $email)
+    "ok" => false,
+    "status" => $cartStatus !== "" ? $cartStatus : "unpaid",
+    "access" => false
 ]);

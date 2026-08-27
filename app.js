@@ -2022,13 +2022,35 @@ function clearMaketouReturnUrl() {
     window.history.replaceState({}, document.title, window.location.pathname);
 }
 
+function extractReturnMemberId(params) {
+    const raw = String((params && params.get("uid")) || (params && params.get("uniqueId")) || "").trim();
+    const fromUrl = formatMemberId(raw);
+    if (fromUrl) return fromUrl;
+    const pending = readMaketouPending();
+    if (pending && pending.uniqueId) {
+        const fromPending = formatMemberId(pending.uniqueId);
+        if (fromPending) return fromPending;
+    }
+    return formatMemberId(currentUser && currentUser.uniqueId) || "";
+}
+
+function isMaketouPendingFresh(pending) {
+    if (!pending || typeof pending !== "object") return false;
+    const started = Number(pending.startedAt || 0);
+    if (!started) return true;
+    return (Date.now() - started) < (48 * 60 * 60 * 1000);
+}
+
 function denyPaymentAccess(message) {
     if (verifiedAccessGranted) {
-        clearMaketouReturnUrl();
+        return;
+    }
+    if (isMaketouPendingFresh(readMaketouPending()) || hasMaketouReturnHint(new URLSearchParams(window.location.search))) {
+        startMaketouPaymentWatch();
+        showToast("Validation du paiement en cours…");
         return;
     }
     verifiedAccessGranted = false;
-    clearMaketouReturnUrl();
     initGlobalViewRouter();
     showToast(message || "Paiement non confirmé. L'accès reste bloqué.", "error");
 }
@@ -2083,6 +2105,9 @@ async function restoreVerifiedAccess() {
                 paidReturn.paymentDate
             );
             return true;
+        }
+        if (isMaketouPendingFresh(readMaketouPending())) {
+            startMaketouPaymentWatch();
         }
     }
     verifiedAccessGranted = false;
@@ -3453,6 +3478,20 @@ function initAuthSecurity() {
                     closeAllModals();
                     logForm.reset();
                     resetPasswordToggles(logForm);
+                    if (!isSubscriptionActive(found) && !hasExpiredSubscription(found)) {
+                        const paidReturn = await fetchMaketouVerificationByEmail();
+                        if (paidReturn && paidReturn.access === true) {
+                            await activateMaketouLicense(
+                                paidReturn.cartId || "maketou",
+                                paidReturn.token,
+                                paidReturn.expiresAt,
+                                paidReturn.paymentDate
+                            );
+                            showToast(`Connexion réussie ! Bienvenue, ${found.name}.`);
+                            if (pendingCheckoutAfterAuth) pendingCheckoutAfterAuth = false;
+                            return;
+                        }
+                    }
                     if (isSubscriptionActive(found)) {
                         grantVerifiedAccess();
                         initGlobalViewRouter();
@@ -3950,19 +3989,22 @@ async function createMaketouCart(user) {
     };
 
     const paths = maketouServerPaths("checkout");
-    for (let i = 0; i < paths.length; i++) {
-        try {
-            const response = await fetch(paths[i], {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "Accept": "application/json" },
-                body: JSON.stringify(payload)
-            });
-            const data = await parseJsonResponse(response);
-            const redirectUrl = extractMaketouRedirect(data);
-            if (redirectUrl) {
-                return { redirectUrl, cartId: data.cartId || "" };
-            }
-        } catch {}
+    for (let attempt = 0; attempt < 3; attempt++) {
+        for (let i = 0; i < paths.length; i++) {
+            try {
+                const response = await fetch(paths[i], {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                const data = await parseJsonResponse(response);
+                const redirectUrl = extractMaketouRedirect(data);
+                if (redirectUrl) {
+                    return { redirectUrl, cartId: data.cartId || "" };
+                }
+            } catch {}
+        }
+        await new Promise((resolve) => setTimeout(resolve, 600));
     }
     return null;
 }
@@ -3973,10 +4015,19 @@ function currentPaymentEmail() {
     return pending && pending.email ? String(pending.email).trim() : "";
 }
 
+function maketouVerifyQuery(ref) {
+    const email = currentPaymentEmail();
+    const uid = extractReturnMemberId(new URLSearchParams(window.location.search));
+    const parts = ["action=verify"];
+    if (ref) parts.push(`ref=${encodeURIComponent(ref)}`);
+    if (email) parts.push(`email=${encodeURIComponent(email)}`);
+    if (uid) parts.push(`uniqueId=${encodeURIComponent(uid)}`);
+    return parts.join("&");
+}
+
 async function fetchMaketouVerification(ref) {
     if (!ref) return fetchMaketouVerificationByEmail();
-    const email = currentPaymentEmail();
-    const query = `action=verify&ref=${encodeURIComponent(ref)}${email ? `&email=${encodeURIComponent(email)}` : ""}`;
+    const query = maketouVerifyQuery(ref);
     const paths = maketouServerPaths("verify", query);
     for (let i = 0; i < paths.length; i++) {
         try {
@@ -3985,13 +4036,14 @@ async function fetchMaketouVerification(ref) {
             if (data && typeof data.access === "boolean") return data;
         } catch {}
     }
-    return null;
+    return fetchMaketouVerificationByEmail();
 }
 
 async function fetchMaketouVerificationByEmail() {
     const email = currentPaymentEmail();
-    if (!email) return null;
-    const query = `action=verify&email=${encodeURIComponent(email)}`;
+    const uid = extractReturnMemberId(new URLSearchParams(window.location.search));
+    if (!email && !uid) return null;
+    const query = maketouVerifyQuery("");
     const paths = maketouServerPaths("verify", query);
     for (let i = 0; i < paths.length; i++) {
         try {
@@ -4023,16 +4075,22 @@ async function fetchMaketouCartStatus(cartId) {
 
 async function activateMaketouLicense(cartId, token, expiresAt, paymentDate) {
     trackMetaPurchase(cartId || token || "maketou");
-    if (currentUser) {
-        applyPaidSubscriptionPeriod(currentUser, cartId, expiresAt);
-        if (paymentDate) currentUser.paymentDate = paymentDate;
-    }
-    grantVerifiedAccess(token);
     if (!currentUser) {
-        initGlobalViewRouter();
-        showToast("🎉 Félicitations ! Votre session d'analyse est débloquée pour le mois !");
-        return;
+        if (token) storeAccessToken(token);
+        const pending = readMaketouPending() || {};
+        writeMaketouPending({
+            ...pending,
+            startedAt: pending.startedAt || Date.now(),
+            cartId: cartId || pending.cartId || "",
+            uniqueId: pending.uniqueId || ""
+        });
+        document.getElementById("loginModal")?.classList.add("active");
+        showToast("Paiement validé. Connectez-vous pour ouvrir votre session.");
+        return true;
     }
+    applyPaidSubscriptionPeriod(currentUser, cartId, expiresAt);
+    if (paymentDate) currentUser.paymentDate = paymentDate;
+    grantVerifiedAccess(token);
     await handlePaymentSuccess({
         transaction_id: cartId || `maketou-${currentUser.uniqueId}-${Date.now()}`,
         tx_ref: cartId || currentUser.uniqueId,
@@ -4040,6 +4098,7 @@ async function activateMaketouLicense(cartId, token, expiresAt, paymentDate) {
         payment_type: "maketou",
         expiresAt: expiresAt || currentUser.subscriptionExpiresAt || ""
     }, "USD", CONFIG.licenseUsd);
+    return true;
 }
 
 function startMaketouPaymentWatch() {
@@ -4050,12 +4109,16 @@ function startMaketouPaymentWatch() {
             maketouPollTimer = null;
             return;
         }
+        const pending = readMaketouPending();
         let pendingCart = "";
         try { pendingCart = localStorage.getItem(CONFIG.maketouCartKey) || ""; } catch {}
-        if (pendingCart || readMaketouPending()) {
-            verifyMaketouReturn();
+        if (!isMaketouPendingFresh(pending) && !pendingCart) {
+            clearInterval(maketouPollTimer);
+            maketouPollTimer = null;
+            return;
         }
-    }, 4000);
+        verifyMaketouReturn();
+    }, 3000);
 }
 
 async function startMaketouCheckout() {
@@ -4157,7 +4220,8 @@ async function verifyMaketouReturn() {
     const returnHint = hasMaketouReturnHint(params);
     const ref = extractPaymentRef(params);
     const pending = readMaketouPending();
-    const shouldPoll = returnHint || Boolean(ref) || Boolean(pending);
+    const uid = extractReturnMemberId(params);
+    const shouldPoll = returnHint || Boolean(ref) || isMaketouPendingFresh(pending) || Boolean(uid && returnHint);
 
     if (!shouldPoll) {
         if (verifiedAccessGranted) return;
@@ -4174,7 +4238,7 @@ async function verifyMaketouReturn() {
     maketouVerifyInFlight = true;
     if (returnHint) showPaymentOverlay("Validation de la licence…");
     try {
-        const attempts = returnHint ? 8 : 2;
+        const attempts = returnHint ? 12 : 3;
         for (let i = 0; i < attempts; i++) {
             if (verifiedAccessGranted) {
                 clearMaketouReturnUrl();
@@ -4187,16 +4251,12 @@ async function verifyMaketouReturn() {
                 hidePaymentOverlay();
                 return;
             }
-            if (i < attempts - 1) await new Promise((resolve) => setTimeout(resolve, 1600));
+            if (i < attempts - 1) await new Promise((resolve) => setTimeout(resolve, 2000));
         }
         hidePaymentOverlay();
-        if (returnHint && !verifiedAccessGranted && (pending || ref)) {
-            showToast("Validation du paiement en cours…");
-            startMaketouPaymentWatch();
-            return;
-        }
-        if (returnHint && !verifiedAccessGranted && !pending && !ref) {
-            denyPaymentAccess("Paiement non confirmé. L'accès reste bloqué.");
+        startMaketouPaymentWatch();
+        if (returnHint && !verifiedAccessGranted) {
+            showToast("Validation du paiement en cours… votre accès s’ouvre dès confirmation.");
         }
     } finally {
         maketouVerifyInFlight = false;
