@@ -12,18 +12,19 @@
 
     function emberCount() {
         const w = window.innerWidth || 360;
-        return w < 600 ? 16 : 24;
+        return w < 600 ? 22 : 34;
     }
 
     function spawnEmber(randomY) {
+        const big = Math.random() < 0.18;
         return {
             x: Math.random() * width,
-            y: randomY ? Math.random() * height : -8 - Math.random() * 40,
-            r: 0.6 + Math.random() * 1.4,
-            vy: 18 + Math.random() * 28,
-            vx: (Math.random() - 0.5) * 8,
-            a: 0.18 + Math.random() * 0.28,
-            hue: 22 + Math.random() * 28
+            y: randomY ? Math.random() * height : -12 - Math.random() * 50,
+            r: big ? 2.2 + Math.random() * 2.2 : 1.1 + Math.random() * 1.6,
+            vy: 22 + Math.random() * 34,
+            vx: (Math.random() - 0.5) * 10,
+            a: big ? 0.72 + Math.random() * 0.22 : 0.48 + Math.random() * 0.32,
+            hue: 18 + Math.random() * 26
         };
     }
 
@@ -51,14 +52,19 @@
             const p = embers[i];
             p.y += p.vy * dt;
             p.x += p.vx * dt;
-            if (p.y > height + 10 || p.x < -12 || p.x > width + 12) {
+            if (p.y > height + 14 || p.x < -16 || p.x > width + 16) {
                 embers[i] = spawnEmber(false);
                 continue;
             }
             ctx.beginPath();
-            ctx.fillStyle = "hsla(" + p.hue + ", 95%, 62%, " + p.a + ")";
-            ctx.shadowColor = "hsla(" + p.hue + ", 100%, 58%, 0.55)";
-            ctx.shadowBlur = 6;
+            ctx.fillStyle = "hsla(" + p.hue + ", 100%, 58%, " + (p.a * 0.35) + ")";
+            ctx.shadowColor = "hsla(" + p.hue + ", 100%, 62%, 0.9)";
+            ctx.shadowBlur = 16;
+            ctx.arc(p.x, p.y, p.r * 1.8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.shadowBlur = 8;
+            ctx.fillStyle = "hsla(" + Math.min(48, p.hue + 16) + ", 100%, 78%, " + p.a + ")";
             ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
             ctx.fill();
         }
