@@ -989,6 +989,18 @@ function maketou_supabase_repair_rows() {
     return is_array($rows) ? $rows : [];
 }
 
+function maketou_supabase_licensed_count() {
+    [$status, $body] = maketou_supabase_http(
+        "GET",
+        "/rest/v1/users?is_subscribed=eq.true&select=unique_id&limit=400"
+    );
+    if ($status < 200 || $status >= 300) {
+        return -1;
+    }
+    $rows = json_decode((string) $body, true);
+    return is_array($rows) ? count($rows) : -1;
+}
+
 function maketou_repair_queue_file() {
     $dir = __DIR__ . DIRECTORY_SEPARATOR . "data";
     if (!is_dir($dir)) {
@@ -1048,7 +1060,7 @@ function maketou_build_repair_queue($extraRefs = []) {
                     $record["email"] ?? $email,
                     $record["uniqueId"] ?? "",
                     $record["lastPaymentRef"] ?? "",
-                    0
+                    trim((string) ($record["lastPaymentRef"] ?? "")) !== "" ? 2000000000 : 0
                 );
             }
         }
@@ -1078,7 +1090,7 @@ function maketou_build_repair_queue($extraRefs = []) {
             $row["email"] ?? "",
             $row["unique_id"] ?? "",
             $row["last_payment_ref"] ?? "",
-            0
+            trim((string) ($row["last_payment_ref"] ?? "")) !== "" ? 2000000000 : 0
         );
     }
     if (is_array($extraRefs)) {
@@ -1138,6 +1150,9 @@ function maketou_repair_paid_unactivated($limit = 6, $offset = 0, $rebuild = fal
         usort($refs, function ($a, $b) {
             return $b[1] <=> $a[1];
         });
+        if (count($refs) > 8) {
+            $refs = array_merge(array_slice($refs, 0, 4), array_slice($refs, -4));
+        }
         if ($refs === []) {
             continue;
         }
@@ -1159,6 +1174,7 @@ function maketou_repair_paid_unactivated($limit = 6, $offset = 0, $rebuild = fal
     $alreadyActive = 0;
     $skipped = 0;
     $memberIds = [];
+    $sampleStatuses = [];
     $index = $offset;
     $apiBudget = 8;
     while ($index < $total && ($apiBudget > 0 || $scanned < 20)) {
@@ -1188,6 +1204,10 @@ function maketou_repair_paid_unactivated($limit = 6, $offset = 0, $rebuild = fal
             $tried++;
             $apiBudget--;
             [$paid, $status, $data] = maketou_verify_ref_with_api($ref, 5);
+            $statusKey = strtolower(trim((string) $status));
+            if ($statusKey !== "" && count($sampleStatuses) < 8 && !in_array($statusKey, $sampleStatuses, true)) {
+                $sampleStatuses[] = $statusKey;
+            }
             if (!$paid) {
                 continue;
             }
@@ -1229,7 +1249,9 @@ function maketou_repair_paid_unactivated($limit = 6, $offset = 0, $rebuild = fal
         "memberIds" => $memberIds,
         "hasMore" => $index < $total,
         "nextOffset" => $index,
-        "expectedPaid" => 19
+        "expectedPaid" => 19,
+        "licensedCloud" => maketou_supabase_licensed_count(),
+        "sampleStatuses" => $sampleStatuses
     ];
 }
 
