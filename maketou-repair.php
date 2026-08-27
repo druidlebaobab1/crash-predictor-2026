@@ -49,5 +49,5 @@ echo json_encode([
     "memberIds" => $report["memberIds"],
     "hasMore" => $report["hasMore"],
     "nextOffset" => $report["nextOffset"],
-    "repairVersion" => 2
+    "repairVersion" => 3
 ], JSON_UNESCAPED_SLASHES);

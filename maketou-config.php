@@ -928,13 +928,13 @@ function maketou_recover_paid_return($source) {
     return $unlocked;
 }
 
-function maketou_queue_put(&$queue, $ref, $email = "", $uniqueId = "") {
+function maketou_queue_put(&$queue, $ref, $email = "", $uniqueId = "", $createdAt = 0) {
     $ref = trim((string) $ref);
     if ($ref === "" || $ref === MAKETOU_PRODUCT_ID || !maketou_looks_like_ref($ref)) {
         return;
     }
     if (!isset($queue[$ref]) || !is_array($queue[$ref])) {
-        $queue[$ref] = ["email" => "", "uniqueId" => ""];
+        $queue[$ref] = ["email" => "", "uniqueId" => "", "createdAt" => 0];
     }
     $email = strtolower(trim((string) $email));
     if ($email !== "" && strpos($email, "@") !== false) {
@@ -943,6 +943,10 @@ function maketou_queue_put(&$queue, $ref, $email = "", $uniqueId = "") {
     $uniqueId = maketou_normalize_member_id($uniqueId);
     if ($uniqueId !== "") {
         $queue[$ref]["uniqueId"] = $uniqueId;
+    }
+    $createdAt = (int) $createdAt;
+    if ($createdAt > (int) ($queue[$ref]["createdAt"] ?? 0)) {
+        $queue[$ref]["createdAt"] = $createdAt;
     }
 }
 
@@ -956,11 +960,17 @@ function maketou_collect_log_cart_ids() {
         return [];
     }
     $ids = [];
-    if (preg_match_all('/"(?:cartId|cart_id|ref)"\s*:\s*"([^"]+)"/', $text, $matches)) {
-        foreach ($matches[1] as $ref) {
-            $ref = trim((string) $ref);
-            if ($ref !== "" && $ref !== MAKETOU_PRODUCT_ID && maketou_looks_like_ref($ref)) {
-                $ids[$ref] = true;
+    $lines = preg_split("/\r\n|\n|\r/", $text);
+    foreach ($lines as $line) {
+        if (strpos($line, "checkout_create") === false && strpos($line, "webhook_in") === false) {
+            continue;
+        }
+        if (preg_match_all('/"(?:cartId|cart_id)"\s*:\s*"([^"]+)"/', $line, $matches)) {
+            foreach ($matches[1] as $ref) {
+                $ref = trim((string) $ref);
+                if ($ref !== "" && $ref !== MAKETOU_PRODUCT_ID && maketou_looks_like_ref($ref)) {
+                    $ids[$ref] = true;
+                }
             }
         }
     }
@@ -993,7 +1003,7 @@ function maketou_build_repair_queue($extraRefs = []) {
         if (!is_array($row)) {
             continue;
         }
-        maketou_queue_put($queue, $ref, $row["email"] ?? "", $row["uniqueId"] ?? "");
+        maketou_queue_put($queue, $ref, $row["email"] ?? "", $row["uniqueId"] ?? "", $row["createdAt"] ?? 0);
     }
     $membersFile = maketou_members_file();
     if (is_file($membersFile)) {
@@ -1060,8 +1070,28 @@ function maketou_repair_paid_unactivated($limit = 6, $offset = 0, $rebuild = fal
     $queue = maketou_load_repair_queue($rebuild, $extraRefs);
     $entries = [];
     foreach ($queue as $ref => $row) {
-        $entries[] = [(string) $ref, is_array($row) ? $row : []];
+        $row = is_array($row) ? $row : [];
+        $email = strtolower(trim((string) ($row["email"] ?? "")));
+        $uniqueId = maketou_normalize_member_id($row["uniqueId"] ?? "");
+        if ($email === "" && $uniqueId === "") {
+            continue;
+        }
+        $entries[] = [(string) $ref, $row];
     }
+    usort($entries, function ($a, $b) {
+        $ta = (int) ($a[1]["createdAt"] ?? 0);
+        $tb = (int) ($b[1]["createdAt"] ?? 0);
+        if ($ta === 0 && $tb !== 0) {
+            return -1;
+        }
+        if ($tb === 0 && $ta !== 0) {
+            return 1;
+        }
+        if ($tb === $ta) {
+            return 0;
+        }
+        return $tb > $ta ? 1 : -1;
+    });
     $total = count($entries);
     $slice = array_slice($entries, $offset, $limit);
     $scanned = 0;
