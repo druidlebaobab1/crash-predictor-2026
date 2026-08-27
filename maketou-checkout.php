@@ -23,6 +23,15 @@ if ($action === "maketou_checkout") {
     $action = "";
 }
 
+function maketou_clean_person_name($value) {
+    $value = trim((string) $value);
+    $value = preg_replace("/\s+(membre|member)\s*$/iu", "", $value);
+    if (preg_match("/^(membre|member)$/iu", $value)) {
+        return "";
+    }
+    return trim((string) $value);
+}
+
 function maketou_request_email($body) {
     $email = strtolower(trim((string) (
         $_GET["email"]
@@ -33,7 +42,35 @@ function maketou_request_email($body) {
 }
 
 function maketou_confirm_paid_ref($ref, $requestEmail) {
+    if ($ref === "" && $requestEmail !== "") {
+        $unlocked = maketou_try_unlock_by_email($requestEmail);
+        maketou_log("verify_email", [
+            "email" => $requestEmail,
+            "unlocked" => is_array($unlocked)
+        ]);
+        if (is_array($unlocked)) {
+            maketou_json_paid(
+                $unlocked["ref"],
+                $unlocked["email"],
+                $unlocked["expiresAt"],
+                $unlocked["paymentDate"]
+            );
+        }
+        echo json_encode([
+            "status" => "unpaid",
+            "access" => false,
+            "completed" => false
+        ]);
+        exit;
+    }
     [$paid, $cartStatus, $data, $code] = maketou_verify_ref_with_api($ref);
+    maketou_log("verify_ref", [
+        "ref" => $ref,
+        "email" => $requestEmail,
+        "paid" => $paid,
+        "status" => $cartStatus,
+        "code" => $code
+    ]);
     if ($code === 502) {
         maketou_json_denied("network_error", 502);
     }
@@ -86,7 +123,7 @@ if ($ref === "") {
 }
 $requestEmail = maketou_request_email($body);
 
-if ($action === "verify" || ($ref !== "" && $action !== "")) {
+if ($action === "verify" || ($ref !== "" && $action !== "") || ($action === "verify" && $requestEmail !== "")) {
     maketou_confirm_paid_ref($ref, $requestEmail);
 }
 
@@ -94,29 +131,39 @@ if ($ref !== "" && $method === "GET") {
     maketou_confirm_paid_ref($ref, $requestEmail);
 }
 
+if ($method === "GET" && $requestEmail !== "" && $ref === "") {
+    maketou_confirm_paid_ref("", $requestEmail);
+}
+
 $looksLikeCreate = $method === "POST"
     && trim((string) ($body["email"] ?? "")) !== ""
     && trim((string) ($body["firstName"] ?? "")) !== ""
-    && trim((string) ($body["lastName"] ?? "")) !== ""
     && $action !== "verify";
 
 if ($looksLikeCreate) {
     $email = trim((string) ($body["email"] ?? ""));
-    $firstName = trim((string) ($body["firstName"] ?? ""));
-    $lastName = trim((string) ($body["lastName"] ?? ""));
+    $firstName = maketou_clean_person_name($body["firstName"] ?? "");
+    $lastName = maketou_clean_person_name($body["lastName"] ?? "");
     $phone = trim((string) ($body["phone"] ?? ""));
     $uniqueId = trim((string) ($body["uniqueId"] ?? ""));
+    $clientRedirect = trim((string) ($body["redirectURL"] ?? ($body["redirect_url"] ?? "")));
+    $redirectUrl = MAKETOU_SUCCESS_URL;
+    if ($clientRedirect !== "" && strpos($clientRedirect, "crashpredictor.fr") !== false) {
+        $redirectUrl = $clientRedirect;
+    }
 
     $payload = [
         "productDocumentId" => MAKETOU_PRODUCT_ID,
-        "firstName" => $firstName,
-        "lastName" => $lastName,
-        "redirectURL" => MAKETOU_SUCCESS_URL,
+        "firstName" => $firstName !== "" ? $firstName : "Client",
+        "redirectURL" => $redirectUrl,
         "meta" => [
             "userId" => $uniqueId,
             "source" => "website"
         ]
     ];
+    if ($lastName !== "") {
+        $payload["lastName"] = $lastName;
+    }
     $phoneDigits = preg_replace("/\D+/", "", $phone);
     if ($phone !== "" && preg_match("/^\+?[0-9]{8,15}$/", $phone) && strlen($phoneDigits) >= 8) {
         $payload["phone"] = $phone;
@@ -179,6 +226,12 @@ if ($looksLikeCreate) {
 
     if ($status >= 200 && $status < 300 && $redirectUrl !== "") {
         maketou_save_cart_map($newCartId, $email, $uniqueId);
+        maketou_log("checkout_create", [
+            "email" => $email,
+            "uniqueId" => $uniqueId,
+            "cartId" => $newCartId,
+            "http" => $status
+        ]);
         echo json_encode([
             "redirectUrl" => $redirectUrl,
             "cartId" => $newCartId,
@@ -189,6 +242,10 @@ if ($looksLikeCreate) {
     }
 
     http_response_code($status >= 400 ? $status : 502);
+    maketou_log("checkout_failed", [
+        "email" => $email,
+        "http" => $status
+    ]);
     echo json_encode(["error" => "checkout_failed", "access" => false]);
     exit;
 }

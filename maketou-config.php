@@ -66,9 +66,56 @@ function maketou_http($method, $url, $payload = null) {
     return [$status, $responseBody];
 }
 
+function maketou_log($event, $payload = []) {
+    $dir = __DIR__ . DIRECTORY_SEPARATOR . "data";
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0755, true);
+    }
+    $line = date("c") . " " . trim((string) $event) . " " . json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
+    @file_put_contents($dir . DIRECTORY_SEPARATOR . "maketou-events.log", $line, FILE_APPEND | LOCK_EX);
+}
+
 function maketou_is_paid_status($status) {
     $status = strtolower(trim((string) $status));
-    return in_array($status, ["completed", "paid", "success", "successful", "approved", "succeeded"], true);
+    $status = str_replace([" ", "-"], "_", $status);
+    return in_array($status, [
+        "completed", "complete", "paid", "success", "successful", "approved",
+        "succeeded", "settled", "captured", "processed", "confirmed",
+        "payment_success", "payment_successful", "done"
+    ], true);
+}
+
+function maketou_payload_looks_paid($data) {
+    if (maketou_is_paid_status(maketou_extract_status($data))) {
+        return true;
+    }
+    if (!is_array($data)) {
+        return false;
+    }
+    $flags = [
+        $data["paid"] ?? null,
+        $data["isPaid"] ?? null,
+        $data["is_paid"] ?? null,
+        $data["completed"] ?? null,
+        $data["access"] ?? null
+    ];
+    $nested = is_array($data["data"] ?? null) ? $data["data"] : [];
+    if ($nested) {
+        $flags[] = $nested["paid"] ?? null;
+        $flags[] = $nested["isPaid"] ?? null;
+        $flags[] = $nested["is_paid"] ?? null;
+        $flags[] = $nested["completed"] ?? null;
+    }
+    foreach ($flags as $flag) {
+        if ($flag === true || $flag === 1 || $flag === "1" || (is_string($flag) && maketou_is_paid_status($flag))) {
+            return true;
+        }
+    }
+    $event = strtolower(trim((string) ($data["event"] ?? ($data["type"] ?? ($nested["event"] ?? "")))));
+    if ($event !== "" && preg_match("/paid|success|complet|approved|settled/i", $event)) {
+        return true;
+    }
+    return false;
 }
 
 function maketou_extract_status($data) {
@@ -219,7 +266,7 @@ function maketou_verify_ref_with_api($ref) {
         $data = [];
     }
     $status = maketou_extract_status($data);
-    $paid = $code >= 200 && $code < 300 && maketou_is_paid_status($status);
+    $paid = $code >= 200 && $code < 300 && (maketou_is_paid_status($status) || maketou_payload_looks_paid($data));
     return [$paid, $status, $data, $code];
 }
 
@@ -411,14 +458,25 @@ function maketou_collect_subscription_state($email, $uniqueId = "") {
     ];
 }
 
-function maketou_apply_local_subscription($email, $ref, $expiresAt, $paymentDate) {
+function maketou_apply_local_subscription($email, $ref, $expiresAt, $paymentDate, $uniqueId = "") {
     $email = strtolower(trim((string) $email));
     if ($email === "" || strpos($email, "@") === false) {
         return;
     }
     $record = maketou_read_local_member($email);
     if (!is_array($record)) {
-        return;
+        $record = [
+            "email" => $email,
+            "uniqueId" => trim((string) $uniqueId),
+            "name" => "Client",
+            "phone" => "",
+            "passwordHash" => "",
+            "isSubscribed" => true,
+            "registeredAt" => date("Y-m-d")
+        ];
+    }
+    if (trim((string) $uniqueId) !== "" && trim((string) ($record["uniqueId"] ?? "")) === "") {
+        $record["uniqueId"] = trim((string) $uniqueId);
     }
     $record["isSubscribed"] = true;
     $record["paymentDate"] = $paymentDate;
@@ -632,6 +690,69 @@ function maketou_mark_local_member_paid($email, $ref = "") {
     return ["expiresAt" => $expiresAt, "paymentDate" => $paymentDate];
 }
 
+function maketou_carts_for_email($email) {
+    $email = strtolower(trim((string) $email));
+    if ($email === "" || strpos($email, "@") === false) {
+        return [];
+    }
+    $ranked = [];
+    foreach (maketou_read_carts() as $ref => $row) {
+        if (!is_array($row)) {
+            continue;
+        }
+        if (strtolower(trim((string) ($row["email"] ?? ""))) !== $email) {
+            continue;
+        }
+        $ranked[] = [trim((string) $ref), (int) ($row["createdAt"] ?? 0)];
+    }
+    usort($ranked, function ($left, $right) {
+        return $right[1] - $left[1];
+    });
+    $refs = [];
+    foreach ($ranked as $row) {
+        if ($row[0] !== "") {
+            $refs[] = $row[0];
+        }
+    }
+    return $refs;
+}
+
+function maketou_try_unlock_by_email($email) {
+    $email = strtolower(trim((string) $email));
+    if ($email === "" || strpos($email, "@") === false) {
+        return null;
+    }
+    $state = maketou_read_subscription_state($email);
+    if (is_array($state) && !empty($state["active"])) {
+        return [
+            "email" => $email,
+            "ref" => (string) ($state["lastPaymentRef"] ?? "subscription"),
+            "expiresAt" => (string) ($state["expiresAt"] ?? ""),
+            "paymentDate" => (string) ($state["paymentDate"] ?? "")
+        ];
+    }
+    foreach (maketou_carts_for_email($email) as $ref) {
+        [$paid, $status, $data, $code] = maketou_verify_ref_with_api($ref);
+        maketou_log("unlock_by_email_cart", [
+            "email" => $email,
+            "ref" => $ref,
+            "paid" => $paid,
+            "status" => $status,
+            "code" => $code
+        ]);
+        if ($paid) {
+            $activated = maketou_activate_paid_account($ref, $email, $data);
+            return [
+                "email" => (string) ($activated["email"] ?? $email),
+                "ref" => $ref,
+                "expiresAt" => (string) ($activated["expiresAt"] ?? ""),
+                "paymentDate" => (string) ($activated["paymentDate"] ?? "")
+            ];
+        }
+    }
+    return null;
+}
+
 function maketou_mark_supabase_paid_by_unique_id($uniqueId) {
     $expiresAt = maketou_iso_from_ts(time() + (MAKETOU_SUBSCRIPTION_DAYS * 86400));
     maketou_apply_supabase_subscription("", $uniqueId, "", $expiresAt, maketou_now_iso());
@@ -670,11 +791,17 @@ function maketou_activate_paid_account($ref, $requestEmail, $data = []) {
     [$changed, $expiresAt] = maketou_next_expiry_iso($state["expiresAt"], $state["lastPaymentRef"], $ref);
     $paymentDate = $changed ? maketou_now_iso() : ($state["paymentDate"] !== "" ? $state["paymentDate"] : maketou_now_iso());
     if ($email !== "") {
-        maketou_apply_local_subscription($email, $ref, $expiresAt, $paymentDate);
+        maketou_apply_local_subscription($email, $ref, $expiresAt, $paymentDate, $uniqueId);
         maketou_apply_supabase_subscription($email, $uniqueId, $ref, $expiresAt, $paymentDate);
     } elseif ($uniqueId !== "") {
         maketou_apply_supabase_subscription("", $uniqueId, $ref, $expiresAt, $paymentDate);
     }
+    maketou_log("activate", [
+        "ref" => $ref,
+        "email" => $email,
+        "uniqueId" => $uniqueId,
+        "expiresAt" => $expiresAt
+    ]);
     return [
         "email" => $email,
         "expiresAt" => $expiresAt,

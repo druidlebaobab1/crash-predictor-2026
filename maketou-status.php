@@ -15,10 +15,29 @@ if (strtoupper((string) ($_SERVER["REQUEST_METHOD"] ?? "")) !== "GET") {
 $ref = maketou_extract_ref($_GET);
 $email = strtolower(trim((string) ($_GET["email"] ?? "")));
 if ($ref === "") {
+    if ($email !== "") {
+        $unlocked = maketou_try_unlock_by_email($email);
+        if (is_array($unlocked)) {
+            maketou_json_paid(
+                $unlocked["ref"],
+                $unlocked["email"],
+                $unlocked["expiresAt"],
+                $unlocked["paymentDate"]
+            );
+        }
+        maketou_json_denied("unpaid");
+    }
     maketou_json_denied("missing_ref", 400);
 }
 
 [$paid, $cartStatus, $data, $code] = maketou_verify_ref_with_api($ref);
+maketou_log("status_check", [
+    "ref" => $ref,
+    "email" => $email,
+    "paid" => $paid,
+    "status" => $cartStatus,
+    "code" => $code
+]);
 if ($code === 502) {
     maketou_json_denied("network_error", 502);
 }
