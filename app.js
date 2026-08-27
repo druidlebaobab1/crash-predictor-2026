@@ -2074,6 +2074,16 @@ async function restoreVerifiedAccess() {
             notifyExpiredAndInviteRenew(false);
             return false;
         }
+        const paidReturn = await fetchMaketouVerificationByEmail();
+        if (paidReturn && paidReturn.access === true) {
+            await activateMaketouLicense(
+                paidReturn.cartId || "maketou",
+                paidReturn.token,
+                paidReturn.expiresAt,
+                paidReturn.paymentDate
+            );
+            return true;
+        }
     }
     verifiedAccessGranted = false;
     return false;
