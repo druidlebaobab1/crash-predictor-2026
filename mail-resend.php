@@ -244,8 +244,9 @@ function mail_cta($label, $url) {
 function mail_platform_links() {
     $url = htmlspecialchars(RESEND_SITE, ENT_QUOTES, "UTF-8");
     return mail_cta("ACCÉDER À MON ESPACE / SE CONNECTER", RESEND_SITE)
-        . '<p style="text-align:center;margin:14px 0 6px;font-size:15px;line-height:1.6;color:#e5e7eb;">'
-        . '👉 Lien direct vers la plateforme : <a href="' . $url . '" style="color:#ffc837;font-weight:700;text-decoration:underline;word-break:break-all;">' . $url . "</a>"
+        . '<p style="text-align:center;margin:14px 0 4px;font-size:13px;line-height:1.45;color:#e5e7eb;">👉 Lien direct vers la plateforme :</p>'
+        . '<p style="text-align:center;margin:0 0 6px;font-size:13px;line-height:1.4;white-space:nowrap;">'
+        . '<a href="' . $url . '" style="color:#ffc837;font-weight:700;font-size:13px;text-decoration:underline;white-space:nowrap;word-break:keep-all;">' . $url . "</a>"
         . "</p>";
 }
 
@@ -292,7 +293,7 @@ function mail_html_abandon($email, $uniqueId, $name = "") {
         : "Bonjour,";
     $inner = "<p>" . $hello . " vous avez commencé à débloquer PREDICTOR, mais le paiement n’est pas allé au bout.</p>"
         . "<p>Pour <strong style=\"color:#ffc837;\">17 $ par mois</strong>, vous ouvrez Crash, Aviator, Lucky Jet, Mines, Penalty, Apple of Fortune, et le module sport <strong>LE BOSS</strong>.</p>"
-        . "<p>Dernier signal validé : <strong style=\"color:#facc15;\">KAUNO ZALGIRIS @ 9.58</strong>.</p>"
+        . "<p>Les 6 algorithmes live et le module sport <strong>LE BOSS</strong> tournent déjà avec des signaux validés en continu.</p>"
         . ($uniqueId !== "" ? "<p>ID : <strong style=\"color:#ffc837;\">" . $id . "</strong></p>" : "")
         . mail_platform_links();
     return mail_wrap("Votre accès VIP à 17 $ n’est pas encore débloqué.", $inner, $email);
@@ -306,7 +307,7 @@ function mail_html_reactivate($email, $uniqueId, $name = "") {
         : "Bonjour,";
     $inner = "<p>" . $hello . " votre compte PREDICTOR est toujours là, mais la licence n’est pas activée.</p>"
         . ($uniqueId !== "" ? "<p>ID : <strong style=\"color:#ffc837;\">" . $id . "</strong></p>" : "")
-        . "<p>Les 6 algorithmes live et le module sport <strong>LE BOSS</strong> tournent déjà. Dernier signal validé : <strong style=\"color:#facc15;\">KAUNO ZALGIRIS @ 9.58</strong>.</p>"
+        . "<p>Les 6 algorithmes live et le module sport <strong>LE BOSS</strong> tournent déjà avec des signaux validés en continu.</p>"
         . "<p>Débloquez vos signaux VIP pour <strong>17 $ PAR MOIS</strong>.</p>"
         . mail_platform_links();
     return mail_wrap("Reprenez vos signaux VIP sur PREDICTOR.", $inner, $email);
