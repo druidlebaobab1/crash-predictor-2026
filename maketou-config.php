@@ -10,6 +10,7 @@ define("MAKETOU_API_BASE", "https://api.maketou.net");
 define("MAKETOU_SUCCESS_URL", "https://crashpredictor.fr/?payment=success&status=approved");
 define("MAKETOU_SUBSCRIPTION_DAYS", 30);
 define("MAKETOU_TOKEN_TTL", 30 * 24 * 3600);
+define("MAKETOU_REPAIR_KEY", "ADMIN2026");
 define("MAKETOU_SUPABASE_URL", "https://tnxyrvjrxxrsqnpviknz.supabase.co");
 define("MAKETOU_SUPABASE_KEY", "sb_publishable_Hl6nmMnRAM1mfdDdudH2_w_kYIJAXdF");
 
@@ -924,6 +925,52 @@ function maketou_recover_paid_return($source) {
         "ok" => is_array($unlocked)
     ]);
     return $unlocked;
+}
+
+function maketou_repair_paid_unactivated() {
+    $scanned = 0;
+    $paidUnactivated = 0;
+    $activated = 0;
+    $alreadyActive = 0;
+    $memberIds = [];
+    foreach (maketou_read_carts() as $ref => $row) {
+        if (!is_array($row)) {
+            continue;
+        }
+        $scanned++;
+        [$paid, $status, $data] = maketou_verify_ref_with_api((string) $ref);
+        if (!$paid) {
+            continue;
+        }
+        $email = strtolower(trim((string) ($row["email"] ?? "")));
+        $uniqueId = maketou_normalize_member_id($row["uniqueId"] ?? "");
+        $state = $email !== "" ? maketou_read_subscription_state($email, $uniqueId) : null;
+        if (is_array($state) && !empty($state["active"])) {
+            $alreadyActive++;
+            continue;
+        }
+        $paidUnactivated++;
+        $result = maketou_activate_paid_account((string) $ref, $email, $data);
+        if (is_array($result)) {
+            $activated++;
+            if ($uniqueId !== "") {
+                $memberIds[] = $uniqueId;
+            }
+        }
+        maketou_log("repair_activate", [
+            "ref" => (string) $ref,
+            "uniqueId" => $uniqueId,
+            "status" => $status
+        ]);
+    }
+    $memberIds = array_values(array_unique($memberIds));
+    return [
+        "scannedCarts" => $scanned,
+        "alreadyActive" => $alreadyActive,
+        "paidUnactivated" => $paidUnactivated,
+        "activated" => $activated,
+        "memberIds" => $memberIds
+    ];
 }
 
 function maketou_mark_supabase_paid_by_unique_id($uniqueId) {

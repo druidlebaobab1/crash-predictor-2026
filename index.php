@@ -13,6 +13,10 @@ if ($maketouAction === "maketou_webhook") {
     require __DIR__ . "/maketou-webhook.php";
     exit();
 }
+if ($maketouAction === "maketou_repair") {
+    require __DIR__ . "/maketou-repair.php";
+    exit();
+}
 if ($maketouAction === "member_account") {
     require __DIR__ . "/member-account.php";
     exit();
