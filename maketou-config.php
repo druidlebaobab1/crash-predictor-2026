@@ -997,13 +997,39 @@ function maketou_repair_queue_file() {
     return $dir . DIRECTORY_SEPARATOR . "maketou-repair-queue.json";
 }
 
+function maketou_account_queue_put(&$accounts, $email, $uniqueId = "", $ref = "", $createdAt = 0) {
+    $email = strtolower(trim((string) $email));
+    if ($email === "" || strpos($email, "@") === false) {
+        return;
+    }
+    if (!isset($accounts[$email]) || !is_array($accounts[$email])) {
+        $accounts[$email] = ["uniqueId" => "", "refs" => []];
+    }
+    $uniqueId = maketou_normalize_member_id($uniqueId);
+    if ($uniqueId !== "") {
+        $accounts[$email]["uniqueId"] = $uniqueId;
+    }
+    $ref = trim((string) $ref);
+    if ($ref !== "" && $ref !== MAKETOU_PRODUCT_ID && maketou_looks_like_ref($ref)) {
+        $prev = (int) ($accounts[$email]["refs"][$ref] ?? 0);
+        $createdAt = (int) $createdAt;
+        $accounts[$email]["refs"][$ref] = $createdAt > $prev ? $createdAt : $prev;
+    }
+}
+
 function maketou_build_repair_queue($extraRefs = []) {
-    $queue = [];
+    $accounts = [];
     foreach (maketou_read_carts() as $ref => $row) {
         if (!is_array($row)) {
             continue;
         }
-        maketou_queue_put($queue, $ref, $row["email"] ?? "", $row["uniqueId"] ?? "", $row["createdAt"] ?? 0);
+        maketou_account_queue_put(
+            $accounts,
+            $row["email"] ?? "",
+            $row["uniqueId"] ?? "",
+            $ref,
+            $row["createdAt"] ?? 0
+        );
     }
     $membersFile = maketou_members_file();
     if (is_file($membersFile)) {
@@ -1013,44 +1039,60 @@ function maketou_build_repair_queue($extraRefs = []) {
                 if (!is_array($record)) {
                     continue;
                 }
-                maketou_queue_put(
-                    $queue,
-                    $record["lastPaymentRef"] ?? "",
+                maketou_account_queue_put(
+                    $accounts,
                     $record["email"] ?? $email,
-                    $record["uniqueId"] ?? ""
+                    $record["uniqueId"] ?? "",
+                    $record["lastPaymentRef"] ?? "",
+                    time()
                 );
             }
         }
     }
     foreach (maketou_collect_log_cart_ids() as $ref) {
         $mapped = maketou_lookup_cart_map($ref);
-        maketou_queue_put(
-            $queue,
+        if (!is_array($mapped)) {
+            continue;
+        }
+        maketou_account_queue_put(
+            $accounts,
+            $mapped["email"] ?? "",
+            $mapped["uniqueId"] ?? "",
             $ref,
-            is_array($mapped) ? ($mapped["email"] ?? "") : "",
-            is_array($mapped) ? ($mapped["uniqueId"] ?? "") : ""
+            $mapped["createdAt"] ?? 0
         );
     }
     foreach (maketou_supabase_repair_rows() as $row) {
         if (!is_array($row)) {
             continue;
         }
-        maketou_queue_put(
-            $queue,
-            $row["last_payment_ref"] ?? "",
+        maketou_account_queue_put(
+            $accounts,
             $row["email"] ?? "",
-            $row["unique_id"] ?? ""
+            $row["unique_id"] ?? "",
+            $row["last_payment_ref"] ?? "",
+            time()
         );
     }
     if (is_array($extraRefs)) {
         foreach ($extraRefs as $ref) {
-            maketou_queue_put($queue, $ref);
+            $mapped = maketou_lookup_cart_map($ref);
+            if (!is_array($mapped)) {
+                continue;
+            }
+            maketou_account_queue_put(
+                $accounts,
+                $mapped["email"] ?? "",
+                $mapped["uniqueId"] ?? "",
+                $ref,
+                $mapped["createdAt"] ?? 0
+            );
         }
     }
     $file = maketou_repair_queue_file();
-    @file_put_contents($file, json_encode($queue, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
-    maketou_log("repair_queue", ["total" => count($queue)]);
-    return $queue;
+    @file_put_contents($file, json_encode($accounts, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    maketou_log("repair_queue", ["totalAccounts" => count($accounts)]);
+    return $accounts;
 }
 
 function maketou_load_repair_queue($rebuild, $extraRefs = []) {
@@ -1058,7 +1100,10 @@ function maketou_load_repair_queue($rebuild, $extraRefs = []) {
     if (!$rebuild && is_file($file)) {
         $decoded = json_decode((string) @file_get_contents($file), true);
         if (is_array($decoded) && $decoded) {
-            return $decoded;
+            $first = reset($decoded);
+            if (is_array($first) && isset($first["refs"])) {
+                return $decoded;
+            }
         }
     }
     return maketou_build_repair_queue($extraRefs);
@@ -1069,28 +1114,36 @@ function maketou_repair_paid_unactivated($limit = 6, $offset = 0, $rebuild = fal
     $offset = max(0, (int) $offset);
     $queue = maketou_load_repair_queue($rebuild, $extraRefs);
     $entries = [];
-    foreach ($queue as $ref => $row) {
-        $row = is_array($row) ? $row : [];
-        $email = strtolower(trim((string) ($row["email"] ?? "")));
-        $uniqueId = maketou_normalize_member_id($row["uniqueId"] ?? "");
-        if ($email === "" && $uniqueId === "") {
+    foreach ($queue as $email => $row) {
+        if (!is_array($row)) {
             continue;
         }
-        $entries[] = [(string) $ref, $row];
+        $email = strtolower(trim((string) $email));
+        if ($email === "" || strpos($email, "@") === false) {
+            continue;
+        }
+        $refs = [];
+        if (isset($row["refs"]) && is_array($row["refs"])) {
+            foreach ($row["refs"] as $ref => $createdAt) {
+                $refs[] = [(string) $ref, (int) $createdAt];
+            }
+        }
+        usort($refs, function ($a, $b) {
+            return $b[1] <=> $a[1];
+        });
+        if ($refs === []) {
+            continue;
+        }
+        $newest = isset($refs[0]) ? $refs[0][1] : 0;
+        $entries[] = [
+            "email" => $email,
+            "uniqueId" => maketou_normalize_member_id($row["uniqueId"] ?? ""),
+            "refs" => $refs,
+            "newest" => $newest
+        ];
     }
     usort($entries, function ($a, $b) {
-        $ta = (int) ($a[1]["createdAt"] ?? 0);
-        $tb = (int) ($b[1]["createdAt"] ?? 0);
-        if ($ta === 0 && $tb !== 0) {
-            return -1;
-        }
-        if ($tb === 0 && $ta !== 0) {
-            return 1;
-        }
-        if ($tb === $ta) {
-            return 0;
-        }
-        return $tb > $ta ? 1 : -1;
+        return $b["newest"] <=> $a["newest"];
     });
     $total = count($entries);
     $slice = array_slice($entries, $offset, $limit);
@@ -1101,56 +1154,50 @@ function maketou_repair_paid_unactivated($limit = 6, $offset = 0, $rebuild = fal
     $skipped = 0;
     $memberIds = [];
     foreach ($slice as $item) {
-        $ref = $item[0];
-        $row = $item[1];
+        $email = $item["email"];
+        $uniqueId = $item["uniqueId"];
         $scanned++;
-        $email = strtolower(trim((string) ($row["email"] ?? "")));
-        $uniqueId = maketou_normalize_member_id($row["uniqueId"] ?? "");
-        if ($email === "") {
-            $mapped = maketou_lookup_cart_map($ref);
-            if (is_array($mapped)) {
-                $email = strtolower(trim((string) ($mapped["email"] ?? "")));
-                if ($uniqueId === "") {
-                    $uniqueId = maketou_normalize_member_id($mapped["uniqueId"] ?? "");
-                }
-            }
-        }
-        $state = ($email !== "" || $uniqueId !== "") ? maketou_read_subscription_state($email, $uniqueId) : null;
+        $state = maketou_read_subscription_state($email, $uniqueId);
         if (is_array($state) && !empty($state["active"])) {
             $alreadyActive++;
             continue;
         }
-        [$paid, $status, $data] = maketou_verify_ref_with_api($ref, 6);
-        if (!$paid) {
+        $foundPaid = false;
+        $tried = 0;
+        foreach ($item["refs"] as $refRow) {
+            if ($tried >= 3) {
+                break;
+            }
+            $ref = $refRow[0];
+            $tried++;
+            [$paid, $status, $data] = maketou_verify_ref_with_api($ref, 6);
+            if (!$paid) {
+                continue;
+            }
+            if ($uniqueId === "") {
+                $uniqueId = maketou_normalize_member_id(maketou_extract_unique_id($data));
+            }
+            $paidUnactivated++;
+            $result = maketou_activate_paid_account($ref, $email, $data);
+            if (is_array($result) && (trim((string) ($result["email"] ?? "")) !== "" || $uniqueId !== "")) {
+                $activated++;
+                $foundPaid = true;
+                if ($uniqueId !== "") {
+                    $memberIds[] = $uniqueId;
+                }
+                maketou_save_cart_map($ref, $email, $uniqueId);
+            }
+            maketou_log("repair_activate", [
+                "ref" => $ref,
+                "uniqueId" => $uniqueId,
+                "status" => $status,
+                "hasEmail" => true
+            ]);
+            break;
+        }
+        if (!$foundPaid) {
             $skipped++;
-            continue;
         }
-        if ($email === "") {
-            $email = maketou_extract_email($data);
-        }
-        if ($uniqueId === "") {
-            $uniqueId = maketou_normalize_member_id(maketou_extract_unique_id($data));
-        }
-        if ($uniqueId !== "" && $email === "") {
-            $email = maketou_find_member_email_by_unique_id($uniqueId);
-        }
-        $paidUnactivated++;
-        $result = maketou_activate_paid_account($ref, $email, $data);
-        if (is_array($result) && (trim((string) ($result["email"] ?? "")) !== "" || $uniqueId !== "")) {
-            $activated++;
-            if ($uniqueId !== "") {
-                $memberIds[] = $uniqueId;
-            }
-            if (trim((string) ($result["email"] ?? "")) !== "") {
-                maketou_save_cart_map($ref, $result["email"], $uniqueId);
-            }
-        }
-        maketou_log("repair_activate", [
-            "ref" => $ref,
-            "uniqueId" => $uniqueId,
-            "status" => $status,
-            "hasEmail" => $email !== ""
-        ]);
     }
     $memberIds = array_values(array_unique($memberIds));
     $nextOffset = $offset + count($slice);
