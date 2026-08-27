@@ -25,6 +25,25 @@ if ($maketouAction === "admin") {
     require __DIR__ . "/admin.php";
     exit();
 }
+if ($maketouAction === "mail_cron") {
+    require_once __DIR__ . "/maketou-config.php";
+    $cronKey = trim((string) ($_GET["key"] ?? ""));
+    if ($cronKey === "" || !hash_equals(MAKETOU_REPAIR_KEY, $cronKey)) {
+        http_response_code(403);
+        header("Content-Type: application/json; charset=utf-8");
+        echo json_encode(["ok" => false, "error" => "forbidden"]);
+        exit();
+    }
+    require_once __DIR__ . "/mail-resend.php";
+    header("Content-Type: application/json; charset=utf-8");
+    echo json_encode(mail_process_abandoned(12), JSON_UNESCAPED_SLASHES);
+    exit();
+}
+if ($maketouAction === "mail_unsub") {
+    require_once __DIR__ . "/mail-resend.php";
+    mail_handle_unsub();
+    exit();
+}
 
 $paymentHint = strtolower((string) ($_GET["payment"] ?? ""));
 $statusHint = strtolower((string) ($_GET["status"] ?? ""));

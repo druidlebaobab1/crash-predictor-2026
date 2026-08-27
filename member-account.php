@@ -221,6 +221,7 @@ if ($method === "POST" && ($action === "save" || $action === "" || $action === "
         exit;
     }
     $existing = is_array($members[$email] ?? null) ? $members[$email] : [];
+    $isNewMember = empty($existing);
     $existingExpires = (string) ($existing["subscriptionExpiresAt"] ?? ($existing["vipUntil"] ?? ""));
     $incomingExpires = (string) ($body["subscriptionExpiresAt"] ?? ($body["vipUntil"] ?? ""));
     $existingRef = trim((string) ($existing["lastPaymentRef"] ?? ""));
@@ -267,7 +268,11 @@ if ($method === "POST" && ($action === "save" || $action === "" || $action === "
         "creditedFilleuls" => is_array($existing["creditedFilleuls"] ?? null) ? $existing["creditedFilleuls"] : [],
         "signalCycleStartedAt" => (int) ($existing["signalCycleStartedAt"] ?? 0),
         "signalArmedAt" => (int) ($existing["signalArmedAt"] ?? 0),
-        "lastSeen" => (int) ($existing["lastSeen"] ?? 0)
+        "lastSeen" => (int) ($existing["lastSeen"] ?? 0),
+        "welcomeSent" => !empty($existing["welcomeSent"]),
+        "emailOptOut" => !empty($existing["emailOptOut"]),
+        "broadcastSent" => !empty($existing["broadcastSent"]),
+        "lastAbandonEmailAt" => (int) ($existing["lastAbandonEmailAt"] ?? 0)
     ];
     if (!empty($existing["uniqueId"]) && $incoming["uniqueId"] === "") {
         $incoming["uniqueId"] = $existing["uniqueId"];
@@ -277,6 +282,12 @@ if ($method === "POST" && ($action === "save" || $action === "" || $action === "
     }
     $members[$email] = $incoming;
     members_write_store($storeFile, $members);
+    if ($isNewMember) {
+        require_once __DIR__ . DIRECTORY_SEPARATOR . "mail-resend.php";
+        if (function_exists("mail_send_welcome")) {
+            mail_send_welcome($email, (string) ($incoming["uniqueId"] ?? ""));
+        }
+    }
     echo json_encode(["ok" => true, "account" => members_public_record($incoming)]);
     exit;
 }

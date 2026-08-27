@@ -31,7 +31,7 @@ function admin_wants_json() {
     }
     return strpos($accept, "application/json") !== false
         || $x === "xmlhttprequest"
-        || in_array($action, ["login", "logout", "stats", "members", "toggle"], true);
+        || in_array($action, ["login", "logout", "stats", "members", "toggle", "broadcast", "resend_key"], true);
 }
 
 function admin_body() {
@@ -319,12 +319,15 @@ if ($action === "logout") {
     admin_json(["ok" => true]);
 }
 
-if (in_array($action, ["stats", "members", "toggle"], true) && !admin_logged_in()) {
+if (in_array($action, ["stats", "members", "toggle", "broadcast", "resend_key"], true) && !admin_logged_in()) {
     admin_json(["ok" => false, "error" => "unauthorized"], 401);
 }
 
 if ($action === "stats") {
-    admin_json(["ok" => true, "stats" => admin_collect_stats(), "logs" => admin_logs()]);
+    require_once __DIR__ . "/mail-resend.php";
+    $stats = admin_collect_stats();
+    $stats["resendConfigured"] = mail_is_configured();
+    admin_json(["ok" => true, "stats" => $stats, "logs" => admin_logs()]);
 }
 
 if ($action === "members") {
@@ -334,6 +337,21 @@ if ($action === "members") {
 if ($action === "toggle") {
     $ok = admin_toggle($body["email"] ?? "", $body["uniqueId"] ?? "", !empty($body["active"]));
     admin_json(["ok" => $ok]);
+}
+
+if ($action === "broadcast") {
+    require_once __DIR__ . "/mail-resend.php";
+    if (!mail_is_configured()) {
+        admin_json(["ok" => false, "error" => "resend_missing"]);
+    }
+    $offset = (int) ($body["offset"] ?? 0);
+    admin_json(mail_broadcast_inactive(8, $offset));
+}
+
+if ($action === "resend_key") {
+    require_once __DIR__ . "/mail-resend.php";
+    $ok = mail_save_api_key($body["apiKey"] ?? "");
+    admin_json(["ok" => $ok, "configured" => mail_is_configured()], $ok ? 200 : 400);
 }
 
 $logged = admin_logged_in();
@@ -392,6 +410,20 @@ $logged = admin_logged_in();
             <button type="button" class="btn-primary" id="adminLogout">Déconnexion</button>
         </div>
         <div class="admin-stats" id="adminStats"></div>
+        <div class="admin-card">
+            <h2 style="color:#ffc837;font-size:1rem;">Emails Resend</h2>
+            <p id="adminResendState" style="color:#9ca3af;margin:8px 0 12px;">Vérification de la clé d’envoi…</p>
+            <div class="form-group" style="max-width:520px;">
+                <label for="adminResendKey">Clé API Resend</label>
+                <input type="password" id="adminResendKey" class="form-control-dark" autocomplete="off" placeholder="re_…">
+            </div>
+            <button type="button" class="btn-primary" id="adminResendSave" style="margin-top:10px;">Enregistrer la clé</button>
+            <hr style="border:0;border-top:1px solid rgba(255,200,55,.2);margin:18px 0;">
+            <h2 style="color:#ffc837;font-size:1rem;">Campagne de réactivation</h2>
+            <p style="color:#9ca3af;margin:8px 0 14px;">Envoie un email unique aux membres actuellement <strong style="color:#fecaca;">NON ACTIVÉ</strong>. L’envoi se fait par petits lots.</p>
+            <button type="button" class="btn-primary" id="adminBroadcastBtn">Envoyer la campagne de réactivation</button>
+            <p id="adminBroadcastStatus" style="color:#cbd5e1;margin-top:10px;"></p>
+        </div>
         <div class="admin-card">
             <h2 style="color:#ffc837;font-size:1rem;">Licences / Membres</h2>
             <input type="search" id="adminSearch" class="form-control-dark admin-search" placeholder="Rechercher par ID (CRASH-XXXXXXX) ou email">
@@ -485,6 +517,13 @@ $logged = admin_logged_in();
             <div class="admin-stat"><span>Paiements / licences</span><strong>${s.paidLicenses || 0}</strong></div>
             <div class="admin-stat"><span>Paniers non finalisés</span><strong>${s.abandonedCarts || 0}</strong></div>
         `;
+        const resendState = document.getElementById("adminResendState");
+        if (resendState) {
+            resendState.textContent = s.resendConfigured
+                ? "Clé Resend enregistrée sur le serveur. Les emails transactionnels sont actifs."
+                : "Collez une seule fois la clé API Resend pour activer les emails (elle n’est pas stockée dans GitHub).";
+            resendState.style.color = s.resendConfigured ? "#86efac" : "#fca5a5";
+        }
         document.getElementById("adminLogs").textContent = ((pack && pack.logs) || []).join("\n") || "Aucun log récent.";
         const members = await api({ action: "members", q });
         renderMembers((members && members.members) || []);
@@ -498,6 +537,52 @@ $logged = admin_logged_in();
         });
         loadAll();
         setInterval(() => loadAll(search.value), 20000);
+    }
+    const resendSave = document.getElementById("adminResendSave");
+    if (resendSave) {
+        resendSave.addEventListener("click", async () => {
+            const input = document.getElementById("adminResendKey");
+            const status = document.getElementById("adminResendState");
+            const data = await api({ action: "resend_key", apiKey: (input && input.value) || "" });
+            if (data && data.ok) {
+                if (input) input.value = "";
+                if (status) {
+                    status.textContent = "Clé Resend enregistrée sur le serveur. Les emails transactionnels sont actifs.";
+                    status.style.color = "#86efac";
+                }
+            } else if (status) {
+                status.textContent = "Clé invalide. Elle doit commencer par re_";
+                status.style.color = "#fca5a5";
+            }
+        });
+    }
+    const broadcastBtn = document.getElementById("adminBroadcastBtn");
+    if (broadcastBtn) {
+        broadcastBtn.addEventListener("click", async () => {
+            if (!window.confirm("Envoyer l'email de réactivation à tous les membres NON ACTIVÉ ?")) return;
+            const status = document.getElementById("adminBroadcastStatus");
+            broadcastBtn.disabled = true;
+            let offset = 0;
+            let totalSent = 0;
+            let total = 0;
+            try {
+                while (true) {
+                    const data = await api({ action: "broadcast", offset });
+                    if (!data || !data.ok) {
+                        if (status) status.textContent = "Envoi interrompu. Réessayez.";
+                        break;
+                    }
+                    totalSent += Number(data.sent || 0);
+                    if (!total) total = Number(data.total || 0);
+                    if (status) status.textContent = "Envoyés : " + totalSent + " / " + total;
+                    if (!data.hasMore) break;
+                    offset = Number(data.nextOffset || 0);
+                    await new Promise((resolve) => setTimeout(resolve, 400));
+                }
+            } finally {
+                broadcastBtn.disabled = false;
+            }
+        });
     }
     </script>
 </body>

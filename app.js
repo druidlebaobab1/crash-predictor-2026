@@ -924,6 +924,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     startSubscriptionGuard();
     await verifyMaketouReturn();
     startMaketouPaymentWatch();
+    consumeCheckoutDeepLink();
     initPwaInstall();
     initCodeStreams();
     initPredictorGameSuite();
@@ -4120,6 +4121,18 @@ function startMaketouPaymentWatch() {
         }
         verifyMaketouReturn();
     }, 3000);
+}
+
+function consumeCheckoutDeepLink() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("checkout") !== "1") return;
+    if (hasMaketouReturnHint(params)) return;
+    params.delete("checkout");
+    const qs = params.toString();
+    const next = window.location.pathname + (qs ? "?" + qs : "") + (window.location.hash || "");
+    try { window.history.replaceState({}, document.title, next); } catch {}
+    if (verifiedAccessGranted) return;
+    startMaketouCheckout();
 }
 
 async function startMaketouCheckout() {

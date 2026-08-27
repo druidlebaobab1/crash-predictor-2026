@@ -244,6 +244,10 @@ if ($looksLikeCreate) {
 
     if ($status >= 200 && $status < 300 && $redirectUrl !== "") {
         maketou_save_cart_map($newCartId, $email, $uniqueId !== "" ? $uniqueId : $metaId);
+        require_once __DIR__ . DIRECTORY_SEPARATOR . "mail-resend.php";
+        if (function_exists("mail_on_checkout")) {
+            mail_on_checkout($newCartId, $email, $uniqueId !== "" ? $uniqueId : $metaId);
+        }
         maketou_log("checkout_create", [
             "email" => $email,
             "uniqueId" => $uniqueId !== "" ? $uniqueId : $metaId,

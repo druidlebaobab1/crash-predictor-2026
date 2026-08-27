@@ -9,6 +9,7 @@ data/maketou-carts.json
 data/maketou-repair-queue.json
 data/members.json
 data/admin-lock.json
+data/mail-secrets.php
 data/*.tmp
 data/*.sqlite
 

@@ -620,11 +620,12 @@ function maketou_save_cart_map($ref, $email, $uniqueId = "") {
         return;
     }
     $carts = maketou_read_carts();
-    $carts[$ref] = [
+    $prev = is_array($carts[$ref] ?? null) ? $carts[$ref] : [];
+    $carts[$ref] = array_merge($prev, [
         "email" => $email,
         "uniqueId" => trim((string) $uniqueId),
-        "createdAt" => time()
-    ];
+        "createdAt" => (int) ($prev["createdAt"] ?? time())
+    ]);
     maketou_write_carts($carts);
 }
 
@@ -1304,6 +1305,10 @@ function maketou_activate_paid_account($ref, $requestEmail, $data = []) {
         "uniqueId" => $uniqueId,
         "expiresAt" => $expiresAt
     ]);
+    require_once __DIR__ . DIRECTORY_SEPARATOR . "mail-resend.php";
+    if (function_exists("mail_on_paid")) {
+        mail_on_paid($email, $ref);
+    }
     return [
         "email" => $email,
         "expiresAt" => $expiresAt,
