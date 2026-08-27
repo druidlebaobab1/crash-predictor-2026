@@ -1039,12 +1039,16 @@ function maketou_build_repair_queue($extraRefs = []) {
                 if (!is_array($record)) {
                     continue;
                 }
+                $subscribed = !empty($record["isSubscribed"]);
+                if ($subscribed) {
+                    continue;
+                }
                 maketou_account_queue_put(
                     $accounts,
                     $record["email"] ?? $email,
                     $record["uniqueId"] ?? "",
                     $record["lastPaymentRef"] ?? "",
-                    time()
+                    0
                 );
             }
         }
@@ -1066,12 +1070,15 @@ function maketou_build_repair_queue($extraRefs = []) {
         if (!is_array($row)) {
             continue;
         }
+        if (!empty($row["is_subscribed"])) {
+            continue;
+        }
         maketou_account_queue_put(
             $accounts,
             $row["email"] ?? "",
             $row["unique_id"] ?? "",
             $row["last_payment_ref"] ?? "",
-            time()
+            0
         );
     }
     if (is_array($extraRefs)) {
@@ -1146,31 +1153,41 @@ function maketou_repair_paid_unactivated($limit = 6, $offset = 0, $rebuild = fal
         return $b["newest"] <=> $a["newest"];
     });
     $total = count($entries);
-    $slice = array_slice($entries, $offset, $limit);
     $scanned = 0;
     $paidUnactivated = 0;
     $activated = 0;
     $alreadyActive = 0;
     $skipped = 0;
     $memberIds = [];
-    foreach ($slice as $item) {
+    $index = $offset;
+    $apiBudget = 8;
+    while ($index < $total && ($apiBudget > 0 || $scanned < 20)) {
+        $item = $entries[$index];
         $email = $item["email"];
         $uniqueId = $item["uniqueId"];
-        $scanned++;
         $state = maketou_read_subscription_state($email, $uniqueId);
         if (is_array($state) && !empty($state["active"])) {
             $alreadyActive++;
+            $scanned++;
+            $index++;
+            if ($scanned >= 20 && $apiBudget === 8) {
+                break;
+            }
             continue;
+        }
+        if ($apiBudget <= 0) {
+            break;
         }
         $foundPaid = false;
         $tried = 0;
         foreach ($item["refs"] as $refRow) {
-            if ($tried >= 3) {
+            if ($tried >= 8 || $apiBudget <= 0) {
                 break;
             }
             $ref = $refRow[0];
             $tried++;
-            [$paid, $status, $data] = maketou_verify_ref_with_api($ref, 6);
+            $apiBudget--;
+            [$paid, $status, $data] = maketou_verify_ref_with_api($ref, 5);
             if (!$paid) {
                 continue;
             }
@@ -1195,12 +1212,13 @@ function maketou_repair_paid_unactivated($limit = 6, $offset = 0, $rebuild = fal
             ]);
             break;
         }
+        $scanned++;
         if (!$foundPaid) {
             $skipped++;
         }
+        $index++;
     }
     $memberIds = array_values(array_unique($memberIds));
-    $nextOffset = $offset + count($slice);
     return [
         "scannedCarts" => $scanned,
         "totalCarts" => $total,
@@ -1209,8 +1227,8 @@ function maketou_repair_paid_unactivated($limit = 6, $offset = 0, $rebuild = fal
         "activated" => $activated,
         "unpaidOrUnknown" => $skipped,
         "memberIds" => $memberIds,
-        "hasMore" => $nextOffset < $total,
-        "nextOffset" => $nextOffset,
+        "hasMore" => $index < $total,
+        "nextOffset" => $index,
         "expectedPaid" => 19
     ];
 }
