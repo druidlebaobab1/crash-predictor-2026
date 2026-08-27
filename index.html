@@ -80,7 +80,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=Orbitron:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=u76">
+    <link rel="stylesheet" href="style.css?v=u77">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 </head>
 <body class="dark-theme">
@@ -423,7 +423,7 @@
                 <div class="footer-copy"><span>&copy; <span class="notranslate" translate="no">PREDICTOR</span></span>. <span data-i18n="footer_rights">Tous droits réservés.</span></div>
             </div>
         </footer>
-        <a class="xbet-cta-banner" href="https://1xbet.com/" target="_blank" rel="noopener noreferrer">
+        <a class="xbet-cta-banner" href="https://reffpa.com/L?tag=d_2310901m_1573c_DTR&amp;site=2310901&amp;ad=1573" target="_blank" rel="noopener noreferrer">
             <span class="xbet-cta-copy">
                 <span class="xbet-cta-text" data-i18n="xbet_cta">PARIEZ AVEC NOS PRÉDICTIONS SUR 1XBET</span>
                 <i class="fa-solid fa-chevron-right xbet-cta-arrow" aria-hidden="true"></i>
@@ -677,7 +677,7 @@
                 </div>
             </div>
         </main>
-        <a class="xbet-cta-banner" href="https://1xbet.com/" target="_blank" rel="noopener noreferrer">
+        <a class="xbet-cta-banner" href="https://reffpa.com/L?tag=d_2310901m_1573c_DTR&amp;site=2310901&amp;ad=1573" target="_blank" rel="noopener noreferrer">
             <span class="xbet-cta-copy">
                 <span class="xbet-cta-text" data-i18n="xbet_cta">PARIEZ AVEC NOS PRÉDICTIONS SUR 1XBET</span>
                 <i class="fa-solid fa-chevron-right xbet-cta-arrow" aria-hidden="true"></i>
@@ -714,10 +714,10 @@
                 </div>
 
                 <div class="profile-section-group">
-                    <label class="section-field-label" for="profilePhoneInput"><i class="fa-solid fa-phone" aria-hidden="true"></i> <span data-i18n="lbl_phone">Numéro de téléphone / WhatsApp</span></label>
+                    <label class="section-field-label" for="profilePhoneInput"><i class="fa-solid fa-phone" aria-hidden="true"></i> <span data-i18n="lbl_phone">Numéro de téléphone</span></label>
                     <div class="phone-input-row">
                         <input type="tel" id="profilePhoneInput" placeholder="+1 (555) 000-0000" class="form-control-dark" autocomplete="tel">
-                        <button type="button" class="btn-save-mini" id="btnSavePhone" data-i18n="btn_save">Enregistrer</button>
+                        <button type="button" class="btn-save-mini" id="btnSavePhone"><span data-i18n="btn_save">Enregistrer</span></button>
                     </div>
                 </div>
 
@@ -763,7 +763,21 @@
                 </div>
                 <div class="form-group">
                     <label for="regPassword"><i class="fa-solid fa-lock" aria-hidden="true"></i> <span data-i18n="reg_pass_lbl">Mot de passe</span></label>
-                    <input type="password" id="regPassword" placeholder="Au moins 6 caractères" data-i18n-placeholder="ph_pass_min" required autocomplete="new-password" minlength="6">
+                    <div class="password-field">
+                        <input type="password" id="regPassword" placeholder="Au moins 6 caractères" data-i18n-placeholder="ph_pass_min" required autocomplete="new-password" minlength="6">
+                        <button type="button" class="password-toggle" data-password-toggle="regPassword" aria-label="Afficher le mot de passe" aria-pressed="false">
+                            <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="regConfirmPassword"><i class="fa-solid fa-lock" aria-hidden="true"></i> <span data-i18n="reg_confirm_lbl">Confirmer le mot de passe</span></label>
+                    <div class="password-field">
+                        <input type="password" id="regConfirmPassword" placeholder="Confirmer le mot de passe" data-i18n-placeholder="ph_confirm_reg" required autocomplete="new-password" minlength="6">
+                        <button type="button" class="password-toggle" data-password-toggle="regConfirmPassword" aria-label="Afficher le mot de passe" aria-pressed="false">
+                            <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                        </button>
+                    </div>
                 </div>
                 <button type="submit" class="btn-primary btn-block" id="registerSubmitBtn">
                     <i class="fa-solid fa-check" aria-hidden="true"></i> <span data-i18n="reg_submit">Valider mon inscription</span>
@@ -794,7 +808,12 @@
                 </div>
                 <div class="form-group">
                     <label for="loginPassword"><i class="fa-solid fa-lock" aria-hidden="true"></i> <span data-i18n="login_pass_lbl">Mot de passe</span></label>
-                    <input type="password" id="loginPassword" placeholder="Votre mot de passe" data-i18n-placeholder="ph_pass" required autocomplete="current-password">
+                    <div class="password-field">
+                        <input type="password" id="loginPassword" placeholder="Votre mot de passe" data-i18n-placeholder="ph_pass" required autocomplete="current-password">
+                        <button type="button" class="password-toggle" data-password-toggle="loginPassword" aria-label="Afficher le mot de passe" aria-pressed="false">
+                            <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                        </button>
+                    </div>
                 </div>
                 <button type="submit" class="btn-primary btn-block" id="loginSubmitBtn">
                     <i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i> <span data-i18n="login_submit">Se connecter</span>
@@ -996,7 +1015,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=u72" defer></script>
+    <script src="app.js?v=u73" defer></script>
     <script src="ambient-audio.js?v=9" defer></script>
     <script src="fire-embers.js?v=2" defer></script>
 </body>

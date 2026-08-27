@@ -202,8 +202,10 @@ const TRANSLATIONS = {
         profile_license_status: "Statut de votre licence",
         status_unsubscribed: "NON ACTIVÉ",
         status_activated_vip: "ACTIVÉ / VIP",
-        lbl_phone: "Numéro de téléphone / WhatsApp",
+        lbl_phone: "Numéro de téléphone",
         btn_save: "Enregistrer",
+        btn_saved: "Enregistré ✅",
+        btn_edit: "Modifier",
         lbl_update_pass: "Modifier mon mot de passe",
         btn_update: "Mettre à jour",
         btn_profile_unlock: "Débloquer mon accès complet – 17 $",
@@ -213,6 +215,7 @@ const TRANSLATIONS = {
         reg_name_lbl: "Nom ou pseudonyme",
         reg_email_lbl: "Adresse email",
         reg_pass_lbl: "Mot de passe",
+        reg_confirm_lbl: "Confirmer le mot de passe",
         reg_submit: "Valider mon inscription",
         already_registered: "Déjà inscrit ?",
         switch_login: "Se connecter",
@@ -236,6 +239,7 @@ const TRANSLATIONS = {
         ph_name: "Ex: Alex_Trader",
         ph_email: "nom@exemple.com",
         ph_pass_min: "Au moins 6 caractères",
+        ph_confirm_reg: "Confirmer le mot de passe",
         ph_login_id: "nom@exemple.com",
         ph_pass: "Votre mot de passe",
         ph_old_pass: "Mot de passe actuel",
@@ -351,8 +355,10 @@ const TRANSLATIONS = {
         profile_license_status: "License Status",
         status_unsubscribed: "NOT ACTIVATED",
         status_activated_vip: "ACTIVATED / VIP",
-        lbl_phone: "Phone / WhatsApp number",
+        lbl_phone: "Phone number",
         btn_save: "Save",
+        btn_saved: "Saved ✅",
+        btn_edit: "Edit",
         lbl_update_pass: "Change Password",
         btn_update: "Update",
         btn_profile_unlock: "Unlock Full Access – $17",
@@ -362,6 +368,7 @@ const TRANSLATIONS = {
         reg_name_lbl: "Full Name or Username",
         reg_email_lbl: "Email Address",
         reg_pass_lbl: "Password",
+        reg_confirm_lbl: "Confirm password",
         reg_submit: "Complete Registration",
         already_registered: "Already registered?",
         switch_login: "Login here",
@@ -385,6 +392,7 @@ const TRANSLATIONS = {
         ph_name: "E.g. Alex_Trader",
         ph_email: "name@example.com",
         ph_pass_min: "At least 6 characters",
+        ph_confirm_reg: "Confirm password",
         ph_login_id: "name@example.com",
         ph_pass: "Your password",
         ph_old_pass: "Current password",
@@ -500,8 +508,10 @@ const TRANSLATIONS = {
         profile_license_status: "Estado de Licencia",
         status_unsubscribed: "NO ACTIVADO",
         status_activated_vip: "ACTIVADO / VIP",
-        lbl_phone: "Teléfono / WhatsApp",
+        lbl_phone: "Número de teléfono",
         btn_save: "Guardar",
+        btn_saved: "Guardado ✅",
+        btn_edit: "Modificar",
         lbl_update_pass: "Cambiar Contraseña",
         btn_update: "Actualizar",
         btn_profile_unlock: "Desbloquear acceso completo – 17 $",
@@ -511,6 +521,7 @@ const TRANSLATIONS = {
         reg_name_lbl: "Nombre o Alias",
         reg_email_lbl: "Correo Electrónico",
         reg_pass_lbl: "Contraseña",
+        reg_confirm_lbl: "Confirmar contraseña",
         reg_submit: "Validar mi registro",
         already_registered: "¿Ya está registrado?",
         switch_login: "Iniciar sesión aquí",
@@ -534,6 +545,7 @@ const TRANSLATIONS = {
         ph_name: "Ej: Alex_Trader",
         ph_email: "nombre@ejemplo.com",
         ph_pass_min: "Al menos 6 caracteres",
+        ph_confirm_reg: "Confirmar contraseña",
         ph_login_id: "nombre@ejemplo.com",
         ph_pass: "Su contraseña",
         ph_old_pass: "Contraseña actual",
@@ -649,8 +661,10 @@ const TRANSLATIONS = {
         profile_license_status: "Estado da Licença",
         status_unsubscribed: "NÃO ATIVADO",
         status_activated_vip: "ATIVADO / VIP",
-        lbl_phone: "Telefone / WhatsApp",
+        lbl_phone: "Número de telefone",
         btn_save: "Guardar",
+        btn_saved: "Guardado ✅",
+        btn_edit: "Alterar",
         lbl_update_pass: "Alterar Palavra-passe",
         btn_update: "Atualizar",
         btn_profile_unlock: "Desbloquear Acesso – 17 $",
@@ -660,6 +674,7 @@ const TRANSLATIONS = {
         reg_name_lbl: "Nome ou Pseudónimo",
         reg_email_lbl: "Endereço de Email",
         reg_pass_lbl: "Palavra-passe",
+        reg_confirm_lbl: "Confirmar palavra-passe",
         reg_submit: "Validar Registo",
         already_registered: "Já tem conta?",
         switch_login: "Entrar aqui",
@@ -683,6 +698,7 @@ const TRANSLATIONS = {
         ph_name: "Ex: Alex_Trader",
         ph_email: "nome@exemplo.com",
         ph_pass_min: "Pelo menos 6 caracteres",
+        ph_confirm_reg: "Confirmar palavra-passe",
         ph_login_id: "nome@exemplo.com",
         ph_pass: "Sua palavra-passe",
         ph_old_pass: "Palavra-passe atual",
@@ -798,8 +814,10 @@ const TRANSLATIONS = {
         profile_license_status: "Lizenzstatus",
         status_unsubscribed: "NICHT AKTIVIERT",
         status_activated_vip: "AKTIVIERT / VIP",
-        lbl_phone: "Telefon / WhatsApp",
+        lbl_phone: "Telefonnummer",
         btn_save: "Speichern",
+        btn_saved: "Gespeichert ✅",
+        btn_edit: "Bearbeiten",
         lbl_update_pass: "Passwort ändern",
         btn_update: "Aktualisieren",
         btn_profile_unlock: "Zugang freischalten – 17 $",
@@ -809,6 +827,7 @@ const TRANSLATIONS = {
         reg_name_lbl: "Name oder Benutzername",
         reg_email_lbl: "E-Mail-Adresse",
         reg_pass_lbl: "Passwort",
+        reg_confirm_lbl: "Passwort bestätigen",
         reg_submit: "Registrierung abschließen",
         already_registered: "Bereits registriert?",
         switch_login: "Hier anmelden",
@@ -832,6 +851,7 @@ const TRANSLATIONS = {
         ph_name: "Z.B. Alex_Trader",
         ph_email: "name@beispiel.de",
         ph_pass_min: "Mindestens 6 Zeichen",
+        ph_confirm_reg: "Passwort bestätigen",
         ph_login_id: "name@beispiel.de",
         ph_pass: "Ihr Passwort",
         ph_old_pass: "Aktuelles Passwort",
@@ -1346,20 +1366,44 @@ function displayMemberId() {
     return sanitize7DigitId(currentUser && currentUser.uniqueId) || readPersistedMemberId();
 }
 
+function pickPasswordHash() {
+    for (let i = 0; i < arguments.length; i++) {
+        const hash = String(arguments[i] || "").trim();
+        if (hash) return hash;
+    }
+    return "";
+}
+
+function legacyPasswordToken(value) {
+    try {
+        return btoa(String(value || ""));
+    } catch {
+        return "";
+    }
+}
+
 async function hashPassword(password) {
-    const payload = new TextEncoder().encode(`crash2026:${password}`);
-    const digest = await crypto.subtle.digest("SHA-256", payload);
-    return Array.from(new Uint8Array(digest)).map((byte) => byte.toString(16).padStart(2, "0")).join("");
+    const raw = String(password || "");
+    try {
+        if (globalThis.crypto && crypto.subtle) {
+            const payload = new TextEncoder().encode(`crash2026:${raw}`);
+            const digest = await crypto.subtle.digest("SHA-256", payload);
+            return Array.from(new Uint8Array(digest)).map((byte) => byte.toString(16).padStart(2, "0")).join("");
+        }
+    } catch {}
+    return legacyPasswordToken(raw);
 }
 
 async function passwordMatches(user, password) {
     if (!user?.passwordHash) return false;
+    const stored = String(user.passwordHash || "");
     const candidates = [String(password || ""), String(password || "").trim()];
     const unique = candidates.filter((value, index, arr) => value && arr.indexOf(value) === index);
     for (let i = 0; i < unique.length; i++) {
         const candidate = unique[i];
-        if (user.passwordHash === btoa(candidate)) return true;
-        if (user.passwordHash === await hashPassword(candidate)) return true;
+        const legacy = legacyPasswordToken(candidate);
+        if (legacy && stored === legacy) return true;
+        if (stored === await hashPassword(candidate)) return true;
     }
     return false;
 }
@@ -1446,13 +1490,16 @@ async function saveUserSession(user, syncRemote = true) {
     if (!user) return;
     user.email = normalizeEmail(user.email);
     user.uniqueId = persistMemberId(user.uniqueId) || sanitize7DigitId(user.uniqueId);
+    const usersDb = loadUsersDb();
+    const idx = usersDb.findIndex((u) => normalizeEmail(u.email) === user.email);
+    const existingLocal = idx !== -1 ? usersDb[idx] : null;
+    user.passwordHash = pickPasswordHash(user.passwordHash, existingLocal && existingLocal.passwordHash);
     currentUser = user;
     writeJson(CONFIG.sessionKey, user);
 
-    const usersDb = loadUsersDb();
-    const idx = usersDb.findIndex((u) => normalizeEmail(u.email) === user.email);
     if (idx !== -1) {
         usersDb[idx] = { ...usersDb[idx], ...user };
+        usersDb[idx].passwordHash = pickPasswordHash(user.passwordHash, usersDb[idx].passwordHash);
     } else {
         usersDb.push(user);
     }
@@ -1490,7 +1537,7 @@ async function persistAccountToServer(user) {
         uniqueId: user.uniqueId || "",
         name: user.name || "Client",
         phone: user.phone || "",
-        passwordHash: user.passwordHash || "",
+        passwordHash: pickPasswordHash(user.passwordHash),
         isSubscribed: Boolean(user.isSubscribed),
         registeredAt: user.registeredAt || "",
         paymentDate: user.paymentDate || "",
@@ -1580,7 +1627,7 @@ async function upsertUserToSupabase(user) {
                 isSubscribed: Boolean(user.isSubscribed) || Boolean(existing && existing.is_subscribed),
                 subscriptionExpiresAt: expiresAt
             }),
-            password_hash: user.passwordHash || (existing && existing.password_hash) || "",
+            password_hash: pickPasswordHash(user.passwordHash, existing && existing.password_hash),
             updated_at: new Date().toISOString()
         };
         if (user.paymentDate || (existing && existing.payment_date)) {
@@ -1637,7 +1684,7 @@ async function findAccountByEmail(email) {
                     name: data.name || (remote && remote.name) || (local && local.name) || "Client",
                     email: emailKey,
                     phone: data.phone || (remote && remote.phone) || (local && local.phone) || "",
-                    passwordHash: data.password_hash || (remote && remote.passwordHash) || (local && local.passwordHash) || "",
+                    passwordHash: pickPasswordHash(data.password_hash, remote && remote.passwordHash, local && local.passwordHash),
                     isSubscribed: Boolean(data.is_subscribed) || Boolean(remote && remote.isSubscribed) || Boolean(local && local.isSubscribed),
                     registeredAt: (local && local.registeredAt) || (remote && remote.registeredAt) || new Date().toLocaleDateString("fr-FR"),
                     paymentDate: data.payment_date || (remote && remote.paymentDate) || (local && local.paymentDate) || "",
@@ -1659,7 +1706,7 @@ async function findAccountByEmail(email) {
         ...found,
         email: emailKey,
         uniqueId: formatMemberId(found.uniqueId) || (local && local.uniqueId) || "",
-        passwordHash: found.passwordHash || (local && local.passwordHash) || ""
+        passwordHash: pickPasswordHash(found.passwordHash, local && local.passwordHash)
     };
     if (local) mergeSubscriptionFields(merged, local);
     seedLegacySubscriptionWindow(merged);
@@ -3236,6 +3283,41 @@ function handleLogout() {
     showToast("Vous avez été déconnecté.");
 }
 
+function initPasswordToggles() {
+    document.querySelectorAll("[data-password-toggle]").forEach((btn) => {
+        if (btn.dataset.boundToggle === "1") return;
+        btn.dataset.boundToggle = "1";
+        btn.addEventListener("click", () => {
+            const targetId = btn.getAttribute("data-password-toggle");
+            const input = document.getElementById(targetId);
+            if (!input) return;
+            const reveal = input.type === "password";
+            input.type = reveal ? "text" : "password";
+            btn.setAttribute("aria-pressed", reveal ? "true" : "false");
+            btn.setAttribute("aria-label", reveal ? "Masquer le mot de passe" : "Afficher le mot de passe");
+            const icon = btn.querySelector("i");
+            if (icon) {
+                icon.classList.toggle("fa-eye", !reveal);
+                icon.classList.toggle("fa-eye-slash", reveal);
+            }
+        });
+    });
+}
+
+function resetPasswordToggles(root) {
+    (root || document).querySelectorAll("[data-password-toggle]").forEach((btn) => {
+        const input = document.getElementById(btn.getAttribute("data-password-toggle"));
+        if (input) input.type = "password";
+        btn.setAttribute("aria-pressed", "false");
+        btn.setAttribute("aria-label", "Afficher le mot de passe");
+        const icon = btn.querySelector("i");
+        if (icon) {
+            icon.classList.add("fa-eye");
+            icon.classList.remove("fa-eye-slash");
+        }
+    });
+}
+
 function initAuthSecurity() {
     const regForm = document.getElementById("registerForm");
     const logForm = document.getElementById("loginForm");
@@ -3244,12 +3326,15 @@ function initAuthSecurity() {
     const profileLogoutBtn = document.getElementById("profileLogoutBtn");
     const vipLogoutBtn = document.getElementById("vipLogoutBtn");
 
+    initPasswordToggles();
+
     if (regForm) {
         regForm.addEventListener("submit", async (e) => {
             e.preventDefault();
             const name = document.getElementById("regName").value.trim();
             const email = normalizeEmail(document.getElementById("regEmail").value);
             const password = document.getElementById("regPassword").value;
+            const confirmPassword = String(document.getElementById("regConfirmPassword")?.value || "");
 
             if (!name || name.length < 3) {
                 showToast("Nom requis (au moins 3 caractères).", "error");
@@ -3263,6 +3348,10 @@ function initAuthSecurity() {
                 showToast("Le mot de passe doit comporter au moins 6 caractères.", "error");
                 return;
             }
+            if (password !== confirmPassword) {
+                showToast("Les mots de passe ne correspondent pas.", "error");
+                return;
+            }
 
             setButtonLoading(regSubmitBtn, true);
 
@@ -3274,6 +3363,11 @@ function initAuthSecurity() {
             }
 
             const passwordHash = await hashPassword(password);
+            if (!passwordHash) {
+                setButtonLoading(regSubmitBtn, false);
+                showToast("Impossible de sécuriser le mot de passe. Réessayez.", "error");
+                return;
+            }
             const newUser = {
                 id: Date.now(),
                 uniqueId: generateUniqueId(),
@@ -3306,6 +3400,7 @@ function initAuthSecurity() {
             initGlobalViewRouter();
             closeAllModals();
             regForm.reset();
+            resetPasswordToggles(regForm);
             showToast(`Compte créé ! Votre ID : ${newUser.uniqueId}`);
             trackMetaPixel("CompleteRegistration", { status: "success" });
 
@@ -3320,7 +3415,7 @@ function initAuthSecurity() {
         logForm.addEventListener("submit", async (e) => {
             e.preventDefault();
             const emailKey = normalizeEmail(document.getElementById("loginEmail").value);
-            const password = String(document.getElementById("loginPassword")?.value || "").trim();
+            const password = String(document.getElementById("loginPassword")?.value || "");
 
             if (!isValidEmail(emailKey)) {
                 showToast("Adresse email requise.", "error");
@@ -3333,17 +3428,16 @@ function initAuthSecurity() {
             if (found) {
                 const match = await passwordMatches(found, password);
                 if (match) {
-                    if (found.passwordHash === btoa(password)) {
-                        found.passwordHash = await hashPassword(password);
+                    const trimmed = password.trim();
+                    const legacy = legacyPasswordToken(password) || legacyPasswordToken(trimmed);
+                    if (legacy && found.passwordHash === legacy) {
+                        found.passwordHash = await hashPassword(password) || await hashPassword(trimmed);
                     }
-                    if (seedLegacySubscriptionWindow(found)) {
-                        await saveUserSession(found, true);
-                    } else {
-                        await saveUserSession(found, true);
-                    }
+                    await saveUserSession(found, true);
                     setButtonLoading(loginSubmitBtn, false);
                     closeAllModals();
                     logForm.reset();
+                    resetPasswordToggles(logForm);
                     if (isSubscriptionActive(found)) {
                         grantVerifiedAccess();
                         initGlobalViewRouter();
@@ -3378,6 +3472,46 @@ function i18nText(key, fallback) {
     return dict[key] || fallback || key;
 }
 
+function setPhoneSaveButtonLabel(key, fallback) {
+    const btn = document.getElementById("btnSavePhone");
+    if (!btn) return;
+    const label = btn.querySelector("[data-i18n]") || btn;
+    label.setAttribute("data-i18n", key);
+    label.textContent = i18nText(key, fallback);
+}
+
+function applyProfilePhoneState(locked, justSaved) {
+    const input = document.getElementById("profilePhoneInput");
+    const btn = document.getElementById("btnSavePhone");
+    if (!input || !btn) return;
+    input.readOnly = Boolean(locked);
+    input.classList.toggle("is-locked", Boolean(locked));
+    btn.classList.toggle("is-saved", Boolean(locked));
+    btn.disabled = false;
+    btn.style.opacity = "";
+    btn.style.pointerEvents = "";
+    if (window.__phoneSaveFeedbackTimer) {
+        clearTimeout(window.__phoneSaveFeedbackTimer);
+        window.__phoneSaveFeedbackTimer = null;
+    }
+    if (locked) {
+        btn.dataset.mode = "locked";
+        if (justSaved) {
+            setPhoneSaveButtonLabel("btn_saved", "Enregistré ✅");
+            window.__phoneSaveFeedbackTimer = setTimeout(() => {
+                if (btn.dataset.mode === "locked") {
+                    setPhoneSaveButtonLabel("btn_edit", "Modifier");
+                }
+            }, 1600);
+        } else {
+            setPhoneSaveButtonLabel("btn_edit", "Modifier");
+        }
+    } else {
+        btn.dataset.mode = "save";
+        setPhoneSaveButtonLabel("btn_save", "Enregistrer");
+    }
+}
+
 function preservePaidSessionOnProfileSave() {
     if (!currentUser) return;
     if (isAccessUnlocked()) currentUser.isSubscribed = true;
@@ -3391,7 +3525,6 @@ function openProfileModal() {
     const profileEmailDisplay = document.getElementById("profileEmailDisplay");
     const profileUniqueIdDisplay = document.getElementById("profileUniqueIdDisplay");
     const profilePhoneInput = document.getElementById("profilePhoneInput");
-    const btnSavePhone = document.getElementById("btnSavePhone");
     const profileStatusBadge = document.getElementById("profileStatusBadge");
     const btnProfileSubscribe = document.getElementById("btnProfileSubscribe");
     const profileStatusBlock = profileModal.querySelector(".profile-status-block");
@@ -3413,12 +3546,7 @@ function openProfileModal() {
         if (currentUser && savedPhone && !String(currentUser.phone || "").trim()) currentUser.phone = savedPhone;
         profilePhoneInput.value = savedPhone;
         profilePhoneInput.disabled = false;
-        profilePhoneInput.readOnly = false;
-    }
-    if (btnSavePhone) {
-        btnSavePhone.disabled = false;
-        btnSavePhone.style.opacity = "";
-        btnSavePhone.style.pointerEvents = "";
+        applyProfilePhoneState(Boolean(savedPhone), false);
     }
 
     const licensed = Boolean(isSubscriptionActive(currentUser) || isAccessUnlocked());
@@ -3480,6 +3608,11 @@ function initProfileModal() {
         try {
             if (!currentUser) return;
             if (!profilePhoneInput) return;
+            if (btnSavePhone.dataset.mode === "locked") {
+                applyProfilePhoneState(false, false);
+                profilePhoneInput.focus();
+                return;
+            }
             const phone = String(profilePhoneInput.value || "").trim();
             if (!phone) return;
             if (!isValidPhone(phone)) {
@@ -3488,9 +3621,9 @@ function initProfileModal() {
             }
             preservePaidSessionOnProfileSave();
             currentUser.phone = phone;
-            await saveUserSession(currentUser, false);
+            await saveUserSession(currentUser, true);
+            applyProfilePhoneState(true, true);
             showToast("Numéro de téléphone enregistré !");
-            saveUserSession(currentUser, true);
         } catch (err) {
             showToast("Enregistrement impossible. Réessayez.", "error");
         }
@@ -3507,7 +3640,7 @@ function initProfileModal() {
 
             const localSaved = loadUsersDb().find((u) => normalizeEmail(u.email) === normalizeEmail(currentUser.email));
             const checkUser = {
-                passwordHash: currentUser.passwordHash || (localSaved && localSaved.passwordHash) || ""
+                passwordHash: pickPasswordHash(currentUser.passwordHash, localSaved && localSaved.passwordHash)
             };
             if (checkUser.passwordHash) {
                 let match = await passwordMatches(checkUser, oldPass);

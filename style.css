@@ -86,10 +86,10 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     align-items: center;
     justify-content: space-between;
     flex-wrap: nowrap;
-    gap: 12px 16px;
-    margin: 8px 16px 22px;
-    padding: 18px 20px;
-    min-height: 70px;
+    gap: 14px 18px;
+    margin: 12px 16px 28px;
+    padding: 24px 24px;
+    min-height: 92px;
     box-sizing: border-box;
     border-radius: 16px;
     text-decoration: none;
@@ -125,12 +125,13 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 .xbet-cta-text {
     font-family: var(--font-body);
     font-weight: 800;
-    font-size: clamp(0.88rem, 2.8vw, 1.12rem);
-    letter-spacing: 0.02em;
+    font-size: 14px;
+    letter-spacing: 0.01em;
     text-align: left;
-    line-height: 1.3;
+    line-height: 1.35;
     min-width: 0;
     flex: 1 1 auto;
+    white-space: nowrap;
 }
 .xbet-cta-arrow {
     font-size: 1.28rem;
@@ -1629,6 +1630,36 @@ button.vip-member-tag:hover {
 .form-group input:focus,
 .form-control-dark:focus { outline: none; border-color: var(--gold-primary); }
 
+.password-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+.password-field input {
+    width: 100%;
+    padding-right: 42px;
+}
+.password-toggle {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: #cbd5e1;
+    cursor: pointer;
+    padding: 8px;
+    font-size: 0.95rem;
+    line-height: 1;
+    z-index: 1;
+}
+.password-toggle:hover,
+.password-toggle:focus {
+    color: #fff;
+    outline: none;
+}
+
 .uppercase-input { text-transform: uppercase; font-family: var(--font-mono); font-weight: 800; letter-spacing: 1px; }
 
 .btn-primary {
@@ -1699,6 +1730,17 @@ button.vip-member-tag:hover {
     white-space: nowrap;
 }
 .btn-save-mini.btn-full { width: 100%; margin-top: 6px; padding: 8px; }
+.btn-save-mini.is-saved {
+    background: #16a34a;
+    border-color: #22c55e;
+    color: #fff;
+    box-shadow: 0 0 12px rgba(34, 197, 94, 0.45);
+}
+.form-control-dark.is-locked {
+    opacity: 0.78;
+    cursor: default;
+    border-color: rgba(34, 197, 94, 0.45);
+}
 .btn-link-danger { background: transparent; border: none; color: #f87171; font-size: 0.78rem; cursor: pointer; width: 100%; margin-top: 10px; text-align: center; }
 
 /* MODALE CHECKOUT */
@@ -3138,28 +3180,37 @@ button.vip-member-tag:hover {
     .mine-cell.is-safe::after { font-size: 0.95rem; }
     .apple-cell { height: 22px; }
     .xbet-cta-banner {
-        margin: 6px 10px 18px;
-        padding: 16px 12px;
-        min-height: 65px;
-        gap: 10px;
+        flex-wrap: wrap;
+        margin: 10px 10px 26px;
+        padding: 22px 16px 20px;
+        min-height: 108px;
+        gap: 14px 12px;
         align-items: center;
     }
     .xbet-cta-copy {
         gap: 8px;
-        flex: 1 1 0;
+        flex: 1 1 100%;
+        width: 100%;
         min-width: 0;
         align-items: center;
+        order: 1;
     }
     .xbet-cta-logo {
-        height: 40px;
-        max-width: 120px;
+        height: 46px;
+        max-width: 140px;
         flex-shrink: 0;
+        margin-left: 0;
+        order: 2;
     }
     .xbet-cta-text {
-        font-size: clamp(0.72rem, 3.2vw, 0.88rem);
-        letter-spacing: 0.01em;
-        line-height: 1.28;
+        font-size: 13px;
+        letter-spacing: 0;
+        line-height: 1.45;
         white-space: normal;
+        text-wrap: balance;
+        overflow: visible;
+        word-break: normal;
+        overflow-wrap: break-word;
     }
     .xbet-cta-arrow { font-size: 1.05rem; flex-shrink: 0; }
     .sport-signal-badge {
