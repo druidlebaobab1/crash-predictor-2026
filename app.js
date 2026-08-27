@@ -3898,7 +3898,7 @@ function splitCustomerName(fullName) {
     const parts = cleaned.split(/\s+/).filter(Boolean);
     return {
         firstName: parts[0] || "Client",
-        lastName: parts.slice(1).join(" ")
+        lastName: parts.slice(1).join(" ") || parts[0] || "Client"
     };
 }
 
@@ -3982,7 +3982,7 @@ async function createMaketouCart(user) {
     const payload = {
         email: user.email,
         firstName: names.firstName,
-        lastName: names.lastName || "",
+        lastName: names.lastName || names.firstName || "Client",
         phone: user.phone || "",
         uniqueId: user.uniqueId || "",
         redirectURL: buildMaketouReturnUrl(user)
@@ -4158,8 +4158,13 @@ async function startMaketouCheckout() {
 
     const checkout = new URL(CONFIG.maketouCheckoutUrl);
     checkout.searchParams.set("firstName", names.firstName);
-    if (names.lastName) checkout.searchParams.set("lastName", names.lastName);
+    checkout.searchParams.set("lastName", names.lastName || names.firstName);
+    if (currentUser.email) checkout.searchParams.set("email", currentUser.email);
     if (currentUser.phone) checkout.searchParams.set("phone", currentUser.phone);
+    if (currentUser.uniqueId) {
+        checkout.searchParams.set("uid", currentUser.uniqueId);
+        checkout.searchParams.set("userId", currentUser.uniqueId);
+    }
     const returnUrl = buildMaketouReturnUrl(currentUser);
     checkout.searchParams.set("redirectURL", returnUrl);
     checkout.searchParams.set("redirect_url", returnUrl);

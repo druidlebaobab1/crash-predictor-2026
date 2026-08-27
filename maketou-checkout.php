@@ -32,6 +32,47 @@ function maketou_clean_person_name($value) {
     return trim((string) $value);
 }
 
+function maketou_person_names($firstName, $lastName, $fullName = "") {
+    $firstName = maketou_clean_person_name($firstName);
+    $lastName = maketou_clean_person_name($lastName);
+    if ($firstName === "") {
+        $cleaned = maketou_clean_person_name($fullName);
+        $parts = preg_split("/\s+/", $cleaned, -1, PREG_SPLIT_NO_EMPTY);
+        if (!is_array($parts)) {
+            $parts = [];
+        }
+        $firstName = $parts[0] ?? "";
+        if ($lastName === "" && count($parts) > 1) {
+            $lastName = implode(" ", array_slice($parts, 1));
+        }
+    }
+    if ($firstName === "") {
+        $firstName = "Client";
+    }
+    if ($lastName === "") {
+        $lastName = $firstName;
+    }
+    return [$firstName, $lastName];
+}
+
+function maketou_checkout_phone($phone) {
+    $compact = preg_replace("/\s+/", "", trim((string) $phone));
+    $digits = preg_replace("/\D+/", "", (string) $compact);
+    if (strlen((string) $digits) < 8 || strlen((string) $digits) > 15) {
+        return "";
+    }
+    if (strpos((string) $compact, "00") === 0) {
+        $compact = "+" . substr((string) $compact, 2);
+    }
+    if (preg_match("/^\+[0-9]{8,15}$/", (string) $compact)) {
+        return $compact;
+    }
+    if (preg_match("/^[0-9]{8,15}$/", (string) $compact)) {
+        return $compact;
+    }
+    return $digits;
+}
+
 function maketou_request_email($body) {
     $email = strtolower(trim((string) (
         $_GET["email"]
@@ -113,27 +154,32 @@ $looksLikeCreate = $method === "POST"
     && $action !== "verify";
 
 if ($looksLikeCreate) {
-    $email = trim((string) ($body["email"] ?? ""));
-    $firstName = maketou_clean_person_name($body["firstName"] ?? "");
-    $lastName = maketou_clean_person_name($body["lastName"] ?? "");
-    $phone = trim((string) ($body["phone"] ?? ""));
-    $uniqueId = trim((string) ($body["uniqueId"] ?? ""));
-    $redirectUrl = maketou_success_url_with_uid($uniqueId);
+    $email = strtolower(trim((string) ($body["email"] ?? "")));
+    [$firstName, $lastName] = maketou_person_names(
+        $body["firstName"] ?? "",
+        $body["lastName"] ?? "",
+        $body["name"] ?? ""
+    );
+    $phone = maketou_checkout_phone($body["phone"] ?? "");
+    $rawUniqueId = trim((string) ($body["uniqueId"] ?? ""));
+    $uniqueId = maketou_normalize_member_id($rawUniqueId);
+    $metaId = $uniqueId !== "" ? $uniqueId : $rawUniqueId;
+    $redirectUrl = maketou_success_url_with_uid($metaId);
 
     $payload = [
         "productDocumentId" => MAKETOU_PRODUCT_ID,
-        "firstName" => $firstName !== "" ? $firstName : "Client",
+        "email" => $email,
+        "firstName" => $firstName,
+        "lastName" => $lastName,
         "redirectURL" => $redirectUrl,
         "meta" => [
-            "userId" => $uniqueId,
+            "userId" => $metaId,
+            "uniqueId" => $metaId,
+            "customer_id" => $metaId,
             "source" => "website"
         ]
     ];
-    if ($lastName !== "") {
-        $payload["lastName"] = $lastName;
-    }
-    $phoneDigits = preg_replace("/\D+/", "", $phone);
-    if ($phone !== "" && preg_match("/^\+?[0-9]{8,15}$/", $phone) && strlen($phoneDigits) >= 8) {
+    if ($phone !== "") {
         $payload["phone"] = $phone;
     }
 
@@ -141,7 +187,7 @@ if ($looksLikeCreate) {
     $status = 0;
     $responseBody = "";
     $data = [];
-    $redirectUrl = "";
+    $payUrl = "";
     $newCartId = "";
     if (is_array($raw)) {
         [$status, $responseBody] = $raw;
@@ -151,7 +197,7 @@ if ($looksLikeCreate) {
         }
         $nested = is_array($data["data"] ?? null) ? $data["data"] : [];
         $cart = is_array($data["cart"] ?? null) ? $data["cart"] : (is_array($nested["cart"] ?? null) ? $nested["cart"] : []);
-        $redirectUrl = (string) (
+        $payUrl = (string) (
             $data["redirectUrl"]
             ?? $data["redirect_url"]
             ?? $data["checkoutUrl"]
@@ -163,9 +209,13 @@ if ($looksLikeCreate) {
         $newCartId = (string) ($cart["id"] ?? $data["id"] ?? $nested["id"] ?? "");
     }
 
-    if (!($status >= 200 && $status < 300 && $redirectUrl !== "")) {
-        $payload["email"] = maketou_anonymized_gmail($email);
+    if (!($status >= 200 && $status < 300 && $payUrl !== "")) {
         $raw = maketou_http("POST", MAKETOU_API_BASE . "/api/v1/stores/cart/checkout", $payload);
+    }
+    if (!is_array($raw) || (int) ($raw[0] ?? 0) < 200 || (int) ($raw[0] ?? 0) >= 300) {
+        $fallback = $payload;
+        $fallback["email"] = maketou_anonymized_gmail($email);
+        $raw = maketou_http("POST", MAKETOU_API_BASE . "/api/v1/stores/cart/checkout", $fallback);
     }
     if ($raw === null) {
         http_response_code(502);
@@ -193,12 +243,13 @@ if ($looksLikeCreate) {
     $newCartId = (string) ($cart["id"] ?? $data["id"] ?? $nested["id"] ?? "");
 
     if ($status >= 200 && $status < 300 && $redirectUrl !== "") {
-        maketou_save_cart_map($newCartId, $email, $uniqueId);
+        maketou_save_cart_map($newCartId, $email, $uniqueId !== "" ? $uniqueId : $metaId);
         maketou_log("checkout_create", [
             "email" => $email,
-            "uniqueId" => $uniqueId,
+            "uniqueId" => $uniqueId !== "" ? $uniqueId : $metaId,
             "cartId" => $newCartId,
-            "http" => $status
+            "http" => $status,
+            "directPay" => (strpos($redirectUrl, "moneroo") !== false || strpos($redirectUrl, "checkout.") !== false)
         ]);
         echo json_encode([
             "redirectUrl" => $redirectUrl,
