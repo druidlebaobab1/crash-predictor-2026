@@ -253,7 +253,7 @@ function mail_welcome_badge() {
     return '<tr><td align="center" style="padding:18px 18px 6px;background:#0c0716;">'
         . '<table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto;">'
         . '<tr><td align="center" style="padding:9px 16px;border:1px solid #ffc837;border-radius:999px;background:#140c1c;color:#ffc837;font-size:11px;letter-spacing:.10em;font-weight:800;line-height:1.35;white-space:nowrap;">'
-        . "✨ COMPTE ACTIVÉ AVEC SUCCÈS ✨"
+        . "✨ COMPTE CRÉÉ AVEC SUCCÈS ✨"
         . "</td></tr></table></td></tr>";
 }
 
