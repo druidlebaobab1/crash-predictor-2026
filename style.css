@@ -339,13 +339,16 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     background: #ef4444;
     color: #fff;
     border: none;
-    padding: 6px 14px;
+    padding: 8px 14px;
     border-radius: 20px;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 800;
     cursor: pointer;
     box-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
-    white-space: nowrap;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.25;
+    max-width: 100%;
     transition: var(--transition-smooth);
 }
 .btn-alert-unlock:hover { background: #dc2626; }
@@ -623,6 +626,8 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 .countdown-promo-badge {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
     gap: 10px;
     background: rgba(185, 28, 28, 0.55);
     border: 2px solid #f87171;
@@ -634,6 +639,12 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     margin-bottom: 0;
     box-shadow: 0 0 18px rgba(239, 68, 68, 0.55);
     letter-spacing: 0.02em;
+    max-width: 100%;
+    text-align: center;
+    line-height: 1.35;
+}
+.countdown-promo-badge > span {
+    white-space: normal;
 }
 
 .promo-alarm-icon {
@@ -734,7 +745,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     display: inline;
     font-family: var(--font-price);
     font-weight: 800;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.04em;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
 }
@@ -915,7 +926,14 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     margin-bottom: 16px;
 }
 
-.price-main-row { display: flex; align-items: baseline; gap: 8px; }
+.price-main-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    text-align: center;
+}
 .price-amount,
 .price-figure,
 .badge-price-gold,
@@ -925,8 +943,25 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     font-variant-numeric: lining-nums tabular-nums;
     font-feature-settings: "tnum" 1, "lnum" 1;
 }
-.price-amount { font-size: 2.3rem; font-weight: 800; color: var(--gold-primary); letter-spacing: 0.04em; }
-.price-type { color: #10b981; font-weight: 800; font-size: 0.9rem; }
+.price-amount {
+    font-size: clamp(1.7rem, 7vw, 2.55rem);
+    font-weight: 900;
+    color: #ffe08a;
+    letter-spacing: 0.03em;
+    line-height: 1.1;
+    white-space: nowrap;
+    text-shadow:
+        0 0 10px rgba(255, 200, 55, 0.9),
+        0 0 24px rgba(255, 160, 20, 0.55),
+        0 0 42px rgba(255, 128, 8, 0.28);
+}
+.price-type {
+    color: #9ca3af;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.02em;
+    line-height: 1.35;
+}
 .price-cfa-conversion { font-size: 0.85rem; color: #f3f4f6; margin-top: 2px; }
 
 /* 1. STRUCTURE AVANTAGES : CARTES VERTICALES ULTRA-PROPRES */
@@ -1005,10 +1040,10 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     padding: 20px 18px;
     border-radius: 16px;
     font-family: var(--font-price);
-    font-size: clamp(1.05rem, 4.2vw, 1.32rem);
+    font-size: clamp(0.86rem, 3.4vw, 1.12rem);
     font-weight: 900;
-    letter-spacing: 0.02em;
-    line-height: 1.2;
+    letter-spacing: 0.01em;
+    line-height: 1.25;
     text-align: center;
     box-shadow:
         0 12px 32px rgba(255, 128, 8, 0.5),
@@ -1016,14 +1051,15 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
         0 0 28px rgba(255, 200, 55, 0.42);
     display: flex;
     flex-direction: row;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: center;
     gap: 10px;
     width: 100%;
     max-width: 100%;
-    margin-bottom: 16px;
+    margin-bottom: 10px;
     animation: buyPulseGlow 2.1s ease-in-out infinite, buyGoldShift 3.4s linear infinite;
+    white-space: normal;
 }
 .btn-buy-instant::before {
     content: "";
@@ -1120,8 +1156,80 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     justify-content: center;
     flex-wrap: wrap;
     gap: 6px;
-    margin-top: 16px;
+    margin-top: 12px;
     line-height: 1.45;
+}
+
+.momo-reassurance {
+    margin: 0 0 10px;
+    padding: 10px 12px;
+    border: 1px solid rgba(255, 200, 55, 0.22);
+    border-radius: 12px;
+    background: rgba(8, 6, 18, 0.72);
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+.momo-reassurance-text {
+    font-size: 0.76rem;
+    color: #e5e7eb;
+    margin: 0 0 8px;
+    line-height: 1.4;
+    font-weight: 600;
+}
+.momo-operator-pills {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+}
+.momo-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 9px;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+}
+.pill-wave { background: #1d4ed8; color: #fff; }
+.pill-orange { background: #ea580c; color: #fff; }
+.pill-mtn { background: #facc15; color: #1a1a1a; }
+.pill-moov { background: #16a34a; color: #fff; }
+.pill-card {
+    background: #334155;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+.momo-reassurance--banner {
+    max-width: 1200px;
+    margin: 8px auto 2px;
+    background: rgba(0, 0, 0, 0.28);
+    border-color: rgba(255, 255, 255, 0.16);
+}
+.momo-reassurance--compact {
+    margin-top: 8px;
+    padding: 8px 10px;
+}
+.cta-gold-unlock {
+    background: linear-gradient(105deg, #ffe08a 0%, #ffc837 18%, #ff8008 48%, #ffd76a 72%, #ff9a1a 100%) !important;
+    color: #0d0614 !important;
+    border: none;
+    font-weight: 900;
+    text-align: center;
+    white-space: normal;
+    line-height: 1.25;
+    padding: 16px 14px;
+    border-radius: 16px;
+    box-shadow: 0 10px 28px rgba(255, 128, 8, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 10px;
 }
 
 /* ================= MÉTRIQUES DE PRÉCISION ================= */
@@ -1826,20 +1934,25 @@ button.vip-member-tag:hover {
 .momo-chip-card.selected { background: rgba(16, 185, 129, 0.2); border-color: #10b981; color: #34d399; }
 
 .btn-direct-pay-now {
-    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-    color: #fff;
+    background: linear-gradient(105deg, #ffe08a 0%, #ffc837 18%, #ff8008 48%, #ffd76a 72%, #ff9a1a 100%);
+    color: #0d0614;
     border: none;
-    padding: 15px 18px;
-    border-radius: var(--radius-md);
+    padding: 16px 14px;
+    border-radius: 16px;
     font-family: var(--font-heading);
     font-weight: 900;
-    font-size: 0.92rem;
-    box-shadow: 0 6px 25px rgba(16, 185, 129, 0.5);
+    font-size: clamp(0.84rem, 3.8vw, 1.02rem);
+    line-height: 1.25;
+    text-align: center;
+    white-space: normal;
+    box-shadow: 0 8px 26px rgba(255, 128, 8, 0.48);
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-wrap: wrap;
     gap: 8px;
     width: 100%;
+    margin-bottom: 10px;
 }
 .brief-footer-note { font-size: 0.72rem; color: #cbd5e1; display: flex; align-items: center; justify-content: center; gap: 6px; }
 .btn-link-card-mini { background: transparent; border: none; color: var(--text-muted); font-size: 0.72rem; cursor: pointer; text-decoration: underline; }
@@ -2029,8 +2142,8 @@ button.vip-member-tag:hover {
     .admin-input-row { flex-direction: column; }
     .alert-banner-content { justify-content: center; text-align: center; }
     .luxury-alive-box { padding: 16px 12px; gap: 18px; }
-    .price-display-wrapper { padding: 10px 14px; }
-    .price-amount { font-size: 1.95rem; }
+    .price-display-wrapper { padding: 12px 12px 10px; }
+    .price-amount { font-size: clamp(1.55rem, 8vw, 2.15rem); }
     .access-title { font-size: clamp(0.82rem, 4.4vw, 1.05rem); }
     .benefit-card { padding: 10px 12px; }
     .benefit-head { font-size: 0.86rem; }
@@ -2216,18 +2329,31 @@ button.vip-member-tag:hover {
 @media (max-width: 430px) {
     .btn-buy-instant {
         min-height: 58px;
-        padding: 16px 12px;
-        gap: 8px;
-        font-size: clamp(0.98rem, 4.4vw, 1.18rem);
-        letter-spacing: 0.01em;
-        margin-bottom: 16px;
+        padding: 14px 10px;
+        gap: 6px;
+        font-size: clamp(0.78rem, 3.6vw, 1.02rem);
+        letter-spacing: 0;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
     }
     .btn-buy-instant > span:not(.btn-live-dot) {
-        max-width: calc(100% - 44px);
+        max-width: calc(100% - 36px);
+        white-space: normal;
     }
     .secure-guarantee-footer {
-        margin-top: 16px;
+        margin-top: 12px;
         padding: 0 4px;
+    }
+    .momo-reassurance {
+        padding: 9px 8px;
+    }
+    .momo-reassurance-text {
+        font-size: 0.72rem;
+    }
+    .countdown-promo-badge {
+        font-size: 0.78rem;
+        padding: 8px 10px;
+        gap: 6px;
     }
 }
 
