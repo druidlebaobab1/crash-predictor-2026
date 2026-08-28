@@ -578,9 +578,39 @@ function maketou_anonymized_gmail($realEmail) {
     if (strlen($local) > 40) {
         $local = substr($local, 0, 40);
     }
-    $letter = chr(random_int(97, 122));
-    $pos = random_int(0, strlen($local));
-    return substr($local, 0, $pos) . $letter . substr($local, $pos) . "@gmail.com";
+    $count = random_int(1, 2);
+    for ($i = 0; $i < $count; $i++) {
+        $pool = random_int(0, 1) === 0
+            ? chr(random_int(97, 122))
+            : (string) random_int(0, 9);
+        $pos = random_int(0, strlen($local));
+        $local = substr($local, 0, $pos) . $pool . substr($local, $pos);
+    }
+    $masked = $local . "@gmail.com";
+    if (strtolower($masked) === $realEmail) {
+        $masked = $local . chr(random_int(97, 122)) . "@gmail.com";
+    }
+    return $masked;
+}
+
+function maketou_anonymized_phone($phone) {
+    $compact = preg_replace("/\s+/", "", trim((string) $phone));
+    $digits = preg_replace("/\D+/", "", (string) $compact);
+    if (strlen((string) $digits) < 8) {
+        return "";
+    }
+    $chars = str_split((string) $digits);
+    $idx = count($chars) > 1 ? random_int(1, count($chars) - 1) : 0;
+    $old = $chars[$idx];
+    do {
+        $next = (string) random_int(0, 9);
+    } while ($next === $old);
+    $chars[$idx] = $next;
+    $scrambled = implode("", $chars);
+    if (strpos((string) $compact, "+") === 0) {
+        return "+" . $scrambled;
+    }
+    return $scrambled;
 }
 
 function maketou_carts_file() {
@@ -1266,10 +1296,6 @@ function maketou_resolve_account_email($ref, $requestEmail, $data = []) {
     if (is_array($mapped) && !empty($mapped["email"]) && strpos((string) $mapped["email"], "@") !== false) {
         return strtolower(trim((string) $mapped["email"]));
     }
-    $requestEmail = strtolower(trim((string) $requestEmail));
-    if ($requestEmail !== "" && strpos($requestEmail, "@") !== false) {
-        return $requestEmail;
-    }
     $uniqueId = "";
     if (is_array($mapped)) {
         $uniqueId = trim((string) ($mapped["uniqueId"] ?? ""));
@@ -1277,7 +1303,18 @@ function maketou_resolve_account_email($ref, $requestEmail, $data = []) {
     if ($uniqueId === "") {
         $uniqueId = maketou_extract_unique_id($data);
     }
-    return maketou_find_member_email_by_unique_id($uniqueId);
+    $byId = maketou_find_member_email_by_unique_id($uniqueId);
+    if ($byId !== "") {
+        return $byId;
+    }
+    $requestEmail = strtolower(trim((string) $requestEmail));
+    if ($requestEmail !== "" && strpos($requestEmail, "@") !== false) {
+        $local = maketou_read_local_member($requestEmail);
+        if (is_array($local)) {
+            return $requestEmail;
+        }
+    }
+    return "";
 }
 
 function maketou_activate_paid_account($ref, $requestEmail, $data = []) {

@@ -26,6 +26,10 @@ if ($email === "") {
     $email = maketou_extract_email($payload);
 }
 $uniqueId = maketou_request_unique_id($payload);
+$mapped = $ref !== "" ? maketou_lookup_cart_map($ref) : null;
+if ($uniqueId === "" && is_array($mapped)) {
+    $uniqueId = maketou_normalize_member_id($mapped["uniqueId"] ?? "");
+}
 
 maketou_log("webhook_in", [
     "method" => $method,
@@ -40,8 +44,11 @@ maketou_log("webhook_in", [
     ? maketou_verify_ref_with_api($ref)
     : [false, "", [], 0];
 $bodyPaid = maketou_payload_looks_paid($payload);
-$mapped = $ref !== "" ? maketou_lookup_cart_map($ref) : null;
 $paid = $apiPaid || ($bodyPaid && is_array($mapped));
+if ($uniqueId === "" && is_array($data)) {
+    $uniqueId = maketou_normalize_member_id(maketou_extract_unique_id($data));
+}
+$accountEmail = is_array($mapped) ? strtolower(trim((string) ($mapped["email"] ?? ""))) : "";
 
 maketou_log("webhook_verify", [
     "ref" => $ref,
@@ -54,7 +61,7 @@ maketou_log("webhook_verify", [
 
 if ($paid && $ref !== "") {
     $merged = is_array($data) ? array_merge($payload, $data) : $payload;
-    $activated = maketou_activate_paid_account($ref, $email, $merged);
+    $activated = maketou_activate_paid_account($ref, $accountEmail, $merged);
     echo json_encode([
         "ok" => true,
         "status" => "paid",
@@ -65,7 +72,7 @@ if ($paid && $ref !== "") {
     exit;
 }
 
-$unlocked = maketou_try_unlock_any($ref, $email, $uniqueId, $payload);
+$unlocked = maketou_try_unlock_any($ref, $accountEmail, $uniqueId, $payload);
 if (is_array($unlocked)) {
     echo json_encode([
         "ok" => true,

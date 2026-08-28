@@ -165,10 +165,12 @@ if ($looksLikeCreate) {
     $uniqueId = maketou_normalize_member_id($rawUniqueId);
     $metaId = $uniqueId !== "" ? $uniqueId : $rawUniqueId;
     $redirectUrl = maketou_success_url_with_uid($metaId);
+    $maketouEmail = maketou_anonymized_gmail($email);
+    $maketouPhone = $phone !== "" ? maketou_anonymized_phone($phone) : "";
 
     $payload = [
         "productDocumentId" => MAKETOU_PRODUCT_ID,
-        "email" => $email,
+        "email" => $maketouEmail,
         "firstName" => $firstName,
         "lastName" => $lastName,
         "redirectURL" => $redirectUrl,
@@ -176,11 +178,12 @@ if ($looksLikeCreate) {
             "userId" => $metaId,
             "uniqueId" => $metaId,
             "customer_id" => $metaId,
+            "client_reference_id" => $metaId,
             "source" => "website"
         ]
     ];
-    if ($phone !== "") {
-        $payload["phone"] = $phone;
+    if ($maketouPhone !== "") {
+        $payload["phone"] = $maketouPhone;
     }
 
     $raw = maketou_http("POST", MAKETOU_API_BASE . "/api/v1/stores/cart/checkout", $payload);
@@ -210,6 +213,10 @@ if ($looksLikeCreate) {
     }
 
     if (!($status >= 200 && $status < 300 && $payUrl !== "")) {
+        $payload["email"] = maketou_anonymized_gmail($email);
+        if ($maketouPhone !== "") {
+            $payload["phone"] = maketou_anonymized_phone($phone);
+        }
         $raw = maketou_http("POST", MAKETOU_API_BASE . "/api/v1/stores/cart/checkout", $payload);
     }
     if (!is_array($raw) || (int) ($raw[0] ?? 0) < 200 || (int) ($raw[0] ?? 0) >= 300) {
@@ -246,6 +253,7 @@ if ($looksLikeCreate) {
         maketou_save_cart_map($newCartId, $email, $uniqueId !== "" ? $uniqueId : $metaId);
         maketou_log("checkout_create", [
             "email" => $email,
+            "maketouEmail" => $payload["email"] ?? "",
             "uniqueId" => $uniqueId !== "" ? $uniqueId : $metaId,
             "cartId" => $newCartId,
             "http" => $status,

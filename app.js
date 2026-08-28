@@ -4183,11 +4183,10 @@ async function startMaketouCheckout() {
     const checkout = new URL(CONFIG.maketouCheckoutUrl);
     checkout.searchParams.set("firstName", names.firstName);
     checkout.searchParams.set("lastName", names.lastName || names.firstName);
-    if (currentUser.email) checkout.searchParams.set("email", currentUser.email);
-    if (currentUser.phone) checkout.searchParams.set("phone", currentUser.phone);
     if (currentUser.uniqueId) {
         checkout.searchParams.set("uid", currentUser.uniqueId);
         checkout.searchParams.set("userId", currentUser.uniqueId);
+        checkout.searchParams.set("client_reference_id", currentUser.uniqueId);
     }
     const returnUrl = buildMaketouReturnUrl(currentUser);
     checkout.searchParams.set("redirectURL", returnUrl);
