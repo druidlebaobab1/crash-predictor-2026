@@ -857,10 +857,38 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     display: flex;
     flex-direction: column;
     text-align: left;
+    overflow: visible;
 }
 
-.access-title { font-family: var(--font-heading); font-size: 1.5rem; font-weight: 900; margin-bottom: 8px; }
-.access-desc { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 14px; }
+.access-title-badge {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0 0 16px;
+    padding: 10px 12px;
+    text-align: center;
+    background: rgba(8, 6, 18, 0.94);
+    border: 1px solid rgba(255, 200, 55, 0.48);
+    box-shadow: 0 0 16px rgba(255, 200, 55, 0.14), inset 0 0 12px rgba(34, 211, 238, 0.07);
+    border-radius: 12px;
+}
+
+.access-title {
+    font-family: var(--font-heading);
+    font-size: clamp(0.86rem, 3.6vw, 1.28rem);
+    font-weight: 900;
+    line-height: 1.28;
+    margin: 0;
+    color: #ffc837;
+    letter-spacing: 0.02em;
+    white-space: normal;
+    overflow: visible;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    hyphens: none;
+}
+
+.access-desc { display: none; }
 
 .price-display-wrapper {
     background: rgba(0, 0, 0, 0.45);
@@ -1986,7 +2014,7 @@ button.vip-member-tag:hover {
     .luxury-alive-box { padding: 16px 12px; gap: 18px; }
     .price-display-wrapper { padding: 10px 14px; }
     .price-amount { font-size: 1.95rem; }
-    .access-title { font-size: 1.22rem; }
+    .access-title { font-size: clamp(0.82rem, 4.4vw, 1.05rem); }
     .benefit-card { padding: 10px 12px; }
     .benefit-head { font-size: 0.86rem; }
     .benefit-text { font-size: 0.8rem; padding-left: 24px; }
