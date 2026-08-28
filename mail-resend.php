@@ -243,7 +243,7 @@ function mail_cta($label, $url) {
 
 function mail_platform_links() {
     $url = htmlspecialchars(RESEND_SITE, ENT_QUOTES, "UTF-8");
-    return mail_cta("ACCÉDER À MON ESPACE — 2 900 FCFA", RESEND_SITE)
+    return mail_cta("ACCÉDER À MON ESPACE — 4 900 FCFA", RESEND_SITE)
         . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:14px 0 6px;"><tr><td align="center" style="font-size:11px;line-height:1.35;color:#e5e7eb;white-space:nowrap;word-break:normal;">'
         . '<span style="white-space:nowrap;word-break:normal;font-size:11px;">👉&nbsp;Lien&nbsp;direct&nbsp;vers&nbsp;la&nbsp;plateforme&nbsp;:&nbsp;<a href="' . $url . '" style="color:#ffc837;font-weight:700;font-size:11px;text-decoration:underline;white-space:nowrap;word-break:normal;">' . $url . "</a></span>"
         . "</td></tr></table>";
@@ -288,7 +288,7 @@ function mail_html_welcome($email, $uniqueId, $name = "") {
     $inner = "<p style=\"font-size:18px;font-weight:800;color:#fff;margin:8px 0 16px;\">" . $hello . "</p>"
         . "<p>Email : <strong style=\"color:#fff;\">" . $safeEmail . "</strong></p>"
         . ($uniqueId !== "" ? "<p>Identifiant : <strong style=\"color:#ffc837;\">" . $id . "</strong></p>" : "")
-        . "<p style=\"margin:12px 0 8px;font-size:13px;line-height:1.35;\">Connectez-vous pour débloquer vos signaux VIP pour seulement <strong style=\"color:#ffc837;\">2 900 FCFA</strong>.</p>"
+        . "<p style=\"margin:12px 0 8px;font-size:13px;line-height:1.35;\">Connectez-vous pour débloquer vos signaux VIP pour seulement <strong style=\"color:#ffc837;\">4 900 FCFA</strong>.</p>"
         . mail_platform_links();
     return mail_wrap($hello, $inner, $email, mail_welcome_badge());
 }
@@ -300,12 +300,12 @@ function mail_html_abandon($email, $uniqueId, $name = "") {
         ? "Bonjour " . htmlspecialchars($display, ENT_QUOTES, "UTF-8") . ","
         : "Bonjour,";
     $inner = "<p>" . $hello . " vous avez commencé à débloquer PREDICTOR, mais le paiement n’est pas allé au bout.</p>"
-        . "<p>Débloquez vos signaux VIP pour seulement <strong style=\"color:#ffc837;\">2 900 FCFA</strong>.</p>"
+        . "<p>Débloquez vos signaux VIP pour seulement <strong style=\"color:#ffc837;\">4 900 FCFA</strong>.</p>"
         . "<p>Vous ouvrez Crash, Aviator, Lucky Jet, Mines, Penalty, Apple of Fortune, et le module sport <strong>LE BOSS</strong>.</p>"
         . "<p>Les 6 algorithmes live et le module sport <strong>LE BOSS</strong> tournent déjà avec des signaux validés en continu.</p>"
         . ($uniqueId !== "" ? "<p>ID : <strong style=\"color:#ffc837;\">" . $id . "</strong></p>" : "")
         . mail_platform_links();
-    return mail_wrap("Votre accès VIP à 2 900 FCFA n’est pas encore débloqué.", $inner, $email);
+    return mail_wrap("Votre accès VIP à 4 900 FCFA n’est pas encore débloqué.", $inner, $email);
 }
 
 function mail_html_reactivate($email, $uniqueId, $name = "") {
@@ -317,7 +317,7 @@ function mail_html_reactivate($email, $uniqueId, $name = "") {
     $inner = "<p>" . $hello . " votre compte PREDICTOR est toujours là, mais la licence n’est pas activée.</p>"
         . ($uniqueId !== "" ? "<p>ID : <strong style=\"color:#ffc837;\">" . $id . "</strong></p>" : "")
         . "<p>Les 6 algorithmes live et le module sport <strong>LE BOSS</strong> tournent déjà avec des signaux validés en continu.</p>"
-        . "<p>Débloquez vos signaux VIP pour seulement <strong style=\"color:#ffc837;\">2 900 FCFA</strong>.</p>"
+        . "<p>Débloquez vos signaux VIP pour seulement <strong style=\"color:#ffc837;\">4 900 FCFA</strong>.</p>"
         . mail_platform_links();
     return mail_wrap("Reprenez vos signaux VIP sur PREDICTOR.", $inner, $email);
 }
@@ -495,7 +495,7 @@ function mail_on_checkout($ref, $email, $uniqueId) {
     $name = is_array($member) ? (string) ($member["name"] ?? "") : "";
     $sent = mail_send(
         $email,
-        "🔥 Débloquez vos signaux VIP — L'offre à 2 900 FCFA expire bientôt !",
+        "🔥 Débloquez vos signaux VIP — L'offre à 4 900 FCFA expire bientôt !",
         mail_html_abandon($email, $uniqueId, $name),
         [
             "scheduled_at" => gmdate("c", time() + 3600),
@@ -580,7 +580,7 @@ function mail_process_abandoned($limit = 8) {
         $name = is_array($member) ? (string) ($member["name"] ?? "") : "";
         $result = mail_send(
             $email,
-            "🔥 Débloquez vos signaux VIP — L'offre à 2 900 FCFA expire bientôt !",
+            "🔥 Débloquez vos signaux VIP — L'offre à 4 900 FCFA expire bientôt !",
             mail_html_abandon($email, $uniqueId, $name),
             ["idempotency" => "abandon-due-" . md5((string) $ref)]
         );
