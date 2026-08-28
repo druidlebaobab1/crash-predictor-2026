@@ -300,11 +300,11 @@ function mail_html_abandon($email, $uniqueId, $name = "") {
         ? "Bonjour " . htmlspecialchars($display, ENT_QUOTES, "UTF-8") . ","
         : "Bonjour,";
     $inner = "<p>" . $hello . " vous avez commencé à débloquer PREDICTOR, mais le paiement n’est pas allé au bout.</p>"
-        . "<p>Pour <strong style=\"color:#ffc837;\">17 $ par mois</strong>, vous ouvrez Crash, Aviator, Lucky Jet, Mines, Penalty, Apple of Fortune, et le module sport <strong>LE BOSS</strong>.</p>"
+        . "<p>Pour <strong style=\"color:#ffc837;\">5 $ par mois</strong>, vous ouvrez Crash, Aviator, Lucky Jet, Mines, Penalty, Apple of Fortune, et le module sport <strong>LE BOSS</strong>.</p>"
         . "<p>Les 6 algorithmes live et le module sport <strong>LE BOSS</strong> tournent déjà avec des signaux validés en continu.</p>"
         . ($uniqueId !== "" ? "<p>ID : <strong style=\"color:#ffc837;\">" . $id . "</strong></p>" : "")
         . mail_platform_links();
-    return mail_wrap("Votre accès VIP à 17 $ n’est pas encore débloqué.", $inner, $email);
+    return mail_wrap("Votre accès VIP à 5 $ n’est pas encore débloqué.", $inner, $email);
 }
 
 function mail_html_reactivate($email, $uniqueId, $name = "") {
@@ -316,7 +316,7 @@ function mail_html_reactivate($email, $uniqueId, $name = "") {
     $inner = "<p>" . $hello . " votre compte PREDICTOR est toujours là, mais la licence n’est pas activée.</p>"
         . ($uniqueId !== "" ? "<p>ID : <strong style=\"color:#ffc837;\">" . $id . "</strong></p>" : "")
         . "<p>Les 6 algorithmes live et le module sport <strong>LE BOSS</strong> tournent déjà avec des signaux validés en continu.</p>"
-        . "<p>Débloquez vos signaux VIP pour <strong>17 $ PAR MOIS</strong>.</p>"
+        . "<p>Débloquez vos signaux VIP pour <strong>5 $ PAR MOIS</strong>.</p>"
         . mail_platform_links();
     return mail_wrap("Reprenez vos signaux VIP sur PREDICTOR.", $inner, $email);
 }
@@ -494,7 +494,7 @@ function mail_on_checkout($ref, $email, $uniqueId) {
     $name = is_array($member) ? (string) ($member["name"] ?? "") : "";
     $sent = mail_send(
         $email,
-        "🔥 Débloquez vos signaux VIP — L'offre à 17 $ expire bientôt !",
+        "🔥 Débloquez vos signaux VIP — L'offre à 5 $ expire bientôt !",
         mail_html_abandon($email, $uniqueId, $name),
         [
             "scheduled_at" => gmdate("c", time() + 3600),
@@ -579,7 +579,7 @@ function mail_process_abandoned($limit = 8) {
         $name = is_array($member) ? (string) ($member["name"] ?? "") : "";
         $result = mail_send(
             $email,
-            "🔥 Débloquez vos signaux VIP — L'offre à 17 $ expire bientôt !",
+            "🔥 Débloquez vos signaux VIP — L'offre à 5 $ expire bientôt !",
             mail_html_abandon($email, $uniqueId, $name),
             ["idempotency" => "abandon-due-" . md5((string) $ref)]
         );
