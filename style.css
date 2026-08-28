@@ -883,8 +883,9 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     letter-spacing: 0.02em;
     white-space: normal;
     overflow: visible;
-    overflow-wrap: anywhere;
-    word-break: break-word;
+    overflow-wrap: break-word;
+    word-break: normal;
+    text-wrap: balance;
     hyphens: none;
 }
 
