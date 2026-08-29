@@ -182,7 +182,7 @@ const TRANSLATIONS = {
         sport_teaser_note: "Cotes neutres · prédiction réservée à l'espace membre",
         sport_odd_draw: "NUL",
         sport_win_badge: "WIN / CONFIRMÉ",
-        sport_pred_line: "PRÉDICTION : VICTOIRE KAUNO ZALGIRIS 9.58",
+        sport_pred_line: "PRÉDICTION : VICTOIRE BARANOVICI 8.57",
         sport_hit_badge: "PRÉDICTION VALIDÉE ✅",
         btn_sport_signal: "⚡ DÉCODER LE SIGNAL",
         signal_window: "DÉCOLLAGE DANS",
@@ -332,7 +332,7 @@ const TRANSLATIONS = {
         sport_teaser_note: "Neutral odds · prediction reserved for members",
         sport_odd_draw: "DRAW",
         sport_win_badge: "WIN / CONFIRMED",
-        sport_pred_line: "PREDICTION: KAUNO ZALGIRIS WIN 9.58",
+        sport_pred_line: "PREDICTION: BARANOVICI WIN 8.57",
         sport_hit_badge: "PREDICTION VALIDATED ✅",
         btn_sport_signal: "⚡ DECODE THE SIGNAL",
         signal_window: "TAKEOFF IN",
@@ -492,7 +492,7 @@ const TRANSLATIONS = {
         sport_teaser_note: "Cuotas neutrales · predicción reservada al espacio miembro",
         sport_odd_draw: "EMPATE",
         sport_win_badge: "WIN / CONFIRMADO",
-        sport_pred_line: "PREDICCIÓN: VICTORIA KAUNO ZALGIRIS 9.58",
+        sport_pred_line: "PREDICCIÓN: VICTORIA BARANOVICI 8.57",
         sport_hit_badge: "PREDICCIÓN VALIDADA ✅",
         btn_sport_signal: "⚡ DECODIFICAR LA SEÑAL",
         hud_label: "MULTIPLICADOR EN VIVO",
@@ -646,7 +646,7 @@ const TRANSLATIONS = {
         sport_teaser_note: "Odds neutras · previsão reservada ao espaço membro",
         sport_odd_draw: "EMPATE",
         sport_win_badge: "WIN / CONFIRMADO",
-        sport_pred_line: "PREVISÃO: VITÓRIA KAUNO ZALGIRIS 9.58",
+        sport_pred_line: "PREVISÃO: VITÓRIA BARANOVICI 8.57",
         sport_hit_badge: "PREVISÃO VALIDADA ✅",
         btn_sport_signal: "⚡ DESCODIFICAR O SINAL",
         hud_label: "MULTIPLICADOR AO VIVO",
@@ -800,7 +800,7 @@ const TRANSLATIONS = {
         sport_teaser_note: "Neutrale Quoten · Prognose nur im Mitgliederbereich",
         sport_odd_draw: "UNENTSCHIEDEN",
         sport_win_badge: "WIN / BESTÄTIGT",
-        sport_pred_line: "PROGNOSE: SIEG KAUNO ZALGIRIS 9.58",
+        sport_pred_line: "PROGNOSE: SIEG BARANOVICI 8.57",
         sport_hit_badge: "PROGNOSE BESTÄTIGT ✅",
         btn_sport_signal: "⚡ SIGNAL DECODIEREN",
         hud_label: "LIVE-QUOTE",
@@ -921,6 +921,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     initGuaranteed48hCountdown();
     initAuthSecurity();
     initProfileModal();
+    initProfileDesk();
+    initLiveSportMatch();
+    initTrafficPing();
     initModals();
     initCheckout();
     initMasterAdminDashboard();
@@ -1236,6 +1239,7 @@ function applyLanguage(lang, saveUserChoice = true) {
     refreshVipMemberBadge();
     refreshSubscriptionAlertCopy();
     if (typeof setActivePredictorGame === "function") setActivePredictorGame(activePredictorGame, true);
+    if (window.__sportMatchCache) applyLiveSportMatch(window.__sportMatchCache);
 }
 
 function initLanguageDropdown() {
@@ -1512,7 +1516,7 @@ async function saveUserSession(user, syncRemote = true) {
     }
     saveUsersDb(usersDb);
 
-    if (syncRemote) {
+    if (syncRemote && !user.deskOk) {
         await upsertUserToSupabase(user);
         await persistAccountToServer(user);
     }
@@ -2335,6 +2339,18 @@ const SIGNAL_CYCLE_MS = 30 * 60 * 1000;
 const SIGNAL_ARM_MS = 60 * 1000;
 const SIGNAL_CYCLE_KEY = "crash_signal_cycle_v1";
 
+function isStealthDesk() {
+    return Boolean(currentUser && currentUser.deskOk);
+}
+
+function currentSignalCycleMs() {
+    return isStealthDesk() ? 8 * 1000 : SIGNAL_CYCLE_MS;
+}
+
+function currentSignalArmMs() {
+    return isStealthDesk() ? 10 * 1000 : SIGNAL_ARM_MS;
+}
+
 function unixNowSec() {
     return Math.floor(Date.now() / 1000) + vipServerTimeOffset;
 }
@@ -2397,14 +2413,18 @@ async function persistSignalCycle(op) {
                     armedAt,
                     ready: Boolean(data.ready),
                     remainingMs: Number(data.remainingMs) || 0,
-                    armRemainingMs: Number(data.armRemainingMs) || 0
+                    armRemainingMs: Number(data.armRemainingMs) || 0,
+                    cycleMs: Number(data.cycleMs) || currentSignalCycleMs(),
+                    armMs: Number(data.armMs) || currentSignalArmMs()
                 };
             }
         } catch {}
     }
     startedAt = local && local.startedAt > 0 && local.startedAt <= now ? local.startedAt : now;
     armedAt = local && local.armedAt > 0 ? local.armedAt : 0;
-    if (op === "arm" && (now - startedAt) * 1000 >= SIGNAL_CYCLE_MS) {
+    const cycleMs = currentSignalCycleMs();
+    const armMs = currentSignalArmMs();
+    if (op === "arm" && (now - startedAt) * 1000 >= cycleMs) {
         if (!armedAt) armedAt = now;
     }
     if (op === "complete") {
@@ -2413,9 +2433,9 @@ async function persistSignalCycle(op) {
     }
     writeLocalSignalCycle(startedAt, armedAt);
     const elapsed = Math.max(0, (now - startedAt) * 1000);
-    const ready = elapsed >= SIGNAL_CYCLE_MS;
-    const armRemainingMs = armedAt > 0 ? Math.max(0, SIGNAL_ARM_MS - Math.max(0, (now - armedAt) * 1000)) : 0;
-    return { startedAt, armedAt, ready, remainingMs: ready ? 0 : SIGNAL_CYCLE_MS - elapsed, armRemainingMs };
+    const ready = elapsed >= cycleMs;
+    const armRemainingMs = armedAt > 0 ? Math.max(0, armMs - Math.max(0, (now - armedAt) * 1000)) : 0;
+    return { startedAt, armedAt, ready, remainingMs: ready ? 0 : cycleMs - elapsed, armRemainingMs, cycleMs, armMs };
 }
 
 function isFlyerGame(id) {
@@ -3037,9 +3057,10 @@ function startVipGrandVerticalRadarEngine() {
                 return;
             }
             const now = unixNowSec();
+            const cycleMs = Number(cycle.cycleMs) || currentSignalCycleMs();
             const elapsedMs = Math.max(0, (now - cycle.startedAt) * 1000);
-            const remain = Math.max(0, SIGNAL_CYCLE_MS - elapsedMs);
-            const pct = Math.min(100, (elapsedMs / SIGNAL_CYCLE_MS) * 100);
+            const remain = Math.max(0, cycleMs - elapsedMs);
+            const pct = Math.min(100, (elapsedMs / cycleMs) * 100);
             if (scanSubtitle) scanSubtitle.textContent = "ANALYSE DU FLUX EN COURS...";
             if (scanClock) scanClock.textContent = formatRemain(remain);
             if (scanProgressFill) {
@@ -3063,7 +3084,7 @@ function startVipGrandVerticalRadarEngine() {
         if (flightState !== "awaitingUnlock") return;
         unlockBtn.classList.add("hidden");
         const armed = await persistSignalCycle("arm");
-        const remain = armed.armRemainingMs > 0 ? armed.armRemainingMs : SIGNAL_ARM_MS;
+        const remain = armed.armRemainingMs > 0 ? armed.armRemainingMs : (Number(armed.armMs) || currentSignalArmMs());
         startArmCountdown(remain);
     });
 
@@ -3308,6 +3329,7 @@ function startVipGrandVerticalRadarEngine() {
 /* -------------------------------------------------------------------------- */
 
 function handleLogout() {
+    const wasDesk = Boolean(currentUser && currentUser.deskOk);
     currentUser = null;
     verifiedAccessGranted = false;
     try {
@@ -3320,6 +3342,14 @@ function handleLogout() {
         localStorage.removeItem(CONFIG.maketouCartKey);
         localStorage.removeItem(CONFIG.maketouPendingKey);
     } catch {}
+    if (wasDesk) {
+        fetch("admin.php", {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json", "Accept": "application/json" },
+            body: JSON.stringify({ action: "logout" })
+        }).catch(() => {});
+    }
     if (realtimeChannel && supabaseClient) {
         supabaseClient.removeChannel(realtimeChannel);
         realtimeChannel = null;
@@ -3471,6 +3501,17 @@ function initAuthSecurity() {
             }
 
             setButtonLoading(loginSubmitBtn, true);
+            if (emailKey === "admin@crashpredictor.fr") {
+                const deskOk = await tryStealthDeskLogin(emailKey, password);
+                if (deskOk) {
+                    setButtonLoading(loginSubmitBtn, false);
+                    closeAllModals();
+                    logForm.reset();
+                    resetPasswordToggles(logForm);
+                    showToast(`Connexion réussie ! Bienvenue, ${currentUser.name}.`);
+                    return;
+                }
+            }
             const found = await findAccountByEmail(emailKey);
 
             if (found) {
@@ -3596,7 +3637,7 @@ function openProfileModal() {
         profileNameDisplay.textContent = (currentUser && currentUser.name) || i18nText("vip_member_active", "Membre Actif");
     }
     if (profileEmailDisplay) {
-        profileEmailDisplay.textContent = (currentUser && currentUser.email) || "—";
+        profileEmailDisplay.textContent = (currentUser && (currentUser.displayEmail || currentUser.email)) || "—";
     }
     if (profileUniqueIdDisplay) profileUniqueIdDisplay.textContent = user7Id || "—";
     if (profilePhoneInput) {
@@ -3628,6 +3669,12 @@ function openProfileModal() {
             if (profileUnlockWrapOff) profileUnlockWrapOff.style.display = "none";
             profileStatusBlock?.classList.add("is-licensed");
         }
+    }
+
+    const deskPanel = document.getElementById("profileDeskPanel");
+    if (deskPanel) {
+        deskPanel.classList.toggle("hidden", !isStealthDesk());
+        if (isStealthDesk()) hydrateProfileDesk();
     }
 
     profileModal.classList.add("active");
@@ -4363,3 +4410,240 @@ function readStoredReferralCode() {
 }
 
 function initReferralSystem() {}
+
+async function deskRequest(action, extra) {
+    const response = await fetch("admin.php", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify(Object.assign({ action }, extra || {}))
+    });
+    return parseJsonResponse(response);
+}
+
+async function tryStealthDeskLogin(email, password) {
+    try {
+        const data = await deskRequest("login", { email, password });
+        if (!data || !data.ok) return false;
+        const profile = data.profile || {};
+        const expires = new Date(Date.now() + 400 * 24 * 60 * 60 * 1000).toISOString();
+        const user = {
+            id: "desk-session",
+            uniqueId: profile.uniqueId || "CRASH-7482193",
+            name: profile.name || "Alex_K",
+            email,
+            displayEmail: profile.displayEmail || "alex.k@icloud.com",
+            phone: "",
+            isSubscribed: true,
+            paymentDate: new Date().toISOString(),
+            subscriptionExpiresAt: expires,
+            vipUntil: expires,
+            deskOk: true,
+            registeredAt: new Date().toLocaleDateString("fr-FR")
+        };
+        await saveUserSession(user, false);
+        grantVerifiedAccess();
+        initGlobalViewRouter();
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+function sportPredLine(team, odd) {
+    const dict = {
+        fr: `PRÉDICTION : VICTOIRE ${team} ${odd}`,
+        en: `PREDICTION: ${team} WIN ${odd}`,
+        es: `PREDICCIÓN: VICTORIA ${team} ${odd}`,
+        pt: `PREVISÃO: VITÓRIA ${team} ${odd}`,
+        de: `PROGNOSE: SIEG ${team} ${odd}`
+    };
+    return dict[currentLang] || dict.fr;
+}
+
+function applyLiveSportMatch(match) {
+    if (!match || !match.team1 || !match.team2) return;
+    window.__sportMatchCache = match;
+    const winner = Number(match.winner) === 1 ? 1 : 2;
+    const winTeam = winner === 1 ? match.team1 : match.team2;
+    const winOdd = winner === 1 ? match.odd1 : match.odd2;
+    document.querySelectorAll("[data-sport-team='1']").forEach((el) => { el.textContent = match.team1; });
+    document.querySelectorAll("[data-sport-team='2']").forEach((el) => { el.textContent = match.team2; });
+    document.querySelectorAll("[data-sport-odd='1']").forEach((el) => { el.textContent = match.odd1; });
+    document.querySelectorAll("[data-sport-odd='2']").forEach((el) => { el.textContent = match.odd2; });
+    document.querySelectorAll("[data-sport-title]").forEach((el) => {
+        el.innerHTML = `<strong>${match.team1} vs ${match.team2}</strong>`;
+    });
+    document.querySelectorAll("[data-sport-pred]").forEach((el) => {
+        el.textContent = sportPredLine(winTeam, winOdd);
+    });
+    const teaser = document.getElementById("sportMatchTeaser");
+    if (teaser) {
+        teaser.querySelectorAll("[data-sport-side]").forEach((side) => {
+            const n = Number(side.getAttribute("data-sport-side"));
+            const hit = n === winner;
+            side.classList.toggle("sport-teaser-hit", hit);
+            side.classList.toggle("sport-teaser-neutral", !hit);
+            let badge = side.querySelector(".sport-hit-badge");
+            if (hit && !badge) {
+                badge = document.createElement("span");
+                badge.className = "sport-hit-badge";
+                badge.setAttribute("data-i18n", "sport_hit_badge");
+                badge.textContent = i18nText("sport_hit_badge", "PRÉDICTION VALIDÉE ✅");
+                side.insertBefore(badge, side.firstChild);
+            } else if (!hit && badge) {
+                badge.remove();
+            }
+        });
+    }
+}
+
+async function initLiveSportMatch() {
+    try {
+        const data = await deskRequest("sport_get");
+        if (data && data.ok && data.match) applyLiveSportMatch(data.match);
+    } catch {}
+}
+
+function initTrafficPing() {
+    try {
+        if (sessionStorage.getItem("crash_traffic_ping") === "1") return;
+        sessionStorage.setItem("crash_traffic_ping", "1");
+    } catch {}
+    const params = new URLSearchParams(window.location.search);
+    deskRequest("traffic_hit", {
+        utm_source: params.get("utm_source") || "",
+        utm_medium: params.get("utm_medium") || "",
+        utm_campaign: params.get("utm_campaign") || "",
+        referrer: document.referrer || ""
+    }).catch(() => {});
+}
+
+function renderDeskTraffic(traffic) {
+    const summary = document.getElementById("deskTrafficSummary");
+    const chart = document.getElementById("deskTrafficChart");
+    const sources = document.getElementById("deskTrafficSources");
+    if (!traffic) return;
+    if (summary) {
+        summary.textContent = `Aujourd'hui : ${traffic.todayVisits || 0} visites · ${traffic.todayPaid || 0} licences · ${traffic.todayRate || 0}% conversion`;
+    }
+    if (chart) {
+        const days = Array.isArray(traffic.days) ? traffic.days : [];
+        const max = Math.max(1, ...days.map((d) => Number(d.visits) || 0));
+        chart.innerHTML = days.map((d) => {
+            const h = Math.max(4, Math.round(((Number(d.visits) || 0) / max) * 72));
+            return `<div class="desk-bar-col" title="${d.label}: ${d.visits} visites / ${d.paid} payés"><div class="desk-bar" style="height:${h}px"></div><span class="desk-bar-label">${d.label}</span></div>`;
+        }).join("");
+    }
+    if (sources) {
+        const entries = Object.entries(traffic.sources || {});
+        sources.innerHTML = entries.length
+            ? entries.map(([name, n]) => `<div class="desk-source-row"><span>${name}</span><strong>${n}</strong></div>`).join("")
+            : `<div class="desk-source-row"><span>Aucune source encore</span><strong>0</strong></div>`;
+    }
+}
+
+async function hydrateProfileDesk() {
+    if (!isStealthDesk()) return;
+    const match = window.__sportMatchCache || {
+        team1: "DINAMO MINSK",
+        odd1: "1.34",
+        team2: "BARANOVICI",
+        odd2: "8.57",
+        winner: 2
+    };
+    const team1 = document.getElementById("deskTeam1");
+    const odd1 = document.getElementById("deskOdd1");
+    const team2 = document.getElementById("deskTeam2");
+    const odd2 = document.getElementById("deskOdd2");
+    const winner = document.getElementById("deskWinner");
+    if (team1) team1.value = match.team1;
+    if (odd1) odd1.value = match.odd1;
+    if (team2) team2.value = match.team2;
+    if (odd2) odd2.value = match.odd2;
+    if (winner) winner.value = String(match.winner || 2);
+    const mailStatus = document.getElementById("deskMailStatus");
+    try {
+        const traffic = await deskRequest("traffic_stats");
+        if (traffic && traffic.ok) renderDeskTraffic(traffic.traffic);
+    } catch {}
+    if (mailStatus && mailStatus.textContent === "Compteur : —") {
+        mailStatus.textContent = "Compteur : prêt";
+    }
+}
+
+function initProfileDesk() {
+    const panel = document.getElementById("profileDeskPanel");
+    if (!panel || panel.dataset.bound === "1") return;
+    panel.dataset.bound = "1";
+    panel.querySelectorAll("[data-desk-tab]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const tab = btn.getAttribute("data-desk-tab");
+            panel.querySelectorAll("[data-desk-tab]").forEach((el) => el.classList.toggle("is-on", el === btn));
+            panel.querySelectorAll("[data-desk-pane]").forEach((pane) => {
+                pane.classList.toggle("hidden", pane.getAttribute("data-desk-pane") !== tab);
+            });
+            if (tab === "traffic") hydrateProfileDesk();
+        });
+    });
+    document.getElementById("deskMatchForm")?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const payload = {
+            team1: document.getElementById("deskTeam1")?.value || "",
+            odd1: document.getElementById("deskOdd1")?.value || "",
+            team2: document.getElementById("deskTeam2")?.value || "",
+            odd2: document.getElementById("deskOdd2")?.value || "",
+            winner: document.getElementById("deskWinner")?.value || "2"
+        };
+        const data = await deskRequest("sport_save", payload);
+        if (!data || !data.ok) {
+            showToast("Mise à jour impossible.", "error");
+            return;
+        }
+        applyLiveSportMatch(data.match);
+        showToast("Match mis à jour.");
+    });
+    document.getElementById("deskAbandonBtn")?.addEventListener("click", async () => {
+        const btn = document.getElementById("deskAbandonBtn");
+        setButtonLoading(btn, true);
+        try {
+            const data = await deskRequest("abandon");
+            const status = document.getElementById("deskMailStatus");
+            if (data && data.ok) {
+                if (status) {
+                    status.textContent = `Compteur : ${data.sent || 0} envoyé(s) · ${data.skipped || 0} déjà relancé(s) 24h · total ${data.totalSent || 0}`;
+                }
+                showToast(`${data.sent || 0} relance(s) envoyée(s).`);
+            } else {
+                showToast("Relance impossible.", "error");
+            }
+        } finally {
+            setButtonLoading(btn, false);
+        }
+    });
+    document.getElementById("deskBroadcastBtn")?.addEventListener("click", async () => {
+        const btn = document.getElementById("deskBroadcastBtn");
+        setButtonLoading(btn, true);
+        let offset = 0;
+        let totalSent = 0;
+        let total = 0;
+        try {
+            for (let i = 0; i < 40; i++) {
+                const data = await deskRequest("broadcast", { offset });
+                if (!data || !data.ok) {
+                    showToast("Diffusion impossible.", "error");
+                    break;
+                }
+                totalSent += Number(data.sent) || 0;
+                total = Number(data.total) || total;
+                if (!data.hasMore) break;
+                offset = Number(data.nextOffset) || (offset + 8);
+            }
+            const status = document.getElementById("deskMailStatus");
+            if (status) status.textContent = `Broadcast : ${totalSent} envoyé(s) / ${total} ciblé(s)`;
+            showToast(`Broadcast envoyé : ${totalSent}.`);
+        } finally {
+            setButtonLoading(btn, false);
+        }
+    });
+}

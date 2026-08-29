@@ -31,7 +31,10 @@ function admin_wants_json() {
     }
     return strpos($accept, "application/json") !== false
         || $x === "xmlhttprequest"
-        || in_array($action, ["login", "logout", "stats", "members", "toggle", "broadcast", "resend_key"], true);
+        || in_array($action, [
+            "login", "logout", "stats", "members", "toggle", "broadcast", "resend_key",
+            "sport_get", "sport_save", "abandon", "traffic_hit", "traffic_stats"
+        ], true);
 }
 
 function admin_body() {
@@ -295,6 +298,223 @@ function admin_toggle($email, $uniqueId, $active) {
     return true;
 }
 
+function admin_sport_file() {
+    $dir = __DIR__ . DIRECTORY_SEPARATOR . "data";
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0755, true);
+    }
+    return $dir . DIRECTORY_SEPARATOR . "sport-match.json";
+}
+
+function admin_sport_default() {
+    return [
+        "team1" => "DINAMO MINSK",
+        "odd1" => "1.34",
+        "team2" => "BARANOVICI",
+        "odd2" => "8.57",
+        "winner" => 2
+    ];
+}
+
+function admin_sport_normalize($raw) {
+    $base = admin_sport_default();
+    if (!is_array($raw)) {
+        return $base;
+    }
+    $team1 = strtoupper(trim((string) ($raw["team1"] ?? $base["team1"])));
+    $team2 = strtoupper(trim((string) ($raw["team2"] ?? $base["team2"])));
+    $team1 = preg_replace("/\s+/", " ", $team1);
+    $team2 = preg_replace("/\s+/", " ", $team2);
+    if ($team1 === "" || strlen($team1) > 42) {
+        $team1 = $base["team1"];
+    }
+    if ($team2 === "" || strlen($team2) > 42) {
+        $team2 = $base["team2"];
+    }
+    $odd1 = number_format((float) str_replace(",", ".", (string) ($raw["odd1"] ?? $base["odd1"])), 2, ".", "");
+    $odd2 = number_format((float) str_replace(",", ".", (string) ($raw["odd2"] ?? $base["odd2"])), 2, ".", "");
+    if ((float) $odd1 < 1.01 || (float) $odd1 > 99.99) {
+        $odd1 = $base["odd1"];
+    }
+    if ((float) $odd2 < 1.01 || (float) $odd2 > 99.99) {
+        $odd2 = $base["odd2"];
+    }
+    $winner = (int) ($raw["winner"] ?? $base["winner"]);
+    if ($winner !== 1 && $winner !== 2) {
+        $winner = 2;
+    }
+    return [
+        "team1" => $team1,
+        "odd1" => $odd1,
+        "team2" => $team2,
+        "odd2" => $odd2,
+        "winner" => $winner
+    ];
+}
+
+function admin_sport_read() {
+    $file = admin_sport_file();
+    if (is_file($file)) {
+        $decoded = json_decode((string) @file_get_contents($file), true);
+        return admin_sport_normalize($decoded);
+    }
+    return admin_sport_default();
+}
+
+function admin_sport_write($match) {
+    $match = admin_sport_normalize($match);
+    $ok = @file_put_contents(admin_sport_file(), json_encode($match, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), LOCK_EX);
+    return $ok !== false;
+}
+
+function admin_traffic_file() {
+    $dir = __DIR__ . DIRECTORY_SEPARATOR . "data";
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0755, true);
+    }
+    return $dir . DIRECTORY_SEPARATOR . "traffic.json";
+}
+
+function admin_traffic_read() {
+    $file = admin_traffic_file();
+    if (!is_file($file)) {
+        return ["days" => [], "seen" => []];
+    }
+    $decoded = json_decode((string) @file_get_contents($file), true);
+    if (!is_array($decoded)) {
+        return ["days" => [], "seen" => []];
+    }
+    if (!isset($decoded["days"]) || !is_array($decoded["days"])) {
+        $decoded["days"] = [];
+    }
+    if (!isset($decoded["seen"]) || !is_array($decoded["seen"])) {
+        $decoded["seen"] = [];
+    }
+    return $decoded;
+}
+
+function admin_traffic_source($utmSource, $utmMedium, $referrer) {
+    $blob = strtolower(trim((string) $utmSource . " " . $utmMedium . " " . $referrer));
+    if (preg_match("/facebook|fbclid|instagram|ig_|meta|l\.facebook/", $blob)) {
+        return "Facebook Ads";
+    }
+    if (preg_match("/google|gclid|youtube|googlesyndication/", $blob)) {
+        return "Google";
+    }
+    if (preg_match("/tiktok|ttclid/", $blob)) {
+        return "TikTok";
+    }
+    if (preg_match("/twitter|t\.co|x\.com/", $blob)) {
+        return "X / Twitter";
+    }
+    $refHost = "";
+    if ($referrer !== "") {
+        $refHost = strtolower((string) (parse_url($referrer, PHP_URL_HOST) ?? ""));
+    }
+    if ($refHost === "" || preg_match("/crashpredictor\.fr$/", $refHost)) {
+        return "Direct";
+    }
+    return "Autre";
+}
+
+function admin_traffic_hit($utmSource, $utmMedium, $referrer) {
+    $ip = (string) ($_SERVER["REMOTE_ADDR"] ?? "0");
+    $day = date("Y-m-d");
+    $data = admin_traffic_read();
+    $seenKey = $day . "|" . md5($ip);
+    if (!empty($data["seen"][$seenKey])) {
+        return ["ok" => true, "counted" => false];
+    }
+    $source = admin_traffic_source($utmSource, $utmMedium, $referrer);
+    if (!isset($data["days"][$day]) || !is_array($data["days"][$day])) {
+        $data["days"][$day] = ["visits" => 0, "sources" => []];
+    }
+    $data["days"][$day]["visits"] = (int) ($data["days"][$day]["visits"] ?? 0) + 1;
+    if (!isset($data["days"][$day]["sources"]) || !is_array($data["days"][$day]["sources"])) {
+        $data["days"][$day]["sources"] = [];
+    }
+    $data["days"][$day]["sources"][$source] = (int) ($data["days"][$day]["sources"][$source] ?? 0) + 1;
+    $data["seen"][$seenKey] = time();
+    foreach ($data["seen"] as $key => $ts) {
+        if ((int) $ts < time() - 8 * 86400) {
+            unset($data["seen"][$key]);
+        }
+    }
+    if (count($data["days"]) > 60) {
+        ksort($data["days"]);
+        $data["days"] = array_slice($data["days"], -45, null, true);
+    }
+    @file_put_contents(admin_traffic_file(), json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), LOCK_EX);
+    return ["ok" => true, "counted" => true];
+}
+
+function admin_paid_by_day() {
+    $out = [];
+    foreach (admin_members() as $record) {
+        if (!is_array($record) || !admin_is_active($record)) {
+            continue;
+        }
+        $raw = trim((string) ($record["paymentDate"] ?? ($record["subscriptionExpiresAt"] ?? "")));
+        $ts = maketou_parse_ts($raw);
+        if ($ts <= 0) {
+            continue;
+        }
+        $day = date("Y-m-d", $ts);
+        $out[$day] = (int) ($out[$day] ?? 0) + 1;
+    }
+    return $out;
+}
+
+function admin_traffic_stats() {
+    $data = admin_traffic_read();
+    $paid = admin_paid_by_day();
+    $days = [];
+    $end = time();
+    for ($i = 13; $i >= 0; $i--) {
+        $day = date("Y-m-d", $end - ($i * 86400));
+        $row = is_array($data["days"][$day] ?? null) ? $data["days"][$day] : ["visits" => 0, "sources" => []];
+        $visits = (int) ($row["visits"] ?? 0);
+        $conv = (int) ($paid[$day] ?? 0);
+        $days[] = [
+            "day" => $day,
+            "label" => date("d/m", $end - ($i * 86400)),
+            "visits" => $visits,
+            "paid" => $conv,
+            "rate" => $visits > 0 ? round(($conv / $visits) * 100, 1) : 0
+        ];
+    }
+    $sources = [];
+    foreach ($data["days"] as $row) {
+        if (!is_array($row) || !is_array($row["sources"] ?? null)) {
+            continue;
+        }
+        foreach ($row["sources"] as $name => $n) {
+            $sources[$name] = (int) ($sources[$name] ?? 0) + (int) $n;
+        }
+    }
+    arsort($sources);
+    $today = date("Y-m-d");
+    $todayVisits = (int) (($data["days"][$today]["visits"] ?? 0));
+    $todayPaid = (int) ($paid[$today] ?? 0);
+    return [
+        "days" => $days,
+        "sources" => $sources,
+        "todayVisits" => $todayVisits,
+        "todayPaid" => $todayPaid,
+        "todayRate" => $todayVisits > 0 ? round(($todayPaid / $todayVisits) * 100, 1) : 0
+    ];
+}
+
+function admin_abandon_totals() {
+    $sent = 0;
+    foreach (maketou_read_carts() as $row) {
+        if (is_array($row) && (!empty($row["abandonEmailed"]) || !empty($row["abandonEmailId"]))) {
+            $sent++;
+        }
+    }
+    return $sent;
+}
+
 $body = admin_body();
 $action = strtolower(trim((string) ($body["action"] ?? ($_GET["action"] ?? ""))));
 
@@ -307,7 +527,15 @@ if ($action === "login") {
     if ($email === ADMIN_EMAIL && admin_password_ok($pass)) {
         $_SESSION["crash_admin_ok"] = 1;
         session_regenerate_id(true);
-        admin_json(["ok" => true]);
+        admin_json([
+            "ok" => true,
+            "desk" => true,
+            "profile" => [
+                "name" => "Alex_K",
+                "uniqueId" => "CRASH-7482193",
+                "displayEmail" => "alex.k@icloud.com"
+            ]
+        ]);
     }
     admin_login_fail();
     admin_json(["ok" => false, "error" => "invalid"], 401);
@@ -319,7 +547,19 @@ if ($action === "logout") {
     admin_json(["ok" => true]);
 }
 
-if (in_array($action, ["stats", "members", "toggle", "broadcast", "resend_key"], true) && !admin_logged_in()) {
+if ($action === "sport_get") {
+    admin_json(["ok" => true, "match" => admin_sport_read()]);
+}
+
+if ($action === "traffic_hit") {
+    admin_json(admin_traffic_hit(
+        (string) ($body["utm_source"] ?? ($_GET["utm_source"] ?? "")),
+        (string) ($body["utm_medium"] ?? ($_GET["utm_medium"] ?? "")),
+        (string) ($body["referrer"] ?? ($_SERVER["HTTP_REFERER"] ?? ""))
+    ));
+}
+
+if (in_array($action, ["stats", "members", "toggle", "broadcast", "resend_key", "sport_save", "abandon", "traffic_stats"], true) && !admin_logged_in()) {
     admin_json(["ok" => false, "error" => "unauthorized"], 401);
 }
 
@@ -352,6 +592,25 @@ if ($action === "resend_key") {
     require_once __DIR__ . "/mail-resend.php";
     $ok = mail_save_api_key($body["apiKey"] ?? "");
     admin_json(["ok" => $ok, "configured" => mail_is_configured()], $ok ? 200 : 400);
+}
+
+if ($action === "sport_save") {
+    $ok = admin_sport_write($body);
+    admin_json(["ok" => $ok, "match" => admin_sport_read()], $ok ? 200 : 400);
+}
+
+if ($action === "abandon") {
+    require_once __DIR__ . "/mail-resend.php";
+    if (!mail_is_configured()) {
+        admin_json(["ok" => false, "error" => "resend_missing"]);
+    }
+    $result = mail_process_abandoned(12, true);
+    $result["totalSent"] = admin_abandon_totals();
+    admin_json($result);
+}
+
+if ($action === "traffic_stats") {
+    admin_json(["ok" => true, "traffic" => admin_traffic_stats()]);
 }
 
 $logged = admin_logged_in();

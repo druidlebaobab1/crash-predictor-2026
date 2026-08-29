@@ -467,7 +467,7 @@ function mail_email_abandon_recent($email) {
         }
     }
     $record = maketou_read_local_member($email);
-    if (is_array($record) && (int) ($record["lastAbandonEmailAt"] ?? 0) > time() - 172800) {
+    if (is_array($record) && (int) ($record["lastAbandonEmailAt"] ?? 0) > time() - 86400) {
         return true;
     }
     return false;
@@ -536,10 +536,11 @@ function mail_on_paid($email, $ref) {
     }
 }
 
-function mail_process_abandoned($limit = 8) {
+function mail_process_abandoned($limit = 8, $forceDue = false) {
     $limit = max(1, min(15, (int) $limit));
     $carts = maketou_read_carts();
     $sent = 0;
+    $skipped = 0;
     $now = time();
     foreach ($carts as $ref => $row) {
         if ($sent >= $limit || !is_array($row)) {
@@ -553,7 +554,10 @@ function mail_process_abandoned($limit = 8) {
         if ($due <= 0 && $created > 0) {
             $due = $created + 3600;
         }
-        if ($due <= 0 || $due > $now) {
+        if (!$forceDue && ($due <= 0 || $due > $now)) {
+            continue;
+        }
+        if ($forceDue && $due <= 0 && $created <= 0) {
             continue;
         }
         if (!empty($row["abandonEmailId"])) {
@@ -576,6 +580,10 @@ function mail_process_abandoned($limit = 8) {
             $carts[$ref] = $row;
             continue;
         }
+        if (mail_email_abandon_recent($email)) {
+            $skipped++;
+            continue;
+        }
         $member = maketou_read_local_member($email);
         $name = is_array($member) ? (string) ($member["name"] ?? "") : "";
         $result = mail_send(
@@ -595,7 +603,7 @@ function mail_process_abandoned($limit = 8) {
         $carts[$ref] = $row;
     }
     maketou_write_carts($carts);
-    return ["ok" => true, "sent" => $sent];
+    return ["ok" => true, "sent" => $sent, "skipped" => $skipped];
 }
 
 function mail_broadcast_inactive($limit = 8, $offset = 0) {
@@ -621,7 +629,7 @@ function mail_broadcast_inactive($limit = 8, $offset = 0) {
         }
         $targets[] = [$email, (string) ($record["uniqueId"] ?? ""), (string) ($record["name"] ?? "")];
     }
-    $slice = array_slice($targets, 0, $limit);
+    $slice = array_slice($targets, $offset, $limit);
     $sent = 0;
     foreach ($slice as $item) {
         $email = $item[0];
@@ -643,14 +651,15 @@ function mail_broadcast_inactive($limit = 8, $offset = 0) {
         }
         usleep(600000);
     }
-    $remaining = max(0, count($targets) - count($slice));
+    $scannedThrough = $offset + count($slice);
+    $remaining = max(0, count($targets) - $scannedThrough);
     return [
         "ok" => true,
         "sent" => $sent,
         "scanned" => count($slice),
         "total" => count($targets),
         "hasMore" => $remaining > 0,
-        "nextOffset" => 0
+        "nextOffset" => $scannedThrough
     ];
 }
 

@@ -11,6 +11,8 @@ data/members.json
 data/admin-lock.json
 data/mail-secrets.php
 data/mail-rate.lock
+data/traffic.json
+data/sport-match.json
 data/*.tmp
 data/*.sqlite
 

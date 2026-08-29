@@ -132,9 +132,14 @@ function signal_cycle_key($email, $uniqueId) {
     return "";
 }
 
-function signal_cycle_payload($startedAt, $armedAt, $now) {
-    $cycleMs = 30 * 60 * 1000;
-    $armMs = 60 * 1000;
+function signal_is_demo_account($email) {
+    return strtolower(trim((string) $email)) === "admin@crashpredictor.fr";
+}
+
+function signal_cycle_payload($startedAt, $armedAt, $now, $email = "") {
+    $demo = signal_is_demo_account($email);
+    $cycleMs = $demo ? 8 * 1000 : 30 * 60 * 1000;
+    $armMs = $demo ? 10 * 1000 : 60 * 1000;
     $elapsedMs = max(0, ($now - $startedAt) * 1000);
     $ready = $elapsedMs >= $cycleMs;
     $armRemain = 0;
@@ -148,7 +153,9 @@ function signal_cycle_payload($startedAt, $armedAt, $now) {
         "armedAt" => $armedAt,
         "ready" => $ready,
         "remainingMs" => $ready ? 0 : max(0, $cycleMs - $elapsedMs),
-        "armRemainingMs" => $armRemain
+        "armRemainingMs" => $armRemain,
+        "cycleMs" => $cycleMs,
+        "armMs" => $armMs
     ];
 }
 
@@ -174,7 +181,7 @@ if ($method === "POST" && $action === "signal_cycle") {
         $startedAt = $now;
         $armedAt = 0;
     }
-    $cycleSec = 30 * 60;
+    $cycleSec = signal_is_demo_account($email) ? 8 : 30 * 60;
     if ($op === "arm") {
         if (($now - $startedAt) >= $cycleSec) {
             if ($armedAt <= 0 || $armedAt > $now) {
@@ -195,7 +202,7 @@ if ($method === "POST" && $action === "signal_cycle") {
         $members[$email]["signalArmedAt"] = $armedAt;
         members_write_store($storeFile, $members);
     }
-    echo json_encode(signal_cycle_payload($startedAt, $armedAt, $now));
+    echo json_encode(signal_cycle_payload($startedAt, $armedAt, $now, $email));
     exit;
 }
 
