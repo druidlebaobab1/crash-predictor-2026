@@ -608,14 +608,14 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     top: 0;
     left: 0;
     width: 100%;
-    height: min(78vh, 820px);
+    height: min(82vh, 860px);
     pointer-events: none;
     z-index: 0;
     background-image:
-        linear-gradient(180deg, rgba(10, 15, 29, 0.40) 0%, rgba(10, 15, 29, 0.82) 60%, #0a0f1d 100%),
-        url("/images/cr7-hero.jpg");
+        linear-gradient(180deg, rgba(10, 15, 29, 0.20) 0%, rgba(10, 15, 29, 0.70) 50%, #0a0f1d 100%),
+        url("/images/cr7-top.jpg");
     background-size: cover;
-    background-position: center 10%;
+    background-position: center 5%;
     background-repeat: no-repeat;
 }
 .section-container {
@@ -1353,10 +1353,32 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 .section-title { font-family: var(--font-heading); font-size: 1.4rem; font-weight: 900; margin-bottom: 6px; }
 .section-subtitle { color: var(--text-muted); font-size: 0.88rem; }
 
+.cr7-bottom-section {
+    position: relative;
+    isolation: isolate;
+    min-height: min(48vh, 460px);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+.cr7-bottom-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+        linear-gradient(180deg, #0a0f1d 0%, rgba(10, 15, 29, 0.45) 40%, rgba(10, 15, 29, 0.85) 100%),
+        url("/images/cr7-bottom.jpg");
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
 .main-footer {
     border-top: 1px solid rgba(255, 200, 55, 0.15);
     padding: 28px 16px 40px;
     text-align: center;
+    position: relative;
+    z-index: 10;
 }
 
 .footer-container { display: flex; flex-direction: column; align-items: center; gap: 8px; }
@@ -3535,10 +3557,12 @@ button.vip-member-tag:hover {
 @media (max-width: 600px) {
     .suite-games-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
     .hero-cr7-bg {
-        height: min(64vh, 560px);
+        height: min(68vh, 580px);
         background-size: cover;
-        background-position: center 8%;
+        background-position: center 5%;
     }
+    .cr7-bottom-section { min-height: min(42vh, 360px); }
+    .cr7-bottom-bg { background-position: center center; }
     .hero-predictor-title { font-size: clamp(1.45rem, 8vw, 2.1rem); }
     .hero-subtitle-desc {
         font-size: 13px;
