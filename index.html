@@ -792,12 +792,12 @@
                 <button type="button" class="btn-primary" id="adminResendSave" style="margin-top:10px;">Enregistrer la clé</button>
                 <hr class="desk-hr">
                 <h2 class="desk-card-title">Campagne de réactivation</h2>
-                <p class="desk-muted">Email unique aux membres actuellement NON ACTIVÉ, par petits lots.</p>
+                <p class="desk-muted">Email unique aux membres NON ACTIVÉ dont Resend a déjà confirmé la boîte. Les fausses adresses sont ignorées.</p>
                 <button type="button" class="btn-primary" id="adminBroadcastBtn">Envoyer la campagne de réactivation</button>
                 <p id="adminBroadcastStatus" class="desk-note"></p>
                 <hr class="desk-hr">
                 <h2 class="desk-card-title">Signal du jour</h2>
-                <p class="desk-muted">Email dynamique depuis le match validé de l’interface Résultat Dernier Signal Foot. Destinataires : membres NON ACTIVÉ uniquement. Aucune saisie manuelle.</p>
+                <p class="desk-muted">Email dynamique depuis le match validé. Destinataires : NON ACTIVÉ + boîte réellement confirmée par Resend. Aucune saisie manuelle.</p>
                 <p id="adminSignalMatchPreview" class="desk-note">Match actuel : —</p>
                 <button type="button" class="btn-primary" id="adminSignalBroadcastBtn">🚀 DIFFUSER LE SIGNAL DU JOUR AUX NON ACTIVÉS</button>
                 <p id="adminSignalBroadcastStatus" class="desk-note"></p>
@@ -1161,7 +1161,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=u88" defer></script>
+    <script src="app.js?v=u89" defer></script>
     <script src="ambient-audio.js?v=9" defer></script>
     <script src="fire-embers.js?v=2" defer></script>
 </body>

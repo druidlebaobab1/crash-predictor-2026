@@ -175,6 +175,19 @@ function admin_collect_stats() {
             $online++;
         }
     }
+    $inboxOk = 0;
+    $inboxDead = 0;
+    foreach ($members as $record) {
+        if (!is_array($record)) {
+            continue;
+        }
+        if (!empty($record["emailInboxOk"])) {
+            $inboxOk++;
+        }
+        if (!empty($record["emailBounced"])) {
+            $inboxDead++;
+        }
+    }
     $abandoned = 0;
     foreach ($carts as $row) {
         if (!is_array($row)) {
@@ -190,7 +203,9 @@ function admin_collect_stats() {
         "totalMembers" => $total,
         "newToday" => $today,
         "paidLicenses" => $paid,
-        "abandonedCarts" => $abandoned
+        "abandonedCarts" => $abandoned,
+        "inboxOk" => $inboxOk,
+        "inboxDead" => $inboxDead
     ];
 }
 
@@ -567,6 +582,12 @@ if ($action === "stats") {
     require_once __DIR__ . "/mail-resend.php";
     $stats = admin_collect_stats();
     $stats["resendConfigured"] = mail_is_configured();
+    if (mail_is_configured()) {
+        mail_ensure_webhook();
+        mail_backfill_inbox(2);
+        $stats = admin_collect_stats();
+        $stats["resendConfigured"] = true;
+    }
     admin_json(["ok" => true, "stats" => $stats, "logs" => admin_logs()]);
 }
 
@@ -600,6 +621,9 @@ if ($action === "signal_broadcast") {
 if ($action === "resend_key") {
     require_once __DIR__ . "/mail-resend.php";
     $ok = mail_save_api_key($body["apiKey"] ?? "");
+    if ($ok) {
+        mail_ensure_webhook();
+    }
     admin_json(["ok" => $ok, "configured" => mail_is_configured()], $ok ? 200 : 400);
 }
 
@@ -688,12 +712,12 @@ $logged = admin_logged_in();
             <button type="button" class="btn-primary" id="adminResendSave" style="margin-top:10px;">Enregistrer la clé</button>
             <hr style="border:0;border-top:1px solid rgba(255,200,55,.2);margin:18px 0;">
             <h2 style="color:#ffc837;font-size:1rem;">Campagne de réactivation</h2>
-            <p style="color:#9ca3af;margin:8px 0 14px;">Envoie un email unique aux membres actuellement <strong style="color:#fecaca;">NON ACTIVÉ</strong>. L’envoi se fait par petits lots.</p>
+            <p style="color:#9ca3af;margin:8px 0 14px;">Envoie un email unique aux membres <strong style="color:#fecaca;">NON ACTIVÉ</strong> dont Resend a déjà confirmé la boîte. Les fausses adresses sont ignorées.</p>
             <button type="button" class="btn-primary" id="adminBroadcastBtn">Envoyer la campagne de réactivation</button>
             <p id="adminBroadcastStatus" style="color:#cbd5e1;margin-top:10px;"></p>
             <hr style="border:0;border-top:1px solid rgba(255,200,55,.2);margin:18px 0;">
             <h2 style="color:#ffc837;font-size:1rem;">Signal du jour</h2>
-            <p style="color:#9ca3af;margin:8px 0 10px;">Email dynamique depuis le match validé (Résultat Dernier Signal Foot). Destinataires : membres <strong style="color:#fecaca;">NON ACTIVÉ</strong> uniquement.</p>
+            <p style="color:#9ca3af;margin:8px 0 10px;">Email dynamique depuis le match validé. Destinataires : <strong style="color:#fecaca;">NON ACTIVÉ</strong> + boîte réellement confirmée par Resend.</p>
             <p id="adminSignalMatchPreview" style="color:#cbd5e1;margin:0 0 12px;">Match actuel : —</p>
             <button type="button" class="btn-primary" id="adminSignalBroadcastBtn">🚀 DIFFUSER LE SIGNAL DU JOUR AUX NON ACTIVÉS</button>
             <p id="adminSignalBroadcastStatus" style="color:#cbd5e1;margin-top:10px;"></p>
@@ -794,7 +818,7 @@ $logged = admin_logged_in();
         const resendState = document.getElementById("adminResendState");
         if (resendState) {
             resendState.textContent = s.resendConfigured
-                ? "Clé Resend enregistrée sur le serveur. Les emails transactionnels sont actifs."
+                ? "Clé Resend enregistrée. Boîtes confirmées : " + (s.inboxOk || 0) + " · Adresses mortes : " + (s.inboxDead || 0) + ". Les campagnes partent uniquement vers les confirmées."
                 : "Collez une seule fois la clé API Resend pour activer les emails (elle n’est pas stockée dans GitHub).";
             resendState.style.color = s.resendConfigured ? "#86efac" : "#fca5a5";
         }

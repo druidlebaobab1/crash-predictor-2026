@@ -37,18 +37,36 @@ function mail_is_configured() {
     return mail_api_key() !== "";
 }
 
-function mail_save_api_key($key) {
-    $key = trim((string) $key);
-    if (!preg_match("/^re_[A-Za-z0-9_]+$/", $key)) {
+function mail_secrets_read() {
+    $file = mail_secrets_file();
+    if (!is_file($file)) {
+        return [];
+    }
+    $data = include $file;
+    return is_array($data) ? $data : [];
+}
+
+function mail_secrets_write($data) {
+    if (!is_array($data)) {
         return false;
     }
     $file = mail_secrets_file();
-    $php = "<?php\nreturn [" . "\n    \"api_key\" => " . var_export($key, true) . "\n];\n";
+    $php = "<?php\nreturn " . var_export($data, true) . ";\n";
     $tmp = $file . ".tmp";
     if (@file_put_contents($tmp, $php, LOCK_EX) === false) {
         return false;
     }
     return @rename($tmp, $file);
+}
+
+function mail_save_api_key($key) {
+    $key = trim((string) $key);
+    if (!preg_match("/^re_[A-Za-z0-9_]+$/", $key)) {
+        return false;
+    }
+    $data = mail_secrets_read();
+    $data["api_key"] = $key;
+    return mail_secrets_write($data);
 }
 
 function mail_normalize_address($email) {
@@ -125,7 +143,7 @@ function mail_log_result($ok, $id, $status, $errorMessage, $extra = []) {
     }
 }
 
-function mail_http($method, $path, $payload = null) {
+function mail_http($method, $path, $payload = null, $timeout = 8) {
     $url = "https://api.resend.com" . $path;
     $headers = [
         "Authorization: Bearer " . mail_api_key(),
@@ -142,7 +160,7 @@ function mail_http($method, $path, $payload = null) {
         CURLOPT_CUSTOMREQUEST => $method,
         CURLOPT_HTTPHEADER => $headers,
         CURLOPT_CONNECTTIMEOUT => 2,
-        CURLOPT_TIMEOUT => 8
+        CURLOPT_TIMEOUT => max(4, (int) $timeout)
     ];
     if ($json !== null) {
         $options[CURLOPT_POSTFIELDS] = $json;
@@ -207,6 +225,315 @@ function mail_mark_opt_out($email) {
     }
     $record["emailOptOut"] = true;
     return maketou_write_local_member($email, $record);
+}
+
+function mail_record_can_campaign($record) {
+    if (!is_array($record)) {
+        return false;
+    }
+    if (!empty($record["emailOptOut"]) || !empty($record["emailBounced"])) {
+        return false;
+    }
+    return !empty($record["emailInboxOk"]);
+}
+
+function mail_event_is_inbox($event) {
+    return in_array($event, ["delivered", "opened", "clicked"], true);
+}
+
+function mail_event_is_dead($event) {
+    return in_array($event, ["bounced", "failed", "suppressed", "complained"], true);
+}
+
+function mail_apply_resend_event($email, $event, $at = 0) {
+    $email = mail_normalize_address($email);
+    $event = strtolower(trim((string) $event));
+    $event = preg_replace("/^email\./", "", $event);
+    if ($email === "" || $event === "") {
+        return false;
+    }
+    $record = maketou_read_local_member($email);
+    if (!is_array($record)) {
+        return false;
+    }
+    $at = (int) $at;
+    $prevAt = (int) ($record["emailLastEventAt"] ?? 0);
+    if ($at > 0 && $prevAt > $at) {
+        return true;
+    }
+    if (mail_event_is_inbox($event)) {
+        $record["emailInboxOk"] = true;
+        $record["emailBounced"] = false;
+    } elseif (mail_event_is_dead($event)) {
+        $record["emailBounced"] = true;
+        $record["emailInboxOk"] = false;
+        if ($event === "complained") {
+            $record["emailOptOut"] = true;
+        }
+    } else {
+        return true;
+    }
+    $record["emailLastEvent"] = $event;
+    $record["emailLastEventAt"] = $at > 0 ? $at : time();
+    return maketou_write_local_member($email, $record);
+}
+
+function mail_apply_resend_events_batch($rows) {
+    if (!is_array($rows) || !$rows) {
+        return 0;
+    }
+    $file = maketou_members_file();
+    $members = [];
+    if (is_file($file)) {
+        $decoded = json_decode((string) @file_get_contents($file), true);
+        $members = is_array($decoded) ? $decoded : [];
+    }
+    $changed = 0;
+    foreach ($rows as $row) {
+        $email = mail_normalize_address($row[0] ?? "");
+        $event = strtolower(trim((string) ($row[1] ?? "")));
+        $event = preg_replace("/^email\./", "", $event);
+        $at = (int) ($row[2] ?? 0);
+        if ($email === "" || $event === "" || !is_array($members[$email] ?? null)) {
+            continue;
+        }
+        $record = $members[$email];
+        $prevAt = (int) ($record["emailLastEventAt"] ?? 0);
+        if ($at > 0 && $prevAt > $at) {
+            continue;
+        }
+        if (mail_event_is_inbox($event)) {
+            $record["emailInboxOk"] = true;
+            $record["emailBounced"] = false;
+        } elseif (mail_event_is_dead($event)) {
+            $record["emailBounced"] = true;
+            $record["emailInboxOk"] = false;
+            if ($event === "complained") {
+                $record["emailOptOut"] = true;
+            }
+        } else {
+            continue;
+        }
+        $record["emailLastEvent"] = $event;
+        $record["emailLastEventAt"] = $at > 0 ? $at : time();
+        $members[$email] = $record;
+        $changed++;
+    }
+    if ($changed > 0) {
+        $tmp = $file . ".tmp";
+        if (@file_put_contents($tmp, json_encode($members, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), LOCK_EX) !== false) {
+            @rename($tmp, $file);
+        }
+    }
+    return $changed;
+}
+
+function mail_mark_dead_address($email, $reason = "invalid") {
+    mail_apply_resend_event($email, "bounced", time());
+    maketou_log("mail_inbox", ["email" => mail_normalize_address($email), "event" => "bounced", "reason" => (string) $reason]);
+}
+
+function mail_send_looks_dead($result) {
+    if (!is_array($result) || !empty($result["ok"])) {
+        return false;
+    }
+    $http = (int) ($result["http"] ?? 0);
+    $err = strtolower((string) ($result["error"] ?? ""));
+    if ($http === 422) {
+        return true;
+    }
+    return (bool) preg_match("/invalid|bounce|suppress|undeliver|not a valid|does not exist/", $err);
+}
+
+function mail_webhook_endpoint() {
+    return RESEND_SITE . "/index.php?action=resend_webhook";
+}
+
+function mail_ensure_webhook() {
+    static $done = false;
+    if ($done || !mail_is_configured()) {
+        return $done;
+    }
+    $secrets = mail_secrets_read();
+    if (trim((string) ($secrets["webhook_secret"] ?? "")) !== "") {
+        $done = true;
+        return true;
+    }
+    $endpoint = mail_webhook_endpoint();
+    $found = null;
+    list($status, $body) = mail_http("GET", "/webhooks", null, 12);
+    $list = json_decode((string) $body, true);
+    $items = is_array($list["data"] ?? null) ? $list["data"] : [];
+    foreach ($items as $item) {
+        if (!is_array($item)) {
+            continue;
+        }
+        if (rtrim((string) ($item["endpoint"] ?? ""), "/") === rtrim($endpoint, "/")) {
+            $found = $item;
+            break;
+        }
+    }
+    if (!is_array($found)) {
+        list($status, $body) = mail_http("POST", "/webhooks", [
+            "endpoint" => $endpoint,
+            "events" => [
+                "email.delivered",
+                "email.opened",
+                "email.clicked",
+                "email.bounced",
+                "email.complained",
+                "email.failed",
+                "email.suppressed"
+            ]
+        ], 12);
+        $found = json_decode((string) $body, true);
+        if ($status < 200 || $status >= 300 || !is_array($found)) {
+            return false;
+        }
+    }
+    $secret = trim((string) ($found["signing_secret"] ?? ($found["secret"] ?? "")));
+    $id = trim((string) ($found["id"] ?? ""));
+    if ($secret === "" && $id !== "") {
+        list($st2, $one) = mail_http("GET", "/webhooks/" . rawurlencode($id), null, 12);
+        $detail = json_decode((string) $one, true);
+        if ($st2 >= 200 && $st2 < 300 && is_array($detail)) {
+            $secret = trim((string) ($detail["signing_secret"] ?? ($detail["secret"] ?? "")));
+        }
+    }
+    if ($secret === "") {
+        return false;
+    }
+    $secrets["webhook_id"] = $id;
+    $secrets["webhook_secret"] = $secret;
+    if (!mail_secrets_write($secrets)) {
+        return false;
+    }
+    $done = true;
+    return true;
+}
+
+function mail_backfill_inbox($maxPages = 4) {
+    if (!mail_is_configured()) {
+        return 0;
+    }
+    $secrets = mail_secrets_read();
+    $after = trim((string) ($secrets["inbox_backfill_after"] ?? ""));
+    $doneAt = (int) ($secrets["inbox_backfill_done_at"] ?? 0);
+    if ($doneAt > 0 && (time() - $doneAt) < 600 && $after === "") {
+        return 0;
+    }
+    $rows = [];
+    $pages = 0;
+    $hasMore = true;
+    while ($hasMore && $pages < max(1, (int) $maxPages)) {
+        $path = "/emails?limit=100";
+        if ($after !== "") {
+            $path .= "&after=" . rawurlencode($after);
+        }
+        list($status, $body) = mail_http("GET", $path, null, 12);
+        $pack = json_decode((string) $body, true);
+        if ($status < 200 || $status >= 300 || !is_array($pack)) {
+            break;
+        }
+        $items = is_array($pack["data"] ?? null) ? $pack["data"] : [];
+        if (!$items) {
+            $hasMore = false;
+            $after = "";
+            break;
+        }
+        foreach ($items as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+            $event = strtolower((string) ($item["last_event"] ?? ""));
+            $at = strtotime((string) ($item["created_at"] ?? "")) ?: time();
+            $tos = $item["to"] ?? [];
+            if (!is_array($tos)) {
+                $tos = [$tos];
+            }
+            foreach ($tos as $to) {
+                $rows[] = [(string) $to, $event, $at];
+            }
+        }
+        $after = (string) ($items[count($items) - 1]["id"] ?? "");
+        $hasMore = !empty($pack["has_more"]);
+        $pages++;
+        if ($after === "") {
+            $hasMore = false;
+        }
+    }
+    $changed = mail_apply_resend_events_batch($rows);
+    $secrets = mail_secrets_read();
+    if ($hasMore && $after !== "") {
+        $secrets["inbox_backfill_after"] = $after;
+        unset($secrets["inbox_backfill_done_at"]);
+    } else {
+        $secrets["inbox_backfill_after"] = "";
+        $secrets["inbox_backfill_done_at"] = time();
+    }
+    mail_secrets_write($secrets);
+    return $changed;
+}
+
+function mail_svix_ok($raw, $id, $timestamp, $signature, $secret) {
+    $id = trim((string) $id);
+    $timestamp = trim((string) $timestamp);
+    $signature = trim((string) $signature);
+    $secret = trim((string) $secret);
+    if ($id === "" || $timestamp === "" || $signature === "" || $secret === "") {
+        return false;
+    }
+    if (abs(time() - (int) $timestamp) > 300) {
+        return false;
+    }
+    $key = $secret;
+    if (stripos($secret, "whsec_") === 0) {
+        $decoded = base64_decode(substr($secret, 6), true);
+        if ($decoded !== false && $decoded !== "") {
+            $key = $decoded;
+        }
+    }
+    $digest = base64_encode(hash_hmac("sha256", $id . "." . $timestamp . "." . $raw, $key, true));
+    foreach (preg_split("/\s+/", $signature) as $item) {
+        $item = trim((string) $item);
+        if (stripos($item, "v1,") === 0 && hash_equals($digest, substr($item, 3))) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function mail_handle_resend_webhook() {
+    header("Content-Type: application/json; charset=utf-8");
+    $raw = (string) file_get_contents("php://input");
+    mail_ensure_webhook();
+    $secret = trim((string) (mail_secrets_read()["webhook_secret"] ?? ""));
+    $svixId = (string) ($_SERVER["HTTP_SVIX_ID"] ?? "");
+    $svixTs = (string) ($_SERVER["HTTP_SVIX_TIMESTAMP"] ?? "");
+    $svixSig = (string) ($_SERVER["HTTP_SVIX_SIGNATURE"] ?? "");
+    if ($secret === "" || !mail_svix_ok($raw, $svixId, $svixTs, $svixSig, $secret)) {
+        http_response_code(400);
+        echo json_encode(["ok" => false, "error" => "invalid_signature"]);
+        exit;
+    }
+    $payload = json_decode($raw, true);
+    if (!is_array($payload)) {
+        http_response_code(400);
+        echo json_encode(["ok" => false]);
+        exit;
+    }
+    $event = strtolower((string) ($payload["type"] ?? ""));
+    $data = is_array($payload["data"] ?? null) ? $payload["data"] : [];
+    $at = strtotime((string) ($payload["created_at"] ?? "")) ?: time();
+    $tos = $data["to"] ?? [];
+    if (!is_array($tos)) {
+        $tos = [$tos];
+    }
+    foreach ($tos as $to) {
+        mail_apply_resend_event($to, $event, $at);
+    }
+    echo json_encode(["ok" => true]);
+    exit;
 }
 
 function mail_release_client() {
@@ -406,6 +733,7 @@ function mail_send($to, $subject, $html, $extra = []) {
         mail_log_result(false, "", 0, "no_key");
         return ["ok" => false, "id" => ""];
     }
+    mail_ensure_webhook();
     $unsub = RESEND_SITE . "/index.php?action=mail_unsub&t=" . rawurlencode(mail_unsub_token($to));
     $payload = [
         "from" => "PREDICTOR <support@mail.crashpredictor.fr>",
@@ -486,7 +814,11 @@ function mail_send($to, $subject, $html, $extra = []) {
             "scheduled" => !empty($extra["scheduled_at"]),
             "attempts" => $attempts
         ]);
-        return ["ok" => $ok, "id" => $id, "http" => $status, "error" => $errorMessage];
+        $result = ["ok" => $ok, "id" => $id, "http" => $status, "error" => $errorMessage];
+        if (!$ok && mail_send_looks_dead($result)) {
+            mail_mark_dead_address($to, $errorMessage !== "" ? $errorMessage : ("http_" . $status));
+        }
+        return $result;
     } catch (Throwable $e) {
         mail_log_result(false, "", 0, $e->getMessage());
         return ["ok" => false, "id" => "", "error" => $e->getMessage()];
@@ -504,7 +836,7 @@ function mail_cancel($emailId) {
 function mail_send_welcome($email, $uniqueId, $name = "") {
     $email = mail_normalize_address($email);
     $record = maketou_read_local_member($email);
-    if (is_array($record) && !empty($record["welcomeSent"])) {
+    if (is_array($record) && (!empty($record["welcomeSent"]) || !empty($record["emailBounced"]) || !empty($record["emailOptOut"]))) {
         return false;
     }
     $uniqueId = $uniqueId !== "" ? $uniqueId : (is_array($record) ? (string) ($record["uniqueId"] ?? "") : "");
@@ -649,16 +981,19 @@ function mail_process_abandoned($limit = 8, $forceDue = false) {
         }
         $email = mail_normalize_address($row["email"] ?? "");
         $uniqueId = (string) ($row["uniqueId"] ?? "");
-        if ($email === "" || mail_opted_out($email) || mail_email_is_active($email)) {
+        $member = maketou_read_local_member($email);
+        if ($email === "" || mail_opted_out($email) || mail_email_is_active($email) || (is_array($member) && !empty($member["emailBounced"]))) {
             $row["abandonEmailed"] = true;
             $carts[$ref] = $row;
+            continue;
+        }
+        if (!mail_record_can_campaign($member)) {
             continue;
         }
         if (mail_email_abandon_recent($email)) {
             $skipped++;
             continue;
         }
-        $member = maketou_read_local_member($email);
         $name = is_array($member) ? (string) ($member["name"] ?? "") : "";
         $result = mail_send(
             $email,
@@ -683,6 +1018,10 @@ function mail_process_abandoned($limit = 8, $forceDue = false) {
 function mail_broadcast_inactive($limit = 8, $offset = 0) {
     $limit = max(1, min(10, (int) $limit));
     $offset = max(0, (int) $offset);
+    mail_ensure_webhook();
+    if ($offset === 0) {
+        mail_backfill_inbox(5);
+    }
     $file = maketou_members_file();
     $members = [];
     if (is_file($file)) {
@@ -698,7 +1037,7 @@ function mail_broadcast_inactive($limit = 8, $offset = 0) {
         if ($email === "" || !empty($record["emailOptOut"]) || !empty($record["broadcastSent"])) {
             continue;
         }
-        if (mail_record_is_active($record)) {
+        if (!mail_record_can_campaign($record) || mail_record_is_active($record)) {
             continue;
         }
         $targets[] = [$email, (string) ($record["uniqueId"] ?? ""), (string) ($record["name"] ?? "")];
@@ -740,6 +1079,10 @@ function mail_broadcast_inactive($limit = 8, $offset = 0) {
 function mail_broadcast_signal($limit = 8, $offset = 0) {
     $limit = max(1, min(10, (int) $limit));
     $offset = max(0, (int) $offset);
+    mail_ensure_webhook();
+    if ($offset === 0) {
+        mail_backfill_inbox(5);
+    }
     $pick = mail_live_sport_pick();
     $key = strtolower(trim((string) ($pick["key"] ?? "")));
     $file = maketou_members_file();
@@ -757,7 +1100,7 @@ function mail_broadcast_signal($limit = 8, $offset = 0) {
         if ($email === "" || !empty($record["emailOptOut"])) {
             continue;
         }
-        if (mail_record_is_active($record)) {
+        if (!mail_record_can_campaign($record) || mail_record_is_active($record)) {
             continue;
         }
         $already = strtolower(trim((string) ($record["signalBroadcastKey"] ?? "")));

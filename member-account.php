@@ -372,6 +372,10 @@ if ($method === "POST" && ($action === "save" || $action === "" || $action === "
         "emailOptOut" => !empty($existing["emailOptOut"]),
         "broadcastSent" => !empty($existing["broadcastSent"]),
         "signalBroadcastKey" => (string) ($existing["signalBroadcastKey"] ?? ""),
+        "emailInboxOk" => !empty($existing["emailInboxOk"]),
+        "emailBounced" => !empty($existing["emailBounced"]),
+        "emailLastEvent" => (string) ($existing["emailLastEvent"] ?? ""),
+        "emailLastEventAt" => (int) ($existing["emailLastEventAt"] ?? 0),
         "lastAbandonEmailAt" => (int) ($existing["lastAbandonEmailAt"] ?? 0)
     ];
     if (!empty($existing["uniqueId"]) && $incoming["uniqueId"] === "") {

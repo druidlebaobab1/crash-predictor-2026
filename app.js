@@ -4855,7 +4855,7 @@ async function loadGlobalDesk(q) {
     const resendState = document.getElementById("adminResendState");
     if (resendState) {
         resendState.textContent = s.resendConfigured
-            ? "Clé Resend enregistrée sur le serveur. Les emails transactionnels sont actifs."
+            ? "Clé Resend enregistrée. Boîtes confirmées : " + (s.inboxOk || 0) + " · Adresses mortes : " + (s.inboxDead || 0) + ". Les campagnes partent uniquement vers les confirmées."
             : "Collez une seule fois la clé API Resend pour activer les emails (elle n’est pas stockée dans GitHub).";
         resendState.style.color = s.resendConfigured ? "#86efac" : "#fca5a5";
     }

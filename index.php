@@ -39,6 +39,11 @@ if ($maketouAction === "mail_cron") {
     echo json_encode(mail_process_abandoned(12), JSON_UNESCAPED_SLASHES);
     exit();
 }
+if ($maketouAction === "resend_webhook") {
+    require_once __DIR__ . "/mail-resend.php";
+    mail_handle_resend_webhook();
+    exit();
+}
 if ($maketouAction === "mail_unsub") {
     require_once __DIR__ . "/mail-resend.php";
     mail_handle_unsub();
