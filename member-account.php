@@ -136,15 +136,34 @@ function signal_is_demo_account($email) {
     return strtolower(trim((string) $email)) === "admin@crashpredictor.fr";
 }
 
-function signal_cycle_payload($startedAt, $armedAt, $now, $email = "") {
+function signal_cycle_times($email) {
     $demo = signal_is_demo_account($email);
-    $cycleMs = $demo ? 8 * 1000 : 30 * 60 * 1000;
-    $armMs = $demo ? 10 * 1000 : 60 * 1000;
+    return [
+        "cycleMs" => $demo ? 8 * 1000 : 30 * 60 * 1000,
+        "armMs" => $demo ? 10 * 1000 : 60 * 1000,
+        "cycleSec" => $demo ? 8 : 30 * 60
+    ];
+}
+
+function signal_cycle_payload($startedAt, $armedAt, $now, $email = "", $extra = []) {
+    $times = signal_cycle_times($email);
+    $cycleMs = $times["cycleMs"];
+    $armMs = $times["armMs"];
     $elapsedMs = max(0, ($now - $startedAt) * 1000);
     $ready = $elapsedMs >= $cycleMs;
     $armRemain = 0;
     if ($armedAt > 0) {
         $armRemain = max(0, $armMs - max(0, ($now - $armedAt) * 1000));
+    }
+    $flightAt = (int) ($extra["flightAt"] ?? 0);
+    $flightMs = (int) ($extra["flightMs"] ?? 0);
+    $targetMult = round((float) ($extra["targetMult"] ?? 0), 2);
+    $forceMult = round((float) ($extra["forceMult"] ?? 0), 2);
+    $flightElapsed = 0;
+    $flightRemain = 0;
+    if ($flightAt > 0 && $flightMs > 0) {
+        $flightElapsed = max(0, ($now - $flightAt) * 1000);
+        $flightRemain = max(0, $flightMs - $flightElapsed);
     }
     return [
         "ok" => true,
@@ -155,7 +174,13 @@ function signal_cycle_payload($startedAt, $armedAt, $now, $email = "") {
         "remainingMs" => $ready ? 0 : max(0, $cycleMs - $elapsedMs),
         "armRemainingMs" => $armRemain,
         "cycleMs" => $cycleMs,
-        "armMs" => $armMs
+        "armMs" => $armMs,
+        "flightAt" => $flightAt,
+        "flightMs" => $flightMs,
+        "flightElapsedMs" => $flightElapsed,
+        "flightRemainingMs" => $flightRemain,
+        "targetMult" => $targetMult,
+        "forceMult" => $forceMult
     ];
 }
 
@@ -173,6 +198,10 @@ if ($method === "POST" && $action === "signal_cycle") {
     $row = is_array($cycles[$key] ?? null) ? $cycles[$key] : [];
     $startedAt = (int) ($row["startedAt"] ?? 0);
     $armedAt = (int) ($row["armedAt"] ?? 0);
+    $flightAt = (int) ($row["flightAt"] ?? 0);
+    $flightMs = (int) ($row["flightMs"] ?? 0);
+    $targetMult = round((float) ($row["targetMult"] ?? 0), 2);
+    $forceMult = round((float) ($row["forceMult"] ?? 0), 2);
     if ($email !== "" && is_array($members[$email] ?? null)) {
         $startedAt = max($startedAt, (int) ($members[$email]["signalCycleStartedAt"] ?? 0));
         $armedAt = max($armedAt, (int) ($members[$email]["signalArmedAt"] ?? 0));
@@ -180,21 +209,82 @@ if ($method === "POST" && $action === "signal_cycle") {
     if ($startedAt <= 0 || $startedAt > $now) {
         $startedAt = $now;
         $armedAt = 0;
+        $flightAt = 0;
+        $flightMs = 0;
+        $targetMult = 0;
     }
-    $cycleSec = signal_is_demo_account($email) ? 8 : 30 * 60;
-    if ($op === "arm") {
+    $times = signal_cycle_times($email);
+    $cycleSec = $times["cycleSec"];
+    $armSec = (int) ceil($times["armMs"] / 1000);
+
+    if ($op === "force" && signal_is_demo_account($email)) {
+        $incoming = round((float) ($body["forceMult"] ?? ($body["targetMult"] ?? 0)), 2);
+        $forceMult = ($incoming >= 1.01 && $incoming <= 100) ? $incoming : 0;
+    } elseif ($op === "arm") {
         if (($now - $startedAt) >= $cycleSec) {
             if ($armedAt <= 0 || $armedAt > $now) {
                 $armedAt = $now;
+                $flightAt = 0;
+                $flightMs = 0;
+                $targetMult = 0;
             }
         }
+    } elseif ($op === "fly") {
+        $incomingMult = round((float) ($body["targetMult"] ?? 0), 2);
+        $incomingMs = max(4000, min(40000, (int) ($body["flightMs"] ?? 0)));
+        if ($armedAt > 0 && $flightAt <= 0) {
+            $armEnd = $armedAt + $armSec;
+            $flightAt = ($armEnd > 0 && $armEnd <= $now) ? $armEnd : $now;
+            if ($incomingMult >= 1.01 && $incomingMult <= 100) {
+                $targetMult = $incomingMult;
+            }
+            $flightMs = $incomingMs > 0 ? $incomingMs : 12000;
+            $forceMult = 0;
+        }
     } elseif ($op === "complete") {
-        $startedAt = $now;
+        $endedAt = (int) ($body["endedAt"] ?? 0);
+        if ($endedAt <= 0 || $endedAt > $now) {
+            $endedAt = $now;
+        }
+        if ($flightAt > 0 && $flightMs > 0) {
+            $naturalEnd = $flightAt + (int) ceil($flightMs / 1000);
+            if ($naturalEnd > 0 && $naturalEnd <= $now) {
+                $endedAt = min($endedAt, $naturalEnd);
+            }
+        }
+        $startedAt = $endedAt;
+        $armedAt = 0;
+        $flightAt = 0;
+        $flightMs = 0;
+        $targetMult = 0;
+    }
+
+    if ($flightAt > 0 && $flightMs > 0) {
+        $flightEnd = $flightAt + (int) ceil($flightMs / 1000);
+        if ($now >= $flightEnd && $op === "ensure") {
+            $startedAt = $flightEnd;
+            $armedAt = 0;
+            $flightAt = 0;
+            $flightMs = 0;
+            $targetMult = 0;
+        }
+    } elseif ($armedAt > 0 && $flightAt <= 0 && $now > ($armedAt + $armSec + 20) && $op === "ensure") {
+        $startedAt = $armedAt + $armSec + 16;
         $armedAt = 0;
     }
-    $cycles[$key] = ["startedAt" => $startedAt, "armedAt" => $armedAt, "updatedAt" => $now];
+
+    $store = [
+        "startedAt" => $startedAt,
+        "armedAt" => $armedAt,
+        "flightAt" => $flightAt,
+        "flightMs" => $flightMs,
+        "targetMult" => $targetMult,
+        "forceMult" => $forceMult,
+        "updatedAt" => $now
+    ];
+    $cycles[$key] = $store;
     if ($email !== "" && $uniqueId !== "") {
-        $cycles["id:" . $uniqueId] = $cycles[$key];
+        $cycles["id:" . $uniqueId] = $store;
     }
     signal_cycles_write($cycleFile, $cycles);
     if ($email !== "" && is_array($members[$email] ?? null)) {
@@ -202,7 +292,7 @@ if ($method === "POST" && $action === "signal_cycle") {
         $members[$email]["signalArmedAt"] = $armedAt;
         members_write_store($storeFile, $members);
     }
-    echo json_encode(signal_cycle_payload($startedAt, $armedAt, $now, $email));
+    echo json_encode(signal_cycle_payload($startedAt, $armedAt, $now, $email, $store));
     exit;
 }
 

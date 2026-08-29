@@ -80,7 +80,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=Orbitron:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=u86">
+    <link rel="stylesheet" href="style.css?v=u87">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 </head>
 <body class="dark-theme">
@@ -760,58 +760,102 @@
                 </div>
                 </div>
 
-                <div id="profileDeskPanel" class="profile-desk hidden">
-                    <div class="desk-tabs" role="tablist">
-                        <button type="button" class="desk-tab is-on" data-desk-tab="match" role="tab">Matchs</button>
-                        <button type="button" class="desk-tab" data-desk-tab="mail" role="tab">Emails</button>
-                        <button type="button" class="desk-tab" data-desk-tab="traffic" role="tab">Trafic</button>
-                    </div>
-
-                    <div class="desk-pane" data-desk-pane="match">
-                        <p class="desk-kicker">Affichage live visiteur + membre</p>
-                        <form id="deskMatchForm" class="desk-form">
-                            <label>Équipe 1
-                                <input type="text" id="deskTeam1" maxlength="42" required class="form-control-dark" autocomplete="off">
-                            </label>
-                            <label>Cote 1
-                                <input type="text" id="deskOdd1" inputmode="decimal" required class="form-control-dark" autocomplete="off">
-                            </label>
-                            <label>Équipe 2
-                                <input type="text" id="deskTeam2" maxlength="42" required class="form-control-dark" autocomplete="off">
-                            </label>
-                            <label>Cote 2
-                                <input type="text" id="deskOdd2" inputmode="decimal" required class="form-control-dark" autocomplete="off">
-                            </label>
-                            <label>Gagnant affiché
-                                <select id="deskWinner" class="form-control-dark">
-                                    <option value="1">Équipe 1</option>
-                                    <option value="2">Équipe 2</option>
-                                </select>
-                            </label>
-                            <button type="submit" class="btn-save-mini btn-full" id="deskMatchSave">Mettre à jour le match</button>
-                        </form>
-                    </div>
-
-                    <div class="desk-pane hidden" data-desk-pane="mail">
-                        <p class="desk-kicker">Relances Resend · 1 email / personne / 24h</p>
-                        <button type="button" class="btn-save-mini btn-full" id="deskAbandonBtn">Relancer les paniers abandonnés</button>
-                        <button type="button" class="btn-save-mini btn-full" id="deskBroadcastBtn">Email Broadcast VIP</button>
-                        <p class="desk-note" id="deskMailStatus">Compteur : —</p>
-                    </div>
-
-                    <div class="desk-pane hidden" data-desk-pane="traffic">
-                        <p class="desk-kicker">Visites 14 jours · conversion</p>
-                        <p class="desk-note" id="deskTrafficSummary">Chargement…</p>
-                        <div class="desk-chart" id="deskTrafficChart" aria-hidden="true"></div>
-                        <div class="desk-sources" id="deskTrafficSources"></div>
-                    </div>
-                </div>
+                <button type="button" class="btn-desk-global hidden" id="btnOpenGlobalDesk">
+                    📊 ACCÉDER AU DASHBOARD GLOBAL
+                </button>
 
                 <button type="button" class="btn-link-danger" id="profileLogoutBtn">
                     <i class="fa-solid fa-power-off" aria-hidden="true"></i> <span data-i18n="btn_logout">Se déconnecter</span>
                 </button>
             </div>
         </div>
+    </div>
+
+    <div id="globalDeskOverlay" class="global-desk-overlay hidden" aria-hidden="true">
+        <div class="admin-shell global-desk-shell">
+            <div class="admin-top">
+                <h1>DASHBOARD GLOBAL</h1>
+                <button type="button" class="btn-primary" id="btnCloseGlobalDesk">Retour à la session</button>
+            </div>
+            <div class="admin-stats" id="adminStats"></div>
+            <div class="admin-card">
+                <h2 class="desk-card-title">Emails Resend</h2>
+                <p id="adminResendState" class="desk-muted">Vérification de la clé d’envoi…</p>
+                <div class="form-group" style="max-width:520px;">
+                    <label for="adminResendKey">Clé API Resend</label>
+                    <input type="password" id="adminResendKey" class="form-control-dark" autocomplete="off" placeholder="re_…">
+                </div>
+                <button type="button" class="btn-primary" id="adminResendSave" style="margin-top:10px;">Enregistrer la clé</button>
+                <hr class="desk-hr">
+                <h2 class="desk-card-title">Campagne de réactivation</h2>
+                <p class="desk-muted">Email unique aux membres actuellement NON ACTIVÉ, par petits lots.</p>
+                <button type="button" class="btn-primary" id="adminBroadcastBtn">Envoyer la campagne de réactivation</button>
+                <p id="adminBroadcastStatus" class="desk-note"></p>
+                <hr class="desk-hr">
+                <h2 class="desk-card-title">Paniers abandonnés</h2>
+                <p class="desk-muted">Manuel ou auto (cron). Maximum 1 email / personne / 24h.</p>
+                <button type="button" class="btn-primary" id="deskAbandonBtn">Relancer les paniers abandonnés</button>
+                <p class="desk-note" id="deskMailStatus">Compteur : —</p>
+            </div>
+            <div class="admin-card">
+                <h2 class="desk-card-title">Gestionnaire de matchs</h2>
+                <p class="desk-muted">Mise à jour instantanée visiteur + espace membre.</p>
+                <form id="deskMatchForm" class="desk-form desk-form-grid">
+                    <label>Équipe 1
+                        <input type="text" id="deskTeam1" maxlength="42" required class="form-control-dark" autocomplete="off">
+                    </label>
+                    <label>Cote 1
+                        <input type="text" id="deskOdd1" inputmode="decimal" required class="form-control-dark" autocomplete="off">
+                    </label>
+                    <label>Équipe 2
+                        <input type="text" id="deskTeam2" maxlength="42" required class="form-control-dark" autocomplete="off">
+                    </label>
+                    <label>Cote 2
+                        <input type="text" id="deskOdd2" inputmode="decimal" required class="form-control-dark" autocomplete="off">
+                    </label>
+                    <label>Gagnant affiché
+                        <select id="deskWinner" class="form-control-dark">
+                            <option value="1">Équipe 1</option>
+                            <option value="2">Équipe 2</option>
+                        </select>
+                    </label>
+                    <button type="submit" class="btn-primary" id="deskMatchSave">Mettre à jour le match</button>
+                </form>
+            </div>
+            <div class="admin-card">
+                <h2 class="desk-card-title">Analytics trafic</h2>
+                <p class="desk-note" id="deskTrafficSummary">Chargement…</p>
+                <div class="desk-chart" id="deskTrafficChart" aria-hidden="true"></div>
+                <div class="desk-sources" id="deskTrafficSources"></div>
+            </div>
+            <div class="admin-card">
+                <h2 class="desk-card-title">Licences / Membres</h2>
+                <input type="search" id="adminSearch" class="form-control-dark admin-search" placeholder="Rechercher par ID (CRASH-XXXXXXX) ou email">
+                <div class="admin-table-wrap">
+                    <table class="admin-table">
+                        <thead>
+                            <tr><th>ID</th><th>Nom</th><th>Email</th><th>Statut</th><th>Action</th></tr>
+                        </thead>
+                        <tbody id="adminMembersBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="admin-card">
+                <h2 class="desk-card-title">Journal / Webhooks</h2>
+                <div class="admin-logs" id="adminLogs">Chargement…</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="deskForcePrompt" class="desk-force-prompt hidden" aria-hidden="true">
+        <form id="deskForceForm" class="desk-force-card">
+            <p>Forcer la prochaine cote</p>
+            <input type="text" id="deskForceInput" inputmode="decimal" placeholder="ex: 4.80" autocomplete="off">
+            <div class="desk-force-actions">
+                <button type="button" id="deskForceCancel">Annuler</button>
+                <button type="submit">Valider</button>
+            </div>
+        </form>
     </div>
 
     <!-- MODALE INSCRIPTION -->
@@ -1107,7 +1151,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=u86" defer></script>
+    <script src="app.js?v=u87" defer></script>
     <script src="ambient-audio.js?v=9" defer></script>
     <script src="fire-embers.js?v=2" defer></script>
 </body>

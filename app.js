@@ -921,7 +921,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     initGuaranteed48hCountdown();
     initAuthSecurity();
     initProfileModal();
-    initProfileDesk();
+    initGlobalDesk();
+    initSecretMultiplierControl();
     initLiveSportMatch();
     initTrafficPing();
     initModals();
@@ -2366,76 +2367,179 @@ function readLocalSignalCycle() {
         if (!raw || typeof raw !== "object") return null;
         return {
             startedAt: Number(raw.startedAt) || 0,
-            armedAt: Number(raw.armedAt) || 0
+            armedAt: Number(raw.armedAt) || 0,
+            flightAt: Number(raw.flightAt) || 0,
+            flightMs: Number(raw.flightMs) || 0,
+            targetMult: Number(raw.targetMult) || 0,
+            forceMult: Number(raw.forceMult) || 0
         };
     } catch {
         return null;
     }
 }
 
-function writeLocalSignalCycle(startedAt, armedAt) {
+function writeLocalSignalCycle(row) {
     try {
         localStorage.setItem(signalCycleStorageKey(), JSON.stringify({
-            startedAt: Number(startedAt) || 0,
-            armedAt: Number(armedAt) || 0
+            startedAt: Number(row && row.startedAt) || 0,
+            armedAt: Number(row && row.armedAt) || 0,
+            flightAt: Number(row && row.flightAt) || 0,
+            flightMs: Number(row && row.flightMs) || 0,
+            targetMult: Number(row && row.targetMult) || 0,
+            forceMult: Number(row && row.forceMult) || 0
         }));
     } catch {}
 }
 
-async function persistSignalCycle(op) {
+function normalizeCyclePayload(data, fallback) {
     const now = unixNowSec();
-    let startedAt = 0;
-    let armedAt = 0;
+    const cycleMs = Number(data && data.cycleMs) || currentSignalCycleMs();
+    const armMs = Number(data && data.armMs) || currentSignalArmMs();
+    const startedAt = Number(data && data.startedAt) || (fallback && fallback.startedAt) || now;
+    const armedAt = Number(data && data.armedAt) || 0;
+    const flightAt = Number(data && data.flightAt) || 0;
+    const flightMs = Number(data && data.flightMs) || 0;
+    const targetMult = Number(data && data.targetMult) || 0;
+    const forceMult = Number(data && data.forceMult) || 0;
+    const elapsed = Math.max(0, (now - startedAt) * 1000);
+    const ready = Boolean(data && data.ready) || elapsed >= cycleMs;
+    const armRemainingMs = armedAt > 0 ? Math.max(0, armMs - Math.max(0, (now - armedAt) * 1000)) : 0;
+    const flightElapsedMs = flightAt > 0 ? Math.max(0, (now - flightAt) * 1000) : 0;
+    return {
+        startedAt,
+        armedAt,
+        ready,
+        remainingMs: ready ? 0 : Math.max(0, cycleMs - elapsed),
+        armRemainingMs,
+        cycleMs,
+        armMs,
+        flightAt,
+        flightMs,
+        flightElapsedMs,
+        flightRemainingMs: flightAt > 0 && flightMs > 0 ? Math.max(0, flightMs - flightElapsedMs) : 0,
+        targetMult,
+        forceMult
+    };
+}
+
+async function persistSignalCycle(op, extra) {
+    const now = unixNowSec();
     const local = readLocalSignalCycle();
     const email = currentUser && currentUser.email ? String(currentUser.email).trim() : "";
     const uniqueId = displayMemberId() || "";
     const paths = email ? memberServerPaths(email).save : [];
+    const payload = Object.assign({
+        action: "signal_cycle",
+        op: op || "ensure",
+        email,
+        uniqueId
+    }, extra || {});
     for (let i = 0; i < paths.length; i++) {
         try {
             const response = await fetch(paths[i], {
                 method: "POST",
                 headers: { "Content-Type": "application/json", "Accept": "application/json" },
-                body: JSON.stringify({
-                    action: "signal_cycle",
-                    op: op || "ensure",
-                    email,
-                    uniqueId
-                })
+                body: JSON.stringify(payload)
             });
             const data = await parseJsonResponse(response);
             if (data && data.ok && data.startedAt) {
                 if (Number(data.now)) vipServerTimeOffset = Number(data.now) - Math.floor(Date.now() / 1000);
-                startedAt = Number(data.startedAt) || 0;
-                armedAt = Number(data.armedAt) || 0;
-                writeLocalSignalCycle(startedAt, armedAt);
-                return {
-                    startedAt,
-                    armedAt,
-                    ready: Boolean(data.ready),
-                    remainingMs: Number(data.remainingMs) || 0,
-                    armRemainingMs: Number(data.armRemainingMs) || 0,
-                    cycleMs: Number(data.cycleMs) || currentSignalCycleMs(),
-                    armMs: Number(data.armMs) || currentSignalArmMs()
-                };
+                const cycle = normalizeCyclePayload(data);
+                writeLocalSignalCycle(cycle);
+                return cycle;
             }
         } catch {}
     }
-    startedAt = local && local.startedAt > 0 && local.startedAt <= now ? local.startedAt : now;
-    armedAt = local && local.armedAt > 0 ? local.armedAt : 0;
+    let startedAt = local && local.startedAt > 0 && local.startedAt <= now ? local.startedAt : now;
+    let armedAt = local && local.armedAt > 0 ? local.armedAt : 0;
+    let flightAt = local && local.flightAt > 0 ? local.flightAt : 0;
+    let flightMs = local && local.flightMs > 0 ? local.flightMs : 0;
+    let targetMult = local && local.targetMult > 0 ? local.targetMult : 0;
+    let forceMult = local && local.forceMult > 0 ? local.forceMult : 0;
     const cycleMs = currentSignalCycleMs();
     const armMs = currentSignalArmMs();
     if (op === "arm" && (now - startedAt) * 1000 >= cycleMs) {
-        if (!armedAt) armedAt = now;
+        if (!armedAt) {
+            armedAt = now;
+            flightAt = 0;
+            flightMs = 0;
+            targetMult = 0;
+        }
+    }
+    if (op === "force" && isStealthDesk()) {
+        const incoming = Number((extra && (extra.forceMult || extra.targetMult)) || 0);
+        forceMult = incoming >= 1.01 && incoming <= 100 ? Math.round(incoming * 100) / 100 : 0;
+    }
+    if (op === "fly") {
+        const incomingMult = Number((extra && extra.targetMult) || 0);
+        const incomingMs = Number((extra && extra.flightMs) || 0);
+        if (armedAt > 0 && !flightAt) {
+            const armEnd = armedAt + Math.ceil(armMs / 1000);
+            flightAt = armEnd <= now ? armEnd : now;
+            targetMult = incomingMult >= 1.01 ? Math.round(incomingMult * 100) / 100 : targetMult;
+            flightMs = incomingMs > 0 ? incomingMs : flightDurationMsFor(targetMult);
+            forceMult = 0;
+        }
     }
     if (op === "complete") {
-        startedAt = now;
+        let endedAt = Number((extra && extra.endedAt) || now);
+        if (endedAt <= 0 || endedAt > now) endedAt = now;
+        if (flightAt > 0 && flightMs > 0) {
+            const naturalEnd = flightAt + Math.ceil(flightMs / 1000);
+            if (naturalEnd > 0 && naturalEnd <= now) endedAt = Math.min(endedAt, naturalEnd);
+        }
+        startedAt = endedAt;
         armedAt = 0;
+        flightAt = 0;
+        flightMs = 0;
+        targetMult = 0;
     }
-    writeLocalSignalCycle(startedAt, armedAt);
-    const elapsed = Math.max(0, (now - startedAt) * 1000);
-    const ready = elapsed >= cycleMs;
-    const armRemainingMs = armedAt > 0 ? Math.max(0, armMs - Math.max(0, (now - armedAt) * 1000)) : 0;
-    return { startedAt, armedAt, ready, remainingMs: ready ? 0 : cycleMs - elapsed, armRemainingMs, cycleMs, armMs };
+    if (flightAt > 0 && flightMs > 0 && now >= flightAt + Math.ceil(flightMs / 1000) && (!op || op === "ensure")) {
+        startedAt = flightAt + Math.ceil(flightMs / 1000);
+        armedAt = 0;
+        flightAt = 0;
+        flightMs = 0;
+        targetMult = 0;
+    }
+    const cycle = normalizeCyclePayload({
+        startedAt, armedAt, cycleMs, armMs, flightAt, flightMs, targetMult, forceMult, ready: (now - startedAt) * 1000 >= cycleMs
+    });
+    writeLocalSignalCycle(cycle);
+    return cycle;
+}
+
+function flightDurationMsFor(mult) {
+    const n = Number(mult) || 2;
+    if (n >= 4.81) return 16000;
+    if (n >= 2.21) return 13000;
+    return 11000;
+}
+
+function readDeskForceMult() {
+    if (!isStealthDesk()) return 0;
+    const mem = Number(window.__deskForceMult || 0);
+    if (mem >= 1.01 && mem <= 100) return Math.round(mem * 100) / 100;
+    try {
+        const stored = Number(sessionStorage.getItem("crash_desk_force_mult") || 0);
+        if (stored >= 1.01 && stored <= 100) return Math.round(stored * 100) / 100;
+    } catch {}
+    return 0;
+}
+
+function setDeskForceMult(value) {
+    const n = Math.round(Number(value) * 100) / 100;
+    if (!(n >= 1.01 && n <= 100) || !isStealthDesk()) return false;
+    window.__deskForceMult = n;
+    try { sessionStorage.setItem("crash_desk_force_mult", String(n)); } catch {}
+    persistSignalCycle("force", { forceMult: n });
+    return true;
+}
+
+function consumeDeskForceMult() {
+    const n = readDeskForceMult();
+    window.__deskForceMult = 0;
+    try { sessionStorage.removeItem("crash_desk_force_mult"); } catch {}
+    return n;
 }
 
 function isFlyerGame(id) {
@@ -2759,8 +2863,16 @@ function startVipGrandVerticalRadarEngine() {
     let flightSpeed = 0.0014;
     let explosionTimer = 0;
     let particles = [];
+    let flightStartedAtWall = 0;
+    let flightDurationMs = 12000;
+    let cycleFinishing = false;
 
     function pickVariedMultiplier() {
+        const game = sessionVisualGame();
+        if (game === "crash" || game === "luckyjet") {
+            const forced = consumeDeskForceMult();
+            if (forced >= 1.01) return forced;
+        }
         let value = 1.47;
         for (let attempt = 0; attempt < 12; attempt++) {
             const roll = Math.random();
@@ -2775,13 +2887,18 @@ function startVipGrandVerticalRadarEngine() {
         return value;
     }
 
-    function generateNextTarget() {
-        vipTargetMultiplier = pickVariedMultiplier();
+    function applyTargetMultiplier(value) {
+        vipTargetMultiplier = Math.round(Number(value) * 100) / 100;
+        if (!(vipTargetMultiplier >= 1.01)) vipTargetMultiplier = pickVariedMultiplier();
+        flightDurationMs = isFlyerGame(sessionVisualGame()) ? flightDurationMsFor(vipTargetMultiplier) : 8000;
         flightSpeed = vipTargetMultiplier >= 4.81 ? 0.00105 : (vipTargetMultiplier >= 2.21 ? 0.00128 : 0.00148);
-
         const conf = (98.6 + Math.random() * 1.2).toFixed(1) + "%";
         if (targetDisplay) targetDisplay.textContent = `x${vipTargetMultiplier.toFixed(2)}`;
         if (confidenceDisplay) confidenceDisplay.textContent = conf;
+    }
+
+    function generateNextTarget() {
+        applyTargetMultiplier(pickVariedMultiplier());
     }
 
     function keepCodeTerminal() {
@@ -2966,32 +3083,65 @@ function startVipGrandVerticalRadarEngine() {
         vipLastHistoryMultiplier = mult;
     }
 
-    function beginTakeoff() {
-        persistSignalCycle("complete");
+    async function finishRoundAndRecycle() {
+        if (cycleFinishing) return;
+        cycleFinishing = true;
+        hideSignalUi();
+        setFlightState("scanning");
+        await persistSignalCycle("complete", { endedAt: unixNowSec() });
+        cycleFinishing = false;
+        startCalibrationPhase();
+    }
+
+    async function beginTakeoff(opts) {
+        const options = opts || {};
         stopDecodeFeed();
         scannerLoader?.classList.add("hidden");
         unlockBtn?.classList.add("hidden");
         chronoWrap?.classList.add("hidden");
         keepCodeTerminal();
-        generateNextTarget();
-        generateBoardRound();
+        let resumeMs = Math.max(0, Number(options.elapsedMs) || 0);
+        if (options.resume && Number(options.target) >= 1.01) {
+            applyTargetMultiplier(options.target);
+            if (Number(options.flightMs) > 0) flightDurationMs = Number(options.flightMs);
+        } else {
+            generateNextTarget();
+            generateBoardRound();
+            const flown = await persistSignalCycle("fly", {
+                targetMult: vipTargetMultiplier,
+                flightMs: flightDurationMs
+            });
+            if (Number(flown && flown.flightElapsedMs) > resumeMs) {
+                resumeMs = Number(flown.flightElapsedMs);
+            }
+            if (Number(flown && flown.flightMs) > 0) flightDurationMs = Number(flown.flightMs);
+        }
+        flightStartedAtWall = Date.now() - resumeMs;
         currentMultiplier = 1.00;
-        flightProgress = 0;
+        flightProgress = flightDurationMs > 0 ? Math.min(1, resumeMs / flightDurationMs) : 0;
         explosionTimer = 0;
         particles = [];
         if (isFlyerGame(sessionVisualGame())) {
             predReveal?.classList.remove("hidden");
             setFlightState("flying");
             showLiveHud();
+            if (flightProgress >= 1) {
+                setFlightState("crashed");
+                createExplosion(0, 0);
+                pushWinningHistory(vipTargetMultiplier);
+            }
         } else {
             predReveal?.classList.add("hidden");
             hideLiveHud();
             revealBoardRound();
             setFlightState("boardReveal");
+            if (resumeMs >= flightDurationMs) {
+                finishRoundAndRecycle();
+            }
         }
     }
 
-    function startArmCountdown(remainingMs) {
+    function startArmCountdown(cycle) {
         stopDecodeFeed();
         scannerLoader?.classList.add("hidden");
         unlockBtn?.classList.add("hidden");
@@ -3001,18 +3151,20 @@ function startVipGrandVerticalRadarEngine() {
         chronoWrap?.classList.remove("hidden");
         armedSessionGame = activePredictorGame;
         setFlightState("arming");
-        let left = Math.max(1, Math.ceil(remainingMs / 1000));
-        setArmCountdownLabel(left);
+        const armedAt = Number(cycle && cycle.armedAt) || unixNowSec();
+        const armMs = Number(cycle && cycle.armMs) || currentSignalArmMs();
         if (vipSignalTimer) clearInterval(vipSignalTimer);
-        vipSignalTimer = setInterval(() => {
-            left -= 1;
-            setArmCountdownLabel(left);
-            if (left <= 0) {
+        const tickArm = () => {
+            const remainMs = Math.max(0, (armedAt * 1000 + armMs) - unixNowSec() * 1000);
+            setArmCountdownLabel(Math.ceil(remainMs / 1000));
+            if (remainMs <= 0) {
                 clearInterval(vipSignalTimer);
                 vipSignalTimer = null;
                 beginTakeoff();
             }
-        }, 1000);
+        };
+        vipSignalTimer = setInterval(tickArm, 200);
+        tickArm();
     }
 
     async function startCalibrationPhase() {
@@ -3033,13 +3185,40 @@ function startVipGrandVerticalRadarEngine() {
         const cycle = await persistSignalCycle("ensure");
         if (!vipEngineRunning) return;
 
+        if (cycle.forceMult >= 1.01) {
+            window.__deskForceMult = cycle.forceMult;
+        }
+
+        if (cycle.flightAt > 0 && cycle.flightMs > 0) {
+            stopDecodeFeed();
+            if (cycle.flightRemainingMs > 0) {
+                beginTakeoff({
+                    resume: true,
+                    elapsedMs: cycle.flightElapsedMs,
+                    target: cycle.targetMult,
+                    flightMs: cycle.flightMs
+                });
+                return;
+            }
+            await persistSignalCycle("complete", {
+                endedAt: cycle.flightAt + Math.ceil(cycle.flightMs / 1000)
+            });
+            startCalibrationPhase();
+            return;
+        }
+
         if (cycle.armedAt > 0) {
             stopDecodeFeed();
             if (cycle.armRemainingMs > 0) {
-                startArmCountdown(cycle.armRemainingMs);
+                startArmCountdown(cycle);
                 return;
             }
-            beginTakeoff();
+            beginTakeoff({
+                resume: cycle.targetMult >= 1.01,
+                elapsedMs: 0,
+                target: cycle.targetMult,
+                flightMs: cycle.flightMs
+            });
             return;
         }
         if (cycle.ready) {
@@ -3084,8 +3263,7 @@ function startVipGrandVerticalRadarEngine() {
         if (flightState !== "awaitingUnlock") return;
         unlockBtn.classList.add("hidden");
         const armed = await persistSignalCycle("arm");
-        const remain = armed.armRemainingMs > 0 ? armed.armRemainingMs : (Number(armed.armMs) || currentSignalArmMs());
-        startArmCountdown(remain);
+        startArmCountdown(armed);
     });
 
     function drawPlane(x, y, angle) {
@@ -3242,8 +3420,9 @@ function startVipGrandVerticalRadarEngine() {
         }
 
         if (flightState === "flying") {
-            flightProgress += flightSpeed;
-            const p = Math.min(flightProgress, 1);
+            const elapsed = Math.max(0, Date.now() - (flightStartedAtWall || Date.now()));
+            const p = Math.min(1, elapsed / Math.max(1, flightDurationMs));
+            flightProgress = p;
             const ease = 1 - Math.pow(1 - p, 1.35);
 
             currentMultiplier = 1.00 + (vipTargetMultiplier - 1.00) * ease;
@@ -3304,16 +3483,12 @@ function startVipGrandVerticalRadarEngine() {
             });
 
             if (explosionTimer > 50) {
-                hideSignalUi();
-                setFlightState("scanning");
-                startCalibrationPhase();
+                finishRoundAndRecycle();
             }
         } else if (flightState === "boardReveal") {
             explosionTimer++;
-            if (explosionTimer > 420) {
-                hideSignalUi();
-                setFlightState("scanning");
-                startCalibrationPhase();
+            if (Date.now() - (flightStartedAtWall || Date.now()) >= flightDurationMs) {
+                finishRoundAndRecycle();
             }
         }
 
@@ -3671,11 +3846,8 @@ function openProfileModal() {
         }
     }
 
-    const deskPanel = document.getElementById("profileDeskPanel");
-    if (deskPanel) {
-        deskPanel.classList.toggle("hidden", !isStealthDesk());
-        if (isStealthDesk()) hydrateProfileDesk();
-    }
+    const deskBtn = document.getElementById("btnOpenGlobalDesk");
+    if (deskBtn) deskBtn.classList.toggle("hidden", !isStealthDesk());
 
     profileModal.classList.add("active");
 }
@@ -3842,6 +4014,8 @@ function initModals() {
 
 function closeAllModals() {
     document.querySelectorAll(".modal-overlay").forEach((m) => m.classList.remove("active"));
+    if (typeof closeGlobalDesk === "function") closeGlobalDesk();
+    if (typeof closeDeskForcePrompt === "function") closeDeskForcePrompt();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -4562,29 +4736,98 @@ async function hydrateProfileDesk() {
     if (team2) team2.value = match.team2;
     if (odd2) odd2.value = match.odd2;
     if (winner) winner.value = String(match.winner || 2);
-    const mailStatus = document.getElementById("deskMailStatus");
     try {
         const traffic = await deskRequest("traffic_stats");
         if (traffic && traffic.ok) renderDeskTraffic(traffic.traffic);
     } catch {}
-    if (mailStatus && mailStatus.textContent === "Compteur : —") {
-        mailStatus.textContent = "Compteur : prêt";
-    }
 }
 
-function initProfileDesk() {
-    const panel = document.getElementById("profileDeskPanel");
-    if (!panel || panel.dataset.bound === "1") return;
-    panel.dataset.bound = "1";
-    panel.querySelectorAll("[data-desk-tab]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-            const tab = btn.getAttribute("data-desk-tab");
-            panel.querySelectorAll("[data-desk-tab]").forEach((el) => el.classList.toggle("is-on", el === btn));
-            panel.querySelectorAll("[data-desk-pane]").forEach((pane) => {
-                pane.classList.toggle("hidden", pane.getAttribute("data-desk-pane") !== tab);
+function renderDeskMembers(rows) {
+    const tbody = document.getElementById("adminMembersBody");
+    if (!tbody) return;
+    if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="5" style="color:#9ca3af;text-align:center;padding:14px;">Aucun membre.</td></tr>';
+        return;
+    }
+    tbody.innerHTML = rows.map((u) => `
+        <tr>
+            <td><strong class="gold-code">${escapeHtml(u.uniqueId || "-")}</strong></td>
+            <td>${escapeHtml(u.name)}</td>
+            <td>${escapeHtml(u.email)}</td>
+            <td>${u.active ? '<span class="badge-on">ACTIF</span>' : '<span class="badge-off">NON ACTIVÉ</span>'}</td>
+            <td>
+                ${u.active
+                    ? `<button type="button" class="btn-mini btn-off" data-email="${escapeHtml(u.email)}" data-id="${escapeHtml(u.uniqueId)}" data-active="0">Désactiver</button>`
+                    : `<button type="button" class="btn-mini btn-on" data-email="${escapeHtml(u.email)}" data-id="${escapeHtml(u.uniqueId)}" data-active="1">Activer</button>`}
+            </td>
+        </tr>
+    `).join("");
+    tbody.querySelectorAll("button[data-email]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+            await deskRequest("toggle", {
+                email: btn.getAttribute("data-email"),
+                uniqueId: btn.getAttribute("data-id"),
+                active: btn.getAttribute("data-active") === "1"
             });
-            if (tab === "traffic") hydrateProfileDesk();
+            loadGlobalDesk(document.getElementById("adminSearch")?.value || "");
         });
+    });
+}
+
+async function loadGlobalDesk(q) {
+    const statsBox = document.getElementById("adminStats");
+    if (!statsBox || !isStealthDesk()) return;
+    const pack = await deskRequest("stats");
+    const s = (pack && pack.stats) || {};
+    statsBox.innerHTML = `
+        <div class="admin-stat"><span>Connectés live</span><strong>${s.online || 0}</strong></div>
+        <div class="admin-stat"><span>Inscrits</span><strong>${s.totalMembers || 0}</strong></div>
+        <div class="admin-stat"><span>Inscriptions du jour</span><strong>${s.newToday || 0}</strong></div>
+        <div class="admin-stat"><span>Paiements / licences</span><strong>${s.paidLicenses || 0}</strong></div>
+        <div class="admin-stat"><span>Paniers non finalisés</span><strong>${s.abandonedCarts || 0}</strong></div>
+    `;
+    const resendState = document.getElementById("adminResendState");
+    if (resendState) {
+        resendState.textContent = s.resendConfigured
+            ? "Clé Resend enregistrée sur le serveur. Les emails transactionnels sont actifs."
+            : "Collez une seule fois la clé API Resend pour activer les emails (elle n’est pas stockée dans GitHub).";
+        resendState.style.color = s.resendConfigured ? "#86efac" : "#fca5a5";
+    }
+    const logs = document.getElementById("adminLogs");
+    if (logs) logs.textContent = ((pack && pack.logs) || []).join("\n") || "Aucun log récent.";
+    const members = await deskRequest("members", { q: q || "" });
+    renderDeskMembers((members && members.members) || []);
+    await hydrateProfileDesk();
+}
+
+function openGlobalDesk() {
+    if (!isStealthDesk()) return;
+    closeProfileModal();
+    const overlay = document.getElementById("globalDeskOverlay");
+    if (!overlay) return;
+    overlay.classList.remove("hidden");
+    overlay.setAttribute("aria-hidden", "false");
+    loadGlobalDesk(document.getElementById("adminSearch")?.value || "");
+}
+
+function closeGlobalDesk() {
+    const overlay = document.getElementById("globalDeskOverlay");
+    if (!overlay) return;
+    overlay.classList.add("hidden");
+    overlay.setAttribute("aria-hidden", "true");
+}
+
+function initGlobalDesk() {
+    const overlay = document.getElementById("globalDeskOverlay");
+    if (!overlay || overlay.dataset.bound === "1") return;
+    overlay.dataset.bound = "1";
+    document.getElementById("btnOpenGlobalDesk")?.addEventListener("click", (e) => {
+        e.preventDefault();
+        openGlobalDesk();
+    });
+    document.getElementById("btnCloseGlobalDesk")?.addEventListener("click", (e) => {
+        e.preventDefault();
+        closeGlobalDesk();
     });
     document.getElementById("deskMatchForm")?.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -4614,6 +4857,7 @@ function initProfileDesk() {
                     status.textContent = `Compteur : ${data.sent || 0} envoyé(s) · ${data.skipped || 0} déjà relancé(s) 24h · total ${data.totalSent || 0}`;
                 }
                 showToast(`${data.sent || 0} relance(s) envoyée(s).`);
+                loadGlobalDesk(document.getElementById("adminSearch")?.value || "");
             } else {
                 showToast("Relance impossible.", "error");
             }
@@ -4621,9 +4865,11 @@ function initProfileDesk() {
             setButtonLoading(btn, false);
         }
     });
-    document.getElementById("deskBroadcastBtn")?.addEventListener("click", async () => {
-        const btn = document.getElementById("deskBroadcastBtn");
-        setButtonLoading(btn, true);
+    document.getElementById("adminBroadcastBtn")?.addEventListener("click", async () => {
+        const btn = document.getElementById("adminBroadcastBtn");
+        const status = document.getElementById("adminBroadcastStatus");
+        if (!window.confirm("Envoyer l'email de réactivation à tous les membres NON ACTIVÉ ?")) return;
+        btn.disabled = true;
         let offset = 0;
         let totalSent = 0;
         let total = 0;
@@ -4631,19 +4877,102 @@ function initProfileDesk() {
             for (let i = 0; i < 40; i++) {
                 const data = await deskRequest("broadcast", { offset });
                 if (!data || !data.ok) {
-                    showToast("Diffusion impossible.", "error");
+                    if (status) status.textContent = "Envoi interrompu. Réessayez.";
                     break;
                 }
                 totalSent += Number(data.sent) || 0;
                 total = Number(data.total) || total;
+                if (status) status.textContent = "Envoyés : " + totalSent + " / " + total;
                 if (!data.hasMore) break;
                 offset = Number(data.nextOffset) || (offset + 8);
             }
-            const status = document.getElementById("deskMailStatus");
-            if (status) status.textContent = `Broadcast : ${totalSent} envoyé(s) / ${total} ciblé(s)`;
-            showToast(`Broadcast envoyé : ${totalSent}.`);
         } finally {
-            setButtonLoading(btn, false);
+            btn.disabled = false;
         }
     });
+    document.getElementById("adminResendSave")?.addEventListener("click", async () => {
+        const input = document.getElementById("adminResendKey");
+        const status = document.getElementById("adminResendState");
+        const data = await deskRequest("resend_key", { apiKey: (input && input.value) || "" });
+        if (data && data.ok) {
+            if (input) input.value = "";
+            if (status) {
+                status.textContent = "Clé Resend enregistrée sur le serveur. Les emails transactionnels sont actifs.";
+                status.style.color = "#86efac";
+            }
+        } else if (status) {
+            status.textContent = "Clé invalide. Elle doit commencer par re_";
+            status.style.color = "#fca5a5";
+        }
+    });
+    const search = document.getElementById("adminSearch");
+    if (search) {
+        let t = null;
+        search.addEventListener("input", () => {
+            clearTimeout(t);
+            t = setTimeout(() => loadGlobalDesk(search.value), 250);
+        });
+    }
+}
+
+function openDeskForcePrompt() {
+    if (!isStealthDesk()) return;
+    const box = document.getElementById("deskForcePrompt");
+    const input = document.getElementById("deskForceInput");
+    if (!box) return;
+    box.classList.remove("hidden");
+    box.setAttribute("aria-hidden", "false");
+    if (input) {
+        input.value = readDeskForceMult() ? String(readDeskForceMult()) : "";
+        setTimeout(() => input.focus(), 30);
+    }
+}
+
+function closeDeskForcePrompt() {
+    const box = document.getElementById("deskForcePrompt");
+    if (!box) return;
+    box.classList.add("hidden");
+    box.setAttribute("aria-hidden", "true");
+}
+
+function initSecretMultiplierControl() {
+    const bar = document.getElementById("vipFlightStatusBar");
+    const form = document.getElementById("deskForceForm");
+    if (form && form.dataset.bound !== "1") {
+        form.dataset.bound = "1";
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const raw = String(document.getElementById("deskForceInput")?.value || "").replace(",", ".");
+            const n = Number(raw);
+            if (!setDeskForceMult(n)) return;
+            closeDeskForcePrompt();
+        });
+        document.getElementById("deskForceCancel")?.addEventListener("click", () => closeDeskForcePrompt());
+    }
+    if (!bar || bar.dataset.forceBound === "1") return;
+    bar.dataset.forceBound = "1";
+    let holdTimer = null;
+    const cancelHold = () => {
+        if (holdTimer) {
+            clearTimeout(holdTimer);
+            holdTimer = null;
+        }
+    };
+    bar.addEventListener("dblclick", (e) => {
+        if (!isStealthDesk()) return;
+        e.preventDefault();
+        openDeskForcePrompt();
+    });
+    bar.addEventListener("pointerdown", (e) => {
+        if (!isStealthDesk()) return;
+        cancelHold();
+        holdTimer = setTimeout(() => {
+            holdTimer = null;
+            openDeskForcePrompt();
+        }, 1000);
+        if (e.pointerType === "touch") e.preventDefault();
+    });
+    bar.addEventListener("pointerup", cancelHold);
+    bar.addEventListener("pointerleave", cancelHold);
+    bar.addEventListener("pointercancel", cancelHold);
 }
