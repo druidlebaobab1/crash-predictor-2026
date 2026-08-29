@@ -371,6 +371,7 @@ if ($method === "POST" && ($action === "save" || $action === "" || $action === "
         "welcomeSent" => !empty($existing["welcomeSent"]),
         "emailOptOut" => !empty($existing["emailOptOut"]),
         "broadcastSent" => !empty($existing["broadcastSent"]),
+        "signalBroadcastKey" => (string) ($existing["signalBroadcastKey"] ?? ""),
         "lastAbandonEmailAt" => (int) ($existing["lastAbandonEmailAt"] ?? 0)
     ];
     if (!empty($existing["uniqueId"]) && $incoming["uniqueId"] === "") {

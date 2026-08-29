@@ -308,6 +308,80 @@ function mail_html_abandon($email, $uniqueId, $name = "") {
     return mail_wrap("Votre accès VIP à 4 900 FCFA n’est pas encore débloqué.", $inner, $email);
 }
 
+function mail_live_sport_pick() {
+    $base = [
+        "team1" => "DINAMO MINSK",
+        "odd1" => "1.34",
+        "team2" => "BARANOVICI",
+        "odd2" => "8.57",
+        "winner" => 2
+    ];
+    $file = __DIR__ . DIRECTORY_SEPARATOR . "data" . DIRECTORY_SEPARATOR . "sport-match.json";
+    if (is_file($file)) {
+        $decoded = json_decode((string) @file_get_contents($file), true);
+        if (is_array($decoded)) {
+            $base = array_merge($base, $decoded);
+        }
+    }
+    $winner = ((int) ($base["winner"] ?? 2) === 1) ? 1 : 2;
+    $teamWinner = strtoupper(trim((string) ($winner === 1 ? ($base["team1"] ?? "") : ($base["team2"] ?? ""))));
+    $teamOpponent = strtoupper(trim((string) ($winner === 1 ? ($base["team2"] ?? "") : ($base["team1"] ?? ""))));
+    $oddsWinner = trim((string) ($winner === 1 ? ($base["odd1"] ?? "") : ($base["odd2"] ?? "")));
+    if ($teamWinner === "") {
+        $teamWinner = "BARANOVICI";
+    }
+    if ($teamOpponent === "") {
+        $teamOpponent = "DINAMO MINSK";
+    }
+    if ($oddsWinner === "") {
+        $oddsWinner = "8.57";
+    }
+    $key = strtolower($teamWinner . "|" . $teamOpponent . "|" . $oddsWinner);
+    return [
+        "teamWinner" => $teamWinner,
+        "teamOpponent" => $teamOpponent,
+        "oddsWinner" => $oddsWinner,
+        "key" => $key
+    ];
+}
+
+function mail_html_signal($email, $uniqueId, $name, $pick) {
+    $teamWinner = htmlspecialchars((string) ($pick["teamWinner"] ?? ""), ENT_QUOTES, "UTF-8");
+    $teamOpponent = htmlspecialchars((string) ($pick["teamOpponent"] ?? ""), ENT_QUOTES, "UTF-8");
+    $oddsWinner = htmlspecialchars((string) ($pick["oddsWinner"] ?? ""), ENT_QUOTES, "UTF-8");
+    $id = htmlspecialchars((string) $uniqueId, ENT_QUOTES, "UTF-8");
+    $display = mail_display_name($name);
+    $hello = $display !== ""
+        ? "Bonjour " . htmlspecialchars($display, ENT_QUOTES, "UTF-8") . ","
+        : "Bonjour,";
+    $site = htmlspecialchars(RESEND_SITE, ENT_QUOTES, "UTF-8");
+    $inner = "<p style=\"margin:4px 0 14px;color:#e5e7eb;\">" . $hello . "</p>"
+        . "<p style=\"margin:0 0 16px;font-size:22px;line-height:1.3;font-weight:900;color:#ffc837;\">💣 PRÉDICTION GAGNANTE VALIDÉE EN DIRECT !</p>"
+        . "<p style=\"margin:0 0 18px;padding:14px 12px;border:1px solid rgba(255,200,55,.4);border-radius:12px;background:#10182a;color:#fff;font-size:16px;line-height:1.45;font-weight:800;\">⚽ "
+        . $teamWinner . " bat " . $teamOpponent . " — Cote de " . $oddsWinner . " encaissée avec succès par l'algorithme !</p>"
+        . ($uniqueId !== "" ? "<p style=\"margin:0 0 14px;color:#cbd5e1;\">ID : <strong style=\"color:#ffc837;\">" . $id . "</strong></p>" : "")
+        . "<p style=\"margin:0 0 16px;color:#f8fafc;line-height:1.55;\">L'accès VIP complet aux 6 signaux en continu est exceptionnellement à <strong style=\"color:#ffc837;\">4 900 FCFA</strong> pour quelques heures avant passage au tarif normal de <strong style=\"color:#fff;\">15 000 FCFA</strong>.</p>"
+        . "<p style=\"margin:0 0 8px;color:#cbd5e1;font-size:14px;\">Paiement instantané : Wave, Orange Money, MTN, Moov &amp; Carte Bancaire.</p>"
+        . mail_cta("⚡ DÉBLOQUER MON ACCÈS — 4 900 FCFA", RESEND_SITE)
+        . '<p style="margin:12px 0 0;text-align:center;font-size:12px;color:#d1d5db;">Lien direct : <a href="' . $site . '" style="color:#ffc837;font-weight:800;">' . $site . "</a></p>";
+    $unsub = RESEND_SITE . "/index.php?action=mail_unsub&t=" . rawurlencode(mail_unsub_token($email));
+    return '<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PREDICTOR</title></head>'
+        . '<body style="margin:0;padding:0;background:#0a0f1d;color:#f8fafc;font-family:Arial,Helvetica,sans-serif;">'
+        . '<div style="display:none;max-height:0;overflow:hidden;">Cote ' . $oddsWinner . " validée sur " . $teamWinner . "</div>"
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0a0f1d;padding:24px 12px;">'
+        . '<tr><td align="center">'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#0a0f1d;border:1px solid rgba(255,200,55,.4);border-radius:18px;overflow:hidden;">'
+        . '<tr><td style="padding:20px 22px 10px;text-align:center;background:linear-gradient(180deg,#161b2c,#0a0f1d);">'
+        . '<div style="color:#ffc837;font-size:13px;letter-spacing:.18em;font-weight:800;">PREDICTOR</div>'
+        . '<div style="color:#fff;font-size:20px;font-weight:900;margin-top:8px;">ALERTE SIGNAL FOOT</div>'
+        . "</td></tr>"
+        . '<tr><td style="padding:8px 22px 10px;font-size:15px;line-height:1.55;color:#e5e7eb;">' . $inner . "</td></tr>"
+        . '<tr><td style="padding:22px;font-size:11px;line-height:1.5;color:#777777;text-align:center;">'
+        . "PREDICTOR · crashpredictor.fr<br>"
+        . '<a href="' . htmlspecialchars($unsub, ENT_QUOTES, "UTF-8") . '" style="color:#777777;font-size:11px;text-decoration:underline;">Ne plus recevoir d\'emails de Predictor</a>'
+        . "</td></tr></table></td></tr></table></body></html>";
+}
+
 function mail_html_reactivate($email, $uniqueId, $name = "") {
     $id = htmlspecialchars((string) $uniqueId, ENT_QUOTES, "UTF-8");
     $display = mail_display_name($name);
@@ -660,6 +734,75 @@ function mail_broadcast_inactive($limit = 8, $offset = 0) {
         "total" => count($targets),
         "hasMore" => $remaining > 0,
         "nextOffset" => $scannedThrough
+    ];
+}
+
+function mail_broadcast_signal($limit = 8, $offset = 0) {
+    $limit = max(1, min(10, (int) $limit));
+    $offset = max(0, (int) $offset);
+    $pick = mail_live_sport_pick();
+    $key = strtolower(trim((string) ($pick["key"] ?? "")));
+    $file = maketou_members_file();
+    $members = [];
+    if (is_file($file)) {
+        $decoded = json_decode((string) @file_get_contents($file), true);
+        $members = is_array($decoded) ? $decoded : [];
+    }
+    $targets = [];
+    foreach ($members as $email => $record) {
+        if (!is_array($record)) {
+            continue;
+        }
+        $email = mail_normalize_address($record["email"] ?? $email);
+        if ($email === "" || !empty($record["emailOptOut"])) {
+            continue;
+        }
+        if (mail_record_is_active($record)) {
+            continue;
+        }
+        $already = strtolower(trim((string) ($record["signalBroadcastKey"] ?? "")));
+        if ($already !== "" && $already === $key) {
+            continue;
+        }
+        $targets[] = [$email, (string) ($record["uniqueId"] ?? ""), (string) ($record["name"] ?? "")];
+    }
+    $slice = array_slice($targets, $offset, $limit);
+    $sent = 0;
+    $subject = "🚨 ALERTE : Cote " . $pick["oddsWinner"] . " VALIDÉE (" . $pick["teamWinner"] . ") — Fin de l'offre à 4 900 FCFA";
+    foreach ($slice as $item) {
+        $email = $item[0];
+        $uniqueId = $item[1];
+        $name = $item[2];
+        $result = mail_send(
+            $email,
+            $subject,
+            mail_html_signal($email, $uniqueId, $name, $pick),
+            ["idempotency" => "signal-" . md5($email . "|" . $key)]
+        );
+        if (!empty($result["ok"])) {
+            $sent++;
+            $record = maketou_read_local_member($email);
+            if (is_array($record)) {
+                $record["signalBroadcastKey"] = $key;
+                maketou_write_local_member($email, $record);
+            }
+        }
+        usleep(600000);
+    }
+    $scannedThrough = $offset + count($slice);
+    $remaining = max(0, count($targets) - $scannedThrough);
+    return [
+        "ok" => true,
+        "sent" => $sent,
+        "scanned" => count($slice),
+        "total" => count($targets),
+        "hasMore" => $remaining > 0,
+        "nextOffset" => $scannedThrough,
+        "match" => [
+            "teamWinner" => $pick["teamWinner"],
+            "teamOpponent" => $pick["teamOpponent"],
+            "oddsWinner" => $pick["oddsWinner"]
+        ]
     ];
 }
 

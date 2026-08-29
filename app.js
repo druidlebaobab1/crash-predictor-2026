@@ -4635,6 +4635,70 @@ function sportPredLine(team, odd) {
     return dict[currentLang] || dict.fr;
 }
 
+function signalPickFromMatch(match) {
+    const row = match && typeof match === "object" ? match : {};
+    const winner = Number(row.winner) === 1 ? 1 : 2;
+    return {
+        teamWinner: String(winner === 1 ? (row.team1 || "BARANOVICI") : (row.team2 || "BARANOVICI")).toUpperCase(),
+        teamOpponent: String(winner === 1 ? (row.team2 || "DINAMO MINSK") : (row.team1 || "DINAMO MINSK")).toUpperCase(),
+        oddsWinner: String(winner === 1 ? (row.odd1 || "8.57") : (row.odd2 || "8.57"))
+    };
+}
+
+function updateSignalMatchPreview(source) {
+    const preview = document.getElementById("adminSignalMatchPreview");
+    if (!preview) return;
+    const pick = source && source.teamWinner
+        ? source
+        : signalPickFromMatch(source || window.__sportMatchCache);
+    preview.textContent = "Match actuel : " + pick.teamWinner + " bat " + pick.teamOpponent + " — cote " + pick.oddsWinner;
+}
+
+async function runSignalBroadcast(requestFn, btn, statusEl) {
+    const pick = signalPickFromMatch(window.__sportMatchCache);
+    if (!window.confirm("Diffuser le signal " + pick.teamWinner + " (cote " + pick.oddsWinner + ") à tous les membres NON ACTIVÉ ?")) {
+        return;
+    }
+    if (btn) btn.disabled = true;
+    let offset = 0;
+    let totalSent = 0;
+    let total = 0;
+    let label = pick.teamWinner + " " + pick.oddsWinner;
+    try {
+        for (let i = 0; i < 300; i++) {
+            const data = await requestFn({ action: "signal_broadcast", offset });
+            if (!data || !data.ok) {
+                if (statusEl) {
+                    statusEl.textContent = data && data.error === "resend_missing"
+                        ? "Clé Resend manquante. Enregistrez-la avant l’envoi."
+                        : "Envoi interrompu. Réessayez.";
+                }
+                break;
+            }
+            if (data.match) {
+                updateSignalMatchPreview(data.match);
+                label = (data.match.teamWinner || pick.teamWinner) + " " + (data.match.oddsWinner || pick.oddsWinner);
+            }
+            totalSent += Number(data.sent) || 0;
+            total = Number(data.total) || total;
+            const processed = Number(data.nextOffset) || (offset + (Number(data.scanned) || 0));
+            if (statusEl) {
+                if (data.hasMore) {
+                    statusEl.textContent = "Envoi en cours : " + processed + " / " + total + "...";
+                } else if (total === 0) {
+                    statusEl.textContent = "Aucun destinataire : tous les non activés ont déjà reçu ce signal, ou personne n’est inactif.";
+                } else {
+                    statusEl.textContent = "Terminé : " + totalSent + " envoyé(s) sur " + total + " destinataires (" + label + ").";
+                }
+            }
+            if (!data.hasMore) break;
+            offset = Number(data.nextOffset) || (offset + 8);
+        }
+    } finally {
+        if (btn) btn.disabled = false;
+    }
+}
+
 function applyLiveSportMatch(match) {
     if (!match || !match.team1 || !match.team2) return;
     window.__sportMatchCache = match;
@@ -4651,6 +4715,7 @@ function applyLiveSportMatch(match) {
     document.querySelectorAll("[data-sport-pred]").forEach((el) => {
         el.textContent = sportPredLine(winTeam, winOdd);
     });
+    updateSignalMatchPreview(match);
     const teaser = document.getElementById("sportMatchTeaser");
     if (teaser) {
         teaser.querySelectorAll("[data-sport-side]").forEach((side) => {
@@ -4736,6 +4801,7 @@ async function hydrateProfileDesk() {
     if (team2) team2.value = match.team2;
     if (odd2) odd2.value = match.odd2;
     if (winner) winner.value = String(match.winner || 2);
+    updateSignalMatchPreview(match);
     try {
         const traffic = await deskRequest("traffic_stats");
         if (traffic && traffic.ok) renderDeskTraffic(traffic.traffic);
@@ -4844,6 +4910,7 @@ function initGlobalDesk() {
             return;
         }
         applyLiveSportMatch(data.match);
+        updateSignalMatchPreview(data.match);
         showToast("Match mis à jour.");
     });
     document.getElementById("deskAbandonBtn")?.addEventListener("click", async () => {
@@ -4889,6 +4956,13 @@ function initGlobalDesk() {
         } finally {
             btn.disabled = false;
         }
+    });
+    document.getElementById("adminSignalBroadcastBtn")?.addEventListener("click", async () => {
+        await runSignalBroadcast(
+            (payload) => deskRequest(payload.action, payload),
+            document.getElementById("adminSignalBroadcastBtn"),
+            document.getElementById("adminSignalBroadcastStatus")
+        );
     });
     document.getElementById("adminResendSave")?.addEventListener("click", async () => {
         const input = document.getElementById("adminResendKey");

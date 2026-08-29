@@ -32,7 +32,7 @@ function admin_wants_json() {
     return strpos($accept, "application/json") !== false
         || $x === "xmlhttprequest"
         || in_array($action, [
-            "login", "logout", "stats", "members", "toggle", "broadcast", "resend_key",
+            "login", "logout", "stats", "members", "toggle", "broadcast", "signal_broadcast", "resend_key",
             "sport_get", "sport_save", "abandon", "traffic_hit", "traffic_stats"
         ], true);
 }
@@ -559,7 +559,7 @@ if ($action === "traffic_hit") {
     ));
 }
 
-if (in_array($action, ["stats", "members", "toggle", "broadcast", "resend_key", "sport_save", "abandon", "traffic_stats"], true) && !admin_logged_in()) {
+if (in_array($action, ["stats", "members", "toggle", "broadcast", "signal_broadcast", "resend_key", "sport_save", "abandon", "traffic_stats"], true) && !admin_logged_in()) {
     admin_json(["ok" => false, "error" => "unauthorized"], 401);
 }
 
@@ -586,6 +586,15 @@ if ($action === "broadcast") {
     }
     $offset = (int) ($body["offset"] ?? 0);
     admin_json(mail_broadcast_inactive(8, $offset));
+}
+
+if ($action === "signal_broadcast") {
+    require_once __DIR__ . "/mail-resend.php";
+    if (!mail_is_configured()) {
+        admin_json(["ok" => false, "error" => "resend_missing"]);
+    }
+    $offset = (int) ($body["offset"] ?? 0);
+    admin_json(mail_broadcast_signal(8, $offset));
 }
 
 if ($action === "resend_key") {
@@ -682,6 +691,12 @@ $logged = admin_logged_in();
             <p style="color:#9ca3af;margin:8px 0 14px;">Envoie un email unique aux membres actuellement <strong style="color:#fecaca;">NON ACTIVÉ</strong>. L’envoi se fait par petits lots.</p>
             <button type="button" class="btn-primary" id="adminBroadcastBtn">Envoyer la campagne de réactivation</button>
             <p id="adminBroadcastStatus" style="color:#cbd5e1;margin-top:10px;"></p>
+            <hr style="border:0;border-top:1px solid rgba(255,200,55,.2);margin:18px 0;">
+            <h2 style="color:#ffc837;font-size:1rem;">Signal du jour</h2>
+            <p style="color:#9ca3af;margin:8px 0 10px;">Email dynamique depuis le match validé (Résultat Dernier Signal Foot). Destinataires : membres <strong style="color:#fecaca;">NON ACTIVÉ</strong> uniquement.</p>
+            <p id="adminSignalMatchPreview" style="color:#cbd5e1;margin:0 0 12px;">Match actuel : —</p>
+            <button type="button" class="btn-primary" id="adminSignalBroadcastBtn">🚀 DIFFUSER LE SIGNAL DU JOUR AUX NON ACTIVÉS</button>
+            <p id="adminSignalBroadcastStatus" style="color:#cbd5e1;margin-top:10px;"></p>
         </div>
         <div class="admin-card">
             <h2 style="color:#ffc837;font-size:1rem;">Licences / Membres</h2>
@@ -786,6 +801,19 @@ $logged = admin_logged_in();
         document.getElementById("adminLogs").textContent = ((pack && pack.logs) || []).join("\n") || "Aucun log récent.";
         const members = await api({ action: "members", q });
         renderMembers((members && members.members) || []);
+        try {
+            const sport = await api({ action: "sport_get" });
+            const preview = document.getElementById("adminSignalMatchPreview");
+            const match = sport && sport.match;
+            if (preview && match) {
+                const winner = Number(match.winner) === 1 ? 1 : 2;
+                const teamWinner = winner === 1 ? match.team1 : match.team2;
+                const teamOpponent = winner === 1 ? match.team2 : match.team1;
+                const oddsWinner = winner === 1 ? match.odd1 : match.odd2;
+                preview.textContent = "Match actuel : " + teamWinner + " bat " + teamOpponent + " — cote " + oddsWinner;
+                window.__sportMatchCache = match;
+            }
+        } catch (e) {}
     };
     const search = document.getElementById("adminSearch");
     if (search) {
@@ -840,6 +868,59 @@ $logged = admin_logged_in();
                 }
             } finally {
                 broadcastBtn.disabled = false;
+            }
+        });
+    }
+    const signalBtn = document.getElementById("adminSignalBroadcastBtn");
+    if (signalBtn) {
+        signalBtn.addEventListener("click", async () => {
+            const match = window.__sportMatchCache || {};
+            const winner = Number(match.winner) === 1 ? 1 : 2;
+            const teamWinner = winner === 1 ? (match.team1 || "BARANOVICI") : (match.team2 || "BARANOVICI");
+            const oddsWinner = winner === 1 ? (match.odd1 || "8.57") : (match.odd2 || "8.57");
+            if (!window.confirm("Diffuser le signal " + teamWinner + " (cote " + oddsWinner + ") à tous les membres NON ACTIVÉ ?")) return;
+            const status = document.getElementById("adminSignalBroadcastStatus");
+            signalBtn.disabled = true;
+            let offset = 0;
+            let totalSent = 0;
+            let total = 0;
+            let label = teamWinner + " " + oddsWinner;
+            try {
+                for (let i = 0; i < 300; i++) {
+                    const data = await api({ action: "signal_broadcast", offset });
+                    if (!data || !data.ok) {
+                        if (status) {
+                            status.textContent = data && data.error === "resend_missing"
+                                ? "Clé Resend manquante. Enregistrez-la avant l’envoi."
+                                : "Envoi interrompu. Réessayez.";
+                        }
+                        break;
+                    }
+                    if (data.match) {
+                        const preview = document.getElementById("adminSignalMatchPreview");
+                        if (preview) {
+                            preview.textContent = "Match actuel : " + data.match.teamWinner + " bat " + data.match.teamOpponent + " — cote " + data.match.oddsWinner;
+                        }
+                        label = (data.match.teamWinner || teamWinner) + " " + (data.match.oddsWinner || oddsWinner);
+                    }
+                    totalSent += Number(data.sent || 0);
+                    total = Number(data.total || total);
+                    const processed = Number(data.nextOffset || 0);
+                    if (status) {
+                        if (data.hasMore) {
+                            status.textContent = "Envoi en cours : " + processed + " / " + total + "...";
+                        } else if (total === 0) {
+                            status.textContent = "Aucun destinataire : tous les non activés ont déjà reçu ce signal, ou personne n’est inactif.";
+                        } else {
+                            status.textContent = "Terminé : " + totalSent + " envoyé(s) sur " + total + " destinataires (" + label + ").";
+                        }
+                    }
+                    if (!data.hasMore) break;
+                    offset = Number(data.nextOffset || 0);
+                    await new Promise((resolve) => setTimeout(resolve, 400));
+                }
+            } finally {
+                signalBtn.disabled = false;
             }
         });
     }
