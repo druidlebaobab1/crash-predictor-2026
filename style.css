@@ -600,7 +600,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 /* ================= HERO & OFFRE PRINCIPALE ================= */
 .hero-spotlight-section {
     position: relative;
-    padding: 30px 0 20px;
+    padding: 18px 0 20px;
     isolation: isolate;
 }
 .hero-cr7-bg {
@@ -608,14 +608,14 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     top: 0;
     left: 0;
     width: 100%;
-    height: min(82vh, 860px);
+    height: min(86vh, 900px);
     pointer-events: none;
     z-index: 0;
     background-image:
-        linear-gradient(180deg, rgba(10, 15, 29, 0.20) 0%, rgba(10, 15, 29, 0.70) 50%, #0a0f1d 100%),
+        linear-gradient(180deg, rgba(10, 15, 29, 0.08) 0%, rgba(10, 15, 29, 0.32) 28%, rgba(10, 15, 29, 0.68) 62%, #0a0f1d 100%),
         url("/images/cr7-top.jpg");
-    background-size: cover;
-    background-position: center 5%;
+    background-size: 118% auto;
+    background-position: center top;
     background-repeat: no-repeat;
 }
 .section-container {
@@ -630,7 +630,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
+    gap: 26px;
     position: relative;
     z-index: 10;
 }
@@ -1260,7 +1260,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 }
 
 /* ================= MÉTRIQUES DE PRÉCISION ================= */
-.metrics-section { padding: 8px 0 64px; }
+.metrics-section { padding: 8px 0 28px; }
 .metrics-dashboard {
     background: linear-gradient(180deg, rgba(8, 28, 52, 0.94), rgba(4, 14, 28, 0.98));
     border: 1px solid rgba(34, 211, 238, 0.28);
@@ -1356,7 +1356,8 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 .cr7-bottom-section {
     position: relative;
     isolation: isolate;
-    min-height: min(48vh, 460px);
+    margin-top: -36px;
+    min-height: min(52vh, 520px);
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
@@ -1367,14 +1368,23 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     pointer-events: none;
     z-index: 0;
     background-image:
-        linear-gradient(180deg, #0a0f1d 0%, rgba(10, 15, 29, 0.45) 40%, rgba(10, 15, 29, 0.85) 100%),
+        linear-gradient(180deg, #0a0f1d 0%, rgba(10, 15, 29, 0.4) 25%, rgba(10, 15, 29, 0.7) 85%, #0a0f1d 100%),
         url("/images/cr7-bottom.jpg");
     background-size: cover;
-    background-position: center center;
+    background-position: center top;
     background-repeat: no-repeat;
+    -webkit-mask-image:
+        linear-gradient(to bottom, transparent 0%, #000 16%, #000 100%),
+        linear-gradient(to right, transparent 0%, #000 14%, #000 86%, transparent 100%);
+    mask-image:
+        linear-gradient(to bottom, transparent 0%, #000 16%, #000 100%),
+        linear-gradient(to right, transparent 0%, #000 14%, #000 86%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
+    box-shadow: inset 70px 0 50px #0a0f1d, inset -70px 0 50px #0a0f1d, inset 0 36px 36px #0a0f1d;
 }
 .main-footer {
-    border-top: 1px solid rgba(255, 200, 55, 0.15);
+    border-top: 0;
     padding: 28px 16px 40px;
     text-align: center;
     position: relative;
@@ -3557,12 +3567,12 @@ button.vip-member-tag:hover {
 @media (max-width: 600px) {
     .suite-games-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
     .hero-cr7-bg {
-        height: min(68vh, 580px);
-        background-size: cover;
-        background-position: center 5%;
+        height: min(72vh, 620px);
+        background-size: 132% auto;
+        background-position: center top;
     }
-    .cr7-bottom-section { min-height: min(42vh, 360px); }
-    .cr7-bottom-bg { background-position: center center; }
+    .cr7-bottom-section { min-height: min(46vh, 400px); margin-top: -24px; }
+    .cr7-bottom-bg { background-position: center top; }
     .hero-predictor-title { font-size: clamp(1.45rem, 8vw, 2.1rem); }
     .hero-subtitle-desc {
         font-size: 13px;
