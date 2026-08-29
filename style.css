@@ -598,8 +598,33 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 .btn-logout:hover { color: var(--accent-red); }
 
 /* ================= HERO & OFFRE PRINCIPALE ================= */
-.hero-spotlight-section { padding: 30px 0 20px; }
-.section-container { max-width: 1200px; margin: 0 auto; padding: 0 16px; }
+.hero-spotlight-section {
+    position: relative;
+    padding: 30px 0 20px;
+    isolation: isolate;
+}
+.hero-cr7-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: min(78vh, 820px);
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+        linear-gradient(180deg, rgba(10, 15, 29, 0.40) 0%, rgba(10, 15, 29, 0.82) 60%, #0a0f1d 100%),
+        url("/images/cr7-hero.jpg");
+    background-size: cover;
+    background-position: center 10%;
+    background-repeat: no-repeat;
+}
+.section-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 16px;
+    position: relative;
+    z-index: 10;
+}
 .hero-header-text {
     margin-bottom: 25px;
     display: flex;
@@ -607,7 +632,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     align-items: center;
     gap: 16px;
     position: relative;
-    z-index: 1;
+    z-index: 10;
 }
 
 .hero-predictor-frame {
@@ -620,7 +645,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     background: linear-gradient(180deg, rgba(8, 28, 52, 0.92), rgba(4, 14, 28, 0.96));
     box-shadow: 0 0 28px rgba(34, 211, 238, 0.22), inset 0 0 24px rgba(34, 211, 238, 0.08);
     position: relative;
-    z-index: 1;
+    z-index: 10;
     flex-shrink: 0;
 }
 
@@ -630,6 +655,8 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     justify-content: center;
     flex-wrap: wrap;
     gap: 10px;
+    position: relative;
+    z-index: 10;
     background: rgba(185, 28, 28, 0.55);
     border: 2px solid #f87171;
     padding: 8px 16px;
@@ -733,7 +760,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     white-space: nowrap;
     overflow: hidden;
     position: relative;
-    z-index: 1;
+    z-index: 10;
     flex-shrink: 0;
 }
 .hero-subtitle-desc > span {
@@ -2726,7 +2753,7 @@ button.vip-member-tag:hover {
 .vip-pred-reveal { width: 100%; }
 
 /* ===== SUITE MULTI-JEUX ===== */
-.suite-games-showcase { margin: 8px 0 22px; }
+.suite-games-showcase { margin: 8px 0 22px; position: relative; z-index: 10; }
 .suite-games-kicker {
     text-align: center;
     font-size: 0.78rem;
@@ -3507,6 +3534,11 @@ button.vip-member-tag:hover {
 }
 @media (max-width: 600px) {
     .suite-games-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .hero-cr7-bg {
+        height: min(64vh, 560px);
+        background-size: cover;
+        background-position: center 8%;
+    }
     .hero-predictor-title { font-size: clamp(1.45rem, 8vw, 2.1rem); }
     .hero-subtitle-desc {
         font-size: 13px;
