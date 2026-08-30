@@ -183,7 +183,7 @@ const TRANSLATIONS = {
         sport_teaser_note: "Cotes neutres · prédiction réservée à l'espace membre",
         sport_odd_draw: "NUL",
         sport_win_badge: "WIN / CONFIRMÉ",
-        sport_pred_line: "PRÉDICTION : VICTOIRE BARANOVICI 8.57",
+        sport_pred_line: "VICTOIRE BARANOVICI 8.57",
         sport_hit_badge: "PRÉDICTION VALIDÉE ✅",
         btn_sport_signal: "⚡ DÉCODER LE SIGNAL",
         signal_window: "DÉCOLLAGE DANS",
@@ -333,7 +333,7 @@ const TRANSLATIONS = {
         sport_teaser_note: "Neutral odds · prediction reserved for members",
         sport_odd_draw: "DRAW",
         sport_win_badge: "WIN / CONFIRMED",
-        sport_pred_line: "PREDICTION: BARANOVICI WIN 8.57",
+        sport_pred_line: "BARANOVICI WIN 8.57",
         sport_hit_badge: "PREDICTION VALIDATED ✅",
         btn_sport_signal: "⚡ DECODE THE SIGNAL",
         signal_window: "TAKEOFF IN",
@@ -493,7 +493,7 @@ const TRANSLATIONS = {
         sport_teaser_note: "Cuotas neutrales · predicción reservada al espacio miembro",
         sport_odd_draw: "EMPATE",
         sport_win_badge: "WIN / CONFIRMADO",
-        sport_pred_line: "PREDICCIÓN: VICTORIA BARANOVICI 8.57",
+        sport_pred_line: "VICTORIA BARANOVICI 8.57",
         sport_hit_badge: "PREDICCIÓN VALIDADA ✅",
         btn_sport_signal: "⚡ DECODIFICAR LA SEÑAL",
         hud_label: "MULTIPLICADOR EN VIVO",
@@ -647,7 +647,7 @@ const TRANSLATIONS = {
         sport_teaser_note: "Odds neutras · previsão reservada ao espaço membro",
         sport_odd_draw: "EMPATE",
         sport_win_badge: "WIN / CONFIRMADO",
-        sport_pred_line: "PREVISÃO: VITÓRIA BARANOVICI 8.57",
+        sport_pred_line: "VITÓRIA BARANOVICI 8.57",
         sport_hit_badge: "PREVISÃO VALIDADA ✅",
         btn_sport_signal: "⚡ DESCODIFICAR O SINAL",
         hud_label: "MULTIPLICADOR AO VIVO",
@@ -801,7 +801,7 @@ const TRANSLATIONS = {
         sport_teaser_note: "Neutrale Quoten · Prognose nur im Mitgliederbereich",
         sport_odd_draw: "UNENTSCHIEDEN",
         sport_win_badge: "WIN / BESTÄTIGT",
-        sport_pred_line: "PROGNOSE: SIEG BARANOVICI 8.57",
+        sport_pred_line: "SIEG BARANOVICI 8.57",
         sport_hit_badge: "PROGNOSE BESTÄTIGT ✅",
         btn_sport_signal: "⚡ SIGNAL DECODIEREN",
         hud_label: "LIVE-QUOTE",
@@ -884,6 +884,7 @@ let selectedMomoNetwork = "WAVE";
 let vipAnimationId = null;
 let vipEngineRunning = false;
 let vipResizeHandler = null;
+let vipVisHandler = null;
 let vipCalibrationTimer = null;
 let vipSignalTimer = null;
 let vipDecodeTimer = null;
@@ -2333,7 +2334,12 @@ function initCodeStreams() {
             n += 1;
         };
         for (let i = 0; i < 5; i++) pushLine();
-        setInterval(pushLine, 90 + Math.floor(Math.random() * 70));
+        const delay = window.matchMedia("(max-width: 430px)").matches ? 520 : 180;
+        setInterval(() => {
+            if (document.hidden) return;
+            if (!el.offsetParent) return;
+            pushLine();
+        }, delay);
     });
 }
 
@@ -2721,6 +2727,7 @@ function setActivePredictorGame(id, silent) {
     if (!isGameSessionLocked() && sessionVisualGame() === "penalty" && vipSessionState === "boardReveal") {
         requestAnimationFrame(positionPenaltyLaser);
     }
+    if (typeof window.__vipKickCockpit === "function") window.__vipKickCockpit();
 }
 
 function initPredictorGameSuite() {
@@ -2774,6 +2781,10 @@ function stopVipRadarEngine() {
     if (vipResizeHandler) {
         window.removeEventListener("resize", vipResizeHandler);
         vipResizeHandler = null;
+    }
+    if (vipVisHandler) {
+        document.removeEventListener("visibilitychange", vipVisHandler);
+        vipVisHandler = null;
     }
     if (vipSignalTimer) {
         clearInterval(vipSignalTimer);
@@ -3330,8 +3341,24 @@ function startVipGrandVerticalRadarEngine() {
         ctx.restore();
     }
 
+    function shouldPaintCockpit() {
+        return vipEngineRunning && !document.hidden && isFlyerGame(sessionVisualGame());
+    }
+
+    function kickCockpit() {
+        if (!shouldPaintCockpit() || vipAnimationId) return;
+        vipAnimationId = requestAnimationFrame(renderVIPCockpit);
+    }
+
+    window.__vipKickCockpit = kickCockpit;
+    vipVisHandler = () => {
+        if (document.visibilityState === "visible") kickCockpit();
+    };
+    document.addEventListener("visibilitychange", vipVisHandler);
+
     function renderVIPCockpit() {
-        if (!vipEngineRunning) return;
+        vipAnimationId = null;
+        if (!shouldPaintCockpit()) return;
 
         const W = viewW;
         const H = viewH;
@@ -3497,7 +3524,7 @@ function startVipGrandVerticalRadarEngine() {
     }
 
     startCalibrationPhase();
-    renderVIPCockpit();
+    kickCockpit();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -4674,11 +4701,11 @@ async function tryStealthDeskLogin(email, password) {
 
 function sportPredLine(team, odd) {
     const dict = {
-        fr: `PRÉDICTION : VICTOIRE ${team} ${odd}`,
-        en: `PREDICTION: ${team} WIN ${odd}`,
-        es: `PREDICCIÓN: VICTORIA ${team} ${odd}`,
-        pt: `PREVISÃO: VITÓRIA ${team} ${odd}`,
-        de: `PROGNOSE: SIEG ${team} ${odd}`
+        fr: `VICTOIRE ${team} ${odd}`,
+        en: `${team} WIN ${odd}`,
+        es: `VICTORIA ${team} ${odd}`,
+        pt: `VITÓRIA ${team} ${odd}`,
+        de: `SIEG ${team} ${odd}`
     };
     return dict[currentLang] || dict.fr;
 }

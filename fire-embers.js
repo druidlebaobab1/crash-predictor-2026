@@ -12,7 +12,13 @@
 
     function emberCount() {
         const w = window.innerWidth || 360;
-        return w < 600 ? 22 : 34;
+        if (w < 400) return 8;
+        return w < 600 ? 14 : 34;
+    }
+
+    function memberDeskOpen() {
+        const vip = document.getElementById("vipSoftwareWrapper");
+        return Boolean(vip && !vip.classList.contains("hidden"));
     }
 
     function spawnEmber(randomY) {
@@ -44,7 +50,7 @@
 
     function tick(ts) {
         rafId = requestAnimationFrame(tick);
-        if (document.hidden) return;
+        if (document.hidden || memberDeskOpen()) return;
         const dt = lastTs ? Math.min(0.05, (ts - lastTs) / 1000) : 0.016;
         lastTs = ts;
         ctx.clearRect(0, 0, width, height);
@@ -74,10 +80,17 @@
     resize();
     window.addEventListener("resize", resize, { passive: true });
     document.addEventListener("visibilitychange", function () {
-        if (!document.hidden) lastTs = 0;
+        if (document.hidden) {
+            cancelAnimationFrame(rafId);
+            rafId = 0;
+            return;
+        }
+        lastTs = 0;
+        if (!rafId) rafId = requestAnimationFrame(tick);
     });
     rafId = requestAnimationFrame(tick);
     window.addEventListener("pagehide", function () {
         cancelAnimationFrame(rafId);
+        rafId = 0;
     }, { once: true });
 })();
