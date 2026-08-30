@@ -36,7 +36,14 @@ if ($maketouAction === "mail_cron") {
     }
     require_once __DIR__ . "/mail-resend.php";
     header("Content-Type: application/json; charset=utf-8");
-    echo json_encode(mail_process_abandoned(12), JSON_UNESCAPED_SLASHES);
+    $abandon = mail_process_abandoned(12);
+    try {
+        mail_ensure_webhook();
+        $abandon["inboxBackfill"] = mail_backfill_inbox(3);
+    } catch (Throwable $e) {
+        $abandon["inboxBackfill"] = 0;
+    }
+    echo json_encode($abandon, JSON_UNESCAPED_SLASHES);
     exit();
 }
 if ($maketouAction === "resend_webhook") {

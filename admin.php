@@ -582,12 +582,6 @@ if ($action === "stats") {
     require_once __DIR__ . "/mail-resend.php";
     $stats = admin_collect_stats();
     $stats["resendConfigured"] = mail_is_configured();
-    if (mail_is_configured()) {
-        mail_ensure_webhook();
-        mail_backfill_inbox(2);
-        $stats = admin_collect_stats();
-        $stats["resendConfigured"] = true;
-    }
     admin_json(["ok" => true, "stats" => $stats, "logs" => admin_logs()]);
 }
 
@@ -807,7 +801,14 @@ $logged = admin_logged_in();
         const statsBox = document.getElementById("adminStats");
         if (!statsBox) return;
         const pack = await api({ action: "stats" });
-        const s = (pack && pack.stats) || {};
+        if (!pack || !pack.ok || !pack.stats) {
+            if (!statsBox.dataset.ready) {
+                statsBox.innerHTML = '<div class="admin-stat"><span>Dashboard</span><strong>Recharge la page (Ctrl+F5)</strong></div>';
+            }
+            return;
+        }
+        const s = pack.stats;
+        statsBox.dataset.ready = "1";
         statsBox.innerHTML = `
             <div class="admin-stat"><span>Connectés live</span><strong>${s.online || 0}</strong></div>
             <div class="admin-stat"><span>Inscrits</span><strong>${s.totalMembers || 0}</strong></div>

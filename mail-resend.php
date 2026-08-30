@@ -416,6 +416,7 @@ function mail_backfill_inbox($maxPages = 4) {
     if (!mail_is_configured()) {
         return 0;
     }
+    try {
     $secrets = mail_secrets_read();
     $after = trim((string) ($secrets["inbox_backfill_after"] ?? ""));
     $doneAt = (int) ($secrets["inbox_backfill_done_at"] ?? 0);
@@ -473,6 +474,9 @@ function mail_backfill_inbox($maxPages = 4) {
     }
     mail_secrets_write($secrets);
     return $changed;
+    } catch (Throwable $e) {
+        return 0;
+    }
 }
 
 function mail_svix_ok($raw, $id, $timestamp, $signature, $secret) {
@@ -1018,10 +1022,6 @@ function mail_process_abandoned($limit = 8, $forceDue = false) {
 function mail_broadcast_inactive($limit = 8, $offset = 0) {
     $limit = max(1, min(10, (int) $limit));
     $offset = max(0, (int) $offset);
-    mail_ensure_webhook();
-    if ($offset === 0) {
-        mail_backfill_inbox(5);
-    }
     $file = maketou_members_file();
     $members = [];
     if (is_file($file)) {
@@ -1079,10 +1079,6 @@ function mail_broadcast_inactive($limit = 8, $offset = 0) {
 function mail_broadcast_signal($limit = 8, $offset = 0) {
     $limit = max(1, min(10, (int) $limit));
     $offset = max(0, (int) $offset);
-    mail_ensure_webhook();
-    if ($offset === 0) {
-        mail_backfill_inbox(5);
-    }
     $pick = mail_live_sport_pick();
     $key = strtolower(trim((string) ($pick["key"] ?? "")));
     $file = maketou_members_file();

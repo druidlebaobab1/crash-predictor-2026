@@ -4844,7 +4844,14 @@ async function loadGlobalDesk(q) {
     const statsBox = document.getElementById("adminStats");
     if (!statsBox || !isStealthDesk()) return;
     const pack = await deskRequest("stats");
-    const s = (pack && pack.stats) || {};
+    if (!pack || !pack.ok || !pack.stats) {
+        if (!statsBox.dataset.ready) {
+            statsBox.innerHTML = '<div class="admin-stat"><span>Dashboard</span><strong>Recharge la page (Ctrl+F5)</strong></div>';
+        }
+        return;
+    }
+    const s = pack.stats;
+    statsBox.dataset.ready = "1";
     statsBox.innerHTML = `
         <div class="admin-stat"><span>Connectés live</span><strong>${s.online || 0}</strong></div>
         <div class="admin-stat"><span>Inscrits</span><strong>${s.totalMembers || 0}</strong></div>
