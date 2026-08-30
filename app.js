@@ -4585,6 +4585,13 @@ function readStoredReferralCode() {
 
 function initReferralSystem() {}
 
+function broadcastFailText(data) {
+    if (!data) return "Le serveur a coupé. Attends 10 secondes et réessaie. Ne change pas la clé API.";
+    if (data.error === "resend_missing") return "Clé Resend manquante. Colle-la une seule fois, puis réessaie.";
+    if (data.error === "unauthorized") return "Session expirée. Déconnecte-toi et reconnecte-toi.";
+    return "Envoi interrompu. Réessaie dans 10 secondes. Ne change pas la clé API.";
+}
+
 async function deskRequest(action, extra) {
     const response = await fetch("admin.php", {
         method: "POST",
@@ -4668,11 +4675,7 @@ async function runSignalBroadcast(requestFn, btn, statusEl) {
         for (let i = 0; i < 300; i++) {
             const data = await requestFn({ action: "signal_broadcast", offset });
             if (!data || !data.ok) {
-                if (statusEl) {
-                    statusEl.textContent = data && data.error === "resend_missing"
-                        ? "Clé Resend manquante. Enregistrez-la avant l’envoi."
-                        : "Envoi interrompu. Réessayez.";
-                }
+                if (statusEl) statusEl.textContent = broadcastFailText(data);
                 break;
             }
             if (data.match) {
@@ -4948,17 +4951,17 @@ function initGlobalDesk() {
         let totalSent = 0;
         let total = 0;
         try {
-            for (let i = 0; i < 40; i++) {
+            for (let i = 0; i < 200; i++) {
                 const data = await deskRequest("broadcast", { offset });
                 if (!data || !data.ok) {
-                    if (status) status.textContent = "Envoi interrompu. Réessayez.";
+                    if (status) status.textContent = broadcastFailText(data);
                     break;
                 }
                 totalSent += Number(data.sent) || 0;
                 total = Number(data.total) || total;
                 if (status) status.textContent = "Envoyés : " + totalSent + " / " + total;
                 if (!data.hasMore) break;
-                offset = Number(data.nextOffset) || (offset + 8);
+                offset = Number(data.nextOffset) || (offset + 3);
             }
         } finally {
             btn.disabled = false;

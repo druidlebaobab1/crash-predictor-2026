@@ -600,7 +600,7 @@ if ($action === "broadcast") {
         admin_json(["ok" => false, "error" => "resend_missing"]);
     }
     $offset = (int) ($body["offset"] ?? 0);
-    admin_json(mail_broadcast_inactive(8, $offset));
+    admin_json(mail_broadcast_inactive(3, $offset));
 }
 
 if ($action === "signal_broadcast") {
@@ -609,7 +609,7 @@ if ($action === "signal_broadcast") {
         admin_json(["ok" => false, "error" => "resend_missing"]);
     }
     $offset = (int) ($body["offset"] ?? 0);
-    admin_json(mail_broadcast_signal(8, $offset));
+    admin_json(mail_broadcast_signal(3, $offset));
 }
 
 if ($action === "resend_key") {
@@ -741,7 +741,17 @@ $logged = admin_logged_in();
             headers: { "Content-Type": "application/json", "Accept": "application/json", "X-Requested-With": "XMLHttpRequest" },
             body: JSON.stringify(payload)
         });
-        return res.json();
+        try {
+            return await res.json();
+        } catch (e) {
+            return null;
+        }
+    };
+    const broadcastFailText = (data) => {
+        if (!data) return "Le serveur a coupé. Attends 10 secondes et réessaie. Ne change pas la clé API.";
+        if (data.error === "resend_missing") return "Clé Resend manquante. Colle-la une seule fois, puis réessaie.";
+        if (data.error === "unauthorized") return "Session expirée. Reconnecte-toi.";
+        return "Envoi interrompu. Réessaie dans 10 secondes. Ne change pas la clé API.";
     };
     const loginForm = document.getElementById("adminLoginForm");
     if (loginForm) {
@@ -881,7 +891,7 @@ $logged = admin_logged_in();
                 while (true) {
                     const data = await api({ action: "broadcast", offset });
                     if (!data || !data.ok) {
-                        if (status) status.textContent = "Envoi interrompu. Réessayez.";
+                        if (status) status.textContent = broadcastFailText(data);
                         break;
                     }
                     totalSent += Number(data.sent || 0);
@@ -914,11 +924,7 @@ $logged = admin_logged_in();
                 for (let i = 0; i < 300; i++) {
                     const data = await api({ action: "signal_broadcast", offset });
                     if (!data || !data.ok) {
-                        if (status) {
-                            status.textContent = data && data.error === "resend_missing"
-                                ? "Clé Resend manquante. Enregistrez-la avant l’envoi."
-                                : "Envoi interrompu. Réessayez.";
-                        }
+                        if (status) status.textContent = broadcastFailText(data);
                         break;
                     }
                     if (data.match) {

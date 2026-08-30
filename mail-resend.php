@@ -1019,8 +1019,14 @@ function mail_process_abandoned($limit = 8, $forceDue = false) {
     return ["ok" => true, "sent" => $sent, "skipped" => $skipped];
 }
 
-function mail_broadcast_inactive($limit = 8, $offset = 0) {
-    $limit = max(1, min(10, (int) $limit));
+function mail_broadcast_begin() {
+    @set_time_limit(50);
+    ignore_user_abort(true);
+}
+
+function mail_broadcast_inactive($limit = 3, $offset = 0) {
+    mail_broadcast_begin();
+    $limit = max(1, min(5, (int) $limit));
     $offset = max(0, (int) $offset);
     $file = maketou_members_file();
     $members = [];
@@ -1062,7 +1068,7 @@ function mail_broadcast_inactive($limit = 8, $offset = 0) {
                 maketou_write_local_member($email, $record);
             }
         }
-        usleep(600000);
+        usleep(200000);
     }
     $scannedThrough = $offset + count($slice);
     $remaining = max(0, count($targets) - $scannedThrough);
@@ -1076,7 +1082,8 @@ function mail_broadcast_inactive($limit = 8, $offset = 0) {
     ];
 }
 
-function mail_broadcast_signal($limit = 8, $offset = 0) {
+function mail_broadcast_signal($limit = 3, $offset = 0) {
+    mail_broadcast_begin();
     $limit = max(1, min(10, (int) $limit));
     $offset = max(0, (int) $offset);
     $pick = mail_live_sport_pick();
@@ -1126,7 +1133,7 @@ function mail_broadcast_signal($limit = 8, $offset = 0) {
                 maketou_write_local_member($email, $record);
             }
         }
-        usleep(600000);
+        usleep(200000);
     }
     $scannedThrough = $offset + count($slice);
     $remaining = max(0, count($targets) - $scannedThrough);
