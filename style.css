@@ -2394,6 +2394,12 @@ button.vip-member-tag:hover {
         padding: 0;
         box-sizing: border-box;
     }
+    .vip-game-stage[data-game="sport"] {
+        aspect-ratio: auto;
+        min-height: 220px;
+        max-height: 260px;
+        height: auto;
+    }
     .vip-game-stage[data-game="sport"] .sport-panel {
         display: flex;
         flex-direction: column;
