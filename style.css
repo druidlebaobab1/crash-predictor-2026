@@ -740,8 +740,8 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
 
 .hero-subtitle-desc {
     font-family: var(--font-heading);
-    font-size: 14px;
-    font-weight: 900;
+    font-size: 13px;
+    font-weight: 700;
     letter-spacing: 0.01em;
     line-height: 1.3;
     color: #0b1220;
@@ -753,7 +753,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important
     width: 100%;
     max-width: min(920px, 100%);
     margin: 0 auto;
-    padding: 8px 10px;
+    padding: 10px 12px;
     border-radius: 12px;
     text-transform: uppercase;
     text-align: center;
@@ -1731,9 +1731,21 @@ button.vip-member-tag:hover {
 .stat-row {
     display: flex;
     justify-content: space-between;
-    font-size: 0.82rem;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
     padding: 6px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+.stat-row > span {
+    min-width: 0;
+    flex: 1 1 auto;
+    line-height: 1.25;
+}
+.stat-row > strong {
+    text-align: right;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .history-list { display: flex; flex-direction: column; gap: 8px; max-height: 380px; overflow-y: auto; }
@@ -2367,7 +2379,40 @@ button.vip-member-tag:hover {
     .user-info-text { display: none; }
     .momo-chips-simple-grid { grid-template-columns: repeat(2, 1fr); }
     .vip-canvas-viewport.grand-vertical-viewport,
-    .vip-game-stage.grand-vertical-viewport { height: 360px; }
+    .vip-game-stage.grand-vertical-viewport {
+        min-height: 220px;
+        max-height: 260px;
+        height: auto;
+        width: 100%;
+        max-width: 100%;
+        aspect-ratio: 16 / 9;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    .vip-game-stage[data-game="sport"] .sport-panel {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+        padding: 16px;
+        overflow: hidden;
+    }
+    .vip-flight-canvas.grand-canvas-height,
+    .vip-game-stage .vip-canvas-viewport,
+    .mines-panel,
+    .apple-panel,
+    .penalty-panel,
+    .sport-panel {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
     .decode-stream { height: 96px; }
     .decode-clock { font-size: 1rem; }
     .admin-input-row { flex-direction: column; }
@@ -3576,11 +3621,16 @@ button.vip-member-tag:hover {
     .hero-predictor-title { font-size: clamp(1.45rem, 8vw, 2.1rem); }
     .hero-subtitle-desc {
         font-size: 13px;
+        font-weight: 700;
         letter-spacing: 0;
-        padding: 7px 8px;
-        line-height: 1.25;
+        padding: 10px 12px;
+        line-height: 1.2;
         max-width: 100%;
+        width: 100%;
+        box-sizing: border-box;
         white-space: nowrap;
+        text-align: center;
+        overflow: hidden;
     }
     .hero-subtitle-desc > span { white-space: nowrap; }
     .suite-game-card strong { font-size: 0.62rem; }
@@ -3608,14 +3658,15 @@ button.vip-member-tag:hover {
     .mine-cell.is-safe::after { font-size: 0.95rem; }
     .apple-cell { height: 22px; }
     .xbet-cta-banner {
+        display: flex;
         flex-direction: row;
         flex-wrap: nowrap;
-        justify-content: center;
         align-items: center;
+        justify-content: space-between;
         margin: 10px 8px 22px;
-        padding: 14px 8px;
-        min-height: 72px;
-        gap: 6px 8px;
+        padding: 8px 12px;
+        min-height: 0;
+        gap: 8px;
     }
     .xbet-cta-copy {
         gap: 4px;
@@ -3624,10 +3675,12 @@ button.vip-member-tag:hover {
         width: auto;
         order: 0;
         justify-content: flex-start;
+        align-items: center;
     }
     .xbet-cta-logo {
-        height: 28px;
-        max-width: 72px;
+        height: auto;
+        max-height: 32px;
+        max-width: 88px;
         flex-shrink: 0;
         margin-left: 0;
         order: 0;
@@ -3635,7 +3688,7 @@ button.vip-member-tag:hover {
     .xbet-cta-text {
         font-size: 11px;
         letter-spacing: 0;
-        line-height: 1.25;
+        line-height: 1.2;
         white-space: normal;
         overflow: visible;
         text-overflow: unset;
@@ -3649,8 +3702,8 @@ button.vip-member-tag:hover {
 }
 @media (max-width: 360px) {
     .hero-subtitle-desc {
-        font-size: 11px;
-        padding: 6px 6px;
+        font-size: 12px;
+        padding: 10px 10px;
     }
     .btn-buy-instant,
     .btn-buy-instant > span:not(.btn-live-dot) {
