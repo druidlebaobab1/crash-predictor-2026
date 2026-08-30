@@ -2394,20 +2394,97 @@ button.vip-member-tag:hover {
         padding: 0;
         box-sizing: border-box;
     }
+    .vip-game-stage[data-game="mines"],
+    .vip-game-stage[data-game="apple"],
+    .vip-game-stage[data-game="penalty"],
     .vip-game-stage[data-game="sport"] {
         aspect-ratio: auto;
-        min-height: 220px;
-        max-height: 260px;
+        min-height: unset;
+        max-height: none;
         height: auto;
+        overflow: visible;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: stretch;
+    }
+    .vip-game-stage[data-game="mines"] .mines-panel,
+    .vip-game-stage[data-game="apple"] .apple-panel,
+    .vip-game-stage[data-game="penalty"] .penalty-panel,
+    .vip-game-stage[data-game="sport"] .sport-panel {
+        position: relative;
+        inset: auto;
+        height: auto;
+        overflow: visible;
+    }
+    .vip-game-stage[data-game="mines"] .vip-graph-center-overlay,
+    .vip-game-stage[data-game="apple"] .vip-graph-center-overlay,
+    .vip-game-stage[data-game="sport"] .vip-graph-center-overlay {
+        position: relative;
+        inset: auto;
+        padding: 10px 8px 12px;
+        align-items: center;
+        justify-content: center;
+    }
+    .vip-game-stage[data-game="sport"] {
+        padding: 10px 8px 14px;
+        box-sizing: border-box;
     }
     .vip-game-stage[data-game="sport"] .sport-panel {
         display: flex;
         flex-direction: column;
-        justify-content: center;
+        justify-content: flex-start;
         align-items: center;
-        gap: 12px;
-        padding: 16px;
-        overflow: hidden;
+        gap: 10px;
+        padding: 8px 6px 0;
+        overflow: visible;
+    }
+    .vip-game-stage[data-game="sport"] .sport-match-title,
+    .vip-game-stage[data-game="sport"] .sport-match-title strong {
+        display: block;
+        width: 100%;
+        font-size: 12px;
+        line-height: 1.3;
+        letter-spacing: 0.02em;
+        text-align: center;
+        white-space: normal;
+        word-break: break-word;
+        overflow: visible;
+        margin-bottom: 8px;
+    }
+    .vip-game-stage[data-game="sport"] .sport-pick {
+        width: 100%;
+        max-width: 100%;
+        padding: 10px 8px;
+        margin: 0;
+        box-sizing: border-box;
+    }
+    .vip-game-stage[data-game="sport"] .sport-pick-line {
+        font-size: 11px;
+        line-height: 1.35;
+        letter-spacing: 0.01em;
+        white-space: normal;
+        text-align: center;
+        word-break: break-word;
+        overflow: visible;
+    }
+    .mines-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 6px;
+        width: 100%;
+        max-width: 340px;
+    }
+    .mine-cell {
+        aspect-ratio: 1 / 1;
+        width: 100%;
+        height: auto;
+    }
+    .apple-tower { gap: 4px; width: 100%; }
+    .apple-row { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; }
+    .apple-cell {
+        height: auto;
+        min-height: 20px;
+        aspect-ratio: 2.4 / 1;
     }
     .vip-flight-canvas.grand-canvas-height,
     .vip-game-stage .vip-canvas-viewport,
@@ -3658,21 +3735,39 @@ button.vip-member-tag:hover {
         letter-spacing: 0.04em;
         padding: 3px 5px;
     }
-    .sport-panel { padding-bottom: 20px; }
+    .sport-panel { padding-bottom: 14px; }
     .vip-game-chip { padding: 3px 10px 3px 3px; font-size: 0.62rem; }
     .vip-chip-logo { width: 30px; height: 30px; }
     .mine-cell.is-safe::after { font-size: 0.95rem; }
-    .apple-cell { height: 22px; }
+    .stat-row {
+        padding: 4px 0;
+        font-size: 11px;
+        align-items: center;
+    }
+    .stat-row > span {
+        color: #8a99ad;
+        text-align: left;
+    }
+    .stat-row > strong {
+        text-align: right;
+        font-weight: 700;
+        flex-shrink: 0;
+        max-width: 50%;
+        white-space: normal;
+        word-break: break-all;
+    }
     .xbet-cta-banner {
         display: flex;
         flex-direction: row;
         flex-wrap: nowrap;
         align-items: center;
         justify-content: space-between;
-        margin: 10px 8px 22px;
-        padding: 8px 12px;
+        width: calc(100% - 24px);
+        margin: 0 auto 18px;
+        padding: 6px 10px;
         min-height: 0;
         gap: 8px;
+        box-sizing: border-box;
     }
     .xbet-cta-copy {
         gap: 4px;
@@ -3684,20 +3779,25 @@ button.vip-member-tag:hover {
         align-items: center;
     }
     .xbet-cta-logo {
-        height: auto;
-        max-height: 32px;
+        height: 28px;
+        width: auto;
+        min-width: 68px;
         max-width: 88px;
+        max-height: 28px;
         flex-shrink: 0;
         margin-left: 0;
         order: 0;
     }
     .xbet-cta-text {
-        font-size: 11px;
+        font-size: 10px;
+        font-weight: 700;
         letter-spacing: 0;
         line-height: 1.2;
-        white-space: normal;
-        overflow: visible;
-        text-overflow: unset;
+        white-space: nowrap;
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     .xbet-cta-arrow { font-size: 0.95rem; flex-shrink: 0; }
     .sport-signal-badge {
