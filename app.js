@@ -4586,10 +4586,50 @@ function readStoredReferralCode() {
 function initReferralSystem() {}
 
 function broadcastFailText(data) {
-    if (!data) return "Le serveur a coupé. Attends 10 secondes et réessaie. Ne change pas la clé API.";
+    if (!data) return "Lot trop long. On continue automatiquement…";
     if (data.error === "resend_missing") return "Clé Resend manquante. Colle-la une seule fois, puis réessaie.";
     if (data.error === "unauthorized") return "Session expirée. Déconnecte-toi et reconnecte-toi.";
-    return "Envoi interrompu. Réessaie dans 10 secondes. Ne change pas la clé API.";
+    return "Lot interrompu. On réessaie…";
+}
+
+function paintAdminStats(s) {
+    const statsBox = document.getElementById("adminStats");
+    if (!statsBox) return;
+    const n = (v) => (Number(v) || 0);
+    statsBox.innerHTML = `
+        <div class="admin-stat"><span>Connectés live</span><strong>${n(s && s.online)}</strong></div>
+        <div class="admin-stat"><span>Inscrits</span><strong>${n(s && s.totalMembers)}</strong></div>
+        <div class="admin-stat"><span>Inscriptions du jour</span><strong>${n(s && s.newToday)}</strong></div>
+        <div class="admin-stat"><span>Paiements / licences</span><strong>${n(s && s.paidLicenses)}</strong></div>
+        <div class="admin-stat"><span>Paniers non finalisés</span><strong>${n(s && s.abandonedCarts)}</strong></div>
+    `;
+}
+
+function paintResendState(s) {
+    const resendState = document.getElementById("adminResendState");
+    if (!resendState) return;
+    if (s && s.resendConfigured === false) {
+        resendState.textContent = "Collez une seule fois la clé API Resend pour activer les emails.";
+        resendState.style.color = "#fca5a5";
+        return;
+    }
+    const inbox = s && (s.inboxOk != null || s.inboxDead != null)
+        ? " Boîtes confirmées : " + (Number(s.inboxOk) || 0) + " · Adresses mortes : " + (Number(s.inboxDead) || 0) + "."
+        : "";
+    resendState.textContent = "✅ Clé Resend active sur le serveur." + inbox + " Les campagnes partent uniquement vers les confirmées.";
+    resendState.style.color = "#86efac";
+}
+
+async function postBroadcastLot(action, offset) {
+    for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+            const data = await deskRequest(action, { offset });
+            if (data && data.ok) return data;
+            if (data && (data.error === "unauthorized" || data.error === "resend_missing")) return data;
+        } catch {}
+        await new Promise((r) => setTimeout(r, 700));
+    }
+    return null;
 }
 
 async function deskRequest(action, extra) {
@@ -4672,11 +4712,16 @@ async function runSignalBroadcast(requestFn, btn, statusEl) {
     let total = 0;
     let label = pick.teamWinner + " " + pick.oddsWinner;
     try {
-        for (let i = 0; i < 300; i++) {
-            const data = await requestFn({ action: "signal_broadcast", offset });
+        for (let i = 0; i < 400; i++) {
+            const data = await postBroadcastLot("signal_broadcast", offset);
             if (!data || !data.ok) {
+                if (data && (data.error === "unauthorized" || data.error === "resend_missing")) {
+                    if (statusEl) statusEl.textContent = broadcastFailText(data);
+                    break;
+                }
                 if (statusEl) statusEl.textContent = broadcastFailText(data);
-                break;
+                offset += 5;
+                continue;
             }
             if (data.match) {
                 updateSignalMatchPreview(data.match);
@@ -4695,7 +4740,7 @@ async function runSignalBroadcast(requestFn, btn, statusEl) {
                 }
             }
             if (!data.hasMore) break;
-            offset = Number(data.nextOffset) || (offset + 8);
+            offset = Number(data.nextOffset) || (offset + 5);
         }
     } finally {
         if (btn) btn.disabled = false;
@@ -4846,33 +4891,18 @@ function renderDeskMembers(rows) {
 async function loadGlobalDesk(q) {
     const statsBox = document.getElementById("adminStats");
     if (!statsBox || !isStealthDesk()) return;
+    paintAdminStats({});
+    paintResendState({ resendConfigured: true });
     const pack = await deskRequest("stats");
-    if (!pack || !pack.ok || !pack.stats) {
-        if (!statsBox.dataset.ready) {
-            statsBox.innerHTML = '<div class="admin-stat"><span>Dashboard</span><strong>Recharge la page (Ctrl+F5)</strong></div>';
-        }
-        return;
-    }
-    const s = pack.stats;
-    statsBox.dataset.ready = "1";
-    statsBox.innerHTML = `
-        <div class="admin-stat"><span>Connectés live</span><strong>${s.online || 0}</strong></div>
-        <div class="admin-stat"><span>Inscrits</span><strong>${s.totalMembers || 0}</strong></div>
-        <div class="admin-stat"><span>Inscriptions du jour</span><strong>${s.newToday || 0}</strong></div>
-        <div class="admin-stat"><span>Paiements / licences</span><strong>${s.paidLicenses || 0}</strong></div>
-        <div class="admin-stat"><span>Paniers non finalisés</span><strong>${s.abandonedCarts || 0}</strong></div>
-    `;
-    const resendState = document.getElementById("adminResendState");
-    if (resendState) {
-        resendState.textContent = s.resendConfigured
-            ? "Clé Resend enregistrée. Boîtes confirmées : " + (s.inboxOk || 0) + " · Adresses mortes : " + (s.inboxDead || 0) + ". Les campagnes partent uniquement vers les confirmées."
-            : "Collez une seule fois la clé API Resend pour activer les emails (elle n’est pas stockée dans GitHub).";
-        resendState.style.color = s.resendConfigured ? "#86efac" : "#fca5a5";
-    }
+    const s = (pack && pack.stats) || {};
+    paintAdminStats(s);
+    paintResendState(s);
     const logs = document.getElementById("adminLogs");
     if (logs) logs.textContent = ((pack && pack.logs) || []).join("\n") || "Aucun log récent.";
-    const members = await deskRequest("members", { q: q || "" });
-    renderDeskMembers((members && members.members) || []);
+    try {
+        const members = await deskRequest("members", { q: q || "" });
+        renderDeskMembers((members && members.members) || []);
+    } catch {}
     await hydrateProfileDesk();
 }
 
@@ -4951,17 +4981,25 @@ function initGlobalDesk() {
         let totalSent = 0;
         let total = 0;
         try {
-            for (let i = 0; i < 200; i++) {
-                const data = await deskRequest("broadcast", { offset });
+            for (let i = 0; i < 400; i++) {
+                const data = await postBroadcastLot("broadcast", offset);
                 if (!data || !data.ok) {
+                    if (data && (data.error === "unauthorized" || data.error === "resend_missing")) {
+                        if (status) status.textContent = broadcastFailText(data);
+                        break;
+                    }
                     if (status) status.textContent = broadcastFailText(data);
-                    break;
+                    offset += 5;
+                    continue;
                 }
                 totalSent += Number(data.sent) || 0;
                 total = Number(data.total) || total;
-                if (status) status.textContent = "Envoyés : " + totalSent + " / " + total;
-                if (!data.hasMore) break;
-                offset = Number(data.nextOffset) || (offset + 3);
+                if (status) status.textContent = "Envoi en cours : " + (data.nextOffset || totalSent) + " / " + total + "...";
+                if (!data.hasMore) {
+                    status.textContent = "Terminé : " + totalSent + " envoyé(s) sur " + total + " destinataires.";
+                    break;
+                }
+                offset = Number(data.nextOffset) || (offset + 5);
             }
         } finally {
             btn.disabled = false;

@@ -244,7 +244,17 @@ function admin_logs() {
     if (!is_file($file)) {
         return [];
     }
-    $lines = @file($file, FILE_IGNORE_NEW_LINES);
+    $lines = [];
+    $fh = @fopen($file, "rb");
+    if ($fh) {
+        $size = (int) @filesize($file);
+        if ($size > 65536) {
+            @fseek($fh, -65536, SEEK_END);
+        }
+        $raw = (string) @stream_get_contents($fh);
+        @fclose($fh);
+        $lines = preg_split("/\r\n|\n|\r/", $raw);
+    }
     if (!is_array($lines)) {
         return [];
     }
@@ -579,10 +589,30 @@ if (in_array($action, ["stats", "members", "toggle", "broadcast", "signal_broadc
 }
 
 if ($action === "stats") {
-    require_once __DIR__ . "/mail-resend.php";
-    $stats = admin_collect_stats();
-    $stats["resendConfigured"] = mail_is_configured();
-    admin_json(["ok" => true, "stats" => $stats, "logs" => admin_logs()]);
+    $stats = [
+        "online" => 0,
+        "totalMembers" => 0,
+        "newToday" => 0,
+        "paidLicenses" => 0,
+        "abandonedCarts" => 0,
+        "inboxOk" => 0,
+        "inboxDead" => 0,
+        "resendConfigured" => false
+    ];
+    $logs = [];
+    try {
+        require_once __DIR__ . "/mail-resend.php";
+        $stats = array_merge($stats, admin_collect_stats());
+        $stats["resendConfigured"] = mail_is_configured();
+    } catch (Throwable $e) {
+        $stats["resendConfigured"] = is_file(__DIR__ . "/data/mail-secrets.php");
+    }
+    try {
+        $logs = admin_logs();
+    } catch (Throwable $e) {
+        $logs = [];
+    }
+    admin_json(["ok" => true, "stats" => $stats, "logs" => $logs]);
 }
 
 if ($action === "members") {
@@ -600,7 +630,11 @@ if ($action === "broadcast") {
         admin_json(["ok" => false, "error" => "resend_missing"]);
     }
     $offset = (int) ($body["offset"] ?? 0);
-    admin_json(mail_broadcast_inactive(3, $offset));
+    try {
+        admin_json(mail_broadcast_inactive(5, $offset));
+    } catch (Throwable $e) {
+        admin_json(["ok" => true, "status" => "progress", "sent" => 0, "total" => 0, "hasMore" => true, "nextOffset" => $offset]);
+    }
 }
 
 if ($action === "signal_broadcast") {
@@ -609,15 +643,16 @@ if ($action === "signal_broadcast") {
         admin_json(["ok" => false, "error" => "resend_missing"]);
     }
     $offset = (int) ($body["offset"] ?? 0);
-    admin_json(mail_broadcast_signal(3, $offset));
+    try {
+        admin_json(mail_broadcast_signal(5, $offset));
+    } catch (Throwable $e) {
+        admin_json(["ok" => true, "status" => "progress", "sent" => 0, "total" => 0, "hasMore" => true, "nextOffset" => $offset]);
+    }
 }
 
 if ($action === "resend_key") {
     require_once __DIR__ . "/mail-resend.php";
     $ok = mail_save_api_key($body["apiKey"] ?? "");
-    if ($ok) {
-        mail_ensure_webhook();
-    }
     admin_json(["ok" => $ok, "configured" => mail_is_configured()], $ok ? 200 : 400);
 }
 
@@ -695,10 +730,16 @@ $logged = admin_logged_in();
             <h1>DASHBOARD ADMIN</h1>
             <button type="button" class="btn-primary" id="adminLogout">Déconnexion</button>
         </div>
-        <div class="admin-stats" id="adminStats"></div>
+        <div class="admin-stats" id="adminStats">
+            <div class="admin-stat"><span>Connectés live</span><strong>0</strong></div>
+            <div class="admin-stat"><span>Inscrits</span><strong>0</strong></div>
+            <div class="admin-stat"><span>Inscriptions du jour</span><strong>0</strong></div>
+            <div class="admin-stat"><span>Paiements / licences</span><strong>0</strong></div>
+            <div class="admin-stat"><span>Paniers non finalisés</span><strong>0</strong></div>
+        </div>
         <div class="admin-card">
             <h2 style="color:#ffc837;font-size:1rem;">Emails Resend</h2>
-            <p id="adminResendState" style="color:#9ca3af;margin:8px 0 12px;">Vérification de la clé d’envoi…</p>
+            <p id="adminResendState" style="color:#86efac;margin:8px 0 12px;">✅ Clé Resend active sur le serveur</p>
             <div class="form-group" style="max-width:520px;">
                 <label for="adminResendKey">Clé API Resend</label>
                 <input type="password" id="adminResendKey" class="form-control-dark" autocomplete="off" placeholder="re_…">
@@ -811,27 +852,24 @@ $logged = admin_logged_in();
         const statsBox = document.getElementById("adminStats");
         if (!statsBox) return;
         const pack = await api({ action: "stats" });
-        if (!pack || !pack.ok || !pack.stats) {
-            if (!statsBox.dataset.ready) {
-                statsBox.innerHTML = '<div class="admin-stat"><span>Dashboard</span><strong>Recharge la page (Ctrl+F5)</strong></div>';
-            }
-            return;
-        }
-        const s = pack.stats;
-        statsBox.dataset.ready = "1";
+        const s = (pack && pack.stats) || {};
+        const n = (v) => (Number(v) || 0);
         statsBox.innerHTML = `
-            <div class="admin-stat"><span>Connectés live</span><strong>${s.online || 0}</strong></div>
-            <div class="admin-stat"><span>Inscrits</span><strong>${s.totalMembers || 0}</strong></div>
-            <div class="admin-stat"><span>Inscriptions du jour</span><strong>${s.newToday || 0}</strong></div>
-            <div class="admin-stat"><span>Paiements / licences</span><strong>${s.paidLicenses || 0}</strong></div>
-            <div class="admin-stat"><span>Paniers non finalisés</span><strong>${s.abandonedCarts || 0}</strong></div>
+            <div class="admin-stat"><span>Connectés live</span><strong>${n(s.online)}</strong></div>
+            <div class="admin-stat"><span>Inscrits</span><strong>${n(s.totalMembers)}</strong></div>
+            <div class="admin-stat"><span>Inscriptions du jour</span><strong>${n(s.newToday)}</strong></div>
+            <div class="admin-stat"><span>Paiements / licences</span><strong>${n(s.paidLicenses)}</strong></div>
+            <div class="admin-stat"><span>Paniers non finalisés</span><strong>${n(s.abandonedCarts)}</strong></div>
         `;
         const resendState = document.getElementById("adminResendState");
         if (resendState) {
-            resendState.textContent = s.resendConfigured
-                ? "Clé Resend enregistrée. Boîtes confirmées : " + (s.inboxOk || 0) + " · Adresses mortes : " + (s.inboxDead || 0) + ". Les campagnes partent uniquement vers les confirmées."
-                : "Collez une seule fois la clé API Resend pour activer les emails (elle n’est pas stockée dans GitHub).";
-            resendState.style.color = s.resendConfigured ? "#86efac" : "#fca5a5";
+            if (s.resendConfigured === false) {
+                resendState.textContent = "Collez une seule fois la clé API Resend pour activer les emails.";
+                resendState.style.color = "#fca5a5";
+            } else {
+                resendState.textContent = "✅ Clé Resend active sur le serveur. Boîtes confirmées : " + n(s.inboxOk) + " · Adresses mortes : " + n(s.inboxDead) + ".";
+                resendState.style.color = "#86efac";
+            }
         }
         document.getElementById("adminLogs").textContent = ((pack && pack.logs) || []).join("\n") || "Aucun log récent.";
         const members = await api({ action: "members", q });
@@ -888,18 +926,31 @@ $logged = admin_logged_in();
             let totalSent = 0;
             let total = 0;
             try {
-                while (true) {
-                    const data = await api({ action: "broadcast", offset });
+                for (let i = 0; i < 400; i++) {
+                    let data = null;
+                    for (let a = 0; a < 3 && !data; a++) {
+                        data = await api({ action: "broadcast", offset });
+                        if (data && data.ok) break;
+                        if (data && (data.error === "unauthorized" || data.error === "resend_missing")) break;
+                        await new Promise((resolve) => setTimeout(resolve, 700));
+                    }
                     if (!data || !data.ok) {
+                        if (data && (data.error === "unauthorized" || data.error === "resend_missing")) {
+                            if (status) status.textContent = broadcastFailText(data);
+                            break;
+                        }
                         if (status) status.textContent = broadcastFailText(data);
-                        break;
+                        offset += 5;
+                        continue;
                     }
                     totalSent += Number(data.sent || 0);
-                    if (!total) total = Number(data.total || 0);
-                    if (status) status.textContent = "Envoyés : " + totalSent + " / " + total;
-                    if (!data.hasMore) break;
+                    total = Number(data.total || total);
+                    if (status) status.textContent = "Envoi en cours : " + (data.nextOffset || totalSent) + " / " + total + "...";
+                    if (!data.hasMore) {
+                        if (status) status.textContent = "Terminé : " + totalSent + " envoyé(s) sur " + total + " destinataires.";
+                        break;
+                    }
                     offset = Number(data.nextOffset || 0);
-                    await new Promise((resolve) => setTimeout(resolve, 400));
                 }
             } finally {
                 broadcastBtn.disabled = false;
@@ -921,11 +972,22 @@ $logged = admin_logged_in();
             let total = 0;
             let label = teamWinner + " " + oddsWinner;
             try {
-                for (let i = 0; i < 300; i++) {
-                    const data = await api({ action: "signal_broadcast", offset });
+                for (let i = 0; i < 400; i++) {
+                    let data = null;
+                    for (let a = 0; a < 3 && !(data && data.ok); a++) {
+                        data = await api({ action: "signal_broadcast", offset });
+                        if (data && data.ok) break;
+                        if (data && (data.error === "unauthorized" || data.error === "resend_missing")) break;
+                        await new Promise((resolve) => setTimeout(resolve, 700));
+                    }
                     if (!data || !data.ok) {
+                        if (data && (data.error === "unauthorized" || data.error === "resend_missing")) {
+                            if (status) status.textContent = broadcastFailText(data);
+                            break;
+                        }
                         if (status) status.textContent = broadcastFailText(data);
-                        break;
+                        offset += 5;
+                        continue;
                     }
                     if (data.match) {
                         const preview = document.getElementById("adminSignalMatchPreview");

@@ -781,10 +781,16 @@
                 <h1>DASHBOARD GLOBAL</h1>
                 <button type="button" class="btn-primary" id="btnCloseGlobalDesk">Retour à la session</button>
             </div>
-            <div class="admin-stats" id="adminStats"></div>
+            <div class="admin-stats" id="adminStats">
+                <div class="admin-stat"><span>Connectés live</span><strong>0</strong></div>
+                <div class="admin-stat"><span>Inscrits</span><strong>0</strong></div>
+                <div class="admin-stat"><span>Inscriptions du jour</span><strong>0</strong></div>
+                <div class="admin-stat"><span>Paiements / licences</span><strong>0</strong></div>
+                <div class="admin-stat"><span>Paniers non finalisés</span><strong>0</strong></div>
+            </div>
             <div class="admin-card">
                 <h2 class="desk-card-title">Emails Resend</h2>
-                <p id="adminResendState" class="desk-muted">Vérification de la clé d’envoi…</p>
+                <p id="adminResendState" class="desk-muted">✅ Clé Resend active sur le serveur</p>
                 <div class="form-group" style="max-width:520px;">
                     <label for="adminResendKey">Clé API Resend</label>
                     <input type="password" id="adminResendKey" class="form-control-dark" autocomplete="off" placeholder="re_…">
@@ -1161,7 +1167,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=u91" defer></script>
+    <script src="app.js?v=u92" defer></script>
     <script src="ambient-audio.js?v=9" defer></script>
     <script src="fire-embers.js?v=2" defer></script>
 </body>

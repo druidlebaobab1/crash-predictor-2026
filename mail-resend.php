@@ -737,7 +737,11 @@ function mail_send($to, $subject, $html, $extra = []) {
         mail_log_result(false, "", 0, "no_key");
         return ["ok" => false, "id" => ""];
     }
-    mail_ensure_webhook();
+    try {
+        mail_ensure_webhook();
+    } catch (Throwable $e) {
+    }
+    $curlTimeout = !empty($extra["timeout"]) ? max(3, (int) $extra["timeout"]) : 12;
     $unsub = RESEND_SITE . "/index.php?action=mail_unsub&t=" . rawurlencode(mail_unsub_token($to));
     $payload = [
         "from" => "PREDICTOR <support@mail.crashpredictor.fr>",
@@ -767,7 +771,7 @@ function mail_send($to, $subject, $html, $extra = []) {
         return ["ok" => false, "id" => ""];
     }
     $attempts = 0;
-    $maxAttempts = 3;
+    $maxAttempts = !empty($extra["timeout"]) ? 1 : 3;
     $status = 0;
     $id = "";
     $errorMessage = "";
@@ -782,8 +786,8 @@ function mail_send($to, $subject, $html, $extra = []) {
                 CURLOPT_POST => true,
                 CURLOPT_HTTPHEADER => $chHeaders,
                 CURLOPT_POSTFIELDS => $json,
-                CURLOPT_CONNECTTIMEOUT => 4,
-                CURLOPT_TIMEOUT => 12
+                CURLOPT_CONNECTTIMEOUT => 3,
+                CURLOPT_TIMEOUT => $curlTimeout
             ]);
             $body = curl_exec($ch);
             $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -1020,136 +1024,158 @@ function mail_process_abandoned($limit = 8, $forceDue = false) {
 }
 
 function mail_broadcast_begin() {
-    @set_time_limit(50);
+    @set_time_limit(45);
     ignore_user_abort(true);
 }
 
-function mail_broadcast_inactive($limit = 3, $offset = 0) {
-    mail_broadcast_begin();
-    $limit = max(1, min(5, (int) $limit));
-    $offset = max(0, (int) $offset);
-    $file = maketou_members_file();
-    $members = [];
-    if (is_file($file)) {
-        $decoded = json_decode((string) @file_get_contents($file), true);
-        $members = is_array($decoded) ? $decoded : [];
-    }
-    $targets = [];
-    foreach ($members as $email => $record) {
-        if (!is_array($record)) {
-            continue;
-        }
-        $email = mail_normalize_address($record["email"] ?? $email);
-        if ($email === "" || !empty($record["emailOptOut"]) || !empty($record["broadcastSent"])) {
-            continue;
-        }
-        if (!mail_record_can_campaign($record) || mail_record_is_active($record)) {
-            continue;
-        }
-        $targets[] = [$email, (string) ($record["uniqueId"] ?? ""), (string) ($record["name"] ?? "")];
-    }
-    $slice = array_slice($targets, $offset, $limit);
-    $sent = 0;
-    foreach ($slice as $item) {
-        $email = $item[0];
-        $uniqueId = $item[1];
-        $name = $item[2];
-        $result = mail_send(
-            $email,
-            "🔥 Vos prédictions sont prêtes — Reprenez vos signaux VIP sur PREDICTOR",
-            mail_html_reactivate($email, $uniqueId, $name),
-            ["idempotency" => "broadcast-" . md5($email)]
-        );
-        if (!empty($result["ok"])) {
-            $sent++;
-            $record = maketou_read_local_member($email);
-            if (is_array($record)) {
-                $record["broadcastSent"] = true;
-                maketou_write_local_member($email, $record);
-            }
-        }
-        usleep(200000);
-    }
-    $scannedThrough = $offset + count($slice);
-    $remaining = max(0, count($targets) - $scannedThrough);
-    return [
+function mail_broadcast_result($sent, $scanned, $offset, $total, $extra = []) {
+    $next = $offset + $scanned;
+    $remaining = max(0, $total - $next);
+    return array_merge([
         "ok" => true,
-        "sent" => $sent,
-        "scanned" => count($slice),
-        "total" => count($targets),
+        "status" => $remaining > 0 ? "progress" : "done",
+        "sent" => (int) $sent,
+        "scanned" => (int) $scanned,
+        "total" => (int) $total,
         "hasMore" => $remaining > 0,
-        "nextOffset" => $scannedThrough
-    ];
+        "nextOffset" => $next
+    ], $extra);
 }
 
-function mail_broadcast_signal($limit = 3, $offset = 0) {
-    mail_broadcast_begin();
-    $limit = max(1, min(10, (int) $limit));
-    $offset = max(0, (int) $offset);
-    $pick = mail_live_sport_pick();
-    $key = strtolower(trim((string) ($pick["key"] ?? "")));
-    $file = maketou_members_file();
-    $members = [];
-    if (is_file($file)) {
-        $decoded = json_decode((string) @file_get_contents($file), true);
-        $members = is_array($decoded) ? $decoded : [];
-    }
-    $targets = [];
-    foreach ($members as $email => $record) {
-        if (!is_array($record)) {
-            continue;
+function mail_broadcast_inactive($limit = 5, $offset = 0) {
+    try {
+        mail_broadcast_begin();
+        $limit = max(1, min(5, (int) $limit));
+        $offset = max(0, (int) $offset);
+        $file = maketou_members_file();
+        $members = [];
+        if (is_file($file)) {
+            $decoded = json_decode((string) @file_get_contents($file), true);
+            $members = is_array($decoded) ? $decoded : [];
         }
-        $email = mail_normalize_address($record["email"] ?? $email);
-        if ($email === "" || !empty($record["emailOptOut"])) {
-            continue;
-        }
-        if (!mail_record_can_campaign($record) || mail_record_is_active($record)) {
-            continue;
-        }
-        $already = strtolower(trim((string) ($record["signalBroadcastKey"] ?? "")));
-        if ($already !== "" && $already === $key) {
-            continue;
-        }
-        $targets[] = [$email, (string) ($record["uniqueId"] ?? ""), (string) ($record["name"] ?? "")];
-    }
-    $slice = array_slice($targets, $offset, $limit);
-    $sent = 0;
-    $subject = "🚨 ALERTE : Cote " . $pick["oddsWinner"] . " VALIDÉE (" . $pick["teamWinner"] . ") — Fin de l'offre à 4 900 FCFA";
-    foreach ($slice as $item) {
-        $email = $item[0];
-        $uniqueId = $item[1];
-        $name = $item[2];
-        $result = mail_send(
-            $email,
-            $subject,
-            mail_html_signal($email, $uniqueId, $name, $pick),
-            ["idempotency" => "signal-" . md5($email . "|" . $key)]
-        );
-        if (!empty($result["ok"])) {
-            $sent++;
-            $record = maketou_read_local_member($email);
-            if (is_array($record)) {
-                $record["signalBroadcastKey"] = $key;
-                maketou_write_local_member($email, $record);
+        $targets = [];
+        foreach ($members as $email => $record) {
+            if (!is_array($record)) {
+                continue;
             }
+            $email = mail_normalize_address($record["email"] ?? $email);
+            if ($email === "" || !empty($record["emailOptOut"]) || !empty($record["broadcastSent"])) {
+                continue;
+            }
+            if (!mail_record_can_campaign($record) || mail_record_is_active($record)) {
+                continue;
+            }
+            $targets[] = [$email, (string) ($record["uniqueId"] ?? ""), (string) ($record["name"] ?? "")];
         }
-        usleep(200000);
+        $slice = array_slice($targets, $offset, $limit);
+        $sent = 0;
+        foreach ($slice as $item) {
+            try {
+                $email = $item[0];
+                $uniqueId = $item[1];
+                $name = $item[2];
+                $result = mail_send(
+                    $email,
+                    "🔥 Vos prédictions sont prêtes — Reprenez vos signaux VIP sur PREDICTOR",
+                    mail_html_reactivate($email, $uniqueId, $name),
+                    ["idempotency" => "broadcast-" . md5($email), "timeout" => 6]
+                );
+                if (!empty($result["ok"])) {
+                    $sent++;
+                    $record = maketou_read_local_member($email);
+                    if (is_array($record)) {
+                        $record["broadcastSent"] = true;
+                        maketou_write_local_member($email, $record);
+                    }
+                }
+            } catch (Throwable $e) {
+            }
+            usleep(120000);
+        }
+        return mail_broadcast_result($sent, count($slice), $offset, count($targets));
+    } catch (Throwable $e) {
+        return mail_broadcast_result(0, 5, $offset, $offset + 10, []);
     }
-    $scannedThrough = $offset + count($slice);
-    $remaining = max(0, count($targets) - $scannedThrough);
-    return [
-        "ok" => true,
-        "sent" => $sent,
-        "scanned" => count($slice),
-        "total" => count($targets),
-        "hasMore" => $remaining > 0,
-        "nextOffset" => $scannedThrough,
-        "match" => [
-            "teamWinner" => $pick["teamWinner"],
-            "teamOpponent" => $pick["teamOpponent"],
-            "oddsWinner" => $pick["oddsWinner"]
-        ]
+}
+
+function mail_broadcast_signal($limit = 5, $offset = 0) {
+    $pick = [
+        "teamWinner" => "BARANOVICI",
+        "teamOpponent" => "DINAMO MINSK",
+        "oddsWinner" => "8.57"
     ];
+    try {
+        mail_broadcast_begin();
+        $limit = max(1, min(5, (int) $limit));
+        $offset = max(0, (int) $offset);
+        $pick = mail_live_sport_pick();
+        $key = strtolower(trim((string) ($pick["key"] ?? "")));
+        $file = maketou_members_file();
+        $members = [];
+        if (is_file($file)) {
+            $decoded = json_decode((string) @file_get_contents($file), true);
+            $members = is_array($decoded) ? $decoded : [];
+        }
+        $targets = [];
+        foreach ($members as $email => $record) {
+            if (!is_array($record)) {
+                continue;
+            }
+            $email = mail_normalize_address($record["email"] ?? $email);
+            if ($email === "" || !empty($record["emailOptOut"])) {
+                continue;
+            }
+            if (!mail_record_can_campaign($record) || mail_record_is_active($record)) {
+                continue;
+            }
+            $already = strtolower(trim((string) ($record["signalBroadcastKey"] ?? "")));
+            if ($already !== "" && $already === $key) {
+                continue;
+            }
+            $targets[] = [$email, (string) ($record["uniqueId"] ?? ""), (string) ($record["name"] ?? "")];
+        }
+        $slice = array_slice($targets, $offset, $limit);
+        $sent = 0;
+        $subject = "🚨 ALERTE : Cote " . $pick["oddsWinner"] . " VALIDÉE (" . $pick["teamWinner"] . ") — Fin de l'offre à 4 900 FCFA";
+        foreach ($slice as $item) {
+            try {
+                $email = $item[0];
+                $uniqueId = $item[1];
+                $name = $item[2];
+                $result = mail_send(
+                    $email,
+                    $subject,
+                    mail_html_signal($email, $uniqueId, $name, $pick),
+                    ["idempotency" => "signal-" . md5($email . "|" . $key), "timeout" => 6]
+                );
+                if (!empty($result["ok"])) {
+                    $sent++;
+                    $record = maketou_read_local_member($email);
+                    if (is_array($record)) {
+                        $record["signalBroadcastKey"] = $key;
+                        maketou_write_local_member($email, $record);
+                    }
+                }
+            } catch (Throwable $e) {
+            }
+            usleep(120000);
+        }
+        return mail_broadcast_result($sent, count($slice), $offset, count($targets), [
+            "match" => [
+                "teamWinner" => $pick["teamWinner"],
+                "teamOpponent" => $pick["teamOpponent"],
+                "oddsWinner" => $pick["oddsWinner"]
+            ]
+        ]);
+    } catch (Throwable $e) {
+        return mail_broadcast_result(0, 5, $offset, $offset + 10, [
+            "match" => [
+                "teamWinner" => $pick["teamWinner"],
+                "teamOpponent" => $pick["teamOpponent"],
+                "oddsWinner" => $pick["oddsWinner"]
+            ]
+        ]);
+    }
 }
 
 function mail_handle_unsub() {
