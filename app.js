@@ -36,6 +36,7 @@ const CONFIG = {
 };
 
 const META_PIXEL_ID = "902325525891827";
+const META_PIXEL_IDS = ["902325525891827", "2575698122882923"];
 const META_LICENSE_EVENT = {
     value: 5.00,
     currency: "USD",
